@@ -1,27 +1,73 @@
-"""用 sherpa-onnx + Kokoro v1.1-zh 離線合成旁白，並依旁白長度排出場景時間軸。
+"""合成旁白，並依旁白長度排出場景時間軸。
 
-用法：python3 -I voice/tts.py <ep> <kokoro 模型資料夾>
+用法：
+  python3 -I voice/tts.py <ep> <kokoro 模型資料夾>   # 離線 Kokoro（sherpa-onnx）
+  python3 -I voice/tts.py <ep> elevenlabs            # ElevenLabs API
+    需要環境變數 ELEVENLABS_API_KEY；可選 ELEVENLABS_VOICE_ID（未設定時自動在語音庫找台灣口音男聲）
 輸出：voice/ep<ep>_voice.wav（整條旁白音軌）、voice/ep<ep>_timeline.js（場景與字幕時間）
 """
-import json, sys, wave
+import json, os, sys, wave, urllib.request, urllib.parse
 from pathlib import Path
 import numpy as np
-import sherpa_onnx
 
-ep, mdir = sys.argv[1], Path(sys.argv[2])
+ep, engine = sys.argv[1], sys.argv[2]
 here = Path(__file__).resolve().parent
 spec = json.loads((here / f'ep{ep}_lines.json').read_text())
 
-m = str(mdir) + '/'
-cfg = sherpa_onnx.OfflineTtsConfig(
-    model=sherpa_onnx.OfflineTtsModelConfig(
-        kokoro=sherpa_onnx.OfflineTtsKokoroModelConfig(
-            model=m + 'model.onnx', voices=m + 'voices.bin', tokens=m + 'tokens.txt',
-            data_dir=m + 'espeak-ng-data', dict_dir=m + 'dict',
-            lexicon=m + 'lexicon-us-en.txt,' + m + 'lexicon-zh.txt'),
-        num_threads=4),
-    rule_fsts=m + 'phone-zh.fst,' + m + 'date-zh.fst,' + m + 'number-zh.fst')
-tts = sherpa_onnx.OfflineTts(cfg)
+
+class Kokoro:
+    def __init__(self, mdir):
+        import sherpa_onnx
+        m = str(mdir) + '/'
+        cfg = sherpa_onnx.OfflineTtsConfig(
+            model=sherpa_onnx.OfflineTtsModelConfig(
+                kokoro=sherpa_onnx.OfflineTtsKokoroModelConfig(
+                    model=m + 'model.onnx', voices=m + 'voices.bin', tokens=m + 'tokens.txt',
+                    data_dir=m + 'espeak-ng-data', dict_dir=m + 'dict',
+                    lexicon=m + 'lexicon-us-en.txt,' + m + 'lexicon-zh.txt'),
+                num_threads=4),
+            rule_fsts=m + 'phone-zh.fst,' + m + 'date-zh.fst,' + m + 'number-zh.fst')
+        self.tts = sherpa_onnx.OfflineTts(cfg)
+
+    def say(self, line):
+        a = self.tts.generate(line['say'], sid=spec['voice_sid'], speed=spec['speed'])
+        return np.array(a.samples, dtype=np.float32), a.sample_rate
+
+
+class ElevenLabs:
+    API = 'https://api.elevenlabs.io'
+
+    def __init__(self):
+        self.key = os.environ['ELEVENLABS_API_KEY']
+        self.voice = os.environ.get('ELEVENLABS_VOICE_ID') or spec.get('elevenlabs_voice_id') or self.find_voice()
+        self.model = spec.get('elevenlabs_model', 'eleven_multilingual_v2')
+        self.prev = []
+        print('ElevenLabs voice', self.voice, 'model', self.model)
+
+    def req(self, path, body=None):
+        r = urllib.request.Request(self.API + path, data=json.dumps(body).encode() if body else None,
+                                   headers={'xi-api-key': self.key, 'Content-Type': 'application/json'})
+        with urllib.request.urlopen(r, timeout=120) as f:
+            return f.read()
+
+    def find_voice(self):
+        q = urllib.parse.urlencode({'language': 'zh', 'gender': 'male', 'age': 'young', 'page_size': 100})
+        voices = json.loads(self.req('/v1/shared-voices?' + q))['voices']
+        tw = [v for v in voices if 'taiwan' in json.dumps(v).lower()]
+        pick = (tw or voices)[0]
+        print('picked', pick.get('name'), pick.get('accent'), pick.get('description', '')[:80])
+        return pick['voice_id']
+
+    def say(self, line):
+        body = {'text': line.get('say_el', line['disp']), 'model_id': self.model,
+                'voice_settings': {'stability': .5, 'similarity_boost': .75, 'style': .2, 'speed': spec.get('el_speed', .95)},
+                'previous_text': ''.join(self.prev[-2:])}
+        pcm = self.req(f'/v1/text-to-speech/{self.voice}?output_format=pcm_24000', body)
+        self.prev.append(body['text'])
+        return np.frombuffer(pcm, '<i2').astype(np.float32) / 32768, 24000
+
+
+tts = ElevenLabs() if engine == 'elevenlabs' else Kokoro(Path(engine))
 
 LEAD_FIRST, LEAD, GAP, TAIL, TAIL_LAST = 1.0, .6, .45, .9, 4.0
 sr = None
@@ -36,9 +82,8 @@ for si, lines in enumerate(spec['scenes']):
     t += LEAD_FIRST if si == 0 else LEAD
     out = []
     for li, ln in enumerate(lines):
-        a = tts.generate(ln['say'], sid=spec['voice_sid'], speed=spec['speed'])
-        sr = a.sample_rate
-        x = trim(np.array(a.samples, dtype=np.float32))
+        x, sr = tts.say(ln)
+        x = trim(x)
         d = len(x) / sr
         out.append({'t0': round(t - s0, 3), 't1': round(t - s0 + d, 3), 'disp': ln['disp'], 'say': ln['say']})
         track.append((t, x))
