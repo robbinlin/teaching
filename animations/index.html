@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>統計手繪動畫</title>
+<link rel="stylesheet" href="fonts/iansui/400.css">
+<link rel="stylesheet" href="fonts/400.css">
+<link rel="stylesheet" href="fonts/700.css">
+<style>html,body{margin:0;background:#222}canvas{display:block;width:100vw;height:auto}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script src="engine.js"></script>
+<script src="characters.js"></script>
+<script src="props.js"></script>
+<script src="audio.js"></script>
+<script src="episodes.js"></script>
+<script>
+const qs = new URLSearchParams(location.search);
+const EP = EPISODES[qs.get('ep') || '1'];
+ctx = document.getElementById('c').getContext('2d');
+const XFADE = .35;
+
+function drawScene(sc, lt, alpha) {
+  ALPHA = alpha;
+  SEED = 1000 * (EP.scenes.indexOf(sc) + 1);
+  sc.draw(lt, sc.t1 - sc.t0);
+  SEED = 900000 + 1000 * EP.scenes.indexOf(sc);
+  subtitle(sc.sub, lt, sc.t1 - sc.t0);
+}
+function renderFrame(t) {
+  T = t; BOIL = Math.floor(t * BOIL_RATE);
+  ALPHA = 1;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  drawPaper();
+  const i = EP.scenes.findIndex(s => t >= s.t0 && t < s.t1);
+  const idx = i < 0 ? EP.scenes.length - 1 : i;
+  const sc = EP.scenes[idx], lt = t - sc.t0;
+  if (idx > 0 && lt < XFADE) {
+    const pv = EP.scenes[idx - 1];
+    drawScene(pv, pv.t1 - pv.t0 - .001, 1 - ease(lt / XFADE));
+    drawScene(sc, lt, ease(lt / XFADE));
+  } else drawScene(sc, lt, 1);
+  ALPHA = 1; SEED = 990000;
+  episodeTag(EP.tag);
+  const k = ease((t - (EP.dur - 3.6)) / .4);
+  sourceCard(EP.sources, k);
+  // fade from/to paper at the very start and end
+  const f = Math.min(clamp(t / .25), clamp((EP.dur - t) / .4));
+  if (f < 1) { ctx.globalAlpha = 1 - f; ctx.fillStyle = '#f4ead3'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+}
+async function warmup() {
+  for (let t = 0; t < EP.dur; t += .25) renderFrame(t);
+  await document.fonts.ready;
+  await new Promise(r => setTimeout(r, 300));
+  for (let t = 0; t < EP.dur; t += .25) renderFrame(t);
+  await document.fonts.ready;
+  return [...document.fonts].filter(f => f.status === 'loaded').length;
+}
+function frameJPEG(t) { renderFrame(t); return document.getElementById('c').toDataURL('image/jpeg', .94); }
+window.READY = (async () => { await warmup(); return true; })();
+if (qs.get('play')) { const st = performance.now(); (function loop() { renderFrame(((performance.now() - st) / 1000) % EP.dur); requestAnimationFrame(loop); })(); }
+else if (qs.get('t')) window.READY.then(() => renderFrame(+qs.get('t')));
+</script>
+</body>
+</html>
