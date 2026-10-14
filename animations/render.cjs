@@ -26,12 +26,19 @@ const FPS = 30;
       fs.writeFileSync(path.join(OUT, 'preview', `ep${ep}_${t.toFixed(2)}.jpg`), Buffer.from(b64.split(',')[1], 'base64'));
     }
   } else {
-    const wav = await page.evaluate(async () => renderMusic(EP.music, EP.dur));
+    const wav = await page.evaluate(async () => renderMusic((S, d) => EP.music(S, d, EP.scenes.map(s => s.t0)), EP.dur));
     const wavPath = path.join(OUT, `ep${ep}.wav`);
     fs.writeFileSync(wavPath, Buffer.from(wav, 'base64'));
     const mp4 = path.join(OUT, `ep${ep}.mp4`);
+    // narrated version: duck the music under the voice track
+    const voice = path.join(__dirname, 'voice', `ep${ep.replace('v', '')}_voice.wav`);
+    const audioArgs = ep.endsWith('v')
+      ? ['-i', wavPath, '-i', voice, '-filter_complex',
+        '[2:a]aresample=44100,pan=stereo|c0=c0|c1=c0,volume=1.3,asplit=2[v1][v2];[1:a]volume=0.55[m];[m][v1]sidechaincompress=threshold=0.03:ratio=8:attack=15:release=350[d];[d][v2]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100[a]',
+        '-map', '0:v', '-map', '[a]']
+      : ['-i', wavPath, '-map', '0:v', '-map', '1:a'];
     const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-      '-i', wavPath, '-map', '0:v', '-map', '1:a', '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p',
+      ...audioArgs, '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p',
       '-c:a', 'aac', '-b:a', '192k', '-t', String(dur), '-movflags', '+faststart', mp4], { stdio: ['pipe', 'inherit', 'inherit'] });
     const n = Math.round(dur * FPS);
     const t0 = Date.now();

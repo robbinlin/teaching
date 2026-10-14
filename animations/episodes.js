@@ -23,7 +23,7 @@ const EP1 = {
   tag: '高等體育統計｜EP1 平均數比一比：t 檢定', dur: 30,
   sources: ['資料來源', 'Wikipedia〈William Sealy Gosset〉', 'The Conversation〈The genius at Guinness…〉', '林老師講義〈單樣本及雙樣本檢定〉p.7–11'],
   scenes: [
-    { t0: 0, t1: 5, sub: '1908 年，健力士酒廠的 Gosset 只有少少樣本，卻要判斷原料好不好',
+    { t0: 0, t1: 5, beats: [0, 1.8, 2.5], sub: '1908 年，健力士酒廠的 Gosset 只有少少樣本，卻要判斷原料好不好',
       draw(lt) {
         ground(lt);
         brewery(230, GY, 1.1, easeOut(prog(lt, .1, 1.4)));
@@ -31,12 +31,12 @@ const EP1 = {
         underline(760, 1200, 225, { p: prog(lt, 1, .5), color: COL.mustardD });
         barrel(1450, GY, 1.0); barrel(1620, GY, .9);
         appear(prog(lt, .6, .4), () => barrel(1535, GY - 110, .85));
-        [0, 1, 2].forEach(i => barley(640 + i * 34, GY, .9, Math.sin(lt * 2 + i) * .05));
+        [0, 1, 2].forEach(i => barley(640 + i * 34, GY, .9, Math.sin(RLT * 2 + i) * .05));
         const g = appear(prog(lt, .4, .5), () => gosset(980, GY, .95, { ra: [-.7, -1.75], la: [P / 2 + .3, P / 2 - .4], look: 1, mouth: lt > 2.5 ? 'o' : 'flat', brow: lt > 2.5 ? 1 : 0 }));
         if (g) beerGlass(g.rh[0] + 4, g.rh[1] + 18, .75, 1);
         bubble(1330, 330, 300, 120, 1070, 360, '只有 n = 4 ？', 44, prog(lt, 2.2, .5));
       } },
-    { t0: 5, t1: 10, sub: '公司不准用本名發表，他署名「Student」，t 分配就此誕生',
+    { t0: 5, t1: 10, beats: [0, .35, 1.6], sub: '公司不准用本名發表，他署名「Student」，t 分配就此誕生',
       draw(lt) {
         paperSheet(760, 465, 1060, 640, -.015);
         const pw = txt('Student', 470, 255, 120, { p: prog(lt, .4, 1.3), color: INK, align: 'center' });
@@ -61,11 +61,11 @@ const EP1 = {
         });
         gosset(1610, GY, .78, { ra: [-.9, -2.1], la: [P / 2 + .3, P / 2 + .1], mouth: 'smile', look: -1 });
       } },
-    { t0: 10, t1: 16, sub: '單樣本 t 檢定：一組的平均數，和一個已知標準值比',
+    { t0: 10, t1: 16, beats: [0, .6, 3.8], sub: '單樣本 t 檢定：一組的平均數，和一個已知標準值比',
       draw(lt) {
         ground(lt, 140, 560);
-        const d = dad(330, GY, .92, { ra: [-.5, -1.9], la: [P / 2 + .3, P / 2 + .15], mouth: lt > 4 ? 'smile' : 'flat', look: 1, bob: idle(lt) * .3 });
-        stopwatch(d.rh[0] + 10, d.rh[1] - 40, 46, lt);
+        const d = dad(330, GY, .92, { ra: [-.5, -1.9], la: [P / 2 + .3, P / 2 + .15], mouth: lt > 4 ? 'smile' : 'flat', look: 1, bob: idle(RLT) * .3 });
+        stopwatch(d.rh[0] + 10, d.rh[1] - 40, 46, RLT);
         const X = v => 700 + (v - 6) / 8 * 1000, AY = 700;
         axis(660, 1760, AY, { p: prog(lt, .2, .6) });
         for (let v = 6; v <= 14; v += 2) { inkLine(X(v), AY - 8, X(v), AY + 8, { w: 3, p: prog(lt, .6, .2) }); txt(String(v), X(v), AY + 36, 30, { p: prog(lt, .6, .3) }); }
@@ -90,11 +90,11 @@ const EP1 = {
           ctx.restore();
         });
       } },
-    { t0: 16, t1: 22, sub: '獨立雙樣本 t 檢定：兩組「不同的人」比平均數',
+    { t0: 16, t1: 22, beats: [0, .3, 2.6], sub: '獨立雙樣本 t 檢定：兩組「不同的人」比平均數',
       draw(lt) {
         ground(lt);
-        dad(300, GY, .85, { ra: [-.25, -.35], rhand: 'open', mouth: 'smile', look: 1, bob: idle(lt) * .3 });
-        mom(1640, GY, .85, { la: [P + .25, P + .35], lhand: 'open', look: -1, bob: idle(lt, 1) * .3 });
+        dad(300, GY, .85, { ra: [-.25, -.35], rhand: 'open', mouth: 'smile', look: 1, bob: idle(RLT) * .3 });
+        mom(1640, GY, .85, { la: [P + .25, P + .35], lhand: 'open', look: -1, bob: idle(RLT, 1) * .3 });
         const base = 760, h1 = 380 * easeOut(prog(lt, .4, 1.2)), h2 = 300 * easeOut(prog(lt, .7, 1.2));
         inkLine(620, base, 1300, base, { w: 4.5, p: prog(lt, .2, .4) });
         bar(800, base, 170, h1, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 16 });
@@ -116,10 +116,10 @@ const EP1 = {
           ctx.restore();
         });
       } },
-    { t0: 22, t1: 27, sub: '成對 t 檢定：同一批人「訓練前、後」比，看的是差值 d',
+    { t0: 22, t1: 27, beats: [0, .1, 2.0], sub: '成對 t 檢定：同一批人「訓練前、後」比，看的是差值 d',
       draw(lt) {
         ground(lt, 140, 600);
-        const jump = Math.max(0, Math.sin(lt * 5)) * 46;
+        const jump = Math.max(0, Math.sin(RLT * 5)) * 46;
         kid(330, GY, 1.35, { bob: -jump, liftL: jump > 10 ? 10 : 0, liftR: jump > 10 ? 10 : 0, mouth: jump > 20 ? 'open' : 'smile' });
         const Y = v => 760 - (v - 28) / 24 * 460, xa = 820, xb = 1220;
         ink([[xa, 300], [xa, 770]], { w: 4, p: prog(lt, .1, .4) }); ink([[xb, 300], [xb, 770]], { w: 4, p: prog(lt, .1, .4) });
@@ -143,46 +143,42 @@ const EP1 = {
           ctx.restore();
         });
       } },
-    { t0: 27, t1: 30, sub: '比平均數前先問：比標準值？兩組不同人？同一批人前後？',
+    { t0: 27, t1: 30, beats: [0, .7, 1.3], sub: '比平均數前先問：比標準值？兩組不同人？同一批人前後？',
       draw(lt) {
         ground(lt, 140, 1000);
         txt('t 檢定三兄弟', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
         underline(330, 790, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
         txt('單樣本・獨立樣本・成對樣本', 560, 275, 40, { p: prog(lt, .7, .6), color: COL.blue });
-        dad(330, GY, .8, DANCE_DAD(lt));
-        kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(lt * 6)) * 20 });
-        mom(790, GY, .8, DANCE_MOM(lt));
+        dad(330, GY, .8, DANCE_DAD(RLT));
+        kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 });
+        mom(790, GY, .8, DANCE_MOM(RLT));
       } }
   ],
-  music(S, dur) {
-    const bpm = 112, b = 60 / bpm;
-    const uke = S.bus(.42, -.25, .25), wh = S.bus(.5, .2, .5), bass = S.bus(.5, 0, .05), perc = S.bus(.35, .15, .1), sfx = S.bus(.5, 0, .3);
+  music(S, dur, starts = [0, 5, 10, 16, 22, 27]) {
+    const bpm = 112, b = 60 / bpm, voiced = dur > 40;
+    const uke = S.bus(.42, -.25, .25), wh = S.bus(voiced ? .3 : .5, .2, .5), bass = S.bus(.5, 0, .05), perc = S.bus(.35, .15, .1), sfx = S.bus(.5, 0, .3);
     const prog4 = [['C4', 'E4', 'G4', 'C5'], ['B3', 'D4', 'G4', 'B4'], ['C4', 'E4', 'A4', 'C5'], ['C4', 'F4', 'A4', 'C5']].map(c => c.map(NOTE));
     const roots = ['C3', 'G2', 'A2', 'F2'].map(NOTE);
     const bars = Math.floor(dur / (4 * b));
     for (let bar = 0; bar < bars; bar++) {
       const t0 = bar * 4 * b, ch = prog4[bar % 4];
-      // strum: D . D U . U D U
       [[0, 1, .5], [1, 1, .38], [1.5, 0, .3], [2.5, 0, .3], [3, 1, .4], [3.5, 0, .3]].forEach(([bt, d, v]) => S.strum(t0 + bt * b, ch, v, uke, !!d));
       S.bass(t0, roots[bar % 4], b * 1.6, .55, bass); S.bass(t0 + 2 * b, roots[bar % 4] + 7, b * 1.4, .45, bass);
       for (let i = 0; i < 4; i++) S.noise(t0 + i * b + b / 2, .05, .12, perc, 'highpass', 6000, .7);
       if (bar % 2 === 1) S.kick(t0, .25, perc);
     }
-    // whistle melody (2 phrases) from bar 1
     const mel = [
       [0, 'E5', 1], [1, 'G5', 1], [2, 'A5', .5], [2.5, 'G5', .5], [3, 'E5', 1],
       [4, 'D5', 1], [5, 'D5', .5], [5.5, 'E5', .5], [6, 'D5', 1], [7, 'B4', 1],
       [8, 'C5', 1], [9, 'E5', 1], [10, 'A5', 1.5], [11.5, 'G5', .5],
       [12, 'A5', 1], [13, 'G5', .5], [13.5, 'F5', .5], [14, 'E5', 1], [15, 'C5', 1]
     ];
-    const ends = [[0, 'G5', 1], [1, 'E5', 1], [2, 'D5', 1], [3, 'C5', 1]];
-    for (let rep = 0; rep < 3; rep++) {
-      const off = (1 + rep * 4) * 4 * b; if (off > dur - 4) break;
-      mel.forEach(([bt, n, l]) => { const t = off + bt * b; if (t < dur - 2.5) S.whistle(t, NOTE(n) + (rep === 1 ? 0 : 0), l * b * .92, .2, wh); });
-    }
-    ends.forEach(([bt, n, l]) => S.whistle(13 * 4 * b + bt * b, NOTE(n), l * b * .9, .18, wh));
-    S.bell(27 * 1 + .05, NOTE('C6'), .25, sfx); S.bell(27.25, NOTE('E6'), .2, sfx); S.bell(27.5, NOTE('G6'), .2, sfx);
-    [5, 10, 16, 22, 27].forEach(t => S.whoosh(t - .25, .35, .12, sfx));
+    // whistle phrase every other 4-bar block (every block when there is no narration)
+    for (let blk = 1; (blk * 4 + 4) * 4 * b < dur - 3; blk += voiced ? 2 : 1)
+      mel.forEach(([bt, n, l]) => S.whistle(blk * 16 * b + bt * b, NOTE(n), l * b * .92, .2, wh));
+    const last = starts[starts.length - 1];
+    S.bell(last + .05, NOTE('C6'), .25, sfx); S.bell(last + .3, NOTE('E6'), .2, sfx); S.bell(last + .55, NOTE('G6'), .2, sfx);
+    starts.slice(1).forEach(t => S.whoosh(t - .25, .35, .12, sfx));
   }
 };
 

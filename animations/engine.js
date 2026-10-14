@@ -9,7 +9,7 @@ const COL = {
 };
 const FONT = '"Iansui", "LXGW WenKai TC", "WenQuanYi Zen Hei", sans-serif';
 
-let ctx, BOIL = 0, T = 0, SEED = 1, ALPHA = 1;
+let ctx, BOIL = 0, T = 0, SEED = 1, ALPHA = 1, RLT = 0; // RLT: real (unstretched) scene time for idle motion
 
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 const lerp = (a, b, k) => a + (b - a) * k;
@@ -201,9 +201,15 @@ function txt(s, x, y, size, o = {}) {
 }
 function measure(s, size, weight = 700) { ctx.save(); setFont(size, weight); const w = ctx.measureText(s).width; ctx.restore(); return w; }
 function wrapText(s, size, maxW) {
+  const chars = [...s], total = measure(s, size);
+  if (total <= maxW) return [s];
+  // balanced lines; never start a line with closing punctuation
+  const n = Math.ceil(total / maxW), target = total / n + size * .5;
+  const closing = '。，、）」』？！：；…,.)';
   const lines = []; let cur = '';
-  for (const ch of [...s]) {
-    if (measure(cur + ch, size) > maxW && cur) { lines.push(cur); cur = ch.trim() ? ch : ''; } else cur += ch;
+  for (const ch of chars) {
+    if (cur && measure(cur + ch, size) > target && lines.length < n - 1 && !closing.includes(ch)) { lines.push(cur); cur = ch.trim() ? ch : ''; }
+    else cur += ch;
   }
   if (cur) lines.push(cur);
   return lines;

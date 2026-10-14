@@ -16,17 +16,44 @@
 <script src="audio.js"></script>
 <script src="episodes.js"></script>
 <script>
+const TIMELINES = {};
 const qs = new URLSearchParams(location.search);
-const EP = EPISODES[qs.get('ep') || '1'];
+const EPKEY = qs.get('ep') || '1';
+// "1v" = 第 1 支的配音版：場景時間由旁白決定
+if (EPKEY.endsWith('v')) document.write('<script src="voice/ep' + EPKEY.slice(0, -1) + '_timeline.js"><\/script>');
+</script>
+<script>
+// piecewise map from narrated scene time to the original animation time, keyed on each line's beat
+function narrated(base, tl) {
+  const scenes = base.scenes.map((b, i) => {
+    const s = tl.scenes[i], o = b.t1 - b.t0, beats = b.beats || s.lines.map((_, j) => j * o / s.lines.length);
+    const pts = [[0, 0]];
+    s.lines.forEach((l, j) => pts.push([l.t0, Math.max(beats[j], pts[pts.length - 1][1])]));
+    pts.push([s.lines[s.lines.length - 1].t1, o - .001]);
+    const map = lt => {
+      for (let j = 1; j < pts.length; j++) if (lt < pts[j][0]) return lerp(pts[j - 1][1], pts[j][1], (lt - pts[j - 1][0]) / Math.max(1e-6, pts[j][0] - pts[j - 1][0]));
+      return o - .001;
+    };
+    return { t0: s.t0, t1: s.t1, lines: s.lines, draw(lt) { b.draw(map(lt), o); } };
+  });
+  return { ...base, dur: tl.dur, scenes, voiced: true };
+}
+const EP = EPKEY.endsWith('v') ? narrated(EPISODES[EPKEY.slice(0, -1)], TIMELINES[EPKEY.slice(0, -1)]) : EPISODES[EPKEY];
 ctx = document.getElementById('c').getContext('2d');
 const XFADE = .35;
 
 function drawScene(sc, lt, alpha) {
   ALPHA = alpha;
   SEED = 1000 * (EP.scenes.indexOf(sc) + 1);
+  RLT = lt;
   sc.draw(lt, sc.t1 - sc.t0);
   SEED = 900000 + 1000 * EP.scenes.indexOf(sc);
-  subtitle(sc.sub, lt, sc.t1 - sc.t0);
+  if (!sc.lines) return subtitle(sc.sub, lt, sc.t1 - sc.t0);
+  const L = sc.lines, D = sc.t1 - sc.t0;
+  for (let j = 0; j < L.length; j++) {
+    const a = j === 0 ? 0 : L[j].t0 - .12, b = j === L.length - 1 ? D : L[j + 1].t0 - .12;
+    if (lt >= a && lt < b) { subtitle(L[j].disp, lt - a, b - a); break; }
+  }
 }
 function renderFrame(t) {
   T = t; BOIL = Math.floor(t * BOIL_RATE);
