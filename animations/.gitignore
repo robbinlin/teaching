@@ -1,3 +1,4 @@
 out/
 node_modules/
 voice/*.wav
+voice/cache/

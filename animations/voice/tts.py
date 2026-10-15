@@ -59,10 +59,21 @@ class ElevenLabs:
         return pick['voice_id']
 
     def say(self, line):
-        body = {'text': line.get('say_el', line['disp']), 'model_id': self.model,
-                'voice_settings': {'stability': .5, 'similarity_boost': .75, 'style': .2, 'speed': spec.get('el_speed', .95)},
-                'previous_text': ''.join(self.prev[-2:])}
+        # cache each sentence so one bad take can be redone by deleting its file in voice/cache/
+        import hashlib
+        text = line.get('say_el', line['disp'])
+        cache = here / 'cache' / (hashlib.md5(f'{self.voice}|{self.model}|{text}'.encode()).hexdigest() + '.pcm')
+        if cache.exists():
+            return np.frombuffer(cache.read_bytes(), '<i2').astype(np.float32) / 32768, 24000
+        cache.parent.mkdir(exist_ok=True)
+        body = {'text': text, 'model_id': self.model}
+        if self.model == 'eleven_v3':  # v3 takes only stability (0 / .5 / 1) and no request stitching
+            body['voice_settings'] = {'stability': .5}
+        else:
+            body['voice_settings'] = {'stability': .5, 'similarity_boost': .75, 'style': .2, 'speed': spec.get('el_speed', .95)}
+            body['previous_text'] = ''.join(self.prev[-2:])
         pcm = self.req(f'/v1/text-to-speech/{self.voice}?output_format=pcm_24000', body)
+        cache.write_bytes(pcm)
         self.prev.append(body['text'])
         return np.frombuffer(pcm, '<i2').astype(np.float32) / 32768, 24000
 
