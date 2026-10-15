@@ -850,3 +850,186 @@ const C1E1 = (() => {
     sources: ['資料來源', 'Galton (1907) Vox Populi, Nature；Wallis (2014) arXiv:1410.3989', '主計總處 受雇員工薪資統計（講義 p.15）', '課堂資料：lung cancer study（478 位）', '林老師講義〈第一章 描述資料特徵的統計量及圖表〉'] };
 })();
 EPISODES['c1e1'] = C1E1;
+
+// ============ 第 1 章 EP2：分散程度（全距、IQR、標準差、盒鬚圖） ============
+const SURV = { n: 469, min: 0.03, q1: 23.2, med: 45.8, q3: 73.2, max: 204, whi: 145.8, out: [150.2, 153.3, 153.9, 157.5, 157.7, 159.6, 159.9, 162.6, 168.1, 175.9, 204.0] };
+const SITES = [['DFCI', 82, 4.0, 26.5, 51.0, 78.25, 110.0, []], ['HLM', 92, 0.03, 16.2, 38.2, 70.4, 150.2, []], ['MI', 188, 2.2, 22.6, 53.4, 78.6, 162.6, [168.1, 175.9]], ['MSKCC', 107, 2.0, 30.5, 43.0, 62.0, 100.0, [114, 115, 204]]];
+function boxH(x, y, w, X, s, k, col) { // horizontal box plot: s = {min,q1,med,q3,whi,out}
+  const a = ALPHA; ALPHA *= k;
+  ink([[X(s.min), y], [X(s.q1), y]], { w: 4, color: col }); ink([[X(s.q3), y], [X(s.whi), y]], { w: 4, color: col });
+  inkLine(X(s.min), y - 18, X(s.min), y + 18, { w: 4, color: col }); inkLine(X(s.whi), y - 18, X(s.whi), y + 18, { w: 4, color: col });
+  shape(rectPts(X(s.q1), y - w / 2, X(s.q3) - X(s.q1), w), { fill: COL.blueL, smooth: false, w: 4, pattern: 'hatch', patColor: COL.blue, sp: 16 });
+  inkLine(X(s.med), y - w / 2, X(s.med), y + w / 2, { w: 6, color: COL.red });
+  (s.out || []).forEach(o => inkEll(X(o), y, 9, 9, { w: 3, color: col }));
+  ALPHA = a;
+}
+const C1E2 = (() => {
+  const s1 = { beats: [0, 1.4, 3.4], draw(lt) {
+    ground(lt);
+    txt('兩隊的平均身高都是 180 cm', 960, 150, 50, { p: prog(lt, .2, .9), color: COL.black });
+    const teams = [[420, [180, 181, 179, 180, 180], COL.blueL, '整齊'], [1300, [160, 200, 170, 195, 175], COL.pinkL, '參差']];
+    teams.forEach(([x0, hs, col, lab], ti) => {
+      hs.forEach((h, i) => { const k = prog(lt, .4 + ti * 1.0 + i * .12, .4); appear(k, () => mini(x0 + i * 110, GY - (h - 150) * 3 + 64, (h - 150) / 30 * .9 + .6, col, ti ? 'dots' : undefined)); });
+      ink([[x0 - 70, GY - 90 - 20], [x0 + 4 * 110 + 70, GY - 90 - 20]], { w: 3, color: COL.gray, alpha: .6, p: prog(lt, 1.4 + ti * 1.0, .4) });
+      txt(lab, x0 + 220, 330, 44, { color: ti ? COL.red : COL.green, p: prog(lt, 1.6 + ti * 1.0, .5) });
+    });
+    txt('平均 180', 1040, GY - 110, 30, { color: COL.gray, p: prog(lt, 1.5, .4) });
+    noteBox(960, 250, 760, 80, [['集中趨勢一樣，分散程度不一樣', 36, COL.red]], '#fff8e2', prog(lt, 3.6, .6));
+  } };
+  const s2 = { beats: [0, 1.6, 4.2, 6.6], draw(lt) {
+    ground(lt, 140, 440);
+    mom(250, GY, .85, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    txt('469 位肺癌病人的存活月數（課堂資料）', 1160, 150, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 560 + v / 210 * 1180, y = 560;
+    axis(540, 1780, y + 60, { p: prog(lt, .4, .5) });
+    [0, 30, 60, 90, 120, 150, 180, 210].forEach(v => { inkLine(X(v), y + 52, X(v), y + 68, { w: 3, p: prog(lt, .5, .3) }); txt(String(v), X(v), y + 96, 26, { p: prog(lt, .5, .3) }); });
+    // strip of dots (schematic from histogram counts)
+    const H = [69, 80, 82, 62, 70, 40, 26, 16, 12, 1, 8, 2, 0, 1];
+    const kd = prog(lt, .6, 1.4);
+    H.forEach((n, bi) => { for (let j = 0; j < Math.min(n, 14); j++) { const k = prog(kd, (bi * 14 + j) / 196, .05); if (k <= 0) return; shape(ellPts(X(bi * 15 + 2 + (j % 7) * 2), y - (j % 7) * 0 - Math.floor(j / 7) * 14 + 20, 5, 5, 0, 7, 8), { fill: COL.blueL, w: 1.5, alpha: k }); } });
+    const kr = prog(lt, 1.7, .8);
+    if (kr > 0) { arrow(X(0), y - 170, X(204), y - 170, { w: 4, head: 16, p: kr, color: COL.mustardD }); txt('全距 = 204 − 0.03 ≈ 204 個月', X(100), y - 205, 34, { color: COL.mustardD, p: kr }); }
+    const kq = prog(lt, 4.3, .9);
+    [[SURV.q1, 'Q1 = 23.2'], [SURV.med, '中位數 45.8'], [SURV.q3, 'Q3 = 73.2']].forEach(([v, lab], i) => { const k = prog(lt, 4.3 + i * .5, .5); if (k > 0) { ink([[X(v), y + 50], [X(v), y - 30]], { w: 5, color: i === 1 ? COL.red : COL.green, p: k }); txt(lab, X(v), y - 50 - (i === 1 ? 30 : 0), 30, { color: i === 1 ? COL.red : COL.green, p: k }); } });
+    const ki = prog(lt, 6.7, .8);
+    if (ki > 0) { fillShape(rectPts(X(SURV.q1), y + 40, X(SURV.q3) - X(SURV.q1), 16), COL.greenL, { alpha: ki * .9 }); txt('IQR = 73.2 − 23.2 = 50：中間 50% 的人', X(48), y + 150, 36, { color: COL.green, p: ki }); }
+  } };
+  const EX = [110, 98, 110, 66, 29];
+  const s3 = { beats: [0, 1.6, 5.4], draw(lt) {
+    txt('標準差（SD）', 960, 140, 50, { p: prog(lt, .2, .6), color: COL.black });
+    appear(prog(lt, .4, .8), () => { ctx.save(); ctx.translate(960, 250); shape(rectPts(-520, -50, 1040, 100), { fill: '#fff8e2', smooth: false, w: 3.5 }); txt('SD = √[ Σ(xᵢ − 平均)² ÷ (n − 1) ]', 0, 2, 44, { color: COL.black }); ctx.restore(); });
+    const m = 82.6, y0 = 400;
+    txt('5 位病人', 330, y0 - 50, 32, { color: COL.gray, p: prog(lt, 1.7, .3) });
+    EX.forEach((v, i) => {
+      const k = prog(lt, 1.8 + i * .25, .4), y = y0 + i * 62;
+      appear(k, () => { txt(String(v), 330, y, 36); txt('− 82.6 =', 470, y, 30, { color: COL.gray }); txt((v - m).toFixed(1), 620, y, 32, { color: COL.blue }); txt('→ ²', 720, y, 30, { color: COL.gray }); txt(((v - m) ** 2).toFixed(1), 850, y, 32, { color: COL.pink }); });
+    });
+    const ks = prog(lt, 3.2, .6);
+    if (ks > 0) { inkLine(790, y0 + 4 * 62 + 32, 920, y0 + 4 * 62 + 32, { w: 3, p: ks }); txt('Σ = 4,887.2', 850, y0 + 5 * 62 + 10, 32, { color: COL.pink, p: ks }); }
+    noteBox(1380, 520, 760, 150, [['4,887.2 ÷ 4 = 1,221.8', 38], ['√1,221.8 = 35.0 個月', 44, COL.green]], COL.white, prog(lt, 4.0, .7));
+    noteBox(1380, 780, 760, 130, [['全部 469 位：SD = 35.8 個月', 38, COL.blue], ['變異數 = SD² = 1,280', 36, COL.gray]], '#fff8e2', prog(lt, 5.6, .7));
+    dad(1800, GY, .6, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: 'smile' });
+  } };
+  const s4 = { beats: [0, 2.0, 5.0], draw(lt) {
+    ground(lt, 140, 460);
+    tukey(250, GY, .9, { ra: [-.5, -1.3], la: [P / 2 + .3, P / 2 + .1], look: 1, mouth: 'smile' });
+    txt('1977・Tukey 的盒鬚圖（Box-and-Whisker Plot）', 1160, 150, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 560 + v / 210 * 1180, y = 520;
+    axis(540, 1780, y + 150, { p: prog(lt, .4, .5) });
+    [0, 30, 60, 90, 120, 150, 180, 210].forEach(v => { inkLine(X(v), y + 142, X(v), y + 158, { w: 3, p: prog(lt, .5, .3) }); txt(String(v), X(v), y + 186, 26, { p: prog(lt, .5, .3) }); });
+    const kb = prog(lt, 2.1, 1.2);
+    if (kb > 0) {
+      const s = { ...SURV, out: lt > 5.2 ? SURV.out : [] };
+      boxH(0, y, 120, X, s, kb, INK);
+      appear(prog(lt, 2.6, .5), () => { txt('Q1 23.2', X(SURV.q1), y - 95, 28, { color: COL.green }); txt('中位數 45.8', X(SURV.med), y + 95, 28, { color: COL.red }); txt('Q3 73.2', X(SURV.q3), y - 95, 28, { color: COL.green }); });
+      appear(prog(lt, 3.4, .5), () => { arrow(X(SURV.q1), y - 130, X(SURV.q3), y - 130, { w: 3.5, head: 12, color: COL.green }); arrow(X(SURV.q3), y - 130, X(SURV.q1), y - 130, { w: 3.5, head: 12, color: COL.green }); txt('盒長 = IQR = 50', X(48), y - 160, 30, { color: COL.green }); });
+    }
+    const ko = prog(lt, 5.1, .7);
+    if (ko > 0) { ink([[X(148.2), y + 140], [X(148.2), y - 60]], { w: 4, color: COL.red, p: ko }); txt('Q3 + 1.5 IQR = 148.2', X(148.2), y - 85, 28, { color: COL.red, p: ko }); txt('11 位界外值 o', X(178), y - 40, 30, { color: COL.red, p: prog(lt, 5.8, .5) }); txt('鬚線到 145.8', X(110), y + 60, 26, { color: COL.gray, p: prog(lt, 5.5, .5) }); }
+  } };
+  const s5 = { beats: [0, 1.8, 5.0], draw(lt) {
+    txt('四家醫院的存活月數', 960, 140, 50, { p: prog(lt, .2, .8), color: COL.black });
+    const X = v => 440 + v / 210 * 920;
+    axis(420, 1400, 860, { p: prog(lt, .3, .5) });
+    [0, 30, 60, 90, 120, 150, 180, 210].forEach(v => { inkLine(X(v), 852, X(v), 868, { w: 3, p: prog(lt, .4, .3) }); txt(String(v), X(v), 896, 26, { p: prog(lt, .4, .3) }); });
+    SITES.forEach(([name, n, mn, q1, md, q3, whi, out], i) => {
+      const y = 260 + i * 150, k = prog(lt, .5 + i * .4, .7);
+      txt(`${name}（${n}）`, 470, y, 30, { align: 'right', p: k });
+      boxH(0, y, 80, X, { min: mn, q1, med: md, q3, whi, out }, k, INK);
+    });
+    const k2 = prog(lt, 1.9, .6);
+    if (k2 > 0) { txt('中位數 38', X(38.2), 410 + 60, 26, { color: COL.red, p: k2 }); txt('中位數 53', X(53.4), 560 + 60, 26, { color: COL.red, p: k2 }); }
+    const k3 = prog(lt, 3.0, .6);
+    if (k3 > 0) ink(ellPts(X(46), 710, X(62) - X(30) + 60, 70, -P / 2, -P / 2 + 2 * P * k3, 40), { w: 5, color: COL.mustardD });
+    txt('盒子最短 → 分散最小', X(100), 795, 28, { color: COL.mustardD, p: prog(lt, 3.4, .5) });
+    noteBox(1430, 190, 820, 80, [['全距・IQR・標準差・盒鬚圖', 36, COL.blue]], '#fff8e2', prog(lt, 5.1, .6));
+  } };
+  const order = [[s1, 6], [s2, 9], [s3, 8], [s4, 8], [s5, 7]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP2, dur: t, tag: '高等體育統計｜第 1 章 EP2　分散程度：全距、IQR、標準差、盒鬚圖', scenes,
+    sources: ['資料來源', '課堂資料：lung cancer study（469 位存活月數）', 'Tukey (1977) Exploratory Data Analysis', '林老師講義〈第一章〉p.17–27'] };
+})();
+EPISODES['c1e2'] = C1E2;
+
+// ============ 第 1 章 EP3：直方圖、長條圖、散佈圖 ============
+const C1E3 = (() => {
+  const s1 = { beats: [0, 2.6], draw(lt) {
+    ground(lt);
+    txt('1786・William Playfair《商業與政治圖集》', 960, 150, 48, { p: prog(lt, .2, .9), color: COL.black });
+    playfair(360, GY, .9, { ra: [-.6, -1.4], la: [P / 2 + .3, P / 2 + .1], look: 1, mouth: 'smile' });
+    appear(prog(lt, .6, .6), () => { paperSheet(1150, 520, 900, 560, .01); });
+    const vals = [12, 7, 15, 9, 4, 11, 6, 13, 8, 10];
+    vals.forEach((v, i) => { const h = v * 24 * easeOut(prog(lt, 1.0 + i * .12, .5)); bar(790 + i * 80, 760, 50, h, COL.mustard, {}); });
+    inkLine(740, 760, 1580, 760, { w: 3.5, p: prog(lt, .9, .3) });
+    txt('史上第一張長條圖（示意）', 1150, 300, 30, { color: COL.gray, p: prog(lt, 1.2, .5) });
+    noteBox(1150, 900, 760, 80, [['一張圖，比一整頁數字更快看出模式', 34]], '#fff8e2', prog(lt, 2.8, .6));
+  } };
+  const HIST = [69, 80, 82, 62, 70, 40, 26, 16, 12, 1, 8, 2, 0, 1];
+  const s2 = { beats: [0, 1.4, 4.6], draw(lt) {
+    ground(lt, 140, 440);
+    kid(250, GY, 1.15, { ra: [-.25, -.4], rhand: 'open', la: [P / 2 + .4, P / 2 + .2], lhand: 'open', mouth: 'smile', bob: idle(RLT) * .4 });
+    txt('直方圖：存活月數（每 15 個月一組）', 1160, 150, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const base = 760, X = v => 600 + v / 210 * 1160;
+    axis(580, 1780, base, { p: prog(lt, .3, .4) });
+    HIST.forEach((n, i) => { const h = n * 5 * easeOut(prog(lt, 1.5 + i * .12, .5)); shape(rectPts(X(i * 15), base - h, X(15) - X(0), h), { fill: COL.blueL, smooth: false, w: 3.5, pattern: 'hatch', patColor: COL.blue, sp: 16 }); if (i % 2 === 0) txt(String(i * 15), X(i * 15), base + 34, 24, { p: prog(lt, .4, .3) }); });
+    txt('個月', 1790, base + 34, 24, { p: prog(lt, .4, .3) });
+    const km = prog(lt, 3.4, .6);
+    if (km > 0) { ink(ellPts(X(37.5), base - 82 * 5 / 2, 60, 82 * 5 / 2 + 20, -P / 2, -P / 2 + 2 * P * km, 40), { w: 5, color: COL.mustardD }); txt('眾數在 30–45', X(37.5), base - 82 * 5 - 50, 30, { color: COL.mustardD, p: km }); }
+    const kt = prog(lt, 4.0, .8);
+    if (kt > 0) arrow(X(90), base - 200, X(190), base - 60, { w: 4, head: 16, color: COL.red, p: kt, bend: -.3 });
+    txt('右偏長尾', X(160), base - 240, 32, { color: COL.red, p: prog(lt, 4.4, .5) });
+    noteBox(1160, 215, 760, 80, [['連續資料・長條相連・看形狀與眾數', 32]], '#fff8e2', prog(lt, 4.8, .6));
+  } };
+  const SG = [['DFCI', 36, 46], ['HLM', 47, 53], ['MI', 84, 105], ['MSKCC', 67, 40]];
+  const s3 = { beats: [0, 2.4], draw(lt) {
+    ground(lt, 1500, 1800);
+    mom(1660, GY, .75, { la: [P + .3, P + .4], lhand: 'open', look: -1, bob: idle(RLT, 1) * .3 });
+    txt('長條圖：四家醫院的病人數，依性別堆疊', 760, 150, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const base = 760;
+    inkLine(240, base, 1300, base, { w: 4.5, p: prog(lt, .3, .4) });
+    SG.forEach(([name, f, m], i) => {
+      const x = 380 + i * 260, k = easeOut(prog(lt, .5 + i * .3, .6));
+      bar(x, base, 150, m * 2.6 * k, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 16 });
+      if (k >= 1) shape(rectPts(x - 75, base - m * 2.6 - f * 2.6, 150, f * 2.6), { fill: COL.pinkL, smooth: false, w: 4, pattern: 'dots', patColor: COL.pink, sp: 14, r: 3 });
+      txt(name, x, base + 36, 30, { p: prog(lt, .4, .3) });
+      if (k >= 1) { txt(String(m), x, base - m * 2.6 / 2, 26, { color: COL.blue }); txt(String(f), x, base - m * 2.6 - f * 2.6 / 2, 26, { color: COL.pink }); txt(String(m + f), x, base - (m + f) * 2.6 - 24, 28, { color: COL.black }); }
+    });
+    txt('■ 男', 1200, 250, 30, { color: COL.blue, p: prog(lt, .5, .4) }); txt('■ 女', 1200, 300, 30, { color: COL.pink, p: prog(lt, .5, .4) });
+    const k2 = prog(lt, 2.5, .6);
+    if (k2 > 0) { ink(ellPts(380 + 3 * 260, base - 107 * 2.6 / 2, 110, 107 * 2.6 / 2 + 30, -P / 2, -P / 2 + 2 * P * k2, 40), { w: 5, color: COL.mustardD }); txt('唯一女 > 男', 380 + 3 * 260, 380, 30, { color: COL.mustardD, p: prog(lt, 2.9, .5) }); }
+    noteBox(760, 215, 700, 80, [['類別資料・長條分開', 32]], '#fff8e2', prog(lt, 3.2, .6));
+  } };
+  const s4 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 400);
+    dad(230, GY, .8, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: 'smile', bob: idle(RLT) * .3 });
+    txt('散佈圖：收縮壓 vs 舒張壓（CVD 資料，取 400 筆）', 1160, 150, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 560 + (v - 70) / 180 * 1100, Y = v => 800 - (v - 40) / 100 * 520;
+    axis(540, 1720, 800, { p: prog(lt, .4, .5) }); axis(560, 560, 240, { p: prog(lt, .4, .5) });
+    [80, 120, 160, 200, 240].forEach(v => txt(String(v), X(v), 834, 24, { p: prog(lt, .5, .3) })); [60, 90, 120].forEach(v => txt(String(v), 520, Y(v), 24, { align: 'right', p: prog(lt, .5, .3) }));
+    txt('收縮壓', 1720, 850, 28, { color: COL.gray, p: prog(lt, .5, .3) }); txt('舒張壓', 560, 215, 28, { color: COL.gray, p: prog(lt, .5, .3) });
+    const kd = prog(lt, .8, 2.0);
+    SCATTER.forEach(([s, d], i) => { const k = prog(kd, i / SCATTER.length, .04); if (k <= 0) return; shape(ellPts(X(s), Y(d), 6, 6, 0, 7, 8), { fill: COL.blueL, w: 1.6, alpha: k * .9 }); });
+    const kr = prog(lt, 2.8, .8);
+    if (kr > 0) { ink([[X(80), Y(53)], [X(220), Y(118)]], { w: 5, color: COL.red, p: kr, alpha: .8 }); txt('r = 0.74　正相關', X(190), Y(70), 40, { color: COL.red, p: prog(lt, 3.2, .5) }); }
+  } };
+  const FIVE = [70, 108.5, 120.5, 135, 276];
+  const s5 = { beats: [0, 2.6, 4.4], draw(lt) {
+    txt('作業預告：CVD 收縮壓的五數總結', 960, 150, 48, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 300 + (v - 60) / 230 * 1320, y = 480;
+    axis(280, 1680, y + 120, { p: prog(lt, .3, .5) });
+    [60, 100, 140, 180, 220, 260].forEach(v => { inkLine(X(v), y + 112, X(v), y + 128, { w: 3, p: prog(lt, .4, .3) }); txt(String(v), X(v), y + 156, 26, { p: prog(lt, .4, .3) }); });
+    const labs = ['最小 70', 'Q1 108.5', '中位數 120.5', 'Q3 135', '最大 276'];
+    FIVE.forEach((v, i) => { const k = prog(lt, .5 + i * .4, .5); if (k > 0) { ink([[X(v), y + 110], [X(v), y - 40]], { w: 5, color: i === 2 ? COL.red : COL.green, p: k }); txt(labs[i], X(v), y - 70 - (i % 2) * 40, 30, { color: i === 2 ? COL.red : COL.green, p: k }); } });
+    const kb = prog(lt, 2.7, 1.0);
+    if (kb > 0) boxH(0, y + 40, 60, X, { min: 70, q1: 108.5, med: 120.5, q3: 135, whi: 174.5, out: [] }, kb, INK);
+    txt('← 五個數 = 盒鬚圖', X(200), y + 40, 32, { color: COL.blue, p: prog(lt, 3.2, .5) });
+    txt('（鬚線到 Q3 + 1.5 IQR = 174.75；更大的值是界外值）', 760, y + 210, 26, { color: COL.gray, p: prog(lt, 3.6, .5) });
+    noteBox(700, 800, 980, 80, [['直方圖看形狀・長條圖比類別・散佈圖看關係', 36, COL.blue]], '#fff8e2', prog(lt, 4.6, .6));
+  } };
+  const order = [[s1, 6], [s2, 8], [s3, 6], [s4, 6], [s5, 7]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP3, dur: t, tag: '高等體育統計｜第 1 章 EP3　看圖說話：直方圖、長條圖、散佈圖', scenes,
+    sources: ['資料來源', '課堂資料：lung cancer study；作業資料：CVD_All（64,489 筆）', 'Playfair (1786) The Commercial and Political Atlas', '林老師講義〈第一章〉p.28–36'] };
+})();
+EPISODES['c1e3'] = C1E3;
+const SCATTER = [[117, 74], [130, 85], [140, 86], [97, 66], [134, 106], [121, 88], [104, 74], [96, 68], [116, 75], [85, 68], [132, 82], [120, 70], [164, 80], [180, 120], [113, 82], [103, 71], [142, 88], [124, 80], [104, 78], [113, 64], [151, 105], [116, 80], [94, 59], [140, 86], [109, 77], [122, 75], [124, 88], [123, 78], [140, 84], [154, 103], [144, 106], [124, 69], [114, 65], [127, 73], [126, 94], [128, 96], [126, 78], [135, 98], [114, 74], [120, 74], [104, 75], [128, 78], [133, 102], [121, 71], [139, 84], [145, 108], [105, 62], [110, 74], [112, 67], [102, 71], [98, 64], [124, 73], [143, 92], [109, 76], [105, 74], [138, 90], [97, 68], [107, 66], [104, 64], [103, 52], [138, 84], [130, 80], [95, 59], [161, 100], [96, 64], [141, 84], [138, 74], [94, 60], [128, 83], [122, 86], [125, 79], [114, 70], [114, 72], [117, 70], [142, 99], [163, 112], [126, 77], [130, 92], [170, 86], [134, 69], [100, 70], [148, 84], [108, 77], [102, 64], [175, 100], [108, 79], [138, 69], [151, 100], [106, 67], [159, 74], [159, 96], [103, 51], [114, 74], [130, 80], [130, 69], [109, 69], [112, 66], [95, 64], [128, 70], [122, 86], [94, 64], [128, 77], [128, 77], [132, 87], [131, 81], [166, 88], [131, 79], [116, 75], [134, 81], [108, 66], [117, 68], [131, 78], [104, 72], [134, 74], [98, 81], [125, 84], [108, 74], [118, 78], [117, 68], [108, 67], [123, 70], [140, 99], [112, 81], [144, 84], [140, 80], [111, 78], [116, 76], [103, 67], [109, 62], [76, 60], [105, 77], [90, 58], [112, 67], [92, 65], [104, 76], [172, 97], [139, 88], [115, 81], [122, 80], [119, 83], [112, 82], [92, 65], [139, 92], [135, 101], [118, 74], [110, 73], [118, 88], [179, 136], [125, 86], [129, 78], [153, 108], [108, 70], [165, 108], [118, 74], [156, 92], [146, 86], [141, 92], [117, 66], [138, 79], [119, 97], [102, 76], [121, 69], [104, 70], [152, 100], [114, 78], [112, 68], [145, 62], [104, 72], [154, 82], [119, 85], [153, 93], [148, 86], [136, 80], [126, 111], [114, 71], [110, 64], [112, 77], [126, 79], [154, 97], [97, 66], [138, 115], [118, 79], [137, 81], [123, 80], [124, 91], [104, 68], [139, 93], [116, 80], [159, 99], [122, 61], [114, 78], [105, 69], [154, 90], [120, 72], [155, 115], [152, 86], [144, 84], [139, 77], [132, 87], [132, 82], [96, 62], [100, 82], [131, 81], [145, 100], [106, 78], [138, 82], [177, 98], [108, 73], [132, 89], [99, 66], [94, 58], [106, 68], [114, 80], [146, 93], [130, 88], [148, 99], [142, 90], [141, 76], [117, 80], [93, 62], [122, 80], [104, 63], [100, 76], [96, 68], [145, 92], [129, 72], [108, 64], [111, 66], [98, 66], [112, 68], [141, 97], [148, 81], [123, 80], [158, 81], [142, 86], [112, 82], [123, 93], [120, 70], [122, 94], [109, 68], [138, 92], [114, 72], [100, 70], [119, 75], [125, 86], [122, 76], [108, 76], [140, 91], [137, 96], [86, 61], [106, 81], [109, 68], [122, 78], [108, 73], [146, 90], [138, 89], [104, 65], [101, 70], [127, 92], [110, 66], [130, 77], [117, 67], [122, 72], [133, 88], [144, 96], [108, 70], [132, 74], [148, 86], [134, 89], [107, 83], [132, 76], [126, 80], [118, 78], [142, 90], [108, 74], [120, 82], [142, 86], [95, 57], [150, 91], [150, 95], [172, 73], [148, 88], [138, 79], [133, 69], [123, 71], [115, 74], [138, 69], [145, 96], [95, 58], [108, 62], [110, 72], [126, 88], [121, 87], [117, 77], [121, 66], [103, 66], [170, 110], [136, 75], [123, 76], [123, 86], [159, 99], [115, 82], [145, 93], [126, 90], [111, 72], [115, 77], [104, 67], [96, 58], [156, 78], [98, 70], [107, 71], [115, 75], [115, 76], [146, 104], [142, 82], [128, 78], [140, 88], [129, 79], [145, 93], [125, 75], [167, 69], [154, 94], [107, 84], [138, 78], [172, 101], [125, 88], [132, 94], [129, 87], [138, 69], [130, 79], [140, 96], [100, 72], [112, 79], [123, 73], [100, 71], [89, 67], [114, 67], [128, 67], [110, 81], [87, 80], [124, 78], [132, 80], [128, 61], [152, 92], [147, 98], [92, 71], [129, 86], [120, 64], [106, 66], [102, 72], [134, 88], [125, 87], [114, 80], [126, 76], [105, 67], [92, 61], [127, 85], [112, 76], [158, 90], [121, 62], [133, 76], [122, 78], [94, 62], [139, 70], [154, 100], [104, 68], [118, 90], [133, 91], [148, 84], [103, 72], [122, 63], [116, 75], [148, 106], [118, 74], [166, 90], [113, 76], [150, 94], [114, 80], [138, 89], [105, 68], [152, 82], [142, 91], [126, 90], [113, 70], [118, 67], [108, 62], [121, 77], [120, 78], [112, 74], [110, 72], [126, 94], [107, 76], [104, 65], [97, 67], [104, 77], [109, 66], [120, 74], [145, 94], [150, 91], [93, 62]];
