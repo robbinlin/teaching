@@ -84,6 +84,14 @@ LEAD_FIRST, LEAD, GAP, TAIL, TAIL_LAST = 1.0, .6, .45, .9, 4.0
 sr = None
 track, scenes, t = [], [], 0.0
 
+def level(x, target_db=-18.0):
+    """scale a sentence so its speech (not its pauses) sits at the same level as every other sentence"""
+    fr = x[:len(x) // 480 * 480].reshape(-1, 480)
+    r = np.sqrt((fr ** 2).mean(1)); act = r[r > .01]
+    if not len(act): return x
+    cur = 20 * np.log10(np.sqrt((act ** 2).mean()))
+    return x * 10 ** ((target_db - cur) / 20)
+
 def trim(x, thr=.008):
     idx = np.where(np.abs(x) > thr)[0]
     return x[max(0, idx[0] - 200): idx[-1] + 400] if len(idx) else x
@@ -94,7 +102,7 @@ for si, lines in enumerate(spec['scenes']):
     out = []
     for li, ln in enumerate(lines):
         x, sr = tts.say(ln)
-        x = trim(x)
+        x = level(trim(x))
         d = len(x) / sr
         out.append({'t0': round(t - s0, 3), 't1': round(t - s0 + d, 3), 'disp': ln['disp'], 'say': ln['say']})
         track.append((t, x))
@@ -107,7 +115,7 @@ buf = np.zeros(int(dur * sr) + 1, dtype=np.float32)
 for st, x in track:
     i = int(st * sr); buf[i:i + len(x)] += x
 peak = np.abs(buf).max() or 1
-buf = buf / peak * .89
+buf = buf / max(peak, 1.0) * .95  # keep the per-sentence levels; only guard clipping
 with wave.open(str(here / f'ep{ep}_voice.wav'), 'wb') as w:
     w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr)
     w.writeframes((buf * 32767).astype('<i2').tobytes())

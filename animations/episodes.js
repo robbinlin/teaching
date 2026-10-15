@@ -553,3 +553,175 @@ const EP1R = (() => {
     sources: ['資料來源', '課堂資料：PPHN 新生兒（131 位）', '作業資料：109 學年大專運動代表隊（1,846 隊）', 'Wikipedia〈William Sealy Gosset〉', '林老師講義〈單樣本及雙樣本檢定〉'] };
 })();
 EPISODES['1r'] = EP1R;
+
+// ============ 第 4 章 EP2 / EP3（真實資料版） ============
+function noteBox(x, y, w, h, lines, fill, k) {
+  appear(k, () => {
+    shape(rectPts(x - w / 2, y - h / 2, w, h), { fill, smooth: false, w: 3.5 });
+    lines.forEach((l, i) => txt(l[0], x, y - (lines.length - 1) * 30 + i * 60, l[1] || 40, { color: l[2] || COL.black, p: clamp(k * 1.6) }));
+  });
+}
+// 死亡組 (18) / 存活組 (111) 出生體重，與 PPHN 原始資料一致
+const BW_DIED = [610, 790, 910, 1055, 1330, 1800, 1810, 2190, 2390, 2450, 2450, 2720, 2770, 2810, 2980, 3120, 3580, 3740];
+const BW_ALIVE = [470, 560, 580, 590, 864, 900, 900, 910, 935, 954, 1100, 1100, 1100, 1140, 1180, 1250, 1460, 1510, 1610, 1675, 1680, 1810, 1920, 2080, 2120, 2150, 2150, 2225, 2230, 2320, 2350, 2370, 2370, 2375, 2420, 2450, 2480, 2510, 2520, 2550, 2620, 2650, 2680, 2720, 2760, 2790, 2800, 2820, 2830, 2850, 2850, 2855, 2860, 2900, 2910, 2950, 2950, 2950, 2950, 2950, 2990, 3010, 3050, 3050, 3055, 3074, 3075, 3090, 3140, 3150, 3150, 3160, 3180, 3190, 3210, 3250, 3265, 3290, 3300, 3310, 3310, 3320, 3320, 3320, 3350, 3370, 3380, 3430, 3450, 3490, 3495, 3500, 3510, 3540, 3580, 3580, 3635, 3659, 3670, 3690, 3700, 3780, 3876, 3950, 3960, 4016, 4090, 4190, 4270, 4320, 4450];
+
+const EP2R = (() => {
+  const B = EP2.scenes;
+  // 男子組每隊人數：n = 911，平均 10.40，中位數 8，最大 111；偏態 3.05
+  const s1 = { beats: [0, 2.6, 5.0], draw(lt) {
+    ground(lt, 140, 460);
+    dad(250, GY, .85, { la: [-P / 2 - .6, -P / 2 - .3], ra: [-P / 2 + .6, -P / 2 + .3], lhand: 'open', rhand: 'open', mouth: lt > 1.5 ? 'o' : 'smile', brow: lt > 1.5 ? 1.5 : 0, bob: idle(RLT) * .3 });
+    txt('男子組每隊人數（911 隊）', 1160, 150, 46, { p: prog(lt, .2, .8), color: COL.black });
+    const bins = [['0–4', 293], ['5–9', 221], ['10–14', 160], ['15–19', 106], ['20–29', 89], ['30–49', 36], ['50 以上', 6]];
+    const base = 760, x0 = 600, bw = 150;
+    axis(560, 1760, base, { p: prog(lt, .4, .4) });
+    bins.forEach(([lab, n], i) => {
+      const h = n * 1.25 * easeOut(prog(lt, .6 + i * .12, .5));
+      bar(x0 + i * bw + 70, base, 110, h, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 16 });
+      txt(lab, x0 + i * bw + 70, base + 34, 26, { p: prog(lt, .5, .3) });
+      if (h > 4) txt(String(n), x0 + i * bw + 70, base - h - 22, 24, { color: COL.gray, p: prog(lt, 1.0 + i * .12, .3) });
+    });
+    txt('人數', 1720, base + 80, 28, { color: COL.gray, p: prog(lt, .5, .3) });
+    const k1 = prog(lt, 1.6, .5);
+    if (k1 > 0) { shape(ellPts(1690, 720, 34, 34, 0, 7, 20), { fill: COL.red, w: 4, alpha: k1 }); txt('111 人！', 1690, 650, 36, { color: COL.red, p: k1 }); }
+    const XM = v => x0 + 70 + (v / 5) * bw - bw / 2; // bin width 5 → map value to x
+    const k2 = prog(lt, 2.7, .5);
+    if (k2 > 0) { ink([[XM(10.4), base], [XM(10.4), 400]], { w: 5, color: COL.pink, p: k2 }); txt('平均數 10.4', XM(10.4) + 16, 390, 36, { color: COL.pink, align: 'left', p: k2 }); }
+    const k3 = prog(lt, 3.6, .5);
+    if (k3 > 0) { ink([[XM(8), base], [XM(8), 345]], { w: 5, color: COL.green, p: k3 }); txt('中位數 8', XM(8) - 16, 330, 36, { color: COL.green, align: 'right', p: k3 }); }
+    noteBox(1200, 270, 760, 110, [['偏斜＋離群值 → 平均數被拉走', 40, COL.red]], '#fff8e2', prog(lt, 5.2, .6));
+  } };
+  // PH vs 7：92 位高於、22 位低於、17 位相等；W+ = 5428、W− = 1127，p < .001；Apgar 差值 Wilcoxon p < .001
+  const s3 = { beats: [0, 1.6, 4.0, 5.8], draw(lt) {
+    ground(lt, 140, 440);
+    kid(250, GY, 1.15, { ra: [-.25, -.4], rhand: 'open', la: [P / 2 + .4, P / 2 + .2], lhand: 'open', mouth: 'smile', bob: idle(RLT) * .4 });
+    txt('H₀：PH 中位數 = 7（131 位 PPHN 新生兒）', 1160, 150, 46, { p: prog(lt, .2, .8), color: COL.black });
+    const groups = [['高於 7', 92, COL.greenL, COL.green, '＋'], ['低於 7', 22, '#f4c4bd', COL.red, '−'], ['等於 7', 17, COL.white, COL.gray, '＝']];
+    groups.forEach(([lab, n, fill, col, sym], g) => {
+      const y0 = 260 + g * 100, kg = prog(lt, 1.7 + g * .5, .6);
+      txt(lab, 620, y0 + 20, 36, { color: col, align: 'right', p: kg });
+      for (let i = 0; i < n; i++) {
+        const ki = prog(lt, 1.7 + g * .5 + i * .012, .15); if (ki <= 0) break;
+        const x = 700 + (i % 40) * 22, y = y0 + Math.floor(i / 40) * 30;
+        shape(ellPts(x, y, 9, 9, 0, 7, 8), { fill, w: 2.2, alpha: ki });
+      }
+      txt(`${n} 位`, 1740, y0 + 20, 34, { color: col, align: 'right', p: kg });
+      if (g === 2) txt('不列入', 1740, y0 + 52, 26, { color: COL.gray, align: 'right', p: kg });
+    });
+    const kw = prog(lt, 4.2, .6);
+    if (kw > 0) {
+      const base = 740;
+      bar(1300, base, 150, 5428 / 32 * easeOut(kw), COL.greenL, {}); bar(1520, base, 150, 1127 / 32 * easeOut(kw), '#f4c4bd', {});
+      txt('W⁺ = 5428', 1300, base - 5428 / 32 - 28, 32, { color: COL.green, p: kw }); txt('W⁻ = 1127', 1520, base - 1127 / 32 - 28, 32, { color: COL.red, p: kw });
+      txt('名次總和', 1160, base - 40, 30, { color: COL.gray, align: 'right', p: kw });
+    }
+    noteBox(760, 640, 480, 110, [['p < .001 → 中位數 ≠ 7', 36, COL.green]], '#fff8e2', prog(lt, 4.9, .5));
+    noteBox(1160, 820, 1000, 80, [['成對資料：Apgar 差值做同樣的檢定，p < .001', 32]], COL.greenL, prog(lt, 6.0, .5));
+  } };
+  // Mann–Whitney：存活 111 vs 死亡 18（有效 129），平均名次 67.9 vs 47.0，U = 675.5，p = .028
+  const s4 = { beats: [0, 1.4, 4.0, 5.6], draw(lt) {
+    ground(lt, 140, 440);
+    mom(250, GY, .85, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: 'o', bob: idle(RLT) * .3 });
+    txt('出生體重：存活組（111）vs 死亡組（18）', 1160, 150, 46, { p: prog(lt, .2, .8), color: COL.black });
+    const all = BW_ALIVE.map(v => [v, 0]).concat(BW_DIED.map(v => [v, 1])).sort((a, b) => a[0] - b[0]);
+    const X = i => 560 + i * 9.2, yA = 520, yD = 620;
+    const kr = prog(lt, 1.5, 2.2);
+    all.forEach(([v, g], i) => {
+      const k = prog(kr, i / all.length, .08); if (k <= 0) return;
+      const y = lerp(g ? yD : yA, 570, 1 - k);
+      shape(ellPts(X(i), g ? yD : yA, 6, 6, 0, 7, 8), { fill: g ? COL.pinkL : COL.blueL, w: 1.8, alpha: k });
+    });
+    if (kr > 0) { axis(540, 1780, 740, { p: kr }); txt('輕 → 重（名次 1 … 129）', 1160, 780, 28, { color: COL.gray, p: kr }); }
+    txt('存活', 520, yA, 30, { color: COL.blue, align: 'right', p: prog(lt, 1.5, .3) }); txt('死亡', 520, yD, 30, { color: COL.pink, align: 'right', p: prog(lt, 1.5, .3) });
+    const k2 = prog(lt, 4.1, .6);
+    if (k2 > 0) {
+      ink([[X(66.9), yA - 40], [X(66.9), yA + 30]], { w: 5, color: COL.blue, p: k2 }); txt('平均名次 67.9', X(66.9), yA - 60, 32, { color: COL.blue, p: k2 });
+      ink([[X(46.0), yD - 30], [X(46.0), yD + 40]], { w: 5, color: COL.pink, p: k2 }); txt('平均名次 47.0', X(46.0), yD + 68, 32, { color: COL.pink, p: k2 });
+    }
+    noteBox(1160, 300, 760, 140, [['U = 675.5，p = .028', 44], ['兩組分布有顯著差異', 38, COL.green]], '#fff8e2', prog(lt, 5.8, .6));
+  } };
+  const order = [[s1, 7], [{ ...B[1], beats: [0, 1.8, 3.6] }, 5], [s3, 8], [s4, 8], [{ ...B[4], beats: [0, .6] }, 5]];
+  let t = 0;
+  const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP2, dur: t, tag: '高等體育統計｜第 4 章 EP2　不看平均看排名：無母數檢定', scenes,
+    sources: ['資料來源', '課堂資料：PPHN 新生兒（131 位）', '作業資料：109 學年大專運動代表隊（1,846 隊）', 'Significance〈How Frank Wilcoxon helped statisticians…〉', 'Mann & Whitney (1947), Ann. Math. Stat. 18'] };
+})();
+
+const EP3R = (() => {
+  const B = EP3.scenes;
+  // p 值：練習天數 t = −0.19 (p = .85)；隊伍人數 Welch t = 11.58 (p < .001)
+  const s2 = { beats: [0, 1.6, 4.2], draw(lt) {
+    const cx = 960, base = 720, wh = 700, hs = 1000, a = 3.6;
+    axis(240, 1700, base, { p: prog(lt, 0, .5) });
+    curve(cx, base, wh, hs, normalPdf, { p: prog(lt, .1, 1), w: 6 });
+    txt('假設 H₀ 為真時，t 統計量的分配', cx, 250, 40, { p: prog(lt, .3, .6), color: COL.gray });
+    [-1.96, 1.96].forEach(z => { if (lt > .8) { for (let y = base; y > base - 180; y -= 26) inkLine(cx + z / a * wh, y, cx + z / a * wh, y - 14, { w: 4, color: COL.red }); } });
+    if (lt > .8) txt('α = .05（雙尾）', cx + 1.96 / a * wh + 16, base - 200, 32, { color: COL.red, align: 'left' });
+    const k1 = prog(lt, 1.7, .6);
+    if (k1 > 0) {
+      shadeUnder(cx, base, wh, hs, normalPdf, -3.6, -0.19, COL.pinkL, { alpha: .5 }); shadeUnder(cx, base, wh, hs, normalPdf, 0.19, 3.6, COL.pinkL, { alpha: .5 });
+      arrow(cx - 0.19 / a * wh, base + 110, cx - 0.19 / a * wh, base + 12, { w: 5, color: COL.blue, head: 16, p: k1 });
+      txt('練習天數 t = −0.19', cx - 0.19 / a * wh, base + 140, 34, { color: COL.blue, p: k1 });
+      noteBox(400, 380, 440, 120, [['p = .85', 50], ['很常見 → 證據不足', 34, COL.gray]], COL.white, prog(lt, 2.4, .5));
+    }
+    const k2 = prog(lt, 4.3, .6);
+    if (k2 > 0) {
+      arrow(1690, base + 110, 1690, base + 12, { w: 5, color: COL.green, head: 16, p: k2 });
+      txt('隊伍人數 t = 11.58 →', 1560, base + 140, 34, { color: COL.green, p: k2 });
+      noteBox(1500, 380, 440, 120, [['p < .001', 50, COL.green], ['極罕見 → 拒絕 H₀', 34, COL.green]], COL.greenL, prog(lt, 5.0, .5));
+      lamp(1720, 190, k2);
+    }
+  } };
+  // 信賴區間：人數差 4.56 [3.79, 5.33]；天數差 −0.01 [−0.12, 0.10]
+  const s3 = { beats: [0, 1.6, 4.2, 6.5], draw(lt) {
+    txt('男子組 − 女子組 的 95% 信賴區間', 960, 150, 46, { p: prog(lt, .2, .8), color: COL.black });
+    const rows = [
+      { y: 400, lab: '每隊人數', lo: 3.788, hi: 5.334, pt: 4.561, X: v => 760 + v / 7 * 900, ticks: [0, 1, 2, 3, 4, 5, 6], at: 1.7, ok: true, unit: '人' },
+      { y: 660, lab: '每週練習天數', lo: -0.124, hi: 0.102, pt: -0.011, X: v => 1210 + v / 0.35 * 900, ticks: [-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], at: 4.3, ok: false, unit: '天' }
+    ];
+    rows.forEach(r => {
+      const k = prog(lt, r.at - 1.4, .6); if (k <= 0) return;
+      txt(r.lab, 560, r.y, 38, { align: 'right', p: k });
+      axis(600, 1740, r.y + 70, { p: k });
+      r.ticks.forEach(v => { inkLine(r.X(v), r.y + 60, r.X(v), r.y + 80, { w: 3, p: k }); txt(String(v), r.X(v), r.y + 108, 26, { p: k, color: v === 0 ? COL.red : INK }); });
+      ink([[r.X(0), r.y - 70], [r.X(0), r.y + 85]], { w: 5, color: COL.red, p: k });
+      const kc = prog(lt, r.at, .7), col = r.ok ? COL.green : COL.gray;
+      if (kc > 0) {
+        ink([[r.X(r.lo), r.y], [r.X(r.hi), r.y]], { w: 7, color: col, p: kc });
+        inkLine(r.X(r.lo), r.y - 22, r.X(r.lo), r.y + 22, { w: 6, color: col, p: kc }); inkLine(r.X(r.hi), r.y - 22, r.X(r.hi), r.y + 22, { w: 6, color: col, p: kc });
+        shape(ellPts(r.X(r.pt), r.y, 15, 15, 0, 7, 12), { fill: col, w: 3.5, alpha: kc });
+        txt(`${r.pt > 0 ? '+' : ''}${r.pt.toFixed(2)} ${r.unit}（${r.lo.toFixed(2)} ～ ${r.hi.toFixed(2)}）`, r.X(r.pt), r.y - 48, 32, { color: col, p: kc });
+      }
+      const kj = prog(lt, r.at + 1.2, .5);
+      if (kj > 0) { if (r.ok) check(1800, r.y, .9, kj); else cross(1800, r.y, .8, kj); txt(r.ok ? '不含 0 → 拒絕 H₀' : '包含 0 → 不拒絕 H₀', 1860, r.y + 150, 30, { color: r.ok ? COL.green : COL.red, align: 'right', p: kj }); }
+    });
+    noteBox(960, 900, 900, 90, [['區間還告訴你「差多少」，比只看 p 值更有資訊', 36]], '#fff8e2', prog(lt, 6.6, .6));
+  } };
+  // 檢定方向：作業 1 雙尾、作業 2 右尾
+  const s4 = { beats: [0, 1.4, 3.6], draw(lt) {
+    const panels = [
+      { x: 480, t: '雙尾', h: 'H₁：μ男 ≠ μ女', tails: [[-3.6, -1.96], [1.96, 3.6]], q: '作業 1：平均數是否不同', at: 1.5, col: COL.green },
+      { x: 1440, t: '右尾', h: 'H₁：Md男 > Md女', tails: [[1.645, 3.6]], q: '作業 2：男子組是否較大', at: 3.7, col: COL.mustardD }
+    ];
+    panels.forEach((pn, i) => {
+      const k = prog(lt, .2 + i * .5, .6);
+      appear(k, () => {
+        shape(rectPts(pn.x - 360, 200, 720, 520), { fill: '#fffdf6', smooth: false, w: 4 });
+        txt(pn.t, pn.x, 270, 56, { color: COL.black }); txt(pn.h, pn.x, 345, 40, { color: COL.blue });
+        const base = 640, wh = 300, hs = 430;
+        pn.tails.forEach(([a, b]) => shadeUnder(pn.x, base, wh, hs, normalPdf, a, b, COL.pink, { alpha: .75 }));
+        inkLine(pn.x - 330, base, pn.x + 330, base, { w: 3.5 }); curve(pn.x, base, wh, hs, normalPdf, { w: 5, p: k });
+      });
+      const kq = prog(lt, pn.at, .6);
+      if (kq > 0) { ink(ellPts(pn.x, 460, 400, 290, -P / 2, -P / 2 + 2 * P * kq, 40), { w: 6, color: pn.col }); txt(pn.q, pn.x, 790, 40, { color: pn.col, p: prog(lt, pn.at + .3, .5) }); }
+    });
+    const km = prog(lt, 0, .4);
+    txt('「有沒有差」→ 雙尾　　「誰比較大」→ 單尾', 960, 120, 40, { p: km, color: COL.black });
+  } };
+  const order = [[{ ...B[0], beats: [0, 2.6] }, 6], [s2, 6], [s3, 8], [s4, 7], [{ ...B[4], beats: [0, 1.4] }, 5]];
+  let t = 0;
+  const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP3, dur: t, tag: '高等體育統計｜第 4 章 EP3　P 值・信賴區間・檢定方向', scenes,
+    sources: ['資料來源', '作業資料：109 學年大專運動代表隊（1,846 隊）', 'Wasserstein & Lazar (2016), The American Statistician', '林老師講義〈單樣本及雙樣本檢定〉p.22–24'] };
+})();
+EPISODES['2r'] = EP2R; EPISODES['3r'] = EP3R;
