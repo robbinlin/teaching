@@ -725,3 +725,128 @@ const EP3R = (() => {
     sources: ['資料來源', '作業資料：109 學年大專運動代表隊（1,846 隊）', 'Wasserstein & Lazar (2016), The American Statistician', '林老師講義〈單樣本及雙樣本檢定〉p.22–24'] };
 })();
 EPISODES['2r'] = EP2R; EPISODES['3r'] = EP3R;
+
+// ============ 第 1 章 EP1：集中趨勢（平均數、中位數、眾數） ============
+const C1E1 = (() => {
+  function ox(x, y, s, k) {
+    appear(k, () => {
+      ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+      [-90, -40, 40, 90].forEach(lx => shape(rectPts(lx - 14, -10, 28, 90), { fill: '#6b4a2b', smooth: false, w: 3.5 }));
+      shape(ellPts(0, -90, 150, 80, 0, 7, 30), { fill: '#8a5a33', w: 4.5, pattern: 'dots', patColor: '#5a3a1a', sp: 22, r: 5 });
+      shape(ellPts(165, -120, 55, 45, 0, 7, 20), { fill: '#8a5a33', w: 4 });
+      inkSmooth([[185, -160], [205, -200], [235, -190]], { w: 5 }); inkSmooth([[150, -160], [140, -200], [110, -195]], { w: 5 });
+      ctx.save(); ctx.fillStyle = INK; ctx.globalAlpha = ALPHA; ctx.beginPath(); ctx.arc(185, -125, 4, 0, 7); ctx.fill(); ctx.restore();
+      inkSmooth([[-150, -100], [-185, -60], [-170, -20]], { w: 4 });
+      ctx.restore();
+    });
+  }
+  const s1 = { beats: [0, 2.0, 4.3, 7.0], draw(lt) {
+    ground(lt);
+    txt('1906・英國 Plymouth 市集', 960, 140, 50, { p: prog(lt, .2, .9), color: COL.black });
+    ox(560, GY, .95, prog(lt, .6, .6));
+    galton(1460, GY, .9, { ra: [-.6, -1.4], la: [P / 2 + .3, P / 2 + .1], look: -1, mouth: lt > 2 ? 'smile' : 'flat' });
+    // ballot slips piling
+    const n = Math.floor(40 * easeOut(prog(lt, 2.1, 1.6)));
+    for (let i = 0; i < n; i++) { const px = 1690 + (i % 4) * 46, py = 760 - Math.floor(i / 4) * 16; shape(rectPts(px, py, 38, 26), { fill: COL.white, smooth: false, w: 2 }); }
+    txt('787 張猜測', 1780, 560, 34, { p: prog(lt, 3.0, .5) });
+    // number line with median & true
+    const k = prog(lt, 4.4, .8);
+    if (k > 0) {
+      const X = v => 300 + (v - 1100) / 250 * 960, y = 470;
+      axis(280, 1300, y, { p: k });
+      [1100, 1150, 1200, 1250, 1300].forEach(v => { inkLine(X(v), y - 8, X(v), y + 8, { w: 3, p: k }); txt(String(v), X(v), y + 36, 26, { p: k }); });
+      for (let i = 0; i < 60; i++) { const v = 1100 + 250 * (0.5 + 0.5 * Math.tanh((rnd(i, 3) * 2 - 1) * 1.4) * (rnd(i, 4) > .5 ? 1 : -1) * .9); shape(ellPts(X(v), y - 30 - rnd(i, 5) * 40, 6, 6, 0, 7, 8), { fill: COL.blueL, w: 1.5, alpha: k * .8 }); }
+      const k2 = prog(lt, 5.4, .6);
+      if (k2 > 0) { ink([[X(1207), y + 10], [X(1207), y - 150]], { w: 5, color: COL.blue, p: k2 }); txt('中位數 1,207 磅', X(1207) - 16, 300, 34, { color: COL.blue, align: 'right', p: k2 }); }
+      const k3 = prog(lt, 6.2, .6);
+      if (k3 > 0) { ink([[X(1198), y + 10], [X(1198), y - 110]], { w: 5, color: COL.red, p: k3 }); txt('實際 1,198 磅', X(1198) + 16, 350, 34, { color: COL.red, align: 'left', p: k3 }); }
+    }
+    noteBox(1060, 240, 700, 80, [['一群人的意見 → 一個數：集中趨勢', 34]], '#fff8e2', prog(lt, 7.2, .5));
+  } };
+  const STRESS = [['<1', 1525, .5], ['1–2', 527, 1.5], ['2–3', 242, 2.5], ['3–4', 109, 3.5], ['>4', 196, 4.5]];
+  const s2 = { beats: [0, 2.2, 5.0], draw(lt) {
+    ground(lt, 140, 460);
+    mom(250, GY, .85, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    txt('高中職學生每天感到壓力的時間（講義圖 1）', 1160, 150, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const base = 720, x0 = 640, bw = 200;
+    axis(600, 1720, base, { p: prog(lt, .4, .4) });
+    STRESS.forEach(([lab, n, mid], i) => {
+      const h = n * .3 * easeOut(prog(lt, .6 + i * .15, .5)), x = x0 + i * bw + 80;
+      bar(x, base, 130, h, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 16 });
+      txt(lab + ' 小時', x, base + 36, 28, { p: prog(lt, .5, .3) });
+      if (h > 4) txt(String(n), x, base - h - 22, 26, { color: COL.gray, p: prog(lt, 1.0 + i * .15, .3) });
+      const km = prog(lt, 2.3 + i * .25, .35);
+      if (km > 0) { txt('中間值 ' + mid, x, base + 70, 24, { color: COL.pink, p: km }); shape(ellPts(x, base - h / 2, 14, 14, 0, 7, 10), { fill: COL.pink, w: 2.5, alpha: km }); }
+    });
+    noteBox(1160, 300, 1000, 100, [['平均 = Σ(中間值 × 人數) ÷ Σ人數 = 3,422 ÷ 2,599 = 1.31 小時', 34]], '#fff8e2', prog(lt, 3.8, .7));
+    const kmo = prog(lt, 5.2, .6);
+    if (kmo > 0) { ink(ellPts(x0 + 80, base - 1525 * .3 / 2, 110, 1525 * .3 / 2 + 30, -P / 2, -P / 2 + 2 * P * kmo, 40), { w: 6, color: COL.mustardD }); txt('眾數：人數最多的一組', x0 + 80 + 150, 250, 36, { color: COL.mustardD, align: 'left', p: prog(lt, 5.6, .5) }); }
+    txt('（區間資料，平均是近似值）', 1160, 860, 28, { color: COL.gray, p: prog(lt, 5.0, .5) });
+  } };
+  const s3 = { beats: [0, 2.6, 5.2], draw(lt) {
+    const nums = [1, 3, 9, 13, 27];
+    txt('中位數：排好之後，正中間的那個數', 960, 150, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const y = 480;
+    nums.forEach((v, i) => { const k = prog(lt, .4 + i * .2, .4); appear(k, () => { shape(rectPts(560 + i * 170 - 60, y - 60, 120, 120), { fill: i === 2 ? COL.mustard : COL.white, smooth: false, w: 4 }); txt(String(v), 560 + i * 170, y + 4, 56, { color: COL.black }); }); });
+    const kk = prog(lt, 1.6, .6);
+    if (kk > 0) { kid(560 + 2 * 170, y - 70, .85, { bob: -Math.abs(Math.sin(RLT * 5)) * 12, mouth: 'open' }); txt('中位數 = 9', 560 + 2 * 170, 640, 44, { color: COL.mustardD, p: kk }); }
+    const k6 = prog(lt, 2.7, .5);
+    appear(k6, () => { shape(rectPts(560 + 5 * 170 - 60, y - 60, 120, 120), { fill: COL.greenL, smooth: false, w: 4 }); txt('31', 560 + 5 * 170, y + 4, 56, { color: COL.black }); });
+    if (k6 > 0) { ink(roundRectPts(560 + 2 * 170 - 75, y - 75, 150 + 170, 150, 16), { closed: true, w: 5, color: COL.green, p: prog(lt, 3.2, .6) }); }
+    noteBox(1100, 780, 760, 90, [['偶數個 → (9 + 13) ÷ 2 = 11', 42, COL.green]], '#fff8e2', prog(lt, 3.9, .6));
+    const k7 = prog(lt, 5.3, .6);
+    if (k7 > 0) { txt('← 一半比它小', 300, 640, 34, { color: COL.gray, p: k7 }); txt('一半比它大 →', 1500, 640, 34, { color: COL.gray, p: k7 }); }
+  } };
+  const WAGE = [[2013, 44.4, 55.4], [2016, 46.4, 59.1], [2019, 49.7, 64.1], [2022, 51.8, 69.3]];
+  const s4 = { beats: [0, 2.4, 5.2], draw(lt) {
+    ground(lt, 1500, 1800);
+    dad(1790, GY, .7, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: lt > 3 ? 'o' : 'flat', brow: lt > 3 ? 1 : 0 });
+    txt('受雇員工總薪資（主計總處，萬元／年）', 600, 150, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const base = 700, Y = v => base - (v - 40) * 14;
+    WAGE.forEach(([yr, md, mn], i) => {
+      const x = 320 + i * 200, k = prog(lt, .4 + i * .3, .5);
+      bar(x - 42, base, 70, (md - 40) * 14 * easeOut(k), COL.greenL, {}); bar(x + 42, base, 70, (mn - 40) * 14 * easeOut(k), COL.pinkL, { pattern: 'dots', patColor: COL.pink, sp: 14, r: 3 });
+      txt(String(yr), x, base + 36, 30, { p: k });
+      if (k >= 1) { txt(String(md), x - 42, Y(md) - 22, 26, { color: COL.green }); txt(String(mn), x + 42, Y(mn) - 22, 26, { color: COL.pink }); }
+    });
+    inkLine(220, base, 1000, base, { w: 4.5, p: prog(lt, .3, .4) });
+    txt('■ 中位數', 480, 205, 30, { color: COL.green, p: prog(lt, .5, .4) }); txt('■ 平均數', 700, 205, 30, { color: COL.pink, p: prog(lt, .5, .4) });
+    const k2 = prog(lt, 2.5, .8);
+    if (k2 > 0) {
+      const cx = 1330, b2 = 700, wh = 270, hs = 260;
+      const f = z => { const u = (z + 1.6); return u > 0 ? u * Math.exp(-u) * 1.1 : 0; };
+      curve(cx, b2, wh, hs, f, { p: k2, w: 5, range: 3.6 });
+      ink([[cx + (-0.6) / 3.6 * wh, b2], [cx + (-0.6) / 3.6 * wh, b2 - 120]], { w: 4, color: COL.green, p: prog(lt, 3.2, .4) }); txt('中位數', cx + (-0.6) / 3.6 * wh, b2 - 140, 28, { color: COL.green, p: prog(lt, 3.2, .4) });
+      ink([[cx + (0.4) / 3.6 * wh, b2], [cx + (0.4) / 3.6 * wh, b2 - 90]], { w: 4, color: COL.pink, p: prog(lt, 3.6, .4) }); txt('平均數', cx + (0.4) / 3.6 * wh, b2 - 110, 28, { color: COL.pink, p: prog(lt, 3.6, .4) });
+      txt('右偏：少數高薪把平均拉高', cx, b2 + 50, 32, { color: COL.red, p: prog(lt, 4.0, .6) });
+    }
+    noteBox(1330, 290, 520, 100, [['看薪資：中位數更能', 34], ['代表「一般人」', 34, COL.green]], '#fff8e2', prog(lt, 5.4, .6));
+  } };
+  const AGE = [[30, 1], [35, 4], [40, 13], [45, 22], [50, 41], [55, 58], [60, 88], [65, 89], [70, 82], [75, 56], [80, 21], [85, 3]];
+  const s5 = { beats: [0, 2.8, 5.0], draw(lt) {
+    ground(lt, 140, 460);
+    dad(250, GY, .85, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: 'smile', bob: idle(RLT) * .3 });
+    txt('478 位肺癌病人的年齡（課堂資料）', 1160, 150, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const base = 740, X = v => 620 + (v - 30) / 60 * 1100;
+    axis(600, 1760, base, { p: prog(lt, .3, .4) });
+    AGE.forEach(([v, n], i) => { const h = n * 4.2 * easeOut(prog(lt, .5 + i * .08, .5)); bar(X(v + 2.5), base, 86, h, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 16 }); if (i % 2 === 0) txt(String(v), X(v), base + 34, 26, { p: prog(lt, .4, .3) }); });
+    txt('歲', 1760, base + 34, 26, { p: prog(lt, .4, .3) });
+    const marks = [[64.4, '平均 64.4', COL.pink, 2.9], [65, '中位數 65', COL.green, 3.4], [62, '眾數 62', COL.mustardD, 3.9]];
+    marks.forEach(([v, lab, col, at], i) => { const k = prog(lt, at, .5); if (k > 0) { ink([[X(v), base], [X(v), 330 + i * 40]], { w: 5, color: col, p: k }); inkLine(1500, 300 + i * 50, 1530, 300 + i * 50, { w: 6, color: col, p: k }); txt(lab, 1545, 300 + i * 50, 34, { color: col, align: 'left', p: k }); } });
+    noteBox(1160, 880, 900, 80, [['三個數接近 → 分布對稱，三個都好用', 32, COL.green]], COL.greenL, prog(lt, 5.1, .6));
+    noteBox(1725, 565, 340, 70, [['歪斜、有極端值 → 看中位數', 25, COL.red]], '#fff8e2', prog(lt, 6.2, .6));
+  } };
+  const s6 = { beats: [0, 1.2], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('三種代表值', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    txt('平均數・中位數・眾數', 560, 275, 40, { p: prog(lt, .7, .6), color: COL.blue });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    txt('先看分布形狀，再選代表值', 1350, 500, 44, { p: prog(lt, 1.3, .6), color: COL.black });
+  } };
+  const order = [[s1, 9], [s2, 7], [s3, 7], [s4, 7], [s5, 7], [s6, 3]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP1, dur: t, tag: '高等體育統計｜第 1 章 EP1　集中趨勢：平均數、中位數、眾數', scenes,
+    sources: ['資料來源', 'Galton (1907) Vox Populi, Nature；Wallis (2014) arXiv:1410.3989', '主計總處 受雇員工薪資統計（講義 p.15）', '課堂資料：lung cancer study（478 位）', '林老師講義〈第一章 描述資料特徵的統計量及圖表〉'] };
+})();
+EPISODES['c1e1'] = C1E1;

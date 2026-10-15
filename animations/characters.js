@@ -268,3 +268,6 @@ function wilcoxon(x, y, s, pose = {}, opts) { return figure(WILCOXON, x, y, s, p
 const P = Math.PI;
 const DANCE_DAD = t => ({ la: [P + .15, -.25 + Math.sin(t * 6) * .15], ra: [-.1, -P / 2 - .3 + Math.sin(t * 6 + 1) * .15], spread: 95, knee: 18, lean: -6, mouth: 'grit', bob: Math.abs(Math.sin(t * 6)) * -10 });
 const DANCE_MOM = t => ({ la: [P - .6, -.6 + Math.sin(t * 6 + 2) * .2], ra: [P / 2 - .9, P - .2], liftL: 40 + Math.sin(t * 6) * 10, spread: 62, knee: -14, lean: 8, mouth: 'o', bob: Math.abs(Math.sin(t * 6 + 1)) * -8 });
+// 高爾頓（1906 年，85 歲）：白鬍、禿頭、背心
+const GALTON = { ...GOSSET, hair: 'bald', hat: undefined, mustache: true, glasses: 'round', pose0: { spread: 50, mouth: 'smile' } };
+function galton(x, y, s, pose = {}, opts) { return figure(GALTON, x, y, s, pose, opts); }
