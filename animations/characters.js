@@ -271,3 +271,7 @@ const DANCE_MOM = t => ({ la: [P - .6, -.6 + Math.sin(t * 6 + 2) * .2], ra: [P /
 // 高爾頓（1906 年，85 歲）：白鬍、禿頭、背心
 const GALTON = { ...GOSSET, hair: 'bald', hat: undefined, mustache: true, glasses: 'round', pose0: { spread: 50, mouth: 'smile' } };
 function galton(x, y, s, pose = {}, opts) { return figure(GALTON, x, y, s, pose, opts); }
+const TUKEY = { ...WILCOXON, hair: 'side', glasses: 'thick', top: { fill: '#4a5a8a' }, sleeve: { fill: '#4a5a8a' }, bottom: { fill: '#3b3b48' }, pose0: { spread: 50, mouth: 'smile' } };
+function tukey(x, y, s, pose = {}, opts) { return figure(TUKEY, x, y, s, pose, opts); }
+const PLAYFAIR = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: undefined, top: { fill: '#7a2e2e', vest: true }, sleeve: { fill: '#7a2e2e' } };
+function playfair(x, y, s, pose = {}, opts) { return figure(PLAYFAIR, x, y, s, pose, opts); }
