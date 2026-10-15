@@ -294,3 +294,16 @@ const BRISTOL = { ...MOM, top: { fill: '#5f8f6a' }, sleeve: { fill: '#5f8f6a' },
 function bristol(x, y, s, pose = {}, opts) { return figure(BRISTOL, x, y, s, pose, opts); }
 const EPEARSON = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: undefined, top: { fill: '#4a4a55', vest: true }, sleeve: { fill: '#4a4a55' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'flat' } };
 function epearson(x, y, s, pose = {}, opts) { return figure(EPEARSON, x, y, s, pose, opts); }
+// 第 5 章：鮑林（白髮、貝雷帽無→圓眼鏡、藍襯衫）、克魯斯卡（側分、灰西裝）
+const PAULING = { ...GOSSET, hat: undefined, hair: 'bald', mustache: false, glasses: 'round', top: { fill: '#4a78b0', vest: false }, sleeve: { fill: '#4a78b0' }, bottom: { fill: '#3b3b48' }, pose0: { spread: 46, mouth: 'smile' } };
+function pauling(x, y, s, pose = {}, opts) { return figure(PAULING, x, y, s, pose, opts); }
+const KRUSKAL = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: 'thick', top: { fill: '#6b6b75', vest: true }, sleeve: { fill: '#6b6b75' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'flat' } };
+function kruskal(x, y, s, pose = {}, opts) { return figure(KRUSKAL, x, y, s, pose, opts); }
+// 第 6 章：卡爾・皮爾森（禿頭、鬍子、深色西裝）
+const KPEARSON = { ...GOSSET, hat: undefined, hair: 'bald', mustache: true, glasses: undefined, top: { fill: '#3a3a4a', vest: true }, sleeve: { fill: '#3a3a4a' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'flat' } };
+function kpearson(x, y, s, pose = {}, opts) { return figure(KPEARSON, x, y, s, pose, opts); }
+// 第 7 章：斯皮爾曼（側分、鬍子、灰外套）、勒讓德（長髮→側分、無鬍、米色外套）
+const SPEARMAN = { ...GOSSET, hat: undefined, hair: 'side', mustache: true, glasses: undefined, top: { fill: '#6b6b75', vest: true }, sleeve: { fill: '#6b6b75' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'flat' } };
+function spearman(x, y, s, pose = {}, opts) { return figure(SPEARMAN, x, y, s, pose, opts); }
+const LEGENDRE = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: undefined, top: { fill: '#c9b58a', vest: true }, sleeve: { fill: '#c9b58a' }, bottom: { fill: '#3b3b48' }, pose0: { spread: 46, mouth: 'smile' } };
+function legendre(x, y, s, pose = {}, opts) { return figure(LEGENDRE, x, y, s, pose, opts); }

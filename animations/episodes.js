@@ -1749,3 +1749,547 @@ const C3E3 = (() => {
     sources: ['資料來源', 'Neyman & Pearson (1933)；Fisher (1925) Statistical Methods for Research Workers', '講義例：空腹血糖 100 vs 126 mg/dl、切點 115（p.20–21；標準差 10 為示意）', '林老師講義〈估計及檢定〉p.17–21、作業 4–5'] };
 })();
 EPISODES['c3e3'] = C3E3;
+
+// ============ 第 5 章 EP1：變異數分析（為什麼不能兩兩比） ============
+const ORG = [['Stomach 胃', 13, 286.0, 124.0, [124, 42, 25, 45, 412, 51, 1112, 46, 103, 876, 146, 340, 396]], ['Bronchus 支氣管', 17, 211.6, 155.0, [81, 461, 20, 450, 246, 166, 63, 64, 155, 859, 151, 166, 37, 223, 138, 72, 245]], ['Colon 結腸', 17, 457.4, 372.0, [248, 377, 189, 1843, 180, 537, 519, 455, 406, 365, 942, 776, 372, 163, 101, 20, 283]], ['Ovary 卵巢', 6, 884.3, 406.0, [1234, 89, 201, 356, 2970, 456]], ['Breast 乳房', 11, 1395.9, 1166.0, [1235, 24, 1581, 1166, 40, 727, 3808, 791, 1804, 3460, 719]]];
+const C5E1 = (() => {
+  const s1 = { beats: [0, 2.6, 5.6], draw(lt) {
+    txt('講義例：配方奶加 DHA，四種濃度，嬰兒 18 個月時測視力與認知', 960, 130, 42, { p: prog(lt, .2, .9), color: COL.black });
+    const G = [['0%', COL.gray], ['0.32%', COL.blueL], ['0.64%', COL.blue], ['0.96%', COL.pink]];
+    const pos = [[560, 330], [1360, 330], [560, 700], [1360, 700]];
+    G.forEach(([lab, col], i) => { const k = prog(lt, .5 + i * .25, .5), [x, y] = pos[i]; appear(k, () => { shape(roundRectPts(x - 150, y - 60, 300, 120, 24), { fill: COL.white, w: 4 }); txt('DHA ' + lab, x, y + 12, 36, { color: i === 0 ? COL.gray : COL.black }); }); });
+    const pairs = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
+    pairs.forEach(([a, b], i) => { const k = prog(lt, 2.7 + i * .3, .4); if (k > 0) { const [x1, y1] = pos[a], [x2, y2] = pos[b]; ink([[x1, y1], [x2, y2]], { w: 4, color: COL.red, p: k, alpha: .8 }); } });
+    const kc = prog(lt, 4.6, .5);
+    if (kc > 0) txt('兩兩比較：6 次 t 檢定', 960, 515, 40, { color: COL.red, p: kc });
+    noteBox(960, 900, 1100, 90, [['每次 α = 0.05：6 次都不犯錯 0.95⁶ = 0.735 → 至少錯一次 0.265', 32, COL.red]], '#fff8e2', prog(lt, 5.7, .7));
+  } };
+  const s2 = { beats: [0, 3.0], draw(lt) {
+    ground(lt, 140, 760);
+    fisher(420, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: 'smile', bob: idle(RLT) * .3 });
+    txt('1920 年代・洛桑：費雪的「變異數分析」', 1200, 130, 50, { p: prog(lt, .2, .9), color: COL.black });
+    // field plots
+    const k = prog(lt, .6, .8);
+    appear(k, () => { for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { const col = [COL.greenL, COL.mustard, COL.pinkL, COL.blueL][(r + c) % 4]; shape(rectPts(880 + c * 110, 300 + r * 90, 100, 80), { fill: col, smooth: false, w: 3 }); } txt('田間試驗：不同肥料、不同小區', 1095, 620, 28, { color: COL.gray }); });
+    noteBox(1500, 400, 560, 130, [['一次檢定所有組：', 32], ['總變異 = 組間 + 組內', 36, COL.blue]], '#fff8e2', prog(lt, 3.1, .6));
+    txt('F 分配以他的姓氏命名（Snedecor, 1934）', 1200, 800, 30, { color: COL.gray, p: prog(lt, 4.2, .5) });
+  } };
+  const s3 = { beats: [0, 2.4, 5.0, 7.4], draw(lt) {
+    txt('把總變異拆成兩塊', 960, 130, 52, { p: prog(lt, .2, .8), color: COL.black });
+    const X = v => 300 + v * 1.1, base = 640;
+    const grp = [[320, [20, 60, 80, 110, 150]], [560, [230, 260, 300, 330, 370]], [800, [430, 470, 520, 560, 590]]];
+    const gm = 350;
+    axis(260, 1340, base, { p: prog(lt, .3, .4) });
+    grp.forEach(([m, pts], gi) => { const col = [COL.blue, COL.green, COL.pink][gi]; pts.forEach((v, i) => { const k = prog(lt, .4 + gi * .3 + i * .06, .3); shape(ellPts(X(v), base - 40 - i * 28, 11, 11, 0, 7, 10), { fill: col, w: 2.5, alpha: k }); }); const km = prog(lt, 2.5 + gi * .2, .4); if (km > 0) { inkLine(X(m) - 0, base - 200, X(m), base - 10, { w: 4, color: col, p: km }); txt('組平均', X(m), base - 220, 24, { color: col, p: km }); } });
+    const kg = prog(lt, 2.6, .5);
+    if (kg > 0) { ink([[X(gm), base - 250], [X(gm), base - 5]], { w: 4, color: COL.black, dash: true, p: kg }); txt('總平均', X(gm), base - 270, 24, { color: COL.black, p: kg }); }
+    const kb = prog(lt, 5.1, .6);
+    if (kb > 0) { grp.forEach(([m]) => { inkLine(X(gm), base + 30, X(m), base + 30, { w: 6, color: COL.red, p: kb }); }); txt('組間：各組平均離總平均多遠 → SSB', 800, base + 70, 30, { color: COL.red, p: kb }); }
+    const kw = prog(lt, 7.5, .6);
+    if (kw > 0) { grp.forEach(([m, pts], gi) => pts.forEach((v, i) => inkLine(X(m), base - 40 - i * 28, X(v), base - 40 - i * 28, { w: 2.5, color: COL.gray, p: kw }))); txt('組內：每個點離自己組平均多遠 → SSW', 800, base + 110, 30, { color: COL.gray, p: kw }); }
+    noteBox(1600, 300, 560, 180, [['SST = SSB + SSW', 36, COL.black], ['F = MSB ÷ MSW', 36, COL.blue], ['組間大於組內 → 有差異', 26, COL.gray]], '#fff8e2', prog(lt, 5.4, .6));
+  } };
+  const s4 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('課堂資料：64 位晚期癌症病人，依器官分 5 組，存活天數', 960, 130, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 300 + v / 4000 * 1300, rows = ORG;
+    axis(280, 1660, 760, { p: prog(lt, .3, .4) });
+    [0, 1000, 2000, 3000, 4000].forEach(v => { inkLine(X(v), 752, X(v), 768, { w: 3, p: prog(lt, .3, .4) }); txt(v.toLocaleString(), X(v), 795, 24, { p: prog(lt, .3, .4) }); });
+    txt('天', 1680, 795, 24, { p: prog(lt, .3, .4) });
+    rows.forEach(([lab, n, m, md, pts], i) => {
+      const y = 240 + i * 100, k = prog(lt, .5 + i * .3, .5);
+      if (k <= 0) return;
+      txt(lab, 150, y + 8, 26, { color: COL.black, p: k, align: 'left' });
+      pts.forEach((v, j) => shape(ellPts(X(v), y + (rnd(i * 50 + j, 2) - .5) * 30, 8, 8, 0, 7, 8), { fill: COL.blueL, w: 2, alpha: k }));
+      const km = prog(lt, 2.7 + i * .2, .4); if (km > 0) { inkLine(X(m), y - 28, X(m), y + 28, { w: 6, color: COL.red, p: km }); txt('平均 ' + m.toLocaleString(), X(m) + 16, y - 24, 22, { color: COL.red, align: 'left', p: km }); }
+    });
+    noteBox(1560, 460, 560, 110, [['乳癌組平均 1,396 天', 30, COL.red], ['支氣管組只有 212 天', 30, COL.blue]], '#fff8e2', prog(lt, 4.0, .6));
+    noteBox(960, 900, 1000, 80, [['五組平均真的不同？還是抽樣的運氣？→ ANOVA', 34, COL.black]], COL.white, prog(lt, 5.5, .6));
+  } };
+  const s5 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('變異數分析表（講義）', 960, 130, 50, { p: prog(lt, .2, .8), color: COL.black });
+    const X0 = 240, Y0 = 230, cols = [['變異來源', 0], ['平方和', 330], ['自由度', 620], ['均方', 840], ['F', 1130], ['p 值', 1330]];
+    const kh = prog(lt, .4, .5);
+    appear(kh, () => { cols.forEach(([t, dx]) => txt(t, X0 + dx + 60, Y0, 30, { color: COL.gray, align: 'left' })); inkLine(X0, Y0 + 30, X0 + 1500, Y0 + 30, { w: 3.5 }); });
+    const rows = [['組間（處理）', '11,535,761', '4', '2,883,940', '6.43', '0.00023', .9, COL.red], ['組內（誤差）', '26,448,144', '59', '448,274', '', '', 1.5, COL.gray], ['總和', '37,983,905', '63', '', '', '', 2.0, COL.black]];
+    rows.forEach(([a, b, c, d, e, f, at, col], i) => { const k = prog(lt, at, .5), y = Y0 + 90 + i * 80; appear(k, () => { [a, b, c, d, e, f].forEach((t, j) => txt(t, X0 + cols[j][1] + 60, y, 30, { color: j === 0 ? COL.black : col, align: 'left' })); }); });
+    inkLine(X0, Y0 + 90 + 2 * 80 - 40, X0 + 1500, Y0 + 90 + 2 * 80 - 40, { w: 2.5, p: prog(lt, 2.0, .4) });
+    noteBox(960, 580, 1100, 90, [['F = MSB ÷ MSW = 2,883,940 ÷ 448,274 = 6.43', 34, COL.blue]], '#fff8e2', prog(lt, 2.7, .6));
+    const k = prog(lt, 5.5, .8);
+    if (k > 0) {
+      const base = 850, cx = 700, wh = 500, hs = 200, fpdf = z => { const x = z + 1.2; return x > 0 ? Math.pow(x, 1) * Math.exp(-x * 1.8) * 2.2 : 0; };
+      shadeUnder(cx, base, wh, hs, fpdf, 1.6, 3.6, COL.pink, { alpha: .9 });
+      axis(240, 1260, base, { p: k }); curve(cx, base, wh, hs, fpdf, { w: 5, p: k, range: 3.6 });
+      txt('F(4, 59) 分布', 420, 700, 26, { color: COL.gray, p: k }); txt('6.43', cx + 2.4 / 3.6 * wh, 825, 26, { color: COL.red, p: k });
+      noteBox(1560, 780, 560, 110, [['p = 0.00023 < 0.05', 32, COL.red], ['五組平均存活天數有顯著差異', 26, COL.black]], COL.white, prog(lt, 6.2, .6));
+    }
+  } };
+  const s6 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('變異數分析', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(330, 790, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['三組以上 → 一次檢定', 38, COL.blue], ['不要兩兩做 t 檢定', 28, COL.red]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['F = 組間均方 ÷ 組內均方', 36, COL.black], ['前提：常態、變異數相同、獨立', 26, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('F 顯著，只說「至少有兩組不同」', 1400, 150, 40, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 9], [s2, 7], [s3, 11], [s4, 9], [s5, 10], [s6, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP1, dur: t, tag: '高等體育統計｜第 5 章 EP1　變異數分析：為什麼不能兩兩比', scenes,
+    sources: ['資料來源', 'Fisher (1925) Statistical Methods for Research Workers；F 分配命名：Snedecor (1934)', '課堂資料 survival.csv（64 位病人、5 個器官）；講義 ANOVA 表', 'DHA 配方奶例與整體型一錯誤：講義 p.3–4', '林老師講義〈第五章 平均數檢定：多組樣本〉'] };
+})();
+EPISODES['c5e1'] = C5E1;
+
+// ============ 第 5 章 EP2：事後檢定 Bonferroni ============
+const BONF = [['Breast − Bronchus', 1184.3, 0.0003, true], ['Breast − Colon', 938.5, 0.0061, true], ['Breast − Stomach', 1109.9, 0.0015, true], ['Breast − Ovary', 511.6, 1, false], ['Bronchus − Ovary', -672.7, 0.3857, false], ['Ovary − Stomach', 598.3, 0.7528, false], ['Colon − Ovary', -426.9, 1, false], ['Bronchus − Colon', -245.8, 1, false], ['Colon − Stomach', 171.4, 1, false], ['Bronchus − Stomach', -74.4, 1, false]];
+const C5E2 = (() => {
+  const s1 = { beats: [0, 3.0, 6.0], draw(lt) {
+    ground(lt, 140, 760);
+    pauling(420, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: 'smile', bob: idle(RLT) * .3 });
+    txt('1976–1978・鮑林與卡麥隆：維他命 C 與晚期癌症', 1200, 130, 48, { p: prog(lt, .2, .9), color: COL.black });
+    appear(prog(lt, .6, .6), () => { shape(roundRectPts(900, 300, 120, 220, 20), { fill: COL.mustard, w: 4 }); txt('維他命', 960, 390, 24, { color: COL.black }); txt('C', 960, 440, 40, { color: COL.black }); txt('每天 10 公克', 960, 570, 26, { color: COL.gray }); });
+    noteBox(1500, 360, 600, 130, [['兩座諾貝爾獎得主', 30, COL.gray], ['報告：存活時間延長 3–4 倍', 32, COL.blue]], '#fff8e2', prog(lt, 1.4, .6));
+    noteBox(1500, 600, 600, 130, [['後來梅約診所的隨機試驗', 28, COL.gray], ['找不到效果：對照組不可比', 28, COL.red]], COL.white, prog(lt, 3.1, .6));
+    txt('課堂的 64 位病人存活資料，就出自這項研究', 1200, 820, 32, { color: COL.black, p: prog(lt, 6.1, .6) });
+  } };
+  const s2 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('F 顯著了，然後呢？哪幾組不一樣？', 960, 130, 50, { p: prog(lt, .2, .8), color: COL.black });
+    const X = v => 300 + v / 1600 * 1300, y = 430;
+    axis(280, 1660, y, { p: prog(lt, .4, .4) });
+    ORG.forEach(([lab, n, m], i) => { const k = prog(lt, .6 + i * .2, .4); const col = [COL.blue, COL.blue, COL.blue, COL.blue, COL.red][i]; if (k > 0) { shape(ellPts(X(m), y, 16, 16, 0, 7, 12), { fill: col, w: 3, alpha: k }); txt(lab.split(' ')[1], X(m), y - 40 - (i % 2) * 36, 26, { color: col, p: k }); } });
+    txt('各組平均存活天數', 960, 540, 28, { color: COL.gray, p: prog(lt, 1.6, .4) });
+    noteBox(960, 640, 1100, 90, [['5 組兩兩比較：C(5,2) = 10 對', 36, COL.black]], '#fff8e2', prog(lt, 2.7, .6));
+    noteBox(960, 790, 1100, 100, [['1936・Bonferroni：每對改用 α/10 = 0.005', 34, COL.blue], ['整體型一錯誤才不超過 0.05', 28, COL.gray]], COL.white, prog(lt, 5.3, .6));
+  } };
+  const s3 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('Bonferroni 多重比較（講義表）', 960, 120, 46, { p: prog(lt, .2, .8), color: COL.black });
+    const X0 = 300, Y0 = 200;
+    appear(prog(lt, .4, .5), () => { txt('比較', X0, Y0, 26, { color: COL.gray, align: 'left' }); txt('差異（天）', X0 + 520, Y0, 26, { color: COL.gray, align: 'left' }); txt('修正 p 值', X0 + 860, Y0, 26, { color: COL.gray, align: 'left' }); inkLine(X0 - 20, Y0 + 24, X0 + 1140, Y0 + 24, { w: 3 }); });
+    BONF.forEach(([lab, d, p, sig], i) => { const k = prog(lt, .6 + i * .22, .4), y = Y0 + 70 + i * 56; appear(k, () => { txt(lab, X0, y, 28, { color: sig ? COL.red : COL.black, align: 'left' }); txt((d > 0 ? '+' : '') + d.toLocaleString(), X0 + 520, y, 28, { color: sig ? COL.red : COL.gray, align: 'left' }); txt(p === 1 ? '1' : p.toFixed(4), X0 + 860, y, 28, { color: sig ? COL.red : COL.gray, align: 'left' }); }); });
+    const ks = prog(lt, 2.7, .6);
+    if (ks > 0) ink(roundRectPts(X0 - 30, Y0 + 40, 1160, 3 * 56 + 10, 14), { closed: true, w: 5, color: COL.red, p: ks });
+    noteBox(1620, 400, 520, 160, [['只有 3 對顯著：', 30, COL.black], ['乳癌 vs 支氣管、結腸、胃', 28, COL.red], ['乳癌組存活顯著較長', 26, COL.gray]], '#fff8e2', prog(lt, 3.2, .6));
+    noteBox(1620, 720, 520, 130, [['t 的分母用全部 5 組', 26, COL.gray], ['的 MSW 來估變異', 26, COL.gray]], COL.white, prog(lt, 5.5, .6));
+  } };
+  const s4 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 1500, 1800);
+    dad(1700, GY, .75, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: 'smile' });
+    txt('事後檢定的兩個原則', 760, 140, 50, { p: prog(lt, .2, .8), color: COL.black });
+    noteBox(760, 330, 1100, 150, [['① 先做整體 F 檢定', 38, COL.blue], ['F 不顯著，就不用再往下比', 30, COL.gray]], '#fff8e2', prog(lt, .5, .6));
+    noteBox(760, 580, 1100, 150, [['② 多重比較要控制整體型一錯誤', 36, COL.red], ['Bonferroni：α ÷ 比較次數', 30, COL.gray]], '#fff8e2', prog(lt, 2.7, .6));
+    txt('問 10 個問題，就要付 10 倍的小心', 760, 820, 34, { color: COL.black, p: prog(lt, 4.0, .6) });
+  } };
+  const s5 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('事後檢定', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['F 顯著 → 再問「誰不一樣」', 36, COL.blue], ['Bonferroni：α / 比較數', 28, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['乳癌 vs 支氣管、結腸、胃', 34, COL.red], ['其他 7 對沒有顯著差異', 28, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('資料還要問：各組可比嗎？', 1400, 150, 40, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 10], [s2, 9], [s3, 9], [s4, 7], [s5, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP2, dur: t, tag: '高等體育統計｜第 5 章 EP2　事後檢定：Bonferroni 多重比較', scenes,
+    sources: ['資料來源', 'Cameron & Pauling (1976, 1978) PNAS；Moertel et al. (1985) NEJM（梅約診所試驗）', 'Bonferroni (1936)；Dunn (1961) 多重比較', '講義 Bonferroni 多重比較表（10 對、3 對顯著）；survival.csv 重算相符', '林老師講義〈第五章 平均數檢定：多組樣本〉'] };
+})();
+EPISODES['c5e2'] = C5E2;
+
+// ============ 第 5 章 EP3：Kruskal–Wallis 與作業 ============
+const SUPP = [['A', [1.21, 1.19, 1.17, 1.23, 1.29, 1.14], 1.205], ['B', [1.34, 1.41, 1.38, 1.29, 1.36, 1.42, 1.37, 1.32], 1.361], ['C', [1.45, 1.45, 1.51, 1.39, 1.44], 1.448], ['D', [1.31, 1.32, 1.28, 1.35, 1.41, 1.27, 1.37], 1.33]];
+const C5E3 = (() => {
+  const s1 = { beats: [0, 3.0], draw(lt) {
+    ground(lt, 140, 760);
+    kruskal(420, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    txt('1952・芝加哥：克魯斯卡與瓦利斯的「秩次」檢定', 1200, 130, 48, { p: prog(lt, .2, .9), color: COL.black });
+    const vals = [20, 45, 124, 155, 372, 1166, 3808], cols = [COL.blue, COL.blue, COL.pink, COL.green, COL.pink, COL.mustardD, COL.mustardD];
+    vals.forEach((v, i) => { const k = prog(lt, .6 + i * .2, .4); appear(k, () => { shape(roundRectPts(880 + i * 130, 380, 110, 70, 14), { fill: COL.white, w: 3 }); txt(v.toLocaleString(), 935 + i * 130, 425, 24, { color: cols[i] }); }); const kr = prog(lt, 3.1 + i * .15, .4); if (kr > 0) rankTag(935 + i * 130, 520, i + 1, kr); });
+    txt('不管數值多大，只看排第幾', 1330, 620, 34, { color: COL.black, p: prog(lt, 4.4, .5) });
+    noteBox(1330, 780, 900, 80, [['不需要常態、不怕極端值：ANOVA 的無母數版本', 30, COL.blue]], '#fff8e2', prog(lt, 5.0, .6));
+  } };
+  const s2 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('課堂資料：存活天數偏斜、各組變異差很多 → 改用 Kruskal–Wallis', 960, 130, 42, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 300 + v / 4000 * 1300;
+    ORG.forEach(([lab, n, m, md, pts], i) => { const y = 230 + i * 80, k = prog(lt, .4 + i * .2, .4); if (k <= 0) return; txt(lab.split(' ')[1], 150, y + 8, 26, { color: COL.black, p: k, align: 'left' }); pts.forEach((v, j) => shape(ellPts(X(v), y + (rnd(i * 50 + j, 2) - .5) * 24, 7, 7, 0, 7, 8), { fill: COL.blueL, w: 2, alpha: k })); const km = prog(lt, 2.7 + i * .15, .4); if (km > 0) { inkLine(X(md), y - 24, X(md), y + 24, { w: 6, color: COL.green, p: km }); txt('中位數 ' + md.toLocaleString(), X(md) + 14, y - 20, 20, { color: COL.green, align: 'left', p: km }); } });
+    axis(280, 1660, 650, { p: prog(lt, .3, .4) }); [0, 1000, 2000, 3000, 4000].forEach(v => txt(v.toLocaleString(), X(v), 685, 22, { p: prog(lt, .3, .4) }));
+    noteBox(960, 820, 1200, 100, [['H0：五組中位數相同。H = 14.95，自由度 4，p = 0.0048', 32, COL.red], ['結論同 ANOVA：各組不全相同', 28, COL.gray]], '#fff8e2', prog(lt, 5.3, .6));
+  } };
+  const s3 = { beats: [0, 2.6, 5.2, 7.6], draw(lt) {
+    txt('作業：26 位選手，A、B、C、D 四種營養補充品，一週增重（公斤）', 960, 130, 42, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 360 + (v - 1.1) / .45 * 1100, base = 620;
+    axis(330, 1500, base, { p: prog(lt, .3, .4) }); [1.1, 1.2, 1.3, 1.4, 1.5].forEach(v => { inkLine(X(v), base - 8, X(v), base + 8, { w: 3, p: prog(lt, .3, .4) }); txt(v.toFixed(1), X(v), base + 36, 24, { p: prog(lt, .3, .4) }); });
+    SUPP.forEach(([lab, pts, m], i) => { const y = 230 + i * 90, col = [COL.blue, COL.green, COL.pink, COL.mustardD][i], k = prog(lt, .5 + i * .2, .4); if (k <= 0) return; txt(lab, 300, y + 10, 32, { color: col, p: k }); pts.forEach((v, j) => shape(ellPts(X(v), y + (rnd(i * 20 + j, 3) - .5) * 20, 9, 9, 0, 7, 8), { fill: col, w: 2.5, alpha: k })); const km = prog(lt, 2.7 + i * .15, .4); if (km > 0) { inkLine(X(m), y - 28, X(m), y + 28, { w: 5, color: COL.red, p: km }); txt(m.toFixed(2), X(m), y - 36, 22, { color: COL.red, p: km }); } });
+    noteBox(1660, 300, 480, 150, [['H0：四組平均相同', 30, COL.black], ['Ha：不全相同', 30, COL.pink]], '#fff8e2', prog(lt, 1.6, .5));
+    noteBox(1660, 540, 480, 150, [['ANOVA：F(3, 22) = 25.4', 28, COL.red], ['p < 0.001', 32, COL.red]], COL.white, prog(lt, 5.3, .6));
+    noteBox(1660, 760, 480, 120, [['Kruskal–Wallis：', 26, COL.gray], ['H = 18.6, p = 0.0003', 28, COL.blue]], COL.white, prog(lt, 7.7, .6));
+    txt('SSB = 0.171, SSW = 0.049；MSB = 0.057, MSW = 0.0022', 900, 720, 28, { color: COL.gray, p: prog(lt, 5.8, .5) });
+  } };
+  const s4 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('作業 Bonferroni：6 對，每對 α = 0.05/6 = 0.0083', 960, 130, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const P = [['A − B', -0.156, 0.0000, true], ['A − C', -0.243, 0.0000, true], ['A − D', -0.125, 0.0006, true], ['B − C', -0.087, 0.024, true], ['B − D', 0.031, 1, false], ['C − D', 0.118, 0.0019, true]];
+    const X0 = 360, Y0 = 220;
+    appear(prog(lt, .4, .5), () => { txt('比較', X0, Y0, 26, { color: COL.gray, align: 'left' }); txt('差異（kg）', X0 + 360, Y0, 26, { color: COL.gray, align: 'left' }); txt('修正 p 值', X0 + 700, Y0, 26, { color: COL.gray, align: 'left' }); inkLine(X0 - 20, Y0 + 24, X0 + 1000, Y0 + 24, { w: 3 }); });
+    P.forEach(([lab, d, p, sig], i) => { const k = prog(lt, .6 + i * .3, .4), y = Y0 + 80 + i * 70; appear(k, () => { txt(lab, X0, y, 32, { color: sig ? COL.red : COL.black, align: 'left' }); txt((d > 0 ? '+' : '') + d.toFixed(3), X0 + 360, y, 30, { color: sig ? COL.red : COL.gray, align: 'left' }); txt(p === 1 ? '1' : p < .0001 ? '< 0.0001' : p.toFixed(4), X0 + 700, y, 30, { color: sig ? COL.red : COL.gray, align: 'left' }); }); });
+    noteBox(1560, 380, 560, 150, [['5 對顯著', 36, COL.red], ['只有 B 與 D 分不出來', 28, COL.gray]], '#fff8e2', prog(lt, 2.7, .6));
+    noteBox(1560, 640, 560, 150, [['C 增重最多（1.45 kg）', 30, COL.pink], ['A 最少（1.21 kg）', 30, COL.blue]], COL.white, prog(lt, 5.3, .6));
+  } };
+  const s5 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('多組比較', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['常態、變異數相同 → ANOVA', 34, COL.blue], ['否則 → Kruskal–Wallis', 30, COL.green]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['整體顯著 → Bonferroni 事後', 34, COL.red], ['每組至少 5 人', 26, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('先整體，再兩兩', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 8], [s2, 9], [s3, 11], [s4, 9], [s5, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP3, dur: t, tag: '高等體育統計｜第 5 章 EP3　Kruskal–Wallis 與作業', scenes,
+    sources: ['資料來源', 'Kruskal & Wallis (1952) JASA 47:583–621', '課堂 survival.csv（K-W H = 14.95）；作業 26 位選手增重（講義 p.24–25；課程網站 SPS）', '作業重算：F = 25.4、H = 18.6、Bonferroni 6 對', '林老師講義〈第五章 平均數檢定：多組樣本〉'] };
+})();
+EPISODES['c5e3'] = C5E3;
+
+// ============ 第 6 章 EP1：卡方獨立性檢定 ============
+function table2x2(x, y, cw, rh, rows, cols, cells, k, opts = {}) { // cells: [[text,color]...] row-major incl. totals
+  appear(k, () => {
+    txt('', x, y, 1);
+    cols.forEach((c, j) => txt(c, x + cw * (j + 1) + cw / 2, y - 20, 28, { color: COL.gray }));
+    rows.forEach((r, i) => txt(r, x + cw / 2, y + rh * i + rh / 2 + 10, 28, { color: COL.gray }));
+    inkLine(x, y + 10, x + cw * (cols.length + 1), y + 10, { w: 3.5 }); inkLine(x + cw, y - 50, x + cw, y + rh * rows.length + 10, { w: 3.5 });
+    cells.forEach((row, i) => row.forEach((c, j) => { const [t, col, sub] = Array.isArray(c) ? c : [c, COL.black]; txt(String(t), x + cw * (j + 1) + cw / 2, y + rh * i + rh / 2 + (sub ? -4 : 10), opts.size || 34, { color: col || COL.black }); if (sub) txt(sub, x + cw * (j + 1) + cw / 2, y + rh * i + rh / 2 + 34, 22, { color: COL.gray }); }));
+  });
+}
+const C6E1 = (() => {
+  const s1 = { beats: [0, 3.0], draw(lt) {
+    ground(lt, 140, 760);
+    kpearson(420, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    txt('1900・倫敦：卡爾・皮爾森的卡方檢定', 1200, 130, 50, { p: prog(lt, .2, .9), color: COL.black });
+    noteBox(1200, 330, 900, 130, [['觀測次數 O　vs　期望次數 E', 36, COL.black], ['χ² = Σ (O − E)² ÷ E', 40, COL.blue]], '#fff8e2', prog(lt, .8, .6));
+    noteBox(1200, 560, 900, 110, [['差得愈多，χ² 愈大，愈不像「無關」', 32, COL.red]], COL.white, prog(lt, 3.1, .6));
+    txt('適用於兩個「類別」變數：有／無、是／否、A／B／C', 1200, 760, 30, { color: COL.gray, p: prog(lt, 4.2, .5) });
+  } };
+  const s2 = { beats: [0, 2.8], draw(lt) {
+    txt('講義案例：血清鉀濃度低，日後較容易得糖尿病？', 960, 130, 48, { p: prog(lt, .2, .9), color: COL.black });
+    const k = prog(lt, .5, 1.2);
+    for (let i = 0; i < 60; i++) { const kk = clamp(k * 60 - i); if (kk > 0) mini(220 + (i % 15) * 60, 300 + Math.floor(i / 15) * 80, .45, i % 8 === 0 ? COL.pink : COL.blueL, 'dots'); }
+    txt('12,209 位受試者，追蹤 9 年，1,475 人診斷出糖尿病', 660, 680, 32, { color: COL.black, p: prog(lt, 1.4, .5) });
+    const G = [['< 4.0', 1.64], ['4.0–4.5', 1.64], ['4.5–5.0', 1.39], ['5.0–5.5', 1.0]];
+    const base = 700, x0 = 1260;
+    axis(1220, 1800, base, { p: prog(lt, 2.9, .4) });
+    G.forEach(([lab, r], i) => { const h = r * 180 * easeOut(prog(lt, 3.0 + i * .2, .5)), x = x0 + i * 130 + 50; bar(x, base, 80, h, i === 3 ? COL.greenL : COL.pinkL, { pattern: 'hatch', patColor: i === 3 ? COL.green : COL.pink, sp: 14 }); txt(lab, x, base + 32, 22, { p: prog(lt, 2.9, .4) }); if (h > 5) txt(r.toFixed(2) + ' 倍', x, base - h - 20, 24, { color: COL.black, p: prog(lt, 3.4 + i * .2, .3) }); });
+    txt('血清鉀 (mEq/L)：糖尿病罹患率相對第四組', 1510, 790, 24, { color: COL.gray, p: prog(lt, 3.0, .4) });
+    noteBox(1510, 300, 540, 110, [['兩個類別變數：', 28, COL.gray], ['鉀濃度組別 × 是否得病', 30, COL.blue]], '#fff8e2', prog(lt, 4.6, .6));
+  } };
+  const s3 = { beats: [0, 2.6, 5.2, 7.8], draw(lt) {
+    txt('講義例：職級 × 喜歡新式刷卡系統？', 960, 120, 46, { p: prog(lt, .2, .8), color: COL.black });
+    table2x2(240, 230, 200, 90, ['主管', '非主管', '欄總合'], ['喜歡新制', '喜歡舊制', '列總合'], [[55, 45, [100, COL.gray]], [70, 30, [100, COL.gray]], [[125, COL.gray], [75, COL.gray], [200, COL.gray]]], prog(lt, .5, .6));
+    txt('觀測值 O', 640, 560, 28, { color: COL.gray, p: prog(lt, .5, .6) });
+    const k2 = prog(lt, 2.7, .6);
+    table2x2(1120, 230, 200, 90, ['主管', '非主管', '欄總合'], ['喜歡新制', '喜歡舊制', '列總合'], [[[62.5, COL.blue], [37.5, COL.blue], [100, COL.gray]], [[62.5, COL.blue], [37.5, COL.blue], [100, COL.gray]], [[125, COL.gray], [75, COL.gray], [200, COL.gray]]], k2);
+    txt('期望值 E = 列總合 × 欄總合 ÷ N', 1520, 560, 28, { color: COL.blue, p: k2 });
+    txt('若職級與喜好無關，兩列的比例應該一樣：125/200 = 62.5%', 960, 640, 30, { color: COL.gray, p: prog(lt, 3.4, .5) });
+    noteBox(960, 720, 1200, 90, [['χ² = (55−62.5)²/62.5 + (45−37.5)²/37.5 + (70−62.5)²/62.5 + (30−37.5)²/37.5 = 4.8', 28, COL.red]], '#fff8e2', prog(lt, 5.3, .7));
+    noteBox(960, 830, 1200, 80, [['自由度 (2−1)(2−1) = 1，p = 0.028 < 0.05 → 職級與喜好有關（葉氏校正 4.18，p = 0.041）', 26, COL.black]], COL.white, prog(lt, 7.9, .7));
+  } };
+  const s4 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('課堂資料 PPHN：胎齡 < 34 週，和新生兒死亡有關嗎？（表 6-1、6-2）', 960, 120, 44, { p: prog(lt, .2, .9), color: COL.black });
+    noteBox(960, 220, 1100, 80, [['H0：死亡與胎齡 < 34 週無關　　Ha：有關', 34, COL.blue]], '#fff8e2', prog(lt, .4, .6));
+    table2x2(420, 350, 200, 110, ['存活', '死亡', '合計'], ['< 34 週', '≥ 34 週', '合計'], [[[26, COL.black, '列 23.2%'], [86, COL.black, '列 76.8%'], [112, COL.gray]], [[6, COL.black, '列 31.6%'], [13, COL.black, '列 68.4%'], [19, COL.gray]], [[32, COL.gray], [99, COL.gray], [131, COL.gray]]], prog(lt, .8, .6));
+    const k = prog(lt, 2.7, .6);
+    if (k > 0) { txt('死亡組早產比例 31.6%，存活組 23.2%：看起來有差', 1560, 400, 26, { color: COL.gray, p: k }); txt('但 19 位死亡裡只差 2 個人…', 1560, 450, 26, { color: COL.gray, p: prog(lt, 3.6, .5) }); }
+    noteBox(1560, 600, 620, 130, [['χ²（葉氏校正）= 0.246，自由度 1', 28, COL.red], ['p = 0.62 > 0.05', 36, COL.red]], COL.white, prog(lt, 5.5, .6));
+    txt('無法拒絕 H0：沒有證據顯示死亡與早產有關', 960, 850, 34, { color: COL.black, p: prog(lt, 6.4, .6) });
+  } };
+  const s5 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('卡方檢定', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['兩個類別變數 → 列聯表', 36, COL.blue], ['期望值 = 列總合 × 欄總合 ÷ N', 26, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['χ² = Σ(O − E)² / E', 38, COL.red], ['自由度 (列−1)(欄−1)', 26, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('看的是「觀測離期望多遠」', 1400, 150, 42, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 7], [s2, 8], [s3, 11], [s4, 9], [s5, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP1, dur: t, tag: '高等體育統計｜第 6 章 EP1　卡方獨立性檢定', scenes,
+    sources: ['資料來源', 'Pearson (1900) Phil. Mag.；Wikipedia: Chi-squared test', '講義：血清鉀研究（康活健康知識網 2011）、刷卡系統例、PPHN 表 6-1/6-2（n = 131）', '課程網站 CH06 SPS 資料重算：χ² 4.8 / 0.246', '林老師講義〈第六章 兩個類別變數之檢定〉'] };
+})();
+EPISODES['c6e1'] = C6E1;
+
+// ============ 第 6 章 EP2：小樣本：葉氏校正與費雪精確檢定 ============
+const C6E2 = (() => {
+  const s1 = { beats: [0, 3.0], draw(lt) {
+    ground(lt);
+    fisher(1540, GY, .9, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: 'smile' });
+    txt('1934・葉慈的校正　／　1935・費雪的精確檢定', 960, 130, 48, { p: prog(lt, .2, .9), color: COL.black });
+    noteBox(640, 330, 800, 130, [['樣本小、期望次數 < 5 時', 32, COL.gray], ['卡方的近似會「太容易顯著」', 34, COL.red]], '#fff8e2', prog(lt, .8, .6));
+    noteBox(640, 540, 800, 130, [['葉氏：|O − E| 先減 0.5 再平方', 32, COL.blue], ['費雪：直接算出所有排法的機率', 32, COL.green]], COL.white, prog(lt, 3.1, .6));
+    txt('費雪的精確檢定，就是從「女士品茶」來的', 960, 800, 32, { color: COL.gray, p: prog(lt, 4.6, .5) });
+  } };
+  const s2 = { beats: [0, 2.8, 5.6], draw(lt) {
+    txt('講義例：52 張牌抽 6 張，抽到 2 張紅心', 960, 120, 48, { p: prog(lt, .2, .8), color: COL.black });
+    for (let i = 0; i < 6; i++) { const k = prog(lt, .5 + i * .15, .4); appear(k, () => { shape(roundRectPts(300 + i * 130, 220, 100, 140, 12), { fill: COL.white, w: 3.5 }); txt(i < 2 ? '♥' : '♠', 350 + i * 130, 305, 56, { color: i < 2 ? COL.red : COL.black }); }); }
+    table2x2(1140, 260, 200, 90, ['抽到', '沒抽到', ''], ['紅心', '非紅心', ''], [[2, 4, [6, COL.gray]], [11, 35, [46, COL.gray]], [[13, COL.gray], [39, COL.gray], [52, COL.gray]]], prog(lt, 1.6, .6));
+    noteBox(960, 560, 1100, 100, [['期望值：6 × 13 ÷ 52 = 1.5 張 → 小於 5，卡方不適用', 32, COL.red]], '#fff8e2', prog(lt, 2.9, .6));
+    noteBox(960, 720, 1200, 110, [['費雪：用超幾何分布算「恰好 2 張」的機率', 30, COL.green], ['C(13,2) × C(39,4) ÷ C(52,6) = 78 × 82,251 ÷ 20,358,520 = 0.315', 28, COL.black]], COL.white, prog(lt, 5.7, .7));
+    txt('把「同樣或更極端」的排法機率加總，就是精確 p 值', 960, 830, 28, { color: COL.gray, p: prog(lt, 7.2, .5) });
+  } };
+  const s3 = { beats: [0, 2.6, 5.2, 7.8], draw(lt) {
+    txt('作業：慢性疲勞症候群，A 藥物 vs 安慰劑，六週後症狀是否減輕', 960, 120, 42, { p: prog(lt, .2, .9), color: COL.black });
+    table2x2(300, 250, 220, 100, ['A 藥物', '安慰劑', '總計'], ['減輕', '未減輕', '總計'], [[[12, COL.green, '80.0%'], [3, COL.black, '20.0%'], [15, COL.gray]], [[3, COL.black, '17.6%'], [14, COL.red, '82.4%'], [17, COL.gray]], [[15, COL.gray], [17, COL.gray], [32, COL.gray]]], prog(lt, .5, .6));
+    noteBox(1500, 260, 680, 110, [['H0：藥物與症狀減輕無關', 30, COL.black], ['Ha：有關（藥物有效）', 30, COL.pink]], '#fff8e2', prog(lt, 1.4, .5));
+    noteBox(1500, 440, 680, 130, [['期望次數：7.0、8.0、8.0、9.0', 28, COL.gray], ['都 ≥ 5，卡方可用', 30, COL.blue]], COL.white, prog(lt, 2.7, .6));
+    noteBox(1500, 620, 680, 130, [['χ² = 12.44，p = 0.0004', 30, COL.red], ['葉氏校正 10.06，p = 0.0015', 26, COL.gray]], COL.white, prog(lt, 5.3, .6));
+    noteBox(1500, 800, 680, 110, [['費雪精確檢定（雙尾）', 26, COL.gray], ['p = 0.0010 → 藥物有效', 32, COL.green]], '#fff8e2', prog(lt, 7.9, .6));
+    txt('有效率 80% vs 17.6%：差距大，樣本雖小也顯著', 760, 740, 30, { color: COL.black, p: prog(lt, 4.0, .5) });
+  } };
+  const s4 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 1500, 1800);
+    mom(1700, GY, .8, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: 'smile', bob: idle(RLT) * .3 });
+    txt('卡方檢定的適用條件', 760, 140, 52, { p: prog(lt, .2, .8), color: COL.black });
+    const Q = [[.5, '觀測值彼此獨立（一人一格）', true], [1.3, '類別互斥、涵蓋所有情形', true], [2.7, '每格期望次數 ≥ 5', true], [3.5, '資料要常態分布', false]];
+    Q.forEach(([at, q, ok], i) => { const k = prog(lt, at, .5), y = 280 + i * 140; appear(k, () => { shape(rectPts(200, y - 50, 900, 100), { fill: COL.white, smooth: false, w: 3.5 }); txt(q, 650, y + 10, 32, { color: COL.black }); }); const ka = prog(lt, at + .4, .4); if (ka > 0) (ok ? check : cross)(1160, y, 1, ka); });
+    txt('期望次數太小 → 改用費雪精確檢定', 650, 835, 34, { color: COL.green, p: prog(lt, 4.2, .6) });
+  } };
+  const s5 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('小樣本', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(440, 680, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['先看期望次數', 38, COL.blue], ['≥ 5 → 卡方（2×2 可加葉氏校正）', 26, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['< 5 → 費雪精確檢定', 38, COL.green], ['超幾何分布，直接算機率', 26, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('作業結論：A 藥物有效', 1400, 150, 42, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 7], [s2, 10], [s3, 11], [s4, 7], [s5, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP2, dur: t, tag: '高等體育統計｜第 6 章 EP2　小樣本：葉氏校正與費雪精確檢定', scenes,
+    sources: ['資料來源', 'Yates (1934) JRSS Suppl.；Hitchcock (2009) Yates and contingency tables: 75 years later', 'Fisher (1935) The Design of Experiments', '講義紅心例（p.13）；作業 CFS 資料（p.15；課程網站 CH06_homework_CFS_source.sps）重算', '林老師講義〈第六章 兩個類別變數之檢定〉'] };
+})();
+EPISODES['c6e2'] = C6E2;
+
+// ============ 第 6 章 EP3：大樣本與配對：疫苗資料與 McNemar ============
+const C6E3 = (() => {
+  const VAX = [['無接種', 41, 1504669, 27.2], ['一劑', 19, 1152401, 16.5], ['兩劑', 39, 6298333, 6.2], ['三劑', 59, 12031990, 4.9]];
+  const s1 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('講義資料：2022 年台灣，接種劑次 × 中重症（台大醫師整理）', 960, 120, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const X0 = 220, Y0 = 220;
+    appear(prog(lt, .4, .5), () => { ['接種狀態', '中重症', '總人數', '每百萬中重症'].forEach((h, j) => txt(h, X0 + [0, 300, 600, 980][j] + 100, Y0, 28, { color: COL.gray, align: 'left' })); inkLine(X0, Y0 + 28, X0 + 1400, Y0 + 28, { w: 3.5 }); });
+    VAX.forEach(([lab, s, n, r], i) => { const k = prog(lt, .7 + i * .3, .5), y = Y0 + 90 + i * 80; appear(k, () => { txt(lab, X0 + 100, y, 32, { color: COL.black, align: 'left' }); txt(String(s), X0 + 400, y, 32, { color: COL.red, align: 'left' }); txt(n.toLocaleString(), X0 + 700, y, 32, { color: COL.black, align: 'left' }); }); const kr = prog(lt, 2.7 + i * .25, .4); if (kr > 0) { bar(X0 + 1080 + r * 7, y + 2, r * 14, 44, i === 0 ? COL.pinkL : COL.blueL, { pattern: 'hatch', patColor: i === 0 ? COL.pink : COL.blue, sp: 12 }); txt(r.toFixed(1), X0 + 1100 + r * 14, y + 10, 28, { color: i === 0 ? COL.red : COL.blue, align: 'left' }); } });
+    noteBox(960, 640, 1100, 90, [['未接種 27.2 vs 三劑 4.9（每百萬）：差 5.5 倍', 34, COL.red]], '#fff8e2', prog(lt, 4.2, .6));
+    noteBox(960, 790, 1100, 90, [['4×2 列聯表 χ² = 102.5，自由度 3，p < 0.001', 32, COL.blue]], COL.white, prog(lt, 5.5, .6));
+  } };
+  const s2 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('合併成 2×2：未接種 vs 有接種', 960, 120, 48, { p: prog(lt, .2, .8), color: COL.black });
+    table2x2(300, 260, 240, 110, ['無接種', '有接種', ''], ['中重症', '輕症／無症狀', '總人數'], [[[41, COL.red], '1,504,628', ['1,504,669', COL.gray]], [[117, COL.red], '19,482,607', ['19,482,724', COL.gray]], [['158', COL.gray], ['20,987,235', COL.gray], ['20,987,393', COL.gray]]], prog(lt, .5, .6), { size: 30 });
+    noteBox(1600, 330, 560, 130, [['每百萬：27.2 vs 6.0', 32, COL.red], ['相對風險約 4.5 倍', 30, COL.black]], '#fff8e2', prog(lt, 2.7, .6));
+    noteBox(1600, 540, 560, 130, [['χ² = 83.7，自由度 1', 30, COL.blue], ['p < 0.001', 36, COL.blue]], COL.white, prog(lt, 3.6, .6));
+    noteBox(960, 800, 1300, 100, [['樣本兩千萬人：任何小差異都會「顯著」，所以要同時報告效果量（倍數）', 30, COL.black]], '#fff8e2', prog(lt, 5.3, .7));
+  } };
+  const s3 = { beats: [0, 2.8, 5.6], draw(lt) {
+    txt('同一批人前後比：McNemar 檢定（1947）', 960, 120, 48, { p: prog(lt, .2, .8), color: COL.black });
+    ground(lt, 140, 460);
+    kid(300, GY, .9, { bob: idle(RLT) * .4, mouth: 'smile' });
+    txt('訓練前 → 訓練後', 300, 300, 30, { color: COL.gray, p: prog(lt, .4, .5) });
+    const k = prog(lt, .6, .6);
+    table2x2(640, 280, 240, 110, ['前：達標', '前：未達標', ''], ['後：達標', '後：未達標', ''], [[['a', COL.gray], ['b', COL.red]], [['c', COL.blue], ['d', COL.gray]]], k);
+    noteBox(1560, 330, 600, 130, [['配對資料不是獨立的', 30, COL.red], ['不能用一般卡方', 30, COL.red]], '#fff8e2', prog(lt, 2.9, .6));
+    noteBox(1560, 560, 600, 150, [['只看「改變」的兩格 b、c', 30, COL.black], ['χ² = (b − c)² ÷ (b + c)', 34, COL.blue]], COL.white, prog(lt, 5.7, .6));
+    txt('a、d 沒變化，對「訓練有沒有效」沒有資訊', 960, 820, 30, { color: COL.gray, p: prog(lt, 6.8, .5) });
+  } };
+  const s4 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('類別變數', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['獨立樣本 → 卡方／費雪', 36, COL.blue], ['看期望次數選方法', 26, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['配對樣本 → McNemar', 36, COL.green], ['只看改變的格子', 26, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('顯著之外，還要看倍數', 1400, 150, 42, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 10], [s2, 9], [s3, 9], [s4, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP3, dur: t, tag: '高等體育統計｜第 6 章 EP3　大樣本與配對：疫苗資料與 McNemar', scenes,
+    sources: ['資料來源', '講義 p.17 疫苗資料（Yahoo 新聞，台大醫師整理，2022）；課程網站 CH06_class_vaccine_source.sps', 'McNemar (1947) Psychometrika 12:153–157', '重算：4×2 χ² = 102.5；2×2 χ² = 83.7', '林老師講義〈第六章 兩個類別變數之檢定〉'] };
+})();
+EPISODES['c6e3'] = C6E3;
+
+// 第 7 章散佈圖子樣本（各 300 筆，CVD_All_spss.csv；r0 為模擬資料）
+const SC7 = {"age_sbp":[[65.0,147.0],[29.0,146.0],[46.0,154.0],[47.0,179.0],[44.0,103.0],[38.0,124.0],[60.0,120.0],[46.0,99.0],[36.0,147.0],[43.0,102.0],[57.0,166.5],[34.0,122.5],[27.0,102.0],[58.0,149.0],[49.0,120.0],[50.0,111.0],[49.0,120.0],[57.0,97.5],[32.0,132.5],[43.0,137.0],[40.0,121.0],[66.0,104.0],[49.0,123.0],[40.0,111.5],[72.0,129.5],[75.0,142.5],[33.0,86.5],[40.0,126.5],[51.0,133.5],[59.0,134.0],[36.0,111.0],[72.0,136.0],[46.0,166.0],[39.0,130.0],[39.0,128.0],[49.0,149.0],[35.0,97.0],[22.0,105.0],[27.0,99.0],[38.0,101.0],[63.0,134.0],[37.0,94.0],[24.0,120.0],[41.0,146.0],[54.0,125.0],[64.0,124.0],[37.0,126.0],[56.0,117.0],[41.0,126.0],[57.0,130.0],[42.0,103.5],[51.0,129.0],[40.0,100.0],[44.0,150.0],[61.0,145.5],[47.0,177.0],[44.0,138.0],[42.0,108.0],[25.0,115.0],[63.0,157.5],[45.0,130.0],[33.0,126.5],[22.0,87.5],[34.0,144.0],[52.0,120.0],[40.0,103.5],[48.0,134.0],[74.0,168.0],[42.0,117.0],[61.0,179.0],[51.0,130.0],[43.0,167.0],[42.0,131.0],[33.0,114.0],[40.0,100.5],[31.0,106.5],[25.0,120.0],[46.0,131.0],[42.0,133.0],[26.0,141.0],[33.0,86.0],[70.0,172.0],[58.0,140.0],[39.0,104.0],[32.0,129.0],[29.0,144.0],[51.0,103.0],[31.0,143.0],[55.0,132.0],[51.0,130.0],[68.0,114.0],[53.0,100.0],[44.0,125.0],[61.0,131.0],[48.0,113.0],[64.0,127.0],[62.0,154.0],[53.0,136.0],[32.0,113.5],[37.0,143.5],[34.0,120.0],[55.0,111.0],[37.0,123.0],[62.0,149.0],[47.0,160.0],[47.0,127.0],[45.0,132.0],[71.0,118.0],[34.0,94.0],[50.0,127.0],[41.0,102.0],[58.0,113.5],[73.0,145.0],[71.0,130.0],[61.0,139.0],[76.0,154.5],[51.0,120.0],[45.0,115.5],[38.0,110.0],[34.0,146.0],[68.0,117.0],[50.0,147.0],[34.0,144.0],[59.0,132.0],[54.0,136.0],[72.0,165.0],[42.0,145.0],[33.0,122.0],[56.0,87.0],[34.0,133.0],[41.0,119.0],[34.0,124.0],[21.0,115.0],[75.0,123.0],[50.0,123.5],[40.0,100.5],[44.0,94.0],[47.0,111.5],[45.0,122.0],[31.0,119.0],[68.0,108.0],[30.0,89.0],[44.0,120.0],[48.0,148.0],[43.0,100.5],[35.0,88.5],[31.0,107.5],[70.0,112.0],[24.0,120.0],[73.0,156.5],[42.0,88.5],[52.0,93.5],[24.0,107.0],[61.0,126.5],[45.0,123.5],[65.0,156.5],[74.0,165.0],[61.0,119.5],[39.0,109.0],[74.0,137.5],[50.0,115.5],[37.0,112.0],[55.0,111.0],[60.0,145.0],[49.0,113.0],[34.0,116.0],[45.0,119.5],[50.0,127.0],[52.0,139.5],[45.0,124.0],[44.0,116.0],[60.0,134.0],[58.0,119.0],[43.0,95.0],[31.0,119.0],[46.0,180.0],[75.0,152.5],[34.0,99.0],[37.0,146.0],[45.0,114.5],[53.0,119.0],[26.0,118.5],[64.0,104.5],[54.0,141.0],[50.0,123.0],[63.0,128.0],[36.0,118.5],[30.0,89.0],[68.0,130.5],[42.0,127.0],[55.0,133.0],[29.0,122.0],[50.0,119.0],[24.0,130.0],[50.0,135.0],[49.0,118.0],[37.0,107.5],[40.0,103.5],[57.0,123.0],[43.0,116.0],[36.0,110.0],[62.0,125.5],[68.0,143.5],[50.0,109.5],[52.0,106.0],[27.0,114.0],[33.0,124.0],[33.0,112.0],[38.0,107.5],[69.0,159.0],[43.0,137.5],[74.0,163.5],[46.0,105.0],[53.0,138.0],[71.0,174.0],[36.0,117.5],[62.0,109.0],[50.0,95.0],[59.0,164.0],[70.0,106.0],[49.0,131.0],[57.0,113.5],[63.0,144.5],[67.0,110.0],[46.0,146.0],[44.0,113.0],[28.0,93.0],[78.0,181.0],[58.0,142.5],[47.0,110.0],[47.0,132.5],[31.0,104.0],[20.0,101.0],[62.0,169.0],[38.0,93.0],[64.0,111.0],[66.0,126.5],[50.0,117.5],[55.0,109.0],[46.0,145.5],[52.0,133.0],[51.0,122.0],[70.0,124.5],[43.0,109.0],[51.0,125.5],[31.0,114.0],[26.0,120.0],[25.0,129.0],[45.0,102.0],[38.0,102.0],[77.0,160.5],[25.0,87.0],[77.0,150.0],[41.0,124.5],[61.0,136.5],[74.0,138.0],[49.0,110.0],[51.0,99.0],[43.0,109.5],[59.0,127.0],[32.0,105.0],[62.0,189.0],[23.0,112.5],[52.0,123.0],[64.0,115.5],[36.0,85.5],[52.0,144.0],[61.0,173.0],[75.0,157.5],[57.0,127.5],[69.0,124.0],[48.0,160.0],[59.0,125.0],[43.0,111.0],[59.0,128.0],[55.0,181.0],[44.0,135.0],[67.0,131.0],[26.0,104.0],[58.0,149.5],[30.0,153.0],[56.0,130.0],[56.0,107.0],[26.0,113.0],[49.0,119.0],[52.0,150.0],[30.0,116.0],[78.0,164.0],[45.0,98.5],[63.0,150.0],[51.0,112.0],[50.0,114.0],[29.0,106.0],[62.0,145.0],[33.0,99.5],[64.0,140.0],[53.0,138.0],[63.0,121.0],[31.0,128.0],[32.0,99.0]],"dbp_sbp":[[66.5,100.0],[64.0,91.0],[69.5,109.0],[76.5,121.0],[75.0,152.5],[75.0,100.0],[70.0,104.0],[79.0,109.5],[70.0,106.0],[78.0,121.0],[85.0,127.0],[101.0,169.5],[71.5,93.0],[67.0,94.0],[79.0,134.0],[80.0,113.0],[95.5,162.5],[65.5,102.5],[77.5,145.5],[100.0,140.0],[87.5,130.5],[94.0,132.0],[74.5,113.5],[60.0,100.0],[66.5,122.5],[76.5,116.0],[78.0,113.5],[87.0,154.0],[73.0,107.0],[97.0,146.0],[63.5,97.5],[70.0,105.5],[64.0,110.0],[86.0,133.0],[69.0,109.5],[93.0,122.0],[83.0,110.5],[50.0,98.0],[74.5,128.0],[105.0,143.0],[80.0,108.0],[99.0,142.5],[80.0,115.0],[91.0,138.0],[78.0,128.0],[70.0,120.0],[77.0,99.0],[62.0,101.0],[92.5,130.0],[96.0,140.5],[71.0,111.0],[84.0,120.0],[76.0,107.0],[107.5,197.0],[74.0,136.0],[84.5,131.0],[71.5,110.5],[79.0,128.5],[75.0,145.5],[82.0,115.0],[70.0,104.5],[76.0,116.5],[71.0,101.0],[82.0,130.5],[75.0,120.0],[70.0,99.0],[69.0,113.0],[75.5,99.5],[65.5,140.0],[86.0,114.0],[66.0,133.0],[93.5,126.5],[69.0,133.0],[86.0,144.5],[68.5,104.0],[75.0,123.0],[68.0,96.0],[76.5,113.0],[84.0,114.0],[79.0,119.0],[74.0,120.0],[73.0,120.0],[72.0,108.0],[90.5,137.0],[62.0,116.5],[74.0,146.0],[122.5,184.5],[67.0,104.0],[76.0,138.0],[57.0,88.0],[75.0,136.0],[87.5,147.0],[78.5,115.0],[84.0,121.0],[87.0,140.0],[62.0,90.0],[94.0,137.0],[70.0,104.0],[89.0,125.0],[69.0,120.0],[67.5,100.0],[76.0,124.0],[108.5,156.0],[67.5,98.5],[69.0,112.0],[81.0,121.0],[93.0,174.5],[92.0,151.0],[70.0,106.0],[104.0,152.0],[86.5,152.0],[78.0,132.0],[72.0,115.0],[90.0,134.0],[81.0,124.0],[93.0,153.5],[67.0,125.0],[89.0,141.5],[75.5,112.5],[64.5,103.5],[68.5,89.5],[78.0,121.5],[90.5,160.5],[90.0,159.5],[86.0,137.0],[81.0,110.0],[81.0,164.0],[69.5,103.0],[82.0,107.0],[65.0,90.5],[76.0,132.5],[86.0,114.0],[73.0,153.0],[79.5,114.5],[81.0,134.0],[77.5,109.5],[78.5,131.0],[72.0,110.0],[71.0,112.0],[83.0,118.0],[77.0,124.0],[93.0,150.5],[85.5,142.0],[75.0,104.5],[84.0,135.0],[62.0,103.0],[81.0,103.0],[72.0,133.5],[73.0,128.0],[87.0,136.0],[72.0,112.0],[70.0,103.5],[72.0,139.0],[77.0,122.0],[79.5,130.0],[76.5,109.5],[63.0,115.0],[100.0,109.0],[79.5,129.0],[107.5,163.5],[100.5,162.5],[93.0,142.0],[66.0,103.5],[57.0,97.0],[72.5,113.5],[78.0,181.0],[96.0,148.0],[98.5,166.0],[81.0,121.0],[81.0,139.0],[87.0,151.0],[74.5,109.5],[74.0,125.0],[83.0,124.0],[69.5,103.5],[70.0,114.5],[72.0,129.0],[68.0,108.0],[74.0,119.5],[80.5,118.0],[93.0,141.0],[76.0,128.0],[68.0,92.0],[62.0,108.0],[64.0,127.0],[73.5,127.0],[76.0,110.0],[81.5,141.0],[73.0,127.0],[85.0,136.5],[73.0,124.0],[80.5,151.5],[79.5,114.5],[64.0,107.0],[69.0,145.5],[62.5,89.5],[67.5,105.0],[84.5,138.0],[92.0,141.0],[85.5,127.0],[66.0,103.0],[69.5,106.0],[79.5,136.0],[83.0,131.5],[59.5,87.0],[76.5,111.0],[79.0,132.0],[80.5,118.0],[85.0,121.5],[69.0,98.0],[84.0,116.5],[84.0,130.0],[87.0,116.0],[89.5,142.5],[79.0,128.0],[93.0,137.5],[67.0,117.0],[60.0,109.0],[72.5,105.0],[73.0,112.5],[76.5,110.5],[72.5,107.0],[90.5,130.0],[79.5,123.5],[63.0,105.0],[74.0,138.0],[78.0,116.0],[91.0,145.0],[71.0,140.5],[79.0,107.0],[68.0,127.0],[76.0,114.5],[94.0,153.0],[60.0,93.5],[76.0,110.0],[86.0,142.0],[61.0,88.5],[63.0,124.0],[89.0,132.0],[80.0,114.0],[74.5,106.0],[79.0,135.0],[80.0,117.0],[83.0,141.0],[67.0,104.0],[70.5,108.0],[89.0,121.0],[80.5,115.5],[60.0,111.0],[72.5,114.5],[100.0,130.0],[90.0,140.0],[82.0,119.5],[70.0,110.0],[78.0,113.0],[79.0,156.0],[77.5,122.5],[74.0,109.0],[70.5,98.0],[86.0,159.0],[74.5,103.0],[83.5,141.5],[66.5,109.0],[81.0,132.0],[104.5,192.0],[116.5,236.0],[95.0,147.0],[72.5,99.5],[75.0,101.0],[66.0,107.5],[93.0,133.0],[77.5,117.5],[75.0,127.5],[78.0,142.0],[96.5,132.5],[83.5,122.5],[61.0,109.0],[79.0,148.0],[85.0,145.5],[79.5,168.5],[71.0,128.0],[79.0,122.5],[70.0,93.0],[92.0,147.0],[92.0,128.0],[62.0,81.0],[88.0,112.0],[81.0,138.0],[70.0,112.0],[73.0,153.0],[70.0,119.0],[65.5,102.5],[64.5,102.0],[69.5,130.0],[74.5,101.5],[67.5,124.0],[82.5,123.0],[83.5,141.5],[71.0,118.0],[77.0,126.5]],"waist_sbp":[[67.0,99.0],[82.0,161.0],[69.0,99.0],[98.0,172.0],[80.5,110.0],[85.0,121.0],[79.0,100.5],[81.0,141.0],[64.0,99.5],[63.0,125.0],[67.0,86.5],[62.0,91.0],[80.0,105.0],[96.0,132.5],[89.0,120.0],[79.0,123.0],[78.0,147.0],[79.0,146.5],[67.0,115.5],[79.0,114.0],[71.0,138.0],[95.0,117.0],[75.0,128.0],[64.0,111.0],[81.0,109.0],[83.0,105.5],[87.0,112.5],[67.0,94.0],[69.0,96.0],[81.0,121.5],[91.0,142.0],[61.0,100.0],[88.0,103.0],[73.0,117.5],[76.0,142.5],[67.0,114.0],[65.0,124.0],[67.0,109.0],[80.0,123.0],[64.0,106.0],[68.0,115.5],[70.0,102.0],[77.0,128.0],[74.5,134.0],[85.0,127.5],[66.0,121.0],[82.0,122.0],[81.0,104.5],[88.0,107.0],[83.0,105.0],[102.0,150.0],[66.0,126.0],[69.0,104.0],[69.0,113.5],[80.0,116.0],[97.0,130.5],[72.0,141.0],[74.0,130.0],[82.0,125.0],[76.0,161.0],[68.0,110.0],[87.0,157.0],[87.5,136.0],[98.0,140.0],[71.5,148.0],[83.0,123.0],[93.0,130.0],[72.0,95.0],[82.0,143.0],[74.0,129.0],[60.0,90.0],[74.0,173.5],[71.0,111.5],[79.0,114.0],[87.0,129.0],[93.0,144.5],[77.0,125.5],[91.0,147.5],[71.0,128.0],[66.0,104.0],[82.0,118.0],[78.0,95.5],[84.0,145.0],[83.0,148.0],[69.0,92.0],[79.0,107.0],[70.0,161.0],[90.0,136.5],[79.0,102.0],[64.0,103.0],[99.0,151.0],[77.0,117.0],[87.0,123.0],[87.0,117.0],[80.0,120.0],[63.0,95.0],[82.0,123.0],[71.0,98.0],[71.0,118.0],[167.0,112.0],[68.0,112.0],[80.0,110.0],[107.0,113.0],[77.0,85.0],[94.0,176.5],[84.0,126.0],[86.0,111.0],[94.0,129.5],[90.0,90.0],[79.0,121.0],[179.0,129.0],[73.0,123.0],[70.0,110.5],[74.0,105.0],[69.0,86.5],[81.0,151.5],[86.0,138.0],[78.0,135.0],[72.0,97.0],[83.0,117.0],[78.0,100.5],[85.0,111.0],[86.0,123.0],[80.0,110.0],[102.0,143.0],[64.0,131.5],[78.0,115.0],[67.0,105.0],[59.0,135.0],[85.0,136.0],[64.0,108.0],[83.5,129.0],[73.0,128.0],[81.0,140.5],[67.0,100.0],[66.0,108.0],[71.0,123.5],[75.0,104.0],[71.0,97.5],[68.0,113.5],[60.0,96.0],[69.0,112.0],[86.5,136.0],[87.0,125.5],[76.0,127.0],[74.0,114.5],[97.0,143.5],[77.0,106.0],[71.0,104.5],[96.0,111.0],[84.0,126.0],[80.0,133.0],[62.0,91.5],[89.0,117.0],[86.5,129.5],[85.0,130.0],[93.0,142.0],[93.0,96.0],[84.0,135.0],[79.0,118.0],[69.0,102.0],[70.0,121.0],[76.0,121.5],[73.0,110.0],[80.0,169.0],[70.0,100.0],[83.0,131.5],[99.0,155.0],[84.0,160.0],[79.0,118.0],[65.0,117.0],[79.0,134.0],[85.0,189.0],[89.0,143.0],[77.0,106.0],[89.0,130.0],[79.0,151.0],[105.0,120.0],[71.0,131.0],[102.0,143.0],[66.0,140.5],[91.0,124.5],[73.0,92.0],[88.0,131.5],[87.0,132.5],[79.0,135.5],[90.0,128.0],[80.0,110.0],[74.0,122.0],[75.0,110.5],[88.0,132.0],[75.0,92.0],[69.0,91.0],[89.5,130.0],[84.0,156.0],[83.0,108.0],[58.0,112.0],[74.0,92.0],[78.0,123.0],[87.0,108.0],[64.0,87.0],[64.0,103.0],[76.0,99.0],[67.0,98.5],[85.0,123.0],[71.0,115.0],[78.0,129.5],[67.0,124.0],[82.5,126.0],[70.0,108.5],[77.0,103.0],[68.0,110.5],[68.0,104.5],[59.5,124.0],[85.0,109.0],[76.0,144.0],[88.0,105.0],[69.0,133.0],[85.0,182.5],[64.0,105.0],[81.0,130.0],[67.0,138.0],[86.0,105.0],[91.0,153.0],[90.0,114.0],[60.0,132.0],[89.0,162.0],[67.0,101.0],[93.0,85.0],[87.0,141.0],[82.0,125.0],[83.0,160.0],[81.0,112.0],[67.0,91.0],[72.0,100.0],[90.0,146.0],[70.0,94.0],[85.0,133.5],[64.0,148.0],[68.0,113.0],[81.0,150.0],[73.0,123.0],[75.0,86.5],[63.0,115.0],[71.0,128.5],[71.0,118.0],[71.0,147.0],[69.0,125.0],[69.5,130.0],[97.0,129.0],[80.0,153.0],[84.0,156.5],[78.0,102.0],[63.0,88.0],[95.0,153.5],[88.0,117.5],[69.0,107.5],[84.0,106.5],[90.0,161.0],[70.0,126.0],[61.0,137.0],[95.0,172.0],[73.0,109.0],[89.0,114.5],[105.0,180.5],[80.0,116.5],[81.0,101.0],[70.5,104.0],[110.0,148.5],[76.0,142.0],[76.0,108.0],[77.0,129.0],[70.0,91.5],[69.0,147.0],[89.0,120.0],[68.0,129.0],[65.0,108.0],[86.0,138.0],[61.5,143.0],[84.0,157.0],[87.0,109.0],[103.0,128.0],[69.0,124.0],[82.0,105.0],[67.0,165.0],[90.0,145.5],[76.0,107.5],[78.0,137.0],[70.0,127.0],[73.0,133.5],[69.0,136.5],[100.0,134.0],[73.0,111.0],[76.0,107.0],[73.0,146.0],[81.0,157.0],[77.0,110.0],[78.0,95.0],[72.0,104.0],[62.0,102.0]],"r0":[[0.37,-1.96],[0.37,1.17],[1.08,-0.13],[-0.31,-1.44],[0.74,-1.14],[0.24,-0.9],[0.62,1.7],[-1.92,0.69],[1.18,-1.34],[-1.61,1.85],[-1.18,1.34],[0.73,-1.06],[-0.43,-2.66],[1.73,0.96],[0.13,-0.6],[-1.06,-0.14],[0.13,-0.52],[-0.43,1.26],[1.53,1.48],[1.61,0.81],[0.72,-0.15],[-0.42,0.26],[0.07,0.62],[1.04,-1.57],[-0.81,1.24],[-0.81,-0.32],[0.84,0.26],[0.73,0.14],[-0.24,0.91],[-0.28,1.07]]};
+// ============ 第 7 章 EP1：相關係數 ============
+function scatter(pts, X, Y, k, col = COL.blueL, r = 6) { pts.forEach((p, i) => { const kk = clamp(k * pts.length * .5 - i * .5 + 1); if (kk > 0) shape(ellPts(X(p[0]), Y(p[1]), r, r, 0, 7, 8), { fill: col, w: 1.8, alpha: kk * .85 }); }); }
+const C7E1 = (() => {
+  const s1 = { beats: [0, 3.0, 6.0], draw(lt) {
+    ground(lt, 140, 700);
+    galton(400, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: 'smile', bob: idle(RLT) * .3 });
+    txt('1886・高爾頓：父母身高 vs 子女身高', 1200, 130, 50, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 900 + (v - 60) / 18 * 700, Y = v => 760 - (v - 60) / 18 * 460, k = prog(lt, .6, 1.5);
+    axis(880, 1640, 760, { p: prog(lt, .5, .4) }); arrow(900, 780, 900, 280, { w: 4, head: 16, p: prog(lt, .5, .4) });
+    txt('父母平均身高', 1300, 800, 26, { color: COL.gray, p: prog(lt, .5, .4) }); txt('子女身高', 900, 260, 26, { color: COL.gray, p: prog(lt, .5, .4) });
+    const pts = []; for (let i = 0; i < 120; i++) { const px = 62 + rnd(i, 1) * 14 + rnd(i, 2) * 2, py = 69 + (px - 69) * .65 + (rnd(i, 3) - .5) * 5 + (rnd(i, 4) - .5) * 3; pts.push([px, py]); }
+    scatter(pts, X, Y, k);
+    const kl = prog(lt, 3.1, .8);
+    if (kl > 0) { ink([[X(62), Y(69 + (62 - 69) * .65)], [X(76), Y(69 + (76 - 69) * .65)]], { w: 5, color: COL.red, p: kl }); ink([[X(62), Y(62)], [X(76), Y(76)]], { w: 3, color: COL.gray, dash: true, p: kl }); txt('高個子的小孩，平均比父母矮一點：回歸到平庸', 1270, 230, 28, { color: COL.red, p: prog(lt, 3.8, .5) }); }
+    noteBox(1200, 880, 900, 80, [['1888 年他提出「相關」；皮爾森把它寫成係數 r', 30, COL.blue]], '#fff8e2', prog(lt, 6.1, .6));
+  } };
+  const s2 = { beats: [0, 2.8, 5.6], draw(lt) {
+    txt('講義：基隆社區篩檢資料，收縮壓 vs 年齡（隨機取 300 筆）', 960, 120, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 300 + (v - 15) / 70 * 1100, Y = v => 800 - (v - 60) / 160 * 560;
+    axis(280, 1440, 800, { p: prog(lt, .4, .4) }); arrow(300, 820, 300, 200, { w: 4, head: 16, p: prog(lt, .4, .4) });
+    [20, 40, 60, 80].forEach(v => txt(String(v), X(v), 835, 24, { p: prog(lt, .4, .4) })); [80, 120, 160, 200].forEach(v => txt(String(v), 262, Y(v) + 8, 22, { p: prog(lt, .4, .4), align: 'right' }));
+    txt('年齡', 1440, 835, 24, { color: COL.gray, p: prog(lt, .4, .4) }); txt('收縮壓', 300, 180, 24, { color: COL.gray, p: prog(lt, .4, .4) });
+    scatter(SC7.age_sbp, X, Y, prog(lt, .6, 2.0));
+    const kl = prog(lt, 2.9, .8); if (kl > 0) ink([[X(20), Y(93.79 + .63 * 20)], [X(80), Y(93.79 + .63 * 80)]], { w: 4, color: COL.red, p: kl });
+    noteBox(1660, 330, 480, 130, [['年齡愈大，收縮壓愈高', 28, COL.black], ['但散得很開', 28, COL.gray]], '#fff8e2', prog(lt, 3.2, .6));
+    noteBox(1660, 560, 480, 150, [['皮爾生相關係數', 26, COL.gray], ['r = 0.42', 44, COL.red], ['n = 63,251，p < 0.001', 22, COL.gray]], COL.white, prog(lt, 5.7, .6));
+  } };
+  const s3 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('r 從 −1 到 +1：雲的形狀', 960, 120, 50, { p: prog(lt, .2, .8), color: COL.black });
+    const R = [[-1, '−1'], [-0.6, '−0.6'], [0, '0'], [0.6, '0.6'], [1, '1']];
+    R.forEach(([r, lab], i) => {
+      const cx = 300 + i * 330, cy = 480, k = prog(lt, .5 + i * .4, .6); if (k <= 0) return;
+      shape(rectPts(cx - 130, cy - 130, 260, 260), { fill: COL.white, smooth: false, w: 3, alpha: k });
+      for (let j = 0; j < 60; j++) { const u = rnd(j + i * 100, 1) * 2 - 1, e = (rnd(j + i * 100, 2) * 2 - 1) * Math.sqrt(1 - r * r), v = r * u + e * .9; shape(ellPts(cx + u * 110, cy - v * 110, 5, 5, 0, 7, 6), { fill: COL.blue, w: 1.5, alpha: k * .8 }); }
+      txt('r = ' + lab, cx, cy + 180, 34, { color: COL.black, p: k });
+    });
+    txt('負相關：一個增加另一個減少', 630, 720, 28, { color: COL.gray, p: prog(lt, 2.7, .5) }); txt('正相關：一起增加', 1290, 720, 28, { color: COL.gray, p: prog(lt, 2.7, .5) });
+    noteBox(960, 850, 1100, 80, [['r 只量「線性」關係；|r| 愈接近 1，點愈貼近一條直線', 30, COL.blue]], '#fff8e2', prog(lt, 5.3, .6));
+  } };
+  const s4 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('講義表 7-2：年齡與各變數的皮爾生相關係數（n ≈ 59,000）', 960, 120, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const rows = [['腰圍', .347], ['收縮壓', .420], ['舒張壓', .256], ['飯前血糖', .220], ['高密度脂蛋白', -.012], ['三酸甘油脂', .129]];
+    const X0 = 640, Y0 = 260, X = v => 1000 + v * 900;
+    appear(prog(lt, .4, .5), () => { inkLine(X(0), Y0 - 30, X(0), Y0 + 6 * 90, { w: 3, dash: true }); txt('0', X(0), Y0 - 50, 24, { color: COL.gray }); txt('0.5', X(.5), Y0 - 50, 24, { color: COL.gray }); });
+    rows.forEach(([lab, r], i) => { const k = prog(lt, .6 + i * .3, .5), y = Y0 + i * 90 + 40; if (k <= 0) return; txt(lab, 500, y + 10, 30, { color: COL.black, p: k, align: 'right' }); const w = r * 900 * easeOut(k); shape(rectPts(Math.min(X(0), X(0) + w), y - 24, Math.abs(w), 48), { fill: r < 0 ? COL.pinkL : COL.blueL, smooth: false, w: 3, pattern: 'hatch', patColor: r < 0 ? COL.pink : COL.blue, sp: 12 }); txt(r.toFixed(3), X(0) + w + (r < 0 ? -50 : 50), y + 10, 28, { color: r < 0 ? COL.pink : COL.blue, p: k }); });
+    noteBox(1560, 760, 620, 110, [['都隨年齡增加而增加，', 28, COL.black], ['只有高密度脂蛋白略減', 28, COL.pink]], '#fff8e2', prog(lt, 2.7, .6));
+    txt('樣本六萬人：每個 r 都 p < 0.001，但 0.129 很弱、0.420 也只是中等', 960, 900, 28, { color: COL.gray, p: prog(lt, 5.3, .6) });
+  } };
+  const s5 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('相關係數', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['先畫散佈圖', 38, COL.blue], ['再算 r：−1 到 +1', 28, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['顯著 ≠ 很強', 38, COL.red], ['|r| 的大小才是關係強度', 28, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('相關不等於因果', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 10], [s2, 9], [s3, 9], [s4, 9], [s5, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP1, dur: t, tag: '高等體育統計｜第 7 章 EP1　相關係數：兩個連續變數的關係', scenes,
+    sources: ['資料來源', 'Galton (1886; 1888)；USU Statistics History: Correlation & Regression', '課堂資料 CVD_All_spss.csv：表 7-2 皮爾生係數重算（n ≈ 59,000）', '散佈圖為 300 筆隨機子樣本；高爾頓身高圖為示意', '林老師講義〈第七章 相關和廻歸分析（一）〉'] };
+})();
+EPISODES['c7e1'] = C7E1;
+
+// ============ 第 7 章 EP2：斯皮爾曼等級相關與極端值 ============
+const C7E2 = (() => {
+  const s1 = { beats: [0, 3.0], draw(lt) {
+    ground(lt, 140, 700);
+    spearman(400, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    txt('1904・斯皮爾曼：把數值換成名次再算相關', 1200, 130, 50, { p: prog(lt, .2, .9), color: COL.black });
+    const vals = [[98, 1], [117.5, 2], [134.5, 3], [135, 4], [138, 5], [153, 6], [191, 7]];
+    vals.forEach(([v, r], i) => { const k = prog(lt, .6 + i * .2, .4); appear(k, () => { shape(roundRectPts(820 + i * 130, 360, 110, 70, 14), { fill: COL.white, w: 3 }); txt(String(v), 875 + i * 130, 405, 24, { color: COL.black }); }); const kr = prog(lt, 3.1 + i * .15, .4); if (kr > 0) rankTag(875 + i * 130, 500, r, kr); });
+    txt('收縮壓 → 名次', 1265, 300, 28, { color: COL.gray, p: prog(lt, .5, .4) });
+    noteBox(1265, 660, 900, 110, [['兩個變數都換成名次，再算皮爾生 r', 30, COL.blue], ['不要求常態、也能抓到非線性的單調關係', 28, COL.gray]], '#fff8e2', prog(lt, 4.4, .6));
+  } };
+  const s2 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('講義表 7-4：收縮壓與各變數，兩種相關係數比較', 960, 120, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const rows = [['年齡', .420, .421], ['腰圍', .426, .458], ['舒張壓', .743, .742], ['飯前血糖', .191, .255], ['高密度脂蛋白', -.163, -.210], ['三酸甘油脂', .219, .322]];
+    const X0 = 520, Y0 = 220;
+    appear(prog(lt, .4, .5), () => { txt('皮爾生', X0 + 520, Y0, 28, { color: COL.blue }); txt('斯皮爾曼', X0 + 820, Y0, 28, { color: COL.green }); inkLine(X0 - 60, Y0 + 26, X0 + 1000, Y0 + 26, { w: 3.5 }); });
+    rows.forEach(([lab, p, sp], i) => { const k = prog(lt, .6 + i * .3, .5), y = Y0 + 90 + i * 85; appear(k, () => { txt(lab, X0 + 160, y, 30, { color: COL.black, align: 'right' }); txt(p.toFixed(3), X0 + 520, y, 32, { color: COL.blue }); }); const k2 = prog(lt, 2.7 + i * .2, .4); if (k2 > 0) txt(sp.toFixed(3), X0 + 820, y, 32, { color: COL.green, p: k2 }); });
+    noteBox(1660, 420, 480, 150, [['方向、大小都接近', 28, COL.black], ['偏斜的變數（血糖、三酸甘油脂）', 24, COL.gray], ['斯皮爾曼略高', 28, COL.green]], '#fff8e2', prog(lt, 5.3, .6));
+  } };
+  const s3 = { beats: [0, 2.8, 5.6, 8.0], draw(lt) {
+    txt('講義圖 7-3：一個極端值能做什麼？（模擬資料）', 960, 120, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 760 + (v + 3) / 12 * 760, Y = v => 820 - (v + 3) / 12 * 620;
+    axis(360, 1540, 820, { p: prog(lt, .4, .4) }); arrow(380, 840, 380, 200, { w: 4, head: 16, p: prog(lt, .4, .4) });
+    scatter(SC7.r0, X, Y, prog(lt, .6, 1.2), COL.blue, 7);
+    noteBox(1700, 330, 420, 170, [['30 個點', 26, COL.gray], ['皮爾生 −0.17', 30, COL.blue], ['斯皮爾曼 −0.17', 30, COL.green]], COL.white, prog(lt, 1.6, .5));
+    const ko = prog(lt, 2.9, .6);
+    if (ko > 0) { shape(ellPts(X(8), Y(8), 12, 12, 0, 7, 10), { fill: COL.red, w: 3, alpha: ko }); txt('加入 1 個極端點 (8, 8)', X(8) - 40, Y(8) + 50, 26, { color: COL.red, align: 'right', p: ko }); }
+    const kl = prog(lt, 5.7, .8);
+    if (kl > 0) { ink([[X(-3), Y(-3 * .6 - .2)], [X(8), Y(8 * .6 - .2)]], { w: 4, color: COL.red, dash: true, p: kl }); }
+    noteBox(1700, 600, 420, 170, [['31 個點', 26, COL.gray], ['皮爾生 0.59', 32, COL.red], ['斯皮爾曼 −0.06', 30, COL.green]], '#fff8e2', prog(lt, 5.8, .6));
+    noteBox(960, 900, 1100, 70, [['極端值能把「無關」變成「中度相關」；斯皮爾曼只看名次，幾乎不受影響', 26, COL.black]], COL.white, prog(lt, 8.1, .6));
+  } };
+  const s4 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('兩種相關', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['皮爾生：線性、常態', 36, COL.blue], ['用原始數值', 26, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['斯皮爾曼：單調、不怕極端值', 34, COL.green], ['用名次', 26, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('先看圖，再選係數', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 9], [s2, 9], [s3, 11], [s4, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP2, dur: t, tag: '高等體育統計｜第 7 章 EP2　斯皮爾曼等級相關與極端值', scenes,
+    sources: ['資料來源', 'Spearman (1904) Am. J. Psychol. 15:72–101', '課堂資料 CVD_All_spss.csv：表 7-4 斯皮爾曼係數重算', '極端值示範為模擬資料（30 點 + 1 點），對應講義圖 7-3', '林老師講義〈第七章 相關和廻歸分析（一）〉'] };
+})();
+EPISODES['c7e2'] = C7E2;
+
+// ============ 第 7 章 EP3：簡單線性迴歸與作業 ============
+const C7E3 = (() => {
+  const s1 = { beats: [0, 3.0], draw(lt) {
+    ground(lt, 140, 700);
+    legendre(400, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    txt('1805・勒讓德：最小平方法', 1200, 130, 50, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 900 + v * 70, Y = v => 760 - v * 50, pts = [[1, 2.2], [2, 2.6], [3, 4.1], [4, 3.9], [5, 5.6], [6, 5.2], [7, 7.1], [8, 6.9], [9, 8.4]];
+    axis(880, 1600, 760, { p: prog(lt, .4, .4) }); arrow(900, 780, 900, 260, { w: 4, head: 16, p: prog(lt, .4, .4) });
+    const a = 1.2, b = .78, k = prog(lt, .6, .8);
+    pts.forEach(([x, y], i) => { const kk = prog(lt, .6 + i * .1, .3); shape(ellPts(X(x), Y(y), 8, 8, 0, 7, 8), { fill: COL.blue, w: 2, alpha: kk }); });
+    const kl = prog(lt, 1.8, .6); if (kl > 0) ink([[X(0.5), Y(a + b * .5)], [X(9.5), Y(a + b * 9.5)]], { w: 4, color: COL.red, p: kl });
+    const kr = prog(lt, 3.1, .6); if (kr > 0) pts.forEach(([x, y]) => inkLine(X(x), Y(y), X(x), Y(a + b * x), { w: 3, color: COL.pink, p: kr }));
+    noteBox(1250, 860, 900, 80, [['找一條線，讓所有「殘差」的平方和最小', 32, COL.red]], '#fff8e2', prog(lt, 3.6, .6));
+    txt('殘差 = 觀測值 − 直線預測值', 1700, 300, 26, { color: COL.pink, p: prog(lt, 3.3, .5) });
+  } };
+  const s2 = { beats: [0, 2.6, 5.2, 7.6], draw(lt) {
+    txt('講義表 7-5：用年齡預測收縮壓', 960, 120, 48, { p: prog(lt, .2, .8), color: COL.black });
+    const X = v => 300 + (v - 15) / 70 * 1000, Y = v => 800 - (v - 60) / 160 * 560;
+    axis(280, 1340, 800, { p: prog(lt, .4, .4) }); arrow(300, 820, 300, 200, { w: 4, head: 16, p: prog(lt, .4, .4) });
+    [20, 40, 60, 80].forEach(v => txt(String(v), X(v), 835, 24, { p: prog(lt, .4, .4) })); [80, 120, 160, 200].forEach(v => txt(String(v), 262, Y(v) + 8, 22, { p: prog(lt, .4, .4), align: 'right' }));
+    scatter(SC7.age_sbp, X, Y, prog(lt, .5, 1.5));
+    const kl = prog(lt, 2.7, .8); if (kl > 0) ink([[X(20), Y(93.79 + .63 * 20)], [X(80), Y(93.79 + .63 * 80)]], { w: 5, color: COL.red, p: kl });
+    noteBox(1660, 300, 500, 130, [['收縮壓 = 93.79 + 0.63 × 年齡', 26, COL.red], ['斜率 0.63：每大 1 歲，平均高 0.63 mmHg', 22, COL.gray]], '#fff8e2', kl);
+    const kp = prog(lt, 5.3, .6);
+    if (kp > 0) { ink([[X(50), Y(60)], [X(50), Y(125.29)], [X(15), Y(125.29)]], { w: 3, color: COL.green, dash: true, p: kp }); shape(ellPts(X(50), Y(125.29), 12, 12, 0, 7, 10), { fill: COL.green, w: 3, alpha: kp }); noteBox(1660, 520, 500, 110, [['年齡 50 歲', 26, COL.gray], ['→ 預測 125.29 mmHg', 30, COL.green]], COL.white, kp); }
+    noteBox(1660, 730, 500, 130, [['斜率 p < 0.001，顯著', 26, COL.blue], ['但 R² 只有 0.1767', 30, COL.red]], COL.white, prog(lt, 7.7, .6));
+  } };
+  const s3 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('決定係數 R²：直線解釋了多少變異？', 960, 120, 48, { p: prog(lt, .2, .8), color: COL.black });
+    const panels = [[SC7.age_sbp, 'age', '年齡 → 收縮壓', 0.1767, [15, 85], 93.79, .63, 560], [SC7.dbp_sbp, 'dbp', '舒張壓 → 收縮壓', 0.552, [40, 140], 22.58, 1.289, 1360]];
+    panels.forEach(([pts, key, lab, r2, xr, a, b, cx], i) => {
+      const k = prog(lt, .5 + i * 2.6, .6); if (k <= 0) return;
+      const X = v => cx - 300 + (v - xr[0]) / (xr[1] - xr[0]) * 600, Y = v => 760 - (v - 60) / 160 * 480;
+      axis(cx - 320, cx + 320, 760, { p: k }); arrow(cx - 300, 780, cx - 300, 260, { w: 3.5, head: 14, p: k });
+      scatter(pts, X, Y, k, COL.blueL, 5); ink([[X(xr[0]), Y(a + b * xr[0])], [X(xr[1]), Y(a + b * xr[1])]], { w: 4, color: COL.red, p: k });
+      txt(lab, cx, 230, 32, { color: COL.black, p: k });
+      noteBox(cx, 850, 400, 70, [['R² = ' + r2, 36, i ? COL.green : COL.red]], '#fff8e2', prog(lt, 1.2 + i * 2.6, .5));
+    });
+    txt('R² = 0.18：點散得開，直線解釋不多　　R² = 0.55：點貼近直線', 960, 940, 26, { color: COL.gray, p: prog(lt, 5.3, .6) });
+  } };
+  const s4 = { beats: [0, 2.6, 5.2, 7.8], draw(lt) {
+    txt('作業：沒有心血管疾病的成人（n = 56,612），腰圍 → 收縮壓', 960, 120, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 300 + (v - 50) / 80 * 1000, Y = v => 800 - (v - 60) / 160 * 560;
+    axis(280, 1340, 800, { p: prog(lt, .4, .4) }); arrow(300, 820, 300, 200, { w: 4, head: 16, p: prog(lt, .4, .4) });
+    [60, 80, 100, 120].forEach(v => txt(String(v), X(v), 835, 24, { p: prog(lt, .4, .4) })); [80, 120, 160, 200].forEach(v => txt(String(v), 262, Y(v) + 8, 22, { p: prog(lt, .4, .4), align: 'right' }));
+    txt('腰圍 (cm)', 1340, 835, 24, { color: COL.gray, p: prog(lt, .4, .4) });
+    scatter(SC7.waist_sbp, X, Y, prog(lt, .5, 1.5));
+    noteBox(1660, 290, 500, 160, [['皮爾生 r = 0.428', 30, COL.blue], ['斯皮爾曼 ρ = 0.458', 30, COL.green], ['都 p < 0.001：顯著正相關', 22, COL.gray]], '#fff8e2', prog(lt, 2.7, .6));
+    const kl = prog(lt, 5.3, .8); if (kl > 0) ink([[X(55), Y(58.51 + .819 * 55)], [X(125), Y(58.51 + .819 * 125)]], { w: 5, color: COL.red, p: kl });
+    noteBox(1660, 500, 500, 130, [['收縮壓 = 58.51 + 0.819 × 腰圍', 26, COL.red], ['R² = 0.183（解釋 18.3%）', 26, COL.gray]], COL.white, kl);
+    const kp = prog(lt, 7.9, .6);
+    if (kp > 0) { ink([[X(100), Y(60)], [X(100), Y(140.4)], [X(50), Y(140.4)]], { w: 3, color: COL.green, dash: true, p: kp }); shape(ellPts(X(100), Y(140.4), 12, 12, 0, 7, 10), { fill: COL.green, w: 3, alpha: kp }); noteBox(1660, 740, 500, 160, [['腰圍 100 cm', 26, COL.gray], ['→ 平均 140.4 mmHg', 30, COL.green], ['是「平均」預測，個人會散開', 22, COL.gray]], '#fff8e2', kp); }
+  } };
+  const s5 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('線性迴歸', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['y = a + b x', 40, COL.red], ['斜率 b：x 每多 1，y 平均多 b', 26, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['R²：解釋了多少變異', 36, COL.blue], ['顯著 ≠ 預測得準', 26, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('預測的是「平均」', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 9], [s2, 11], [s3, 9], [s4, 11], [s5, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP3, dur: t, tag: '高等體育統計｜第 7 章 EP3　簡單線性迴歸與作業', scenes,
+    sources: ['資料來源', 'Legendre (1805) Nouvelles méthodes…；Leiden stathist 19th century', '課堂 CVD_All：表 7-5 收縮壓～年齡（R² 0.1767、50 歲 → 125.29）、收縮壓～舒張壓（R² 0.552）重算相符', '作業：無 CVD 者 n = 56,612，r 0.428、ρ 0.458、收縮壓 = 58.51 + 0.819 × 腰圍', '林老師講義〈第七章 相關和廻歸分析（一）〉'] };
+})();
+EPISODES['c7e3'] = C7E3;
