@@ -469,3 +469,87 @@ const EP3 = {
 };
 
 const EPISODES = { 1: EP1, 2: EP2, 3: EP3 };
+
+// ============ 第 4 章 EP1（真實資料版）：PPHN 課堂資料 + 109 學年運動代表隊作業資料 ============
+const EP1R = (() => {
+  const B = EP1.scenes;
+  const box = (x, y, w, h, lines, fill, k) => appear(k, () => {
+    shape(rectPts(x - w / 2, y - h / 2, w, h), { fill, smooth: false, w: 3.5 });
+    lines.forEach((l, i) => txt(l[0], x, y - (lines.length - 1) * 30 + i * 60, l[1] || 40, { color: l[2] || COL.black, p: clamp(k * 1.6) }));
+  });
+  // PPHN 新生兒 PH：131 筆，平均 7.131，SD 0.198，SE 0.0173；t = 7.571，df = 130
+  const PH = { 6.6: 2, 6.7: 3, 6.8: 12, 6.9: 5, 7.0: 17, 7.1: 24, 7.2: 28, 7.3: 24, 7.4: 14, 7.5: 2 };
+  const s3 = { beats: [0, 2.0, 4.5], draw(lt) {
+    ground(lt, 140, 520);
+    mom(250, GY, .85, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: lt > 5.6 ? 'open' : 'o', bob: idle(RLT) * .3 });
+    txt('131 位 PPHN 新生兒：平均 PH 是否等於 7？', 1160, 150, 46, { p: prog(lt, .2, 1), color: COL.black });
+    const X = v => 620 + (v - 6.55) * 1080, base = 760;
+    axis(600, 1740, base, { p: prog(lt, 1.8, .4) });
+    Object.entries(PH).forEach(([v, n], i) => {
+      const h = n * 10 * easeOut(prog(lt, 2.0 + i * .1, .5));
+      bar(X(+v), base, 96, h, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 16 });
+      txt((+v).toFixed(1), X(+v), base + 34, 28, { p: prog(lt, 1.9, .3) });
+    });
+    txt('PH 值（人數）', 1620, base + 80, 28, { color: COL.gray, p: prog(lt, 2, .3) });
+    const k0 = prog(lt, 3.3, .5);
+    if (k0 > 0) { ink([[X(7.0), base], [X(7.0), 420]], { w: 5, color: COL.red, p: k0 }); txt('μ₀ = 7', X(7.0) - 14, 405, 38, { color: COL.red, align: 'right', p: k0 }); }
+    const k1 = prog(lt, 3.9, .5);
+    if (k1 > 0) { ink([[X(7.131), base], [X(7.131), 420]], { w: 5, color: COL.blue, p: k1 }); txt('樣本平均 7.13', X(7.131) + 14, 405, 38, { color: COL.blue, align: 'left', p: k1 }); }
+    box(1160, 280, 900, 140, [['t = （7.131 − 7）÷ 0.0173 = 7.57', 42], ['df = 130，p < .001 → 平均 PH ≠ 7', 40, COL.green]], '#fff8e2', prog(lt, 4.6, .6));
+  } };
+  // 運動代表隊：人數 男 10.402 (n=911) / 女 5.841 (n=904)，Welch t = 11.576；每週練習天數 男 2.893 (861) / 女 2.904 (772)，t = −0.192, p = .848
+  const s4 = { beats: [0, 1.0, 3.0, 5.0], draw(lt) {
+    ground(lt);
+    dad(190, GY, .75, { ra: [-.3, -.4], rhand: 'open', look: 1, mouth: 'smile', bob: idle(RLT) * .3 });
+    mom(1730, GY, .75, { la: [P + .3, P + .4], lhand: 'open', look: -1, bob: idle(RLT, 1) * .3 });
+    txt('109 學年大專運動代表隊：男子組 vs 女子組（1,846 隊）', 960, 140, 44, { p: prog(lt, .2, 1), color: COL.black });
+    const base = 760;
+    // chart A: team size
+    inkLine(450, base, 870, base, { w: 4.5, p: prog(lt, .9, .3) });
+    txt('平均人數', 660, 410, 40, { p: prog(lt, 1.0, .3) });
+    const hA = v => v * 22 * easeOut(prog(lt, 1.2, 1.0));
+    bar(570, base, 130, hA(10.402), COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 16 });
+    bar(750, base, 130, hA(5.841), COL.pinkL, { pattern: 'dots', patColor: COL.pink, sp: 14, r: 3 });
+    if (lt > 2.2) { errBar(570, base - 10.402 * 22, 15); errBar(750, base - 5.841 * 22, 8); }
+    txt('10.4 人', 570, base - 10.402 * 22 - 42, 34, { p: prog(lt, 2.2, .4) }); txt('5.8 人', 750, base - 5.841 * 22 - 36, 34, { p: prog(lt, 2.3, .4) });
+    txt('男子組', 570, base + 40, 34, { color: COL.blue, p: prog(lt, 1, .3) }); txt('女子組', 750, base + 40, 34, { color: COL.pink, p: prog(lt, 1, .3) });
+    box(660, 270, 560, 140, [['Welch t = 11.58', 40], ['p < .001 → 有顯著差異', 38, COL.green]], '#fff8e2', prog(lt, 3.1, .6));
+    // chart B: practice days
+    const kB = prog(lt, 5.0, .4);
+    inkLine(1060, base, 1480, base, { w: 4.5, p: kB });
+    txt('每週練習天數', 1270, 410, 40, { p: kB });
+    const hB = v => v * 60 * easeOut(prog(lt, 5.2, 1.0));
+    bar(1180, base, 130, hB(2.893), COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 16 });
+    bar(1360, base, 130, hB(2.904), COL.pinkL, { pattern: 'dots', patColor: COL.pink, sp: 14, r: 3 });
+    txt('2.89 天', 1180, base - 2.893 * 60 - 40, 34, { p: prog(lt, 6.1, .4) }); txt('2.90 天', 1360, base - 2.904 * 60 - 40, 34, { p: prog(lt, 6.2, .4) });
+    txt('男子組', 1180, base + 40, 34, { color: COL.blue, p: kB }); txt('女子組', 1360, base + 40, 34, { color: COL.pink, p: kB });
+    box(1270, 270, 560, 140, [['t = −0.19', 40], ['p = .85 → 沒有顯著差異', 38, COL.red]], '#fff8e2', prog(lt, 6.4, .6));
+  } };
+  // Apgar：131 位，1 分鐘 4.939、5 分鐘 5.725，差值平均 0.786，SD 1.196，t = 7.523
+  const D = { '-4': 1, '-3': 1, '-2': 1, '-1': 2, 0: 55, 1: 41, 2: 21, 3: 6, 4: 2, 5: 1 };
+  const s5 = { beats: [0, 2.0, 4.2], draw(lt) {
+    ground(lt, 140, 480);
+    kid(270, GY, 1.25, { bob: -Math.max(0, Math.sin(RLT * 4)) * 20, mouth: 'smile' });
+    txt('同一個寶寶：1 分鐘 Apgar 平均 4.94 → 5 分鐘 平均 5.73', 1160, 150, 42, { p: prog(lt, .3, 1.2), color: COL.black });
+    const X = v => 620 + (v + 4.5) * 108, base = 760;
+    axis(600, 1740, base, { p: prog(lt, 1.8, .4) });
+    Object.entries(D).forEach(([v, n], i) => {
+      const h = n * 5 * easeOut(prog(lt, 2.0 + i * .1, .5));
+      bar(X(+v), base, 96, h, +v > 0 ? COL.greenL : +v < 0 ? '#f4c4bd' : COL.white, {});
+      txt((+v > 0 ? '+' : '') + v, X(+v), base + 34, 28, { p: prog(lt, 1.9, .3) });
+      if (prog(lt, 2.5 + i * .1, .3) > 0) txt(String(n), X(+v), base - h - 22, 26, { color: COL.gray, p: prog(lt, 2.5 + i * .1, .3) });
+    });
+    txt('差值 d = 5 分鐘 − 1 分鐘（人數）', 1500, base + 80, 28, { color: COL.gray, p: prog(lt, 2, .3) });
+    const k0 = prog(lt, 3.3, .5);
+    if (k0 > 0) { ink([[X(0), base], [X(0), 420]], { w: 5, color: COL.red, p: k0 }); txt('d = 0（沒有改變）', X(0) - 14, 405, 34, { color: COL.red, align: 'right', p: k0 }); }
+    const k1 = prog(lt, 3.8, .5);
+    if (k1 > 0) { ink([[X(0.786), base], [X(0.786), 420]], { w: 5, color: COL.blue, p: k1 }); txt('平均差 0.79', X(0.786) + 14, 405, 36, { color: COL.blue, align: 'left', p: k1 }); }
+    box(1160, 280, 900, 140, [['t = 0.786 ÷ 0.105 = 7.52', 42], ['df = 130，p < .001 → 5 分鐘顯著較高', 40, COL.green]], '#fff8e2', prog(lt, 4.4, .6));
+  } };
+  const order = [[B[0], 5], [B[1], 5], [s3, 7], [s4, 8], [s5, 7], [B[5], 3]];
+  let t = 0;
+  const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP1, dur: t, tag: '高等體育統計｜第 4 章 EP1　平均數比一比：t 檢定', scenes,
+    sources: ['資料來源', '課堂資料：PPHN 新生兒（131 位）', '作業資料：109 學年大專運動代表隊（1,846 隊）', 'Wikipedia〈William Sealy Gosset〉', '林老師講義〈單樣本及雙樣本檢定〉'] };
+})();
+EPISODES['1r'] = EP1R;

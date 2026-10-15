@@ -201,15 +201,16 @@ function txt(s, x, y, size, o = {}) {
 }
 function measure(s, size, weight = 700) { ctx.save(); setFont(size, weight); const w = ctx.measureText(s).width; ctx.restore(); return w; }
 function wrapText(s, size, maxW) {
-  const chars = [...s], total = measure(s, size);
+  const total = measure(s, size);
   if (total <= maxW) return [s];
-  // balanced lines; never start a line with closing punctuation
+  // balanced lines; keep numbers / Latin words whole; never start a line with closing punctuation
+  const tokens = s.match(/[A-Za-z0-9.,%]+|./gu);
   const n = Math.ceil(total / maxW), target = total / n + size * .5;
   const closing = '。，、）」』？！：；…,.)';
   const lines = []; let cur = '';
-  for (const ch of chars) {
-    if (cur && measure(cur + ch, size) > target && lines.length < n - 1 && !closing.includes(ch)) { lines.push(cur); cur = ch.trim() ? ch : ''; }
-    else cur += ch;
+  for (const tk of tokens) {
+    if (cur && measure(cur + tk, size) > target && lines.length < n - 1 && !closing.includes(tk[0])) { lines.push(cur); cur = tk.trim() ? tk : ''; }
+    else cur += tk;
   }
   if (cur) lines.push(cur);
   return lines;
