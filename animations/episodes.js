@@ -1206,3 +1206,236 @@ const C2E1 = (() => {
     sources: ['資料來源', 'Pascal–Fermat 1654 年通信：APS News (2009) This Month in Physics History', '基隆心血管疾病調查 CVD_All（61,963 人，講義表 2-1、2-2）', '作業 1：講義 p.29；課程網站 Chapter 02 計算核對', '林老師講義〈第二章 基礎機率及抽樣分配〉'] };
 })();
 EPISODES['c2e1'] = C2E1;
+
+// ============ 第 2 章 EP2：二項式與常態（從銅板到鐘形曲線） ============
+const SBP5 = [0, 0, 24, 99, 357, 880, 1882, 3143, 4412, 5431, 6088, 6065, 6020, 4935, 4136, 3502, 2721, 2161, 1683, 1111, 779, 569, 390, 323, 230, 123, 110, 72, 40, 31, 26, 12]; // 無 CVD 收縮壓，60 起每 5 mmHg 一組，n = 57,387
+const BIN30 = [0.0012, 0.0093, 0.0337, 0.0785, 0.1325, 0.1723, 0.1795, 0.1538, 0.1106, 0.0676, 0.0355, 0.0161, 0.0064]; // Binomial(30, 0.2)
+const C2E2 = (() => {
+  function book(x, y, s, k) {
+    appear(k, () => {
+      ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+      shape(rectPts(-120, -80, 240, 160), { fill: '#8a3b2f', smooth: false, w: 4 });
+      inkLine(-120, -50, 120, -50, { w: 2.5, color: COL.mustard }); inkLine(-120, 50, 120, 50, { w: 2.5, color: COL.mustard });
+      txt('Ars', 0, -8, 34, { color: COL.mustard }); txt('Conjectandi', 0, 30, 26, { color: COL.mustard });
+      ctx.restore();
+    });
+  }
+  function coin(x, y, r, k, face) { appear(k, () => { shape(ellPts(x, y, r, r * Math.abs(Math.cos(RLT * 6)), 0, 7, 24), { fill: COL.mustard, w: 3.5 }); txt(face, x, y + 8, 28, { color: COL.mustardD }); }); }
+  const s1 = { beats: [0, 2.4, 5.0], draw(lt) {
+    ground(lt);
+    txt('1713・巴塞爾：雅各・白努利《猜度術》', 960, 140, 50, { p: prog(lt, .2, .9), color: COL.black });
+    bernoulli(520, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    book(1000, 600, 1, prog(lt, .6, .6));
+    appear(prog(lt, .5, .5), () => { shape(rectPts(820, 690, 360, 24), { fill: '#8a5a33', smooth: false, w: 4 }); inkLine(850, 714, 840, GY, { w: 5 }); inkLine(1150, 714, 1160, GY, { w: 5 }); });
+    const kc = prog(lt, 2.5, .5);
+    coin(1450, 380 - Math.abs(Math.sin(RLT * 3)) * 120, 50, kc, '成功');
+    noteBox(1450, 580, 520, 130, [['只有兩種結果：', 32], ['成功 p　失敗 1 − p', 36, COL.blue]], '#fff8e2', prog(lt, 2.8, .6));
+    noteBox(960, 300, 820, 80, [['過世 8 年後由姪子出版 → 二項式分配、大數法則', 32, COL.gray]], COL.white, prog(lt, 5.1, .6));
+  } };
+  // five draws, p = .5
+  const PMF5 = [0.03125, 0.15625, 0.3125, 0.3125, 0.15625, 0.03125];
+  const s2 = { beats: [0, 2.4, 5.2], draw(lt) {
+    txt('男女各半，隨機抽 5 人：男生出現幾次？', 960, 130, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const base = 760, x0 = 300, bw = 150;
+    axis(240, 1240, base, { p: prog(lt, .4, .4) });
+    PMF5.forEach((p, k) => { const h = p * 1500 * easeOut(prog(lt, .6 + k * .15, .5)), x = x0 + k * bw + 60; bar(x, base, 100, h, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 16 }); txt(String(k) + ' 男', x, base + 36, 28, { p: prog(lt, .5, .3) }); if (h > 5) txt(p.toFixed(5), x, base - h - 22, 22, { color: COL.gray, p: prog(lt, 1.0 + k * .15, .3) }); });
+    // k = 1: five positions
+    const k1 = prog(lt, 2.5, .8);
+    if (k1 > 0) {
+      ink(roundRectPts(x0 + bw + 60 - 60, base - PMF5[1] * 1500 - 50, 120, PMF5[1] * 1500 + 55, 12), { closed: true, w: 5, color: COL.pink, p: k1 });
+      for (let r = 0; r < 5; r++) { const kr = prog(lt, 2.7 + r * .2, .3); for (let c = 0; c < 5; c++) shape(ellPts(1380 + c * 50, 240 + r * 58, 18, 18, 0, 7, 12), { fill: c === r ? COL.blue : COL.white, w: 3, alpha: kr }); }
+      txt('C(5,1) = 5 種位置 → 5 × 0.5⁵ = 0.15625', 1500, 560, 30, { color: COL.pink, p: prog(lt, 3.8, .6) });
+    }
+    const k2 = prog(lt, 5.3, .8);
+    if (k2 > 0) {
+      ink(roundRectPts(x0 + 2 * bw + 60 - 60, base - PMF5[2] * 1500 - 50, 120, PMF5[2] * 1500 + 55, 12), { closed: true, w: 5, color: COL.green, p: k2 });
+      noteBox(1500, 700, 720, 110, [['恰 2 男：C(5,2) = 10（不是 5 × 4）', 32, COL.green], ['10 × 0.5⁵ = 0.3125', 32, COL.green]], '#fff8e2', k2);
+    }
+  } };
+  // homework 2: Bin(30, .2)
+  const s3 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('作業 2：30 位選手，每人受傷機率 0.2 → X ～ Binomial(30, 0.2)', 960, 130, 44, { p: prog(lt, .2, .9), color: COL.black });
+    // 30 mini athletes, 6 injured on average
+    const km = prog(lt, .5, 1.2);
+    for (let i = 0; i < 30; i++) { const k = clamp(km * 30 - i); if (k > 0) mini(250 + (i % 10) * 70, 300 + Math.floor(i / 10) * 90, .55, [3, 9, 14, 17, 25, 28].includes(i) && lt > 5.6 ? COL.pink : COL.blueL, 'dots'); }
+    const base = 760, x0 = 1000, bw = 66;
+    axis(960, 1900, base, { p: prog(lt, .4, .4) });
+    BIN30.forEach((p, k) => { const h = p * 1800 * easeOut(prog(lt, .8 + k * .1, .5)), x = x0 + k * bw + 30; bar(x, base, 48, h, k === 3 && lt > 2.7 ? COL.pink : COL.blueL, { pattern: 'hatch', patColor: k === 3 && lt > 2.7 ? COL.red : COL.blue, sp: 12 }); txt(String(k), x, base + 32, 24, { p: prog(lt, .6, .3) }); });
+    txt('受傷人數', 1860, base + 32, 24, { p: prog(lt, .6, .3) });
+    const k3 = prog(lt, 2.7, .6);
+    noteBox(1440, 300, 760, 110, [['P(X = 3) = C(30,3) × 0.2³ × 0.8²⁷', 32, COL.red], ['= 0.0785', 36, COL.red]], '#fff8e2', k3);
+    const k4 = prog(lt, 5.5, .6);
+    if (k4 > 0) { ink([[x0 + 6 * bw + 30, base], [x0 + 6 * bw + 30, 440]], { w: 5, color: COL.green, p: k4 }); txt('平均 np = 6', x0 + 6 * bw + 30, 420, 30, { color: COL.green, p: k4 }); }
+    noteBox(600, 880, 760, 80, [['平均 np = 6　變異數 np(1−p) = 4.8', 34, COL.green]], COL.white, prog(lt, 6.0, .6));
+  } };
+  // Galton quincunx
+  const ROWS = 10;
+  const s4 = { beats: [0, 2.6, 5.4], draw(lt) {
+    ground(lt, 140, 520);
+    galton(330, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: 'smile', bob: idle(RLT) * .3 });
+    txt('1873・高爾頓的五點梅花機（Quincunx）', 1160, 130, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const cx = 1160, top = 220, dy = 36, dx = 42, base = 760;
+    const kb = prog(lt, .4, .8);
+    appear(kb, () => {
+      shape(rectPts(cx - 320, top - 40, 640, base - top + 60), { fill: COL.white, smooth: false, w: 4 });
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c <= r; c++) { ctx.fillStyle = INK; ctx.globalAlpha = ALPHA * .8; ctx.beginPath(); ctx.arc(cx + (c - r / 2) * dx, top + r * dy, 4.5, 0, 7); ctx.fill(); }
+      for (let b = -5; b <= 5; b++) inkLine(cx + (b + .5) * dx, base, cx + (b + .5) * dx, base - 160, { w: 2.5, alpha: .6 });
+    });
+    // balls: deterministic random walks
+    const N = 80, bins = new Array(11).fill(0);
+    const t0 = 1.0, dur = 1.6, gap = .06;
+    for (let i = 0; i < N; i++) {
+      const u = (lt - t0 - i * gap) / dur; if (u < 0) continue;
+      let pos = 0; const path = []; for (let r = 0; r < ROWS; r++) { pos += rnd(i, r + 10) < .5 ? -.5 : .5; path.push(pos); }
+      if (u >= 1) { bins[Math.round(pos + 5)]++; continue; }
+      const r = u * ROWS, ri = Math.floor(r), f = r - ri, p0 = ri === 0 ? 0 : path[ri - 1], p1 = path[Math.min(ri, ROWS - 1)];
+      const bx = cx + lerp(p0, p1, f) * dx, by = top + r * dy;
+      shape(ellPts(bx, by, 9, 9, 0, 7, 10), { fill: COL.pink, w: 2 });
+    }
+    bins.forEach((n, b) => { for (let j = 0; j < n; j++) shape(ellPts(cx + (b - 5) * dx, base - 10 - j * 17, 8, 8, 0, 7, 8), { fill: COL.pink, w: 1.8 }); });
+    const kc = prog(lt, 5.5, .8);
+    if (kc > 0) curve(cx, base - 2, 230, 230, normalPdf, { w: 5, color: COL.blue, p: kc, range: 3 });
+    noteBox(1160, 860, 900, 80, [['每顆球左右各 0.5 → 二項式；球夠多 → 鐘形的常態', 32, COL.blue]], '#fff8e2', prog(lt, 5.8, .6));
+    noteBox(1600, 300, 520, 90, [['每顆球：10 次', 30], ['左或右，機率各 0.5', 30, COL.gray]], COL.white, prog(lt, 2.7, .6));
+  } };
+  // Keelung SBP histogram + normal
+  const s5 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('57,387 位無心血管疾病基隆市民的收縮壓（講義圖 2-4）', 960, 130, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const base = 740, X = v => 360 + (v - 60) / 160 * 1200, mean = 122.3, sd = 20.3;
+    axis(330, 1600, base, { p: prog(lt, .3, .4) });
+    [80, 100, 120, 140, 160, 180, 200].forEach(v => { inkLine(X(v), base - 8, X(v), base + 8, { w: 3 }); txt(String(v), X(v), base + 34, 26, { p: prog(lt, .4, .3) }); });
+    txt('mmHg', 1600, base + 34, 24, { p: prog(lt, .4, .3) });
+    SBP5.forEach((n, i) => { const h = n / 6100 * 420 * easeOut(prog(lt, .5 + i * .04, .5)); if (h > 0) bar(X(60 + i * 5 + 2.5), base, 34, h, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 14 }); });
+    const kc = prog(lt, 2.7, .8);
+    if (kc > 0) curve(X(mean), base, (3 * sd) / 160 * 1200, 420 * 1.02, normalPdf, { w: 5, color: COL.red, p: kc, range: 3 });
+    txt('平均 122・標準差 20', X(mean), 250, 36, { color: COL.red, p: prog(lt, 3.2, .5) });
+    const bands = [[1, '68%', COL.green, 5.5], [2, '95%', COL.mustardD, 6.2], [3, '99.7%', COL.pink, 6.9]];
+    bands.forEach(([k, lab, col, at], i) => { const kk = prog(lt, at, .5); if (kk > 0) { const y = 300 + i * 40; ink([[X(mean - k * sd), y], [X(mean + k * sd), y]], { w: 4, color: col, p: kk }); inkLine(X(mean - k * sd), y - 10, X(mean - k * sd), y + 10, { w: 3, color: col, p: kk }); inkLine(X(mean + k * sd), y - 10, X(mean + k * sd), y + 10, { w: 3, color: col, p: kk }); txt(`±${k} SD → ${lab}`, X(mean + 3 * sd) + 150, y + 8, 28, { color: col, p: kk }); } });
+    noteBox(1500, 620, 640, 110, [['實際資料：', 28, COL.gray], ['70.1%・95.7%・99.1%', 32, COL.blue]], '#fff8e2', prog(lt, 7.4, .6));
+  } };
+  // standardisation & height example
+  const s6 = { beats: [0, 2.4, 5.2], draw(lt) {
+    ground(lt, 1500, 1800);
+    kid(1700, GY, 1.0, { bob: idle(RLT) * .4, mouth: lt > 5.2 ? 'o' : 'smile' });
+    noteBox(760, 150, 1000, 90, [['標準化：z = (數值 − 平均) ÷ 標準差', 40, COL.blue]], '#fff8e2', prog(lt, .2, .6));
+    txt('講義例：95% 的學生身高在 1.1 到 1.7 公尺', 760, 290, 40, { p: prog(lt, 2.5, .6), color: COL.black });
+    const base = 620, X = v => 360 + (v - .95) / .9 * 900, m = 1.4, sd = .15;
+    const k = prog(lt, 2.7, .8);
+    if (k > 0) {
+      shadeUnder(X(m), base, 3 * sd / .9 * 900, 260, normalPdf, -2, 2, COL.greenL, { alpha: .8 });
+      axis(330, 1330, base, { p: k }); curve(X(m), base, 3 * sd / .9 * 900, 260, normalPdf, { w: 5, p: k, range: 3 });
+      [1.1, 1.4, 1.7].forEach(v => { inkLine(X(v), base - 8, X(v), base + 8, { w: 3, p: k }); txt(v.toFixed(1), X(v), base + 34, 28, { p: k }); });
+      txt('平均 (1.1+1.7)/2 = 1.4', X(m), 680, 30, { color: COL.blue, p: prog(lt, 3.4, .5) });
+      txt('標準差 (1.7−1.1)/4 = 0.15', X(m), 720, 30, { color: COL.blue, p: prog(lt, 3.9, .5) });
+    }
+    const k2 = prog(lt, 5.3, .8);
+    if (k2 > 0) {
+      const v = 1.4 + 2.326 * .15;
+      ink([[X(v), base], [X(v), 380]], { w: 5, color: COL.red, p: k2 }); txt('第 99 百分位：z = 2.326', X(v) + 20, 400, 30, { color: COL.red, align: 'left', p: k2 });
+      txt('1.4 + 2.326 × 0.15 ≈ 1.75 m', X(v) + 20, 440, 30, { color: COL.red, align: 'left', p: prog(lt, 5.9, .5) });
+      noteBox(1500, 330, 560, 110, [['平均 + 3 SD = 1.85 m', 30, COL.gray], ['是第 99.87 百分位，不是第 99', 26, COL.gray]], COL.white, prog(lt, 6.6, .6));
+    }
+  } };
+  const s7 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('兩種分配', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 620, 120, [['二項式：數「幾次」', 38, COL.blue], ['離散・參數 n, p', 28, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 620, 120, [['常態：量「多少」', 38, COL.red], ['連續・參數 μ, σ', 28, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('n 夠大，二項式也長成鐘形', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 8], [s2, 8], [s3, 8], [s4, 9], [s5, 9], [s6, 9], [s7, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP2, dur: t, tag: '高等體育統計｜第 2 章 EP2　二項式與常態：從銅板到鐘形曲線', scenes,
+    sources: ['資料來源', 'Bernoulli (1713) Ars Conjectandi；Galton (1873) quincunx（Kunert et al. 2001）', '基隆 CVD_All 無心血管疾病者收縮壓（n = 57,387）', '作業 2、身高例：講義 p.23、p.30；課程網站 Chapter 02 計算核對', '林老師講義〈第二章 基礎機率及抽樣分配〉'] };
+})();
+EPISODES['c2e2'] = C2E2;
+
+// ============ 第 2 章 EP3：抽樣分配與中央極限定理 ============
+const MEANS = { // 從 57,387 筆收縮壓反覆抽樣 2,000 次的樣本平均數直方圖（80 起每 2.5 mmHg）
+  1: [7, 8, 13, 17, 29, 34, 45, 56, 76, 72, 111, 98, 106, 82, 118, 82, 129, 99, 124, 74, 78, 62, 55, 60, 67, 34, 36, 24, 30, 28, 21, 22, 16, 15, 10, 13],
+  5: [0, 0, 0, 0, 0, 0, 1, 1, 12, 18, 36, 67, 87, 158, 184, 243, 219, 216, 178, 154, 129, 93, 82, 51, 29, 18, 9, 7, 3, 3, 1, 1, 0, 0, 0, 0],
+  40: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 8, 102, 352, 599, 538, 270, 101, 25, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] };
+const C2E3 = (() => {
+  const s1 = { beats: [0, 2.6, 5.4], draw(lt) {
+    ground(lt, 140, 700);
+    demoivre(400, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    txt('1733・倫敦：棣美弗的小冊子', 1200, 130, 50, { p: prog(lt, .2, .9), color: COL.black });
+    const kp = prog(lt, .6, .6);
+    appear(kp, () => { paperSheet(1000, 420, 260, 340, -.05); curve(1000, 520, 100, 110, normalPdf, { w: 4, range: 3 }); txt('1733', 1000, 300, 30, { color: COL.gray }); });
+    noteBox(1500, 330, 600, 110, [['第一次導出常態曲線', 34, COL.blue], ['（至今只剩 2 份）', 28, COL.gray]], '#fff8e2', prog(lt, 1.2, .6));
+    // timeline
+    const y = 760, kt = prog(lt, 2.7, .8);
+    axis(700, 1860, y, { p: kt });
+    [[1733, '棣美弗', '常態曲線'], [1810, '拉普拉斯', '推廣到一般情形'], [1920, '波利亞', '命名「中央極限定理」']].forEach(([yr, who, what], i) => {
+      const x = 800 + i * 440, k = prog(lt, 3.0 + i * 1.1, .6);
+      if (k > 0) { inkLine(x, y - 14, x, y + 14, { w: 4, p: k }); txt(String(yr), x, y + 50, 34, { color: COL.black, p: k }); txt(who, x, y - 60, 32, { color: COL.blue, p: k }); txt(what, x, y - 24, 24, { color: COL.gray, p: k }); }
+    });
+  } };
+  const s2 = { beats: [0, 3.0], draw(lt) {
+    ground(lt, 140, 600);
+    kid(360, GY, 1.0, { la: [P + .2, P - .8], look: 1, mouth: 'o', brow: 1, bob: idle(RLT) * .4 });
+    bubble(560, 300, 700, 150, 450, 470, '', 36, prog(lt, .3, .6));
+    appear(prog(lt, .3, .6), () => { txt('量 1 個人的血壓，', 560, 275, 34, { color: COL.black }); txt('還是 40 個人取平均比較穩？', 560, 325, 34, { color: COL.black }); });
+    txt('母體：57,387 位無心血管疾病市民的收縮壓', 1300, 150, 40, { p: prog(lt, 3.1, .6), color: COL.black });
+    const base = 740, X = v => 760 + (v - 60) / 160 * 1000, k = prog(lt, 3.2, .8);
+    if (k > 0) { axis(740, 1800, base, { p: k }); SBP5.forEach((n, i) => { const h = n / 6100 * 380 * easeOut(prog(lt, 3.3 + i * .03, .4)); if (h > 0) bar(X(60 + i * 5 + 2.5), base, 28, h, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 14 }); }); [80, 120, 160, 200].forEach(v => txt(String(v), X(v), base + 34, 26, { p: k })); txt('平均 122・標準差 20', 1300, 300, 36, { color: COL.red, p: prog(lt, 4.4, .5) }); }
+  } };
+  // simulation panels
+  const s3 = { beats: [0, 3.0, 6.0], draw(lt) {
+    txt('從真實資料反覆抽樣 2,000 次，看「樣本平均數」怎麼分布', 960, 120, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const P3 = [[1, 20.3, 20.1, .4], [5, 9.1, 9.0, 3.1], [40, 3.2, 3.2, 6.1]];
+    P3.forEach(([n, se, sd, at], i) => {
+      const cx = 400 + i * 560, base = 700, X = v => cx - 260 + (v - 80) / 90 * 520, k = prog(lt, at, .8);
+      if (k <= 0) return;
+      txt(`每次抽 n = ${n} 人`, cx, 230, 36, { color: COL.black, p: k });
+      axis(cx - 270, cx + 280, base, { p: k });
+      [80, 120, 160].forEach(v => txt(String(v), X(v), base + 32, 24, { p: k }));
+      const H = MEANS[n], mx = n === 40 ? 600 : n === 5 ? 250 : 130;
+      H.forEach((c, j) => { const h = c / mx * 380 * easeOut(prog(lt, at + .3 + j * .03, .5)); if (h > 0) bar(X(80 + j * 2.5 + 1.25), base, 12, h, i === 2 ? COL.pinkL : COL.blueL, {}); });
+      txt(`平均數的標準差 ≈ ${sd}`, cx, 770, 28, { color: i === 2 ? COL.red : COL.blue, p: prog(lt, at + 1.4, .5) });
+      txt(`σ/√n = 20.3/√${n} = ${se}`, cx, 810, 28, { color: COL.gray, p: prog(lt, at + 1.9, .5) });
+    });
+    noteBox(960, 900, 960, 70, [['樣本愈大，平均數的分布愈窄、愈像常態', 34, COL.red]], '#fff8e2', prog(lt, 8.2, .6));
+  } };
+  const s4 = { beats: [0, 2.8], draw(lt) {
+    txt('標準誤 SE = σ / √n', 960, 140, 56, { p: prog(lt, .2, .8), color: COL.blue });
+    const base = 700, cx = 960;
+    const k = prog(lt, .5, .8);
+    if (k > 0) { axis(300, 1620, base, { p: k }); curve(cx, base, 540, 150, normalPdf, { w: 5, color: COL.blue, p: k, range: 3 }); txt('個別血壓：標準差 σ = 20', 420, 420, 32, { color: COL.blue, p: prog(lt, 1.0, .5) }); }
+    const k2 = prog(lt, 2.9, .8);
+    if (k2 > 0) { curve(cx, base, 540 / Math.sqrt(40), 150 * Math.sqrt(40) * .6, normalPdf, { w: 5, color: COL.red, p: k2, range: 3 }); txt('40 人平均：標準誤 = 20/√40 = 3.2', 1420, 300, 32, { color: COL.red, p: prog(lt, 3.3, .5) }); }
+    noteBox(960, 860, 1100, 80, [['個別資料的分布沒有改變，變窄的是「平均數」的分布', 32, COL.black]], '#fff8e2', prog(lt, 3.9, .6));
+  } };
+  // homework 3
+  const s5 = { beats: [0, 2.6, 5.4], draw(lt) {
+    ground(lt, 1500, 1800);
+    dad(1700, GY, .75, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: 'smile' });
+    txt('作業 3：母體身高平均 170、標準差 10，隨機抽 40 人', 760, 130, 44, { p: prog(lt, .2, .9), color: COL.black });
+    noteBox(760, 240, 1000, 90, [['樣本平均數 ≈ 常態，平均 170，標準誤 10/√40 = 1.58', 34, COL.blue]], '#fff8e2', prog(lt, 2.7, .6));
+    const base = 680, cx = 700, wh = 450, hs = 260, X = z => cx + z / 3.6 * wh, k = prog(lt, 3.2, .8);
+    if (k > 0) {
+      shadeUnder(cx, base, wh, hs, normalPdf, 3.16, 3.6, COL.pink, { alpha: .9 });
+      axis(200, 1250, base, { p: k }); curve(cx, base, wh, hs, normalPdf, { w: 5, p: k, range: 3.6 });
+      [[-2, '166.8'], [0, '170'], [2, '173.2'], [3.16, '175']].forEach(([z, lab]) => { inkLine(X(z), base - 8, X(z), base + 8, { w: 3, p: k }); txt(lab, X(z), base + 34, 26, { p: k, color: z > 3 ? COL.red : COL.black }); });
+    }
+    const k2 = prog(lt, 5.5, .8);
+    if (k2 > 0) { ink([[X(3.16), base], [X(3.16), 400]], { w: 5, color: COL.red, p: k2 }); txt('z = (175 − 170) ÷ 1.58 = 3.16', X(3.16) + 30, 420, 30, { color: COL.red, align: 'left', p: k2 }); txt('P(平均 > 175) ≈ 0.0008', X(3.16) + 30, 465, 30, { color: COL.red, align: 'left', p: prog(lt, 6.1, .5) }); }
+    noteBox(760, 860, 880, 80, [['問的是 40 人的「平均」，不是 1 個人的身高', 32, COL.gray]], COL.white, prog(lt, 6.8, .6));
+  } };
+  const s6 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('中央極限定理', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(300, 820, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 640, 120, [['樣本平均數 → 常態', 38, COL.blue], ['不管原本資料長什麼樣', 28, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 640, 120, [['標準誤 = σ ÷ √n', 38, COL.red], ['樣本愈大，平均數愈穩', 28, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('推論統計的基石', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 9], [s2, 7], [s3, 10], [s4, 6], [s5, 9], [s6, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP3, dur: t, tag: '高等體育統計｜第 2 章 EP3　抽樣分配與中央極限定理', scenes,
+    sources: ['資料來源', 'de Moivre (1733)；Laplace (1810)；Pólya (1920) 命名 — J. D. Cook, How the CLT began', '模擬：基隆 CVD_All 無心血管疾病者收縮壓（n = 57,387），各抽 2,000 次', '作業 3：講義 p.31；課程網站 Chapter 02 計算核對', '林老師講義〈第二章 基礎機率及抽樣分配〉'] };
+})();
+EPISODES['c2e3'] = C2E3;

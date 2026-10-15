@@ -280,3 +280,8 @@ const PASCAL = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glass
 function pascal(x, y, s, pose = {}, opts) { return figure(PASCAL, x, y, s, pose, opts); }
 const FERMAT = { ...GOSSET, hat: undefined, hair: 'side', mustache: true, glasses: undefined, top: { fill: '#5a3a2a', vest: true }, sleeve: { fill: '#5a3a2a' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 48, mouth: 'smile' } };
 function fermat(x, y, s, pose = {}, opts) { return figure(FERMAT, x, y, s, pose, opts); }
+// 第 2 章：白努利（深綠外套）、棣美弗（圓眼鏡、灰外套）
+const BERNOULLI = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: undefined, top: { fill: '#2f5d4a', vest: true }, sleeve: { fill: '#2f5d4a' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'smile' } };
+function bernoulli(x, y, s, pose = {}, opts) { return figure(BERNOULLI, x, y, s, pose, opts); }
+const DEMOIVRE = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: 'round', top: { fill: '#55575f', vest: true }, sleeve: { fill: '#55575f' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'flat' } };
+function demoivre(x, y, s, pose = {}, opts) { return figure(DEMOIVRE, x, y, s, pose, opts); }
