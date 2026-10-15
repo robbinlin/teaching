@@ -1033,3 +1033,176 @@ const C1E3 = (() => {
 })();
 EPISODES['c1e3'] = C1E3;
 const SCATTER = [[117, 74], [130, 85], [140, 86], [97, 66], [134, 106], [121, 88], [104, 74], [96, 68], [116, 75], [85, 68], [132, 82], [120, 70], [164, 80], [180, 120], [113, 82], [103, 71], [142, 88], [124, 80], [104, 78], [113, 64], [151, 105], [116, 80], [94, 59], [140, 86], [109, 77], [122, 75], [124, 88], [123, 78], [140, 84], [154, 103], [144, 106], [124, 69], [114, 65], [127, 73], [126, 94], [128, 96], [126, 78], [135, 98], [114, 74], [120, 74], [104, 75], [128, 78], [133, 102], [121, 71], [139, 84], [145, 108], [105, 62], [110, 74], [112, 67], [102, 71], [98, 64], [124, 73], [143, 92], [109, 76], [105, 74], [138, 90], [97, 68], [107, 66], [104, 64], [103, 52], [138, 84], [130, 80], [95, 59], [161, 100], [96, 64], [141, 84], [138, 74], [94, 60], [128, 83], [122, 86], [125, 79], [114, 70], [114, 72], [117, 70], [142, 99], [163, 112], [126, 77], [130, 92], [170, 86], [134, 69], [100, 70], [148, 84], [108, 77], [102, 64], [175, 100], [108, 79], [138, 69], [151, 100], [106, 67], [159, 74], [159, 96], [103, 51], [114, 74], [130, 80], [130, 69], [109, 69], [112, 66], [95, 64], [128, 70], [122, 86], [94, 64], [128, 77], [128, 77], [132, 87], [131, 81], [166, 88], [131, 79], [116, 75], [134, 81], [108, 66], [117, 68], [131, 78], [104, 72], [134, 74], [98, 81], [125, 84], [108, 74], [118, 78], [117, 68], [108, 67], [123, 70], [140, 99], [112, 81], [144, 84], [140, 80], [111, 78], [116, 76], [103, 67], [109, 62], [76, 60], [105, 77], [90, 58], [112, 67], [92, 65], [104, 76], [172, 97], [139, 88], [115, 81], [122, 80], [119, 83], [112, 82], [92, 65], [139, 92], [135, 101], [118, 74], [110, 73], [118, 88], [179, 136], [125, 86], [129, 78], [153, 108], [108, 70], [165, 108], [118, 74], [156, 92], [146, 86], [141, 92], [117, 66], [138, 79], [119, 97], [102, 76], [121, 69], [104, 70], [152, 100], [114, 78], [112, 68], [145, 62], [104, 72], [154, 82], [119, 85], [153, 93], [148, 86], [136, 80], [126, 111], [114, 71], [110, 64], [112, 77], [126, 79], [154, 97], [97, 66], [138, 115], [118, 79], [137, 81], [123, 80], [124, 91], [104, 68], [139, 93], [116, 80], [159, 99], [122, 61], [114, 78], [105, 69], [154, 90], [120, 72], [155, 115], [152, 86], [144, 84], [139, 77], [132, 87], [132, 82], [96, 62], [100, 82], [131, 81], [145, 100], [106, 78], [138, 82], [177, 98], [108, 73], [132, 89], [99, 66], [94, 58], [106, 68], [114, 80], [146, 93], [130, 88], [148, 99], [142, 90], [141, 76], [117, 80], [93, 62], [122, 80], [104, 63], [100, 76], [96, 68], [145, 92], [129, 72], [108, 64], [111, 66], [98, 66], [112, 68], [141, 97], [148, 81], [123, 80], [158, 81], [142, 86], [112, 82], [123, 93], [120, 70], [122, 94], [109, 68], [138, 92], [114, 72], [100, 70], [119, 75], [125, 86], [122, 76], [108, 76], [140, 91], [137, 96], [86, 61], [106, 81], [109, 68], [122, 78], [108, 73], [146, 90], [138, 89], [104, 65], [101, 70], [127, 92], [110, 66], [130, 77], [117, 67], [122, 72], [133, 88], [144, 96], [108, 70], [132, 74], [148, 86], [134, 89], [107, 83], [132, 76], [126, 80], [118, 78], [142, 90], [108, 74], [120, 82], [142, 86], [95, 57], [150, 91], [150, 95], [172, 73], [148, 88], [138, 79], [133, 69], [123, 71], [115, 74], [138, 69], [145, 96], [95, 58], [108, 62], [110, 72], [126, 88], [121, 87], [117, 77], [121, 66], [103, 66], [170, 110], [136, 75], [123, 76], [123, 86], [159, 99], [115, 82], [145, 93], [126, 90], [111, 72], [115, 77], [104, 67], [96, 58], [156, 78], [98, 70], [107, 71], [115, 75], [115, 76], [146, 104], [142, 82], [128, 78], [140, 88], [129, 79], [145, 93], [125, 75], [167, 69], [154, 94], [107, 84], [138, 78], [172, 101], [125, 88], [132, 94], [129, 87], [138, 69], [130, 79], [140, 96], [100, 72], [112, 79], [123, 73], [100, 71], [89, 67], [114, 67], [128, 67], [110, 81], [87, 80], [124, 78], [132, 80], [128, 61], [152, 92], [147, 98], [92, 71], [129, 86], [120, 64], [106, 66], [102, 72], [134, 88], [125, 87], [114, 80], [126, 76], [105, 67], [92, 61], [127, 85], [112, 76], [158, 90], [121, 62], [133, 76], [122, 78], [94, 62], [139, 70], [154, 100], [104, 68], [118, 90], [133, 91], [148, 84], [103, 72], [122, 63], [116, 75], [148, 106], [118, 74], [166, 90], [113, 76], [150, 94], [114, 80], [138, 89], [105, 68], [152, 82], [142, 91], [126, 90], [113, 70], [118, 67], [108, 62], [121, 77], [120, 78], [112, 74], [110, 72], [126, 94], [107, 76], [104, 65], [97, 67], [104, 77], [109, 66], [120, 74], [145, 94], [150, 91], [93, 62]];
+
+// ============ 第 2 章 EP1：機率是什麼（邊際、聯合、條件機率） ============
+const SMOKE = [['0 包', 45795, 41629, 4166], ['1 包', 14404, 13021, 1383], ['2 包', 1596, 1420, 176], ['超過 2 包', 168, 144, 24]]; // 表 2-1
+const SMOKE_N = 61963;
+const C2E1 = (() => {
+  const fmt = n => n.toLocaleString('en-US');
+  function die(x, y, s, face, rot, k = 1) {
+    appear(k, () => {
+      ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
+      shape(roundRectPts(-40, -40, 80, 80, 12), { fill: COL.white, w: 4 });
+      const pips = { 1: [[0, 0]], 2: [[-20, -20], [20, 20]], 3: [[-20, -20], [0, 0], [20, 20]], 4: [[-20, -20], [20, -20], [-20, 20], [20, 20]], 5: [[-20, -20], [20, -20], [0, 0], [-20, 20], [20, 20]], 6: [[-20, -22], [20, -22], [-20, 0], [20, 0], [-20, 22], [20, 22]] }[face];
+      ctx.fillStyle = INK; ctx.globalAlpha = ALPHA; pips.forEach(([px, py]) => { ctx.beginPath(); ctx.arc(px, py, 6.5, 0, 7); ctx.fill(); });
+      ctx.restore();
+    });
+  }
+  function umbrella(x, y, s, k = 1) {
+    appear(k, () => {
+      ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+      shape(ellPts(0, 0, 150, 110, P, 2 * P, 30).concat([[150, 0], [110, 18], [75, 0], [37, 18], [0, 0], [-37, 18], [-75, 0], [-110, 18], [-150, 0]]), { fill: COL.pinkL, w: 4, pattern: 'dots', patColor: COL.pink, sp: 20, r: 4 });
+      inkLine(0, 0, 0, 170, { w: 5 }); ink(ellPts(18, 170, 18, 18, 0, P, 12), { w: 5 });
+      ctx.restore();
+    });
+  }
+  function sun(x, y, r, k = 1) {
+    appear(k, () => {
+      shape(ellPts(x, y, r, r, 0, 7, 30), { fill: COL.mustard, w: 4 });
+      for (let i = 0; i < 10; i++) { const a = i / 10 * 2 * P + RLT * .3; inkLine(x + Math.cos(a) * (r + 14), y + Math.sin(a) * (r + 14), x + Math.cos(a) * (r + 40), y + Math.sin(a) * (r + 40), { w: 4, color: COL.mustardD }); }
+    });
+  }
+  // 1654 Pascal & Fermat: problem of points
+  const s1 = { beats: [0, 2.2, 5.6], draw(lt) {
+    ground(lt);
+    txt('1654・巴黎與土魯斯：帕斯卡與費馬的通信', 960, 140, 50, { p: prog(lt, .2, .9), color: COL.black });
+    pascal(380, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: lt > 5.5 ? 'smile' : 'flat' });
+    fermat(1540, GY, .9, { la: [P - .3, P - .2], lhand: 'open', look: -1 });
+    // table with dice & coins
+    const kt = prog(lt, .5, .6);
+    appear(kt, () => { shape(rectPts(760, 700, 400, 24), { fill: '#8a5a33', smooth: false, w: 4 }); inkLine(790, 724, 780, GY, { w: 5 }); inkLine(1130, 724, 1140, GY, { w: 5 }); });
+    die(850, 650, .75, 5, -.2, prog(lt, .8, .5)); die(960, 655, .75, 3, .3, prog(lt, 1.0, .5));
+    for (let i = 0; i < 9; i++) shape(ellPts(1060 + (i % 3) * 22, 672 - Math.floor(i / 3) * 10, 16, 6, 0, 7, 14), { fill: COL.mustard, w: 2.5, alpha: kt });
+    // flying letter
+    const kl = prog(lt, 2.3, 2.2);
+    if (kl > 0 && kl < 1) { const e = easeOut(kl); paperSheet(lerp(520, 1400, e), 430 - Math.sin(e * P) * 160, 120, 90, (e - .5) * .6); }
+    const ks = prog(lt, 2.4, .6);
+    noteBox(960, 300, 760, 80, [['賭局中斷：比數 2 : 1，賭金怎麼分？', 38]], '#fff8e2', ks);
+    const kb = prog(lt, 3.8, .8);
+    if (kb > 0) {
+      const x0 = 580, y = 420, w = 760 * easeOut(kb);
+      shape(rectPts(x0, y, w * .75, 60), { fill: COL.blueL, smooth: false, w: 3.5, pattern: 'hatch', patColor: COL.blue, sp: 16 });
+      shape(rectPts(x0 + w * .75, y, w * .25, 60), { fill: COL.pinkL, smooth: false, w: 3.5 });
+      txt('3/4', x0 + 760 * .375, y + 32, 34, { color: COL.blue, p: kb }); txt('1/4', x0 + 760 * .875, y + 32, 34, { color: COL.pink, p: kb });
+      txt('依「贏的可能性」分：3 : 1', 960, 540, 36, { color: COL.black, p: prog(lt, 4.4, .6) });
+    }
+    noteBox(960, 960, 640, 70, [['這幾封信 → 機率論的起點', 34, COL.blue]], COL.white, prog(lt, 5.8, .6));
+  } };
+  // probability 0..1, rain
+  const s2 = { beats: [0, 2.2, 4.8], draw(lt) {
+    ground(lt, 140, 900);
+    sun(300, 240, 60, prog(lt, 2.4, .6));
+    kid(520, GY, 1.0, { la: [P + .2, P - .8], look: -1, mouth: lt > 2.4 ? 'o' : 'smile', brow: lt > 2.4 ? 1 : 0, bob: idle(RLT) * .3 });
+    umbrella(430, 440, .9, prog(lt, 2.2, .5));
+    txt('機率：0 到 1 之間的數', 1350, 150, 50, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 1000 + v * 700, y = 400;
+    axis(960, 1760, y, { p: prog(lt, .4, .6) });
+    [0, .5, 1].forEach(v => { inkLine(X(v), y - 10, X(v), y + 10, { w: 3.5, p: prog(lt, .6, .4) }); txt(v === .5 ? '0.5' : String(v), X(v), y + 40, 30, { p: prog(lt, .6, .4) }); });
+    txt('不可能', X(0), y - 40, 28, { color: COL.gray, p: prog(lt, .9, .4) }); txt('一定發生', X(1), y - 40, 28, { color: COL.gray, p: prog(lt, .9, .4) });
+    const kp = prog(lt, 2.4, .6);
+    if (kp > 0) { shape(ellPts(X(.7), y, 16, 16, 0, 7, 12), { fill: COL.pink, w: 3, alpha: kp }); txt('降雨機率 0.7', X(.7), y - 60, 36, { color: COL.pink, p: kp }); txt('≠ 一定下雨', X(.7), 520, 34, { color: COL.red, p: prog(lt, 3.2, .5) }); }
+    const kb = prog(lt, 5.0, .8);
+    if (kb > 0) {
+      const x0 = 1000, yy = 640, w = 700 * easeOut(kb);
+      shape(rectPts(x0, yy, w * .7, 70), { fill: COL.blueL, smooth: false, w: 3.5, pattern: 'hatch', patColor: COL.blue, sp: 16 });
+      shape(rectPts(x0 + w * .7, yy, w * .3, 70), { fill: COL.mustard, smooth: false, w: 3.5 });
+      txt('下雨 0.7', x0 + 245, yy + 36, 32, { color: COL.blue, p: kb }); txt('不下雨 0.3', x0 + 595, yy + 36, 30, { color: COL.mustardD, p: kb });
+      txt('0.7 + 0.3 = 1：所有可能加起來一定是 1', 1350, 790, 38, { color: COL.black, p: prog(lt, 5.8, .6) });
+    }
+  } };
+  // Keelung smoking table: marginal probability
+  const s3 = { beats: [0, 2.0, 5.0], draw(lt) {
+    ground(lt, 140, 460);
+    mom(260, GY, .85, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    txt('基隆心血管疾病調查：61,963 人的每日菸量（表 2-1）', 1160, 140, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const X0 = 620, Y0 = 220, RH = 100;
+    const kh = prog(lt, .5, .5);
+    appear(kh, () => { txt('每日菸量', X0 + 110, Y0, 32, { color: COL.gray }); txt('人數', X0 + 420, Y0, 32, { color: COL.gray }); txt('機率', X0 + 760, Y0, 32, { color: COL.gray }); inkLine(X0, Y0 + 30, X0 + 1140, Y0 + 30, { w: 3.5 }); });
+    SMOKE.forEach(([lab, n], i) => {
+      const y = Y0 + 70 + i * RH, k = prog(lt, 2.1 + i * .35, .5), kp = prog(lt, 5.1 + i * .3, .5);
+      appear(k, () => { txt(lab, X0 + 110, y + 10, 36, { color: COL.black }); txt(fmt(n), X0 + 420, y + 10, 36, { color: COL.blue }); });
+      bar(X0 + 1000 + 0, y + 30, 0, 0, COL.blueL); // keep pattern seed stable
+      const bw = n / SMOKE_N * 420 * easeOut(k);
+      if (bw > 0) shape(rectPts(X0 + 560, y - 20, bw, 50), { fill: COL.blueL, smooth: false, w: 3, pattern: 'hatch', patColor: COL.blue, sp: 14 });
+      if (kp > 0) txt((n / SMOKE_N).toFixed(3), X0 + 1060, y + 10, 36, { color: COL.pink, p: kp });
+    });
+    inkLine(X0, Y0 + 70 + 4 * RH - 50, X0 + 1140, Y0 + 70 + 4 * RH - 50, { w: 3.5, p: prog(lt, 3.6, .4) });
+    txt('合計', X0 + 110, Y0 + 80 + 4 * RH, 36, { p: prog(lt, 3.7, .4), color: COL.black }); txt('61,963', X0 + 420, Y0 + 80 + 4 * RH, 36, { color: COL.blue, p: prog(lt, 3.7, .4) });
+    txt('1.000', X0 + 1060, Y0 + 80 + 4 * RH, 36, { color: COL.pink, p: prog(lt, 6.4, .5) });
+    noteBox(1160, 800, 980, 80, [['人數 ÷ 總人數 ＝ 邊際機率（marginal probability）', 34, COL.pink]], '#fff8e2', prog(lt, 6.0, .6));
+  } };
+  // joint probability grid
+  const s4 = { beats: [0, 2.4, 5.6], draw(lt) {
+    txt('兩個變數一起看：每日菸量 × 心血管疾病（表 2-2）', 960, 130, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const X0 = 440, Y0 = 230, CW = 260, RH = 100;
+    const kh = prog(lt, .5, .5);
+    appear(kh, () => {
+      txt('無 CVD', X0 + CW * .5, Y0 - 30, 32, { color: COL.gray }); txt('有 CVD', X0 + CW * 1.5, Y0 - 30, 32, { color: COL.gray }); txt('邊際', X0 + CW * 2.5, Y0 - 30, 32, { color: COL.gray });
+      inkLine(X0 - 220, Y0, X0 + CW * 3, Y0, { w: 3.5 }); inkLine(X0, Y0 - 60, X0, Y0 + RH * 5, { w: 3.5 }); inkLine(X0 + CW * 2, Y0 - 60, X0 + CW * 2, Y0 + RH * 5, { w: 2.5, dash: true });
+    });
+    const showP = lt > 2.4;
+    SMOKE.forEach(([lab, n, a, b], i) => {
+      const y = Y0 + RH * i + 60, k = prog(lt, .8 + i * .25, .5);
+      appear(k, () => {
+        txt(lab, X0 - 110, y, 32, { color: COL.black });
+        const kp = prog(lt, 2.5 + i * .2, .5);
+        const cell = (v, x, col) => { if (kp <= 0) txt(fmt(v), x, y, 32, { color: COL.blue }); else { txt(fmt(v), x, y - 22, 22, { color: COL.gray, p: kp }); txt((v / SMOKE_N).toFixed(4), x, y + 14, 34, { color: col, p: kp }); } };
+        cell(a, X0 + CW * .5, COL.pink); cell(b, X0 + CW * 1.5, COL.pink);
+        const km = prog(lt, 5.8 + i * .15, .4); if (km > 0) txt((n / SMOKE_N).toFixed(3), X0 + CW * 2.5, y, 32, { color: COL.mustardD, p: km });
+      });
+    });
+    const ky = Y0 + RH * 4 + 60, kc = prog(lt, 6.4, .5);
+    inkLine(X0 - 220, ky - 50, X0 + CW * 3, ky - 50, { w: 2.5, dash: true, p: kc });
+    appear(kc, () => { txt('邊際', X0 - 110, ky, 32, { color: COL.gray }); txt('0.9072', X0 + CW * .5, ky, 32, { color: COL.mustardD }); txt('0.0928', X0 + CW * 1.5, ky, 32, { color: COL.mustardD }); txt('1.000', X0 + CW * 2.5, ky, 34, { color: COL.black }); });
+    // highlight joint cell (0 包, 無)
+    const kj = prog(lt, 3.2, .6);
+    if (kj > 0) { ink(roundRectPts(X0 + 20, Y0 + 15, CW - 40, RH - 20, 14), { closed: true, w: 6, color: COL.red, p: kj }); }
+    noteBox(1560, 420, 600, 130, [['P(不吸菸 且 無 CVD)', 34, COL.red], ['= 41,629 ÷ 61,963 = 0.6718', 34, COL.red]], '#fff8e2', prog(lt, 3.6, .6));
+    txt('聯合機率（joint probability）', 1560, 560, 32, { color: COL.gray, p: prog(lt, 4.2, .5) });
+    noteBox(1560, 760, 600, 80, [['8 格加總 = 1；列、行加總 = 邊際機率', 28, COL.blue]], COL.white, prog(lt, 6.0, .6));
+  } };
+  // conditional probability: homework 1
+  const s5 = { beats: [0, 2.4, 5.4, 8.0], draw(lt) {
+    ground(lt, 1500, 1800);
+    dad(1700, GY, .75, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: lt > 5.4 ? 'o' : 'flat', brow: lt > 5.4 ? 1 : 0 });
+    txt('作業 1：某城市 10,000 人，吸菸與肺癌', 760, 130, 46, { p: prog(lt, .2, .9), color: COL.black });
+    // population box
+    const BX = 200, BY = 210, BW = 900, BH = 500;
+    const kb = prog(lt, .5, .7);
+    appear(kb, () => { shape(rectPts(BX, BY, BW, BH), { fill: COL.white, smooth: false, w: 4 }); txt('全部 10,000 人', BX + 130, BY + 40, 30, { color: COL.gray }); });
+    // smokers box (20%)
+    const SX = BX + 20, SY = BY + 90, SW = BW * .2 - 20, SH = BH - 110;
+    const ks = prog(lt, 1.0, .7);
+    appear(ks, () => { shape(rectPts(SX, SY, SW, SH), { fill: COL.mustard, smooth: false, w: 4 }); txt('吸菸', SX + SW / 2, SY + 40, 32, { color: COL.black }); txt('2,000', SX + SW / 2, SY + 85, 34, { color: COL.black }); });
+    appear(prog(lt, 1.4, .6), () => { txt('不吸菸 8,000', BX + BW * .6, SY + 60, 32, { color: COL.gray }); txt('（肺癌 30）', BX + BW * .6, SY + 110, 26, { color: COL.gray }); });
+    // lung cancer block inside smokers (1%)
+    const kc = prog(lt, 1.9, .6);
+    appear(kc, () => { shape(rectPts(SX + 10, SY + SH - 70, SW - 20, 50), { fill: COL.pink, smooth: false, w: 3.5 }); txt('肺癌 20', SX + SW / 2, SY + SH - 42, 26, { color: COL.white }); });
+    // formulas
+    const F = [[2.6, 'P(吸菸) = 2,000 ÷ 10,000 = 0.2', COL.blue], [3.9, 'P(吸菸 且 無肺癌) = 1,980 ÷ 10,000 = 0.198', COL.blue], [5.6, 'P(肺癌 | 吸菸) = 20 ÷ 2,000 = 0.01', COL.red]];
+    F.forEach(([at, s, col], i) => txt(s, 650, 780 + i * 52, 32, { color: col, align: 'center', p: prog(lt, at, .6) }));
+    // denominator frame shrinks from whole population to smokers
+    const kd = prog(lt, 5.5, 1.2);
+    if (kd > 0) {
+      const e = easeOut(kd);
+      const x = lerp(BX - 10, SX - 10, e), y = lerp(BY - 10, SY - 10, e), w = lerp(BW + 20, SW + 20, e), h = lerp(BH + 20, SH + 20, e);
+      ink(roundRectPts(x, y, w, h, 12), { closed: true, w: 7, color: COL.red });
+      txt('← 分母 = 吸菸的 2,000 人', SX + SW + 30, SY + SH / 2 + 60, 32, { color: COL.red, align: 'left', p: prog(lt, 6.4, .5) });
+    }
+    noteBox(1500, 300, 520, 90, [['條件機率', 36, COL.red], ['先限定「已知」的那群人', 30, COL.red]], '#fff8e2', prog(lt, 8.1, .6));
+  } };
+  const s6 = { beats: [0, 2.8], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('三種機率', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    const cards = [['邊際 P(X)', '一個變數', COL.mustardD], ['聯合 P(X, Y)', '兩個同時發生', COL.pink], ['條件 P(Y | X)', '先限定分母', COL.red]];
+    cards.forEach(([a, b, col], i) => noteBox(1400, 290 + i * 140, 620, 120, [[a, 38, col], [b, 28, COL.gray]], '#fff8e2', prog(lt, .4 + i * .5, .6)));
+    txt('算機率之前，先問：分母是誰？', 1400, 150, 44, { p: prog(lt, 2.9, .6), color: COL.black });
+  } };
+  const order = [[s1, 9], [s2, 8], [s3, 8], [s4, 8], [s5, 10], [s6, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP1, dur: t, tag: '高等體育統計｜第 2 章 EP1　機率是什麼：邊際、聯合、條件機率', scenes,
+    sources: ['資料來源', 'Pascal–Fermat 1654 年通信：APS News (2009) This Month in Physics History', '基隆心血管疾病調查 CVD_All（61,963 人，講義表 2-1、2-2）', '作業 1：講義 p.29；課程網站 Chapter 02 計算核對', '林老師講義〈第二章 基礎機率及抽樣分配〉'] };
+})();
+EPISODES['c2e1'] = C2E1;

@@ -275,3 +275,8 @@ const TUKEY = { ...WILCOXON, hair: 'side', glasses: 'thick', top: { fill: '#4a5a
 function tukey(x, y, s, pose = {}, opts) { return figure(TUKEY, x, y, s, pose, opts); }
 const PLAYFAIR = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: undefined, top: { fill: '#7a2e2e', vest: true }, sleeve: { fill: '#7a2e2e' } };
 function playfair(x, y, s, pose = {}, opts) { return figure(PLAYFAIR, x, y, s, pose, opts); }
+// 第 2 章：帕斯卡（長外套、無帽）、費馬（鬍子、深色外套）
+const PASCAL = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: undefined, top: { fill: '#3b3f5c', vest: true }, sleeve: { fill: '#3b3f5c' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'flat' } };
+function pascal(x, y, s, pose = {}, opts) { return figure(PASCAL, x, y, s, pose, opts); }
+const FERMAT = { ...GOSSET, hat: undefined, hair: 'side', mustache: true, glasses: undefined, top: { fill: '#5a3a2a', vest: true }, sleeve: { fill: '#5a3a2a' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 48, mouth: 'smile' } };
+function fermat(x, y, s, pose = {}, opts) { return figure(FERMAT, x, y, s, pose, opts); }
