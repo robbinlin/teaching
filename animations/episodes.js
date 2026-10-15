@@ -2293,3 +2293,167 @@ const C7E3 = (() => {
     sources: ['資料來源', 'Legendre (1805) Nouvelles méthodes…；Leiden stathist 19th century', '課堂 CVD_All：表 7-5 收縮壓～年齡（R² 0.1767、50 歲 → 125.29）、收縮壓～舒張壓（R² 0.552）重算相符', '作業：無 CVD 者 n = 56,612，r 0.428、ρ 0.458、收縮壓 = 58.51 + 0.819 × 腰圍', '林老師講義〈第七章 相關和廻歸分析（一）〉'] };
 })();
 EPISODES['c7e3'] = C7E3;
+
+// ============ 第 8 章 EP1：干擾變數：辛普森詭論與調整 ============
+const C8E1 = (() => {
+  const s1 = { beats: [0, 2.8, 5.6, 8.0], draw(lt) {
+    txt('1951・辛普森詭論：講義的招生例', 960, 120, 50, { p: prog(lt, .2, .8), color: COL.black });
+    const bars = (x, y, lab, m, f, k) => { appear(k, () => { txt(lab, x, y - 270, 30, { color: COL.black }); bar(x - 70, y, 100, m * 2.4, COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 12 }); bar(x + 70, y, 100, f * 2.4, COL.pinkL, { pattern: 'dots', patColor: COL.pink, sp: 10, r: 3 }); txt('男 ' + m + '%', x - 70, y + 34, 24, { color: COL.blue }); txt('女 ' + f + '%', x + 70, y + 34, 24, { color: COL.pink }); }); };
+    bars(400, 620, '全校合計', 68.8, 56.5, prog(lt, .5, .7));
+    const k2 = prog(lt, 2.9, .7); bars(960, 620, '法學院', 15.1, 33.6, k2); bars(1480, 620, '商學院', 80.1, 91.1, prog(lt, 3.4, .7));
+    txt('男 209/304　女 143/253', 400, 700, 22, { color: COL.gray, p: prog(lt, 1.2, .5) }); txt('男 8/53　女 51/152', 960, 700, 22, { color: COL.gray, p: k2 }); txt('男 201/251　女 92/101', 1480, 700, 22, { color: COL.gray, p: prog(lt, 3.6, .5) });
+    noteBox(960, 800, 1200, 90, [['分開看：兩個學院都是女生錄取率高；合併看：男生高', 32, COL.red]], '#fff8e2', prog(lt, 5.7, .6));
+    txt('原因：女生多申請錄取率低的法學院 → 「學院」是干擾變數', 960, 900, 30, { color: COL.black, p: prog(lt, 8.1, .6) });
+  } };
+  const s2 = { beats: [0, 3.0, 6.0], draw(lt) {
+    ground(lt, 140, 520);
+    mom(330, GY, .85, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: lt > 3 ? 'o' : 'smile', bob: idle(RLT) * .3 });
+    txt('講義：賀爾蒙治療 vs 冠狀動脈心臟病', 1160, 130, 50, { p: prog(lt, .2, .8), color: COL.black });
+    noteBox(1160, 330, 1000, 130, [['1990 年代觀察性研究（護士健康研究）：', 28, COL.gray], ['用賀爾蒙的人，冠心病少 35–60%', 34, COL.green]], '#fff8e2', prog(lt, .6, .6));
+    noteBox(1160, 560, 1000, 130, [['2002 年 WHI 隨機試驗：', 28, COL.gray], ['賀爾蒙反而增加冠心病風險', 34, COL.red]], COL.white, prog(lt, 3.1, .6));
+    noteBox(1160, 790, 1000, 110, [['用賀爾蒙的人原本就比較健康、年輕、教育高：「健康使用者」干擾', 28, COL.black]], '#fff8e2', prog(lt, 6.1, .6));
+  } };
+  const s3 = { beats: [0, 2.8, 5.6], draw(lt) {
+    txt('課堂模型（CVD_All 重算，n = 61,167）：抽菸量對腰圍', 960, 120, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const Y = v => 760 - (v - 70) * 30, X0 = 420;
+    axis(360, 1500, 760, { p: prog(lt, .4, .4) }); arrow(380, 780, 380, 220, { w: 4, head: 16, p: prog(lt, .4, .4) });
+    [70, 75, 80, 85].forEach(v => { inkLine(372, Y(v), 388, Y(v), { w: 3, p: prog(lt, .4, .4) }); txt(String(v), 340, Y(v) + 8, 22, { p: prog(lt, .4, .4) }); }); txt('腰圍 (cm)', 380, 200, 22, { color: COL.gray, p: prog(lt, .4, .4) });
+    const G = [['抽 < 1 包', 76.79, COL.blueL, .5], ['抽 ≥ 1 包', 82.54, COL.pinkL, .8]];
+    G.forEach(([lab, v, col, at], i) => { const k = prog(lt, at, .6), x = X0 + i * 220 + 100; bar(x, 760, 140, (v - 70) * 30 * easeOut(k), col, { pattern: 'hatch', patColor: i ? COL.pink : COL.blue, sp: 14 }); txt(lab, x, 795, 24, { p: k }); if (k > .9) txt(v.toFixed(1), x, Y(v) - 20, 24, { color: i ? COL.pink : COL.blue }); });
+    noteBox(1000, 300, 420, 90, [['粗估：+5.75 cm', 34, COL.red]], '#fff8e2', prog(lt, 1.4, .5));
+    const k2 = prog(lt, 2.9, .7);
+    if (k2 > 0) {
+      const G2 = [['< 50 歲', 74.35, 80.09], ['≥ 50 歲', 80.66, 86.40]];
+      G2.forEach(([lab, a, b], i) => { const x = 1000 + i * 240; bar(x, 760, 80, (a - 70) * 30 * easeOut(k2), COL.blueL, { pattern: 'hatch', patColor: COL.blue, sp: 12 }); bar(x + 90, 760, 80, (b - 70) * 30 * easeOut(k2), COL.pinkL, { pattern: 'hatch', patColor: COL.pink, sp: 12 }); txt(lab, x + 45, 795, 24, { p: k2 }); });
+      noteBox(1660, 420, 480, 150, [['加入年齡（≥ 50）調整', 26, COL.gray], ['抽菸 +5.74 cm', 32, COL.red], ['年齡 +6.31 cm', 26, COL.black]], COL.white, prog(lt, 3.6, .6));
+    }
+    noteBox(1660, 660, 480, 130, [['調整前 5.75 ≈ 調整後 5.74', 26, COL.black], ['年齡不是干擾變數', 30, COL.blue]], '#fff8e2', prog(lt, 5.7, .6));
+    txt('（講義結論相同；講義表中的 0.235 為另一尺度之係數）', 960, 900, 22, { color: COL.gray, p: prog(lt, 6.6, .5) });
+  } };
+  const s4 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('什麼是干擾變數？', 960, 130, 56, { p: prog(lt, .2, .8), color: COL.black });
+    const k = prog(lt, .5, .8);
+    appear(k, () => { shape(roundRectPts(300, 480, 300, 100, 24), { fill: COL.blueL, w: 4 }); txt('暴露 X', 450, 540, 34, { color: COL.black }); shape(roundRectPts(1320, 480, 300, 100, 24), { fill: COL.pinkL, w: 4 }); txt('結果 Y', 1470, 540, 34, { color: COL.black }); arrow(620, 530, 1300, 530, { w: 5, head: 20 }); txt('想估的效應', 960, 500, 28, { color: COL.gray }); });
+    const k2 = prog(lt, 2.7, .8);
+    appear(k2, () => { shape(roundRectPts(810, 230, 300, 100, 24), { fill: COL.mustard, w: 4 }); txt('干擾 Z', 960, 290, 34, { color: COL.black }); arrow(880, 340, 520, 470, { w: 4, head: 16, color: COL.mustardD }); arrow(1040, 340, 1400, 470, { w: 4, head: 16, color: COL.mustardD }); });
+    noteBox(960, 720, 1200, 130, [['Z 和 X 有關、也和 Y 有關，但不在 X → Y 的路上', 30, COL.black], ['調整 Z 之後估計值明顯改變，Z 才算干擾變數', 30, COL.red]], '#fff8e2', prog(lt, 5.3, .6));
+    txt('流行病學裡，年齡和性別最常被當成干擾變數來調整', 960, 900, 28, { color: COL.gray, p: prog(lt, 6.4, .5) });
+  } };
+  const s5 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('干擾變數', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['合併看 ≠ 分開看', 38, COL.red], ['辛普森詭論', 26, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['多變項迴歸：把 Z 放進模型', 34, COL.blue], ['調整後估計值', 26, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('比較調整前後', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 10], [s2, 9], [s3, 9], [s4, 9], [s5, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP1, dur: t, tag: '高等體育統計｜第 8 章 EP1　干擾變數：辛普森詭論與調整', scenes,
+    sources: ['資料來源', 'Simpson (1951) JRSS B；Bickel et al. (1975) Science；講義招生例 p.5–6', 'Rossouw (2000)；WHI (2002) JAMA；Hernán et al. (2008)', '課堂模型以 CVD_All_spss.csv 重算（腰圍 ~ 抽菸量 ≥ 1 包，年齡 ≥ 50）', '林老師講義〈多變項迴歸分析〉'] };
+})();
+EPISODES['c8e1'] = C8E1;
+
+// ============ 第 8 章 EP2：交互作用與分層分析 ============
+const C8E2 = (() => {
+  const s1 = { beats: [0, 2.8, 5.6], draw(lt) {
+    txt('抽菸對腰圍的效果，會不會隨年齡層而不同？', 960, 130, 48, { p: prog(lt, .2, .8), color: COL.black });
+    noteBox(960, 215, 1200, 80, [['腰圍 = β₀ + β₁ 抽菸 + β₂ 年齡 + β₃ (抽菸 × 年齡)', 32, COL.blue]], '#fff8e2', prog(lt, .5, .6));
+    const Y = v => 760 - (v - 70) * 30;
+    axis(500, 1420, 760, { p: prog(lt, 2.9, .4) });
+    const k = prog(lt, 3.0, .8);
+    if (k > 0) {
+      const lines = [['< 50 歲', 74.07, 74.07 + 6.83, COL.blue], ['≥ 50 歲', 74.07 + 7.04, 74.07 + 7.04 + 6.83 - 2.81, COL.pink]];
+      lines.forEach(([lab, a, b, col], i) => { ink([[700, Y(a)], [1220, Y(b)]], { w: 5, color: col, p: k }); shape(ellPts(700, Y(a), 10, 10, 0, 7, 8), { fill: col, w: 2, alpha: k }); shape(ellPts(1220, Y(b), 10, 10, 0, 7, 8), { fill: col, w: 2, alpha: k }); txt(lab, 1300, Y(b) + 8, 26, { color: col, align: 'left', p: k }); txt('+' + (b - a).toFixed(2), 960, Y((a + b) / 2) - 24 + (i ? -10 : 10), 24, { color: col, p: prog(lt, 3.6, .5) }); });
+      txt('抽 < 1 包', 700, 795, 24, { p: k }); txt('抽 ≥ 1 包', 1220, 795, 24, { p: k });
+    }
+    noteBox(1660, 560, 480, 170, [['重算（n = 61,167）', 24, COL.gray], ['β₃ = −2.81，p < 0.001', 30, COL.red], ['年輕 +6.83，年長 +4.02', 26, COL.black]], COL.white, prog(lt, 5.7, .6));
+    txt('兩條線不平行 → 抽菸與年齡有交互作用，年齡「修改」了抽菸的效應', 960, 900, 28, { color: COL.black, p: prog(lt, 6.8, .6) });
+  } };
+  const s2 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('三個以上因子的交互作用太複雜 → 分層分析', 960, 130, 48, { p: prog(lt, .2, .8), color: COL.black });
+    const k = prog(lt, .5, .8);
+    appear(k, () => { shape(roundRectPts(660, 230, 600, 110, 24), { fill: COL.white, w: 4 }); txt('全部資料 n = 61,167', 960, 297, 32, { color: COL.black }); arrow(820, 350, 560, 450, { w: 4, head: 16 }); arrow(1100, 350, 1360, 450, { w: 4, head: 16 }); });
+    const P = [[560, '女性層 n = 38,758', '交互作用 p = 0.20', '不顯著', COL.green, 2.7], [1360, '男性層 n = 22,409', '交互作用 −1.08，p < 0.001', '顯著', COL.red, 5.5]];
+    P.forEach(([x, t, r, c, col, at]) => { const kk = prog(lt, at, .7); appear(kk, () => { shape(roundRectPts(x - 300, 460, 600, 260, 24), { fill: '#fffdf6', w: 4 }); txt(t, x, 520, 32, { color: COL.black }); txt('腰圍 ~ 抽菸 × 年齡', x, 575, 24, { color: COL.gray }); txt(r, x, 630, 28, { color: col }); txt(c, x, 685, 34, { color: col }); }); });
+    noteBox(960, 830, 1100, 90, [['各層分開跑模型，不必放複雜的交互作用項（講義：女無、男有）', 28, COL.black]], '#fff8e2', prog(lt, 6.6, .6));
+  } };
+  const s3 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 1500, 1800);
+    dad(1700, GY, .75, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: 'flat' });
+    txt('分層的代價', 760, 140, 56, { p: prog(lt, .2, .8), color: COL.black });
+    noteBox(760, 330, 1100, 150, [['好處：模型簡單，不用解釋三階交互作用', 32, COL.green]], '#fff8e2', prog(lt, .5, .6));
+    noteBox(760, 560, 1100, 150, [['代價：每層人數變少，檢定力下降', 32, COL.red], ['某一層資料太少時，分層就不適合', 28, COL.gray]], COL.white, prog(lt, 2.7, .6));
+    txt('男性層只剩 22,409 人，仍然夠大；小樣本就要小心', 760, 800, 28, { color: COL.gray, p: prog(lt, 4.0, .5) });
+  } };
+  const s4 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('交互作用', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['干擾：調整後估計值變了', 34, COL.blue], ['交互作用：效應隨另一因子改變', 28, COL.red]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['乘積項 β₃ 顯著 → 有交互作用', 32, COL.black], ['太複雜 → 分層', 28, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('一條線不夠，就畫兩條', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 10], [s2, 9], [s3, 7], [s4, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP2, dur: t, tag: '高等體育統計｜第 8 章 EP2　交互作用與分層分析', scenes,
+    sources: ['資料來源', '課堂模型以 CVD_All_spss.csv 重算：腰圍 ~ 抽菸 × 年齡（≥ 50）；性別分層（女 38,758、男 22,409 有效）', '講義 p.19–26：交互作用、分層分析（女性無、男性有）', '林老師講義〈多變項迴歸分析〉'] };
+})();
+EPISODES['c8e2'] = C8E2;
+
+// ============ 第 8 章 EP3：作業：壓差、年齡、性別與卜瓦松發生率 ============
+const C8E3 = (() => {
+  const s1 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('作業 1：壓差 = 收縮壓 − 舒張壓，年齡是壓差的風險因子嗎？', 960, 120, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 300 + (v - 15) / 70 * 1000, Y = v => 800 - (v - 10) / 90 * 560;
+    axis(280, 1340, 800, { p: prog(lt, .4, .4) }); arrow(300, 820, 300, 200, { w: 4, head: 16, p: prog(lt, .4, .4) });
+    [20, 40, 60, 80].forEach(v => txt(String(v), X(v), 835, 24, { p: prog(lt, .4, .4) })); [20, 40, 60, 80].forEach(v => txt(String(v), 262, Y(v) + 8, 22, { p: prog(lt, .4, .4), align: 'right' }));
+    txt('年齡', 1340, 835, 24, { color: COL.gray, p: prog(lt, .4, .4) }); txt('壓差 (mmHg)', 300, 180, 22, { color: COL.gray, p: prog(lt, .4, .4) });
+    const pts = SC7.age_sbp.map(([a, s], i) => [a, s - (0.5 * s + 10 + (rnd(i, 7) - .5) * 10)]);
+    scatter(pts, X, Y, prog(lt, .5, 1.5), COL.blueL, 5);
+    const kl = prog(lt, 2.7, .8); if (kl > 0) ink([[X(20), Y(26.0 + .409 * 20)], [X(80), Y(26.0 + .409 * 80)]], { w: 5, color: COL.red, p: kl });
+    noteBox(1660, 300, 500, 150, [['壓差 = 26.0 + 0.41 × 年齡', 28, COL.red], ['每大 1 歲 +0.41 mmHg', 24, COL.gray], ['p < 0.001，R² = 0.158', 24, COL.gray]], '#fff8e2', kl);
+    noteBox(1660, 610, 500, 250, [['作業 2：加入性別', 26, COL.gray], ['年齡 0.41 → 0.40（幾乎不變）', 26, COL.black], ['性別不是干擾變數', 28, COL.blue], ['年齡×性別 −0.15，p < 0.001', 24, COL.red]], COL.white, prog(lt, 5.3, .6));
+    txt('（散佈圖為示意子樣本；係數以全體 63,200 人重算）', 800, 900, 22, { color: COL.gray, p: prog(lt, 3.5, .5) });
+  } };
+  const s2 = { beats: [0, 2.8, 5.6], draw(lt) {
+    txt('作業 3：卜瓦松模型估計 CVD 每年發生率', 960, 130, 50, { p: prog(lt, .2, .8), color: COL.black });
+    const k = prog(lt, .5, 1.2);
+    for (let i = 0; i < 40; i++) { const kk = clamp(k * 40 - i); if (kk > 0) mini(260 + (i % 10) * 70, 300 + Math.floor(i / 10) * 90, .5, i % 11 === 0 ? COL.pink : COL.blueL, 'dots'); }
+    txt('每人追蹤 1–5 年，加總成「人年」', 575, 680, 28, { color: COL.gray, p: prog(lt, 1.6, .5) });
+    noteBox(1400, 300, 760, 150, [['5,859 件 CVD', 34, COL.red], ['÷ 228,765 人年', 34, COL.black], ['= 每 1,000 人年 25.6 件', 32, COL.blue]], '#fff8e2', prog(lt, 2.9, .7));
+    noteBox(1400, 560, 760, 150, [['卜瓦松迴歸：log(發生率) = β₀ + β₁ X', 28, COL.black], ['追蹤年數取 log 當 offset', 26, COL.gray], ['exp(β) = 發生率比 IRR', 28, COL.blue]], COL.white, prog(lt, 5.7, .7));
+    txt('計數資料（事件數）不用線性迴歸，用卜瓦松', 960, 880, 30, { color: COL.black, p: prog(lt, 7.0, .5) });
+  } };
+  const s3 = { beats: [0, 2.6, 5.2, 7.8], draw(lt) {
+    txt('作業 4：壓差是 CVD 的風險因子嗎？', 960, 130, 50, { p: prog(lt, .2, .8), color: COL.black });
+    const rows = [['粗估：CVD ~ 壓差', '1.025 / mmHg', 'p < 0.001', COL.red, .5], ['調整年齡、性別', '1.003 / mmHg', 'p = 0.0002', COL.blue, 2.7], ['加入 壓差 × 性別', '交互作用 1.001', 'p = 0.43（無）', COL.gray, 5.3]];
+    const X0 = 300, Y0 = 260;
+    appear(prog(lt, .3, .4), () => { txt('模型', X0, Y0, 26, { color: COL.gray, align: 'left' }); txt('壓差 IRR', X0 + 700, Y0, 26, { color: COL.gray, align: 'left' }); txt('p 值', X0 + 1100, Y0, 26, { color: COL.gray, align: 'left' }); inkLine(X0 - 20, Y0 + 26, X0 + 1400, Y0 + 26, { w: 3 }); });
+    rows.forEach(([m, irr, p, col, at], i) => { const k = prog(lt, at, .6), y = Y0 + 100 + i * 110; appear(k, () => { txt(m, X0, y, 32, { color: COL.black, align: 'left' }); txt(irr, X0 + 700, y, 32, { color: col, align: 'left' }); txt(p, X0 + 1100, y, 28, { color: col, align: 'left' }); }); });
+    noteBox(960, 720, 1200, 110, [['調整後從 1.025 掉到 1.003：年齡是干擾變數（壓差隨年齡升高）', 30, COL.red]], '#fff8e2', prog(lt, 3.6, .6));
+    noteBox(960, 870, 1200, 80, [['壓差仍顯著，但效應很小；壓差 × 性別沒有交互作用', 28, COL.black]], COL.white, prog(lt, 7.9, .6));
+  } };
+  const s4 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('作業 5：依性別分層', 960, 130, 52, { p: prog(lt, .2, .8), color: COL.black });
+    const P = [[560, '女性', '39,639 人・3,523 件', '每 1,000 人年 24.3', '壓差 IRR 1.002，p = 0.06', COL.pink, .5], [1360, '男性', '23,561 人・2,336 件', '每 1,000 人年 28.0', '壓差 IRR 1.005，p < 0.001', COL.blue, 2.7]];
+    P.forEach(([x, t, n, r, irr, col, at]) => { const k = prog(lt, at, .7); appear(k, () => { shape(roundRectPts(x - 320, 230, 640, 380, 24), { fill: '#fffdf6', w: 4 }); txt(t, x, 300, 40, { color: col }); txt(n, x, 370, 26, { color: COL.gray }); txt(r, x, 440, 30, { color: COL.black }); txt(irr, x, 530, 28, { color: col }); }); });
+    noteBox(960, 760, 1200, 130, [['分層結論與第 4 題一致：男性壓差效應較明顯，但交互作用檢定不顯著', 28, COL.black], ['事件數、人年與模型樣本要對得上（n = 63,200）', 26, COL.gray]], '#fff8e2', prog(lt, 5.3, .6));
+  } };
+  const s5 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('多變項迴歸', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(330, 790, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['先問干擾：調整前後比一比', 34, COL.blue], ['再問交互作用：乘積項', 30, COL.red]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['計數資料 → 卜瓦松、IRR', 34, COL.green], ['必要時分層', 28, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('八章完結，謝謝收看', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 10], [s2, 10], [s3, 11], [s4, 9], [s5, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP3, dur: t, tag: '高等體育統計｜第 8 章 EP3　作業：壓差、年齡、性別與卜瓦松發生率', scenes,
+    sources: ['資料來源', '作業以 CVD_All_spss.csv 重算（n = 63,200；5,859 件 / 228,765 人年）', '線性：壓差 ~ 年齡 (+性別、交互作用)；卜瓦松：CVD ~ 壓差 (+年齡、性別、交互作用；offset = log 追蹤年)', '課程網站 Chapter 08 作業指南；林老師講義〈多變項迴歸分析〉p.27'] };
+})();
+EPISODES['c8e3'] = C8E3;
