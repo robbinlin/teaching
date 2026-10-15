@@ -12,6 +12,12 @@ class Synth {
     this.rev = ac.createConvolver(); this.rev.buffer = this.impulse(1.6);
     const rg = ac.createGain(); rg.gain.value = .22; this.rev.connect(rg); rg.connect(this.master);
     this.noiseBuf = this.makeNoise(2);
+    // 分段離線渲染：只排進 [winA - pre, winB) 的事件，時間平移到本段起點（見 renderMusic）
+    this.winA = 0; this.pre = 0; this.winB = Infinity; this._d = 0;
+    for (const k of ['pluck', 'strum', 'whistle', 'marimba', 'bell', 'bass', 'noise', 'kick', 'wood', 'whoosh', 'gavel']) {
+      const f = this[k];
+      this[k] = (t, ...r) => { if (this._d === 0) { if (t < this.winA - this.pre || t >= this.winB) return; t = t - this.winA + this.pre; } this._d++; try { return f.call(this, t, ...r); } finally { this._d--; } };
+    }
   }
   impulse(sec) {
     const sr = this.ac.sampleRate, b = this.ac.createBuffer(2, sr * sec, sr);
@@ -78,13 +84,18 @@ class Synth {
 }
 
 async function renderMusic(score, dur) {
-  const sr = 44100, ac = new OfflineAudioContext(2, Math.ceil(sr * dur), sr);
-  const S = new Synth(ac);
-  score(S, dur);
-  // fade out
-  S.master.gain.setValueAtTime(.8, dur - 1.6); S.master.gain.linearRampToValueAtTime(0, dur - .05);
-  const buf = await ac.startRendering();
-  return wavB64(buf);
+  // 以 30 秒為一段分別渲染（含 3 秒前置），避免單一 OfflineAudioContext 節點過多而極慢
+  const sr = 44100, CHK = 30, total = Math.ceil(sr * dur), out = [new Float32Array(total), new Float32Array(total)];
+  for (let a = 0; a < dur; a += CHK) {
+    const b = Math.min(a + CHK, dur), pre = Math.min(3, a), len = Math.ceil(sr * (b - a + pre));
+    const ac = new OfflineAudioContext(2, len, sr), S = new Synth(ac);
+    S.winA = a; S.winB = b; S.pre = pre;
+    score(S, dur);
+    if (b >= dur) { S.master.gain.setValueAtTime(.8, Math.max(0, dur - 1.6 - a + pre)); S.master.gain.linearRampToValueAtTime(0, dur - .05 - a + pre); }
+    const buf = await ac.startRendering(), off = Math.round(sr * pre), o0 = Math.round(sr * a);
+    for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c), n = Math.max(0, Math.min(d.length - off, total - o0)); out[c].set(d.subarray(off, off + n), o0); }
+  }
+  return wavB64({ length: total, numberOfChannels: 2, sampleRate: sr, getChannelData: c => out[c] });
 }
 function wavB64(buf) {
   const n = buf.length, ch = buf.numberOfChannels, sr = buf.sampleRate;

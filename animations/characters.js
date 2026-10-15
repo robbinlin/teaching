@@ -285,3 +285,12 @@ const BERNOULLI = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, gl
 function bernoulli(x, y, s, pose = {}, opts) { return figure(BERNOULLI, x, y, s, pose, opts); }
 const DEMOIVRE = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: 'round', top: { fill: '#55575f', vest: true }, sleeve: { fill: '#55575f' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'flat' } };
 function demoivre(x, y, s, pose = {}, opts) { return figure(DEMOIVRE, x, y, s, pose, opts); }
+// 第 3 章：奈曼（圓眼鏡、深藍西裝）、費雪（圓眼鏡、白鬍、米色外套）、布里斯托女士（鮑伯頭、綠洋裝）、皮爾森（側分、深灰）
+const NEYMAN = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: 'round', top: { fill: '#2f3f6e', vest: true }, sleeve: { fill: '#2f3f6e' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'smile' } };
+function neyman(x, y, s, pose = {}, opts) { return figure(NEYMAN, x, y, s, pose, opts); }
+const FISHER = { ...GOSSET, hat: undefined, hair: 'bald', mustache: true, glasses: 'round', top: { fill: '#b8a27a', vest: true }, sleeve: { fill: '#b8a27a' }, bottom: { fill: '#4a4a55' }, pose0: { spread: 48, mouth: 'flat' } };
+function fisher(x, y, s, pose = {}, opts) { return figure(FISHER, x, y, s, pose, opts); }
+const BRISTOL = { ...MOM, top: { fill: '#5f8f6a' }, sleeve: { fill: '#5f8f6a' }, bottom: { fill: '#3b3b48' }, pose0: { spread: 40, mouth: 'smile' } };
+function bristol(x, y, s, pose = {}, opts) { return figure(BRISTOL, x, y, s, pose, opts); }
+const EPEARSON = { ...GOSSET, hat: undefined, hair: 'side', mustache: false, glasses: undefined, top: { fill: '#4a4a55', vest: true }, sleeve: { fill: '#4a4a55' }, bottom: { fill: '#2b2b35' }, pose0: { spread: 46, mouth: 'flat' } };
+function epearson(x, y, s, pose = {}, opts) { return figure(EPEARSON, x, y, s, pose, opts); }

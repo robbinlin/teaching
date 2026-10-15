@@ -1439,3 +1439,313 @@ const C2E3 = (() => {
     sources: ['資料來源', 'de Moivre (1733)；Laplace (1810)；Pólya (1920) 命名 — J. D. Cook, How the CLT began', '模擬：基隆 CVD_All 無心血管疾病者收縮壓（n = 57,387），各抽 2,000 次', '作業 3：講義 p.31；課程網站 Chapter 02 計算核對', '林老師講義〈第二章 基礎機率及抽樣分配〉'] };
 })();
 EPISODES['c2e3'] = C2E3;
+
+// ============ 第 3 章 EP1：估計與信賴區間 ============
+const CI100 = [[89.89,1],[89.61,1],[90.24,1],[90.07,1],[90.81,0],[89.39,1],[90.91,0],[89.84,1],[90.02,1],[90.09,1],[90.66,1],[89.87,1],[90.68,1],[90.23,1],[90.26,1],[90.33,1],[90.19,1],[89.83,1],[89.65,1],[89.27,1],[89.98,1],[89.78,1],[90.32,1],[90.02,1],[90.55,1],[89.81,1],[89.78,1],[90.31,1],[89.88,1],[90.24,1],[90.19,1],[90.16,1],[90.62,1],[90.09,1],[90.05,1],[89.84,1],[89.41,1],[90.58,1],[90.62,1],[90.07,1],[90.62,1],[90.2,1],[90.13,1],[89.79,1],[89.85,1],[89.66,1],[89.75,1],[89.67,1],[89.67,1],[90.08,1],[90.38,1],[90.5,1],[89.68,1],[90.91,0],[90.16,1],[90.22,1],[90.13,1],[89.55,1],[89.61,1],[90.26,1],[89.19,0],[90.21,1],[89.64,1],[90.23,1],[89.44,1],[90.26,1],[89.8,1],[89.31,1],[90.47,1],[89.9,1],[89.65,1],[89.89,1],[90.25,1],[90.12,1],[90.68,1],[89.26,1],[90.2,1],[90.05,1],[90.16,1],[90.63,1],[89.34,1],[90.43,1],[89.49,1],[89.73,1],[90.1,1],[89.31,1],[90.2,1],[90.34,1],[90.0,1],[89.8,1],[90.1,1],[89.51,1],[89.91,1],[89.15,0],[89.83,1],[90.34,1],[89.96,1],[90.25,1],[90.3,1],[90.84,0]]; // 模擬：母體平均 90、σ 2.6、n 40，各樣本平均與是否涵蓋
+const C3E1 = (() => {
+  const SE = 0.411;
+  const s1 = { beats: [0, 3.0], draw(lt) {
+    ground(lt, 140, 760);
+    neyman(420, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    txt('1937・倫敦：奈曼的「信賴區間」', 1200, 130, 50, { p: prog(lt, .2, .9), color: COL.black });
+    appear(prog(lt, .6, .6), () => { paperSheet(1000, 430, 260, 340, -.05); txt('1937', 1000, 320, 30, { color: COL.gray }); txt('Phil. Trans.', 1000, 400, 24, { color: COL.gray }); txt('R. Soc. A', 1000, 430, 24, { color: COL.gray }); });
+    const k = prog(lt, 1.2, .8);
+    if (k > 0) { const y = 480; axis(1250, 1850, y, { p: k }); ink([[1420, y - 40], [1420, y + 40]], { w: 6, color: COL.blue, p: k }); ink([[1700, y - 40], [1700, y + 40]], { w: 6, color: COL.blue, p: k }); ink([[1420, y], [1700, y]], { w: 8, color: COL.blue, p: k }); txt('a', 1420, y + 80, 34, { color: COL.blue, p: k }); txt('b', 1700, y + 80, 34, { color: COL.blue, p: k }); txt('母體參數大概在這個範圍', 1560, 400, 32, { color: COL.blue, p: prog(lt, 1.8, .5) }); }
+    noteBox(1200, 760, 860, 100, [['不只給「一個數」，', 32], ['還給「一個範圍」加上「多有信心」', 34, COL.blue]], '#fff8e2', prog(lt, 3.1, .6));
+  } };
+  const s2 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('講義例：83 位國小學童，乳清蛋白 vs 碳水化合物，看跳高', 960, 130, 44, { p: prog(lt, .2, .9), color: COL.black });
+    // population cloud
+    const kp = prog(lt, .5, .8);
+    appear(kp, () => { shape(ellPts(560, 520, 420, 300, 0, 7, 40), { fill: COL.white, w: 4, pattern: 'dots', patColor: '#e6e0cc', sp: 30, r: 3 }); for (let i = 0; i < 60; i++) { const a = rnd(i, 1) * 2 * P, r = Math.sqrt(rnd(i, 2)); mini(560 + Math.cos(a) * 360 * r, 560 + Math.sin(a) * 240 * r, .4, COL.blueL, 'dots'); } txt('母體：「所有」國小學生', 560, 260, 34, { color: COL.black }); txt('母體平均 μ 未知', 560, 850, 32, { color: COL.gray }); });
+    const ka = prog(lt, 2.7, .8);
+    if (ka > 0) { arrow(1000, 520, 1240, 520, { w: 5, head: 20, p: ka }); txt('抽樣', 1120, 480, 32, { color: COL.pink, p: ka }); }
+    appear(prog(lt, 3.2, .7), () => { shape(roundRectPts(1260, 380, 360, 300, 30), { fill: COL.pinkL, w: 4 }); for (let i = 0; i < 20; i++) mini(1300 + (i % 5) * 70, 450 + Math.floor(i / 5) * 60, .4, COL.pink, 'dots'); txt('樣本：83 人', 1440, 720, 34, { color: COL.pink }); });
+    const kb = prog(lt, 5.5, .8);
+    if (kb > 0) { arrow(1240, 620, 1000, 620, { w: 5, head: 20, color: COL.blue, p: kb }); txt('推論（估計）', 1120, 670, 32, { color: COL.blue, p: kb }); }
+    noteBox(1440, 250, 560, 90, [['樣本平均 x̄', 32], ['→ 母體平均的點估計', 30, COL.blue]], '#fff8e2', prog(lt, 6.2, .6));
+  } };
+  const s3 = { beats: [0, 2.2, 5.0], draw(lt) {
+    ground(lt, 140, 560);
+    const jump = -Math.abs(Math.sin(RLT * 2.5)) * 90;
+    kid(350, GY, 1.0, { bob: jump, la: [P + .4, P - .6], ra: [-.4, -P / 2 + .6], mouth: 'smile' });
+    txt('40 位攝取乳清蛋白的小運動員：平均跳高 90.2 公分，σ = 2.6', 1180, 130, 42, { p: prog(lt, .2, .9), color: COL.black });
+    noteBox(1180, 250, 900, 80, [['標準誤 = 2.6 ÷ √40 = 0.411', 36, COL.blue]], '#fff8e2', prog(lt, 2.3, .6));
+    const X = v => 700 + (v - 88.5) / 3 * 1000, y = 560;
+    const k = prog(lt, .6, .8);
+    axis(680, 1760, y, { p: k });
+    [89, 90, 91].forEach(v => { inkLine(X(v), y - 10, X(v), y + 10, { w: 3, p: k }); txt(v + '', X(v), y + 40, 28, { p: k }); });
+    txt('公分', 1760, y + 40, 24, { p: k });
+    const kp = prog(lt, 1.0, .5);
+    if (kp > 0) { shape(ellPts(X(90.2), y, 14, 14, 0, 7, 12), { fill: COL.pink, w: 3, alpha: kp }); txt('x̄ = 90.2', X(90.2), y - 50, 32, { color: COL.pink, p: kp }); }
+    const kc = prog(lt, 5.1, 1.0);
+    if (kc > 0) {
+      const e = easeOut(kc), lo = 90.2 - .806 * e, hi = 90.2 + .806 * e;
+      ink([[X(lo), y + 90], [X(hi), y + 90]], { w: 8, color: COL.blue }); inkLine(X(lo), y + 70, X(lo), y + 110, { w: 5, color: COL.blue }); inkLine(X(hi), y + 70, X(hi), y + 110, { w: 5, color: COL.blue });
+      txt('89.39', X(89.394), y + 150, 30, { color: COL.blue, p: prog(lt, 5.8, .4) }); txt('91.01', X(91.006), y + 150, 30, { color: COL.blue, p: prog(lt, 5.8, .4) });
+      noteBox(1180, 820, 980, 90, [['95% CI = 90.2 ± 1.96 × 0.411 = (89.39, 91.01)', 34, COL.blue]], '#fff8e2', prog(lt, 6.2, .6));
+    }
+  } };
+  const s4 = { beats: [0, 2.6, 6.0], draw(lt) {
+    txt('重複抽樣 100 次，每次 40 人，各算一條 95% 信賴區間（模擬）', 960, 120, 42, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 400 + (v - 88.3) / 3.4 * 900;
+    const km = prog(lt, .5, .6);
+    if (km > 0) { ink([[X(90), 180], [X(90), 940]], { w: 4, color: COL.red, dash: true, p: km }); txt('母體平均 μ = 90', X(90), 165, 28, { color: COL.red, p: km }); }
+    const n = Math.floor(100 * clamp((lt - 1.0) / 4.5)); let miss = 0;
+    for (let i = 0; i < n; i++) {
+      const [m, c] = CI100[i], col = c ? COL.blue : COL.red, y = 195 + i * 7.5;
+      if (!c) miss++;
+      ink([[X(m - .806), y], [X(m + .806), y]], { w: c ? 2.5 : 4, color: col, alpha: .9 });
+    }
+    const kn = prog(lt, 1.2, .3);
+    if (kn > 0) { noteBox(1560, 300, 480, 130, [['蓋住 μ：' + (n - miss), 36, COL.blue], ['沒蓋住：' + miss, 36, COL.red]], COL.white, kn); }
+    noteBox(1560, 560, 500, 110, [['長期來看，約 95%', 32], ['的區間會包含母體平均', 32, COL.blue]], '#fff8e2', prog(lt, 6.1, .6));
+    noteBox(1560, 760, 500, 110, [['不是「95% 的資料', 28, COL.gray], ['落在區間內」', 28, COL.gray]], COL.white, prog(lt, 7.2, .6));
+  } };
+  const s5 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('區間多寬？看信心水準，也看樣本數', 960, 130, 48, { p: prog(lt, .2, .9), color: COL.black });
+    const X = v => 560 + (v - 88.8) / 2.8 * 1000;
+    const rows = [['90%', 1.645, COL.green, .5], ['95%', 1.96, COL.blue, .9], ['99%', 2.576, COL.pink, 1.3]];
+    axis(540, 1600, 560, { p: prog(lt, .3, .4) });
+    [89, 90, 91].forEach(v => { inkLine(X(v), 550, X(v), 570, { w: 3, p: prog(lt, .3, .4) }); txt(v + '', X(v), 600, 26, { p: prog(lt, .3, .4) }); });
+    rows.forEach(([lab, z, col, at], i) => {
+      const k = prog(lt, at, .6); if (k <= 0) return;
+      const y = 260 + i * 90, h = z * SE * easeOut(k);
+      ink([[X(90.2 - h), y], [X(90.2 + h), y]], { w: 8, color: col }); inkLine(X(90.2 - h), y - 18, X(90.2 - h), y + 18, { w: 4, color: col }); inkLine(X(90.2 + h), y - 18, X(90.2 + h), y + 18, { w: 4, color: col });
+      txt(lab, 420, y + 10, 34, { color: col, p: k }); txt(`±${z} × 0.411`, 1760, y + 10, 26, { color: col, p: prog(lt, at + .4, .4) });
+    });
+    txt('信心愈高，區間愈寬', 960, 470, 34, { color: COL.black, p: prog(lt, 2.0, .5) });
+    const k2 = prog(lt, 2.7, .8);
+    if (k2 > 0) {
+      [[40, 0.411, COL.blue, 2.7], [160, 0.206, COL.mustardD, 3.6]].forEach(([n, se, col, at], i) => {
+        const k = prog(lt, at, .6); if (k <= 0) return; const y = 700 + i * 80, h = 1.96 * se * easeOut(k);
+        ink([[X(90.2 - h), y], [X(90.2 + h), y]], { w: 8, color: col }); inkLine(X(90.2 - h), y - 18, X(90.2 - h), y + 18, { w: 4, color: col }); inkLine(X(90.2 + h), y - 18, X(90.2 + h), y + 18, { w: 4, color: col });
+        txt(`n = ${n}`, 420, y + 10, 34, { color: col, p: k }); txt(`標準誤 ${se}`, 1760, y + 10, 26, { color: col, p: k });
+      });
+      txt('樣本數四倍，區間減半', 960, 880, 34, { color: COL.black, p: prog(lt, 4.4, .5) });
+    }
+    noteBox(1620, 880, 500, 100, [['寬度 → 精密度', 30, COL.blue], ['信心水準 → 準確性', 30, COL.pink]], '#fff8e2', prog(lt, 5.5, .6));
+  } };
+  const s6 = { beats: [0, 2.4, 4.8, 7.2], draw(lt) {
+    ground(lt, 1500, 1800);
+    mom(1700, GY, .8, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: 'smile', bob: idle(RLT) * .3 });
+    txt('作業 1、2 快問快答：樣本數增加時…', 760, 130, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const Q = [[.5, '樣本平均值的標準誤變小', true, '✓ σ/√n 隨 n 變小'], [2.5, '樣本標準差變小', false, '✗ 不一定，它估計的是 σ'], [4.9, '95% 信賴區間包含 95% 的觀測資料', false, '✗ 區間是在估母體平均'], [7.3, '重複抽樣，約 95% 的區間包含母體平均', true, '✓ 這才是 95% 的意思']];
+    Q.forEach(([at, q, ok, ans], i) => {
+      const k = prog(lt, at, .6), y = 250 + i * 160;
+      appear(k, () => { shape(rectPts(200, y - 50, 820, 100), { fill: COL.white, smooth: false, w: 3.5 }); txt(q, 610, y + 10, 32, { color: COL.black }); });
+      const ka = prog(lt, at + 1.0, .5);
+      if (ka > 0) { (ok ? check : cross)(1080, y, 1, ka); txt(ans, 1140, y + 10, 28, { color: ok ? COL.green : COL.red, align: 'left', p: ka }); }
+    });
+  } };
+  const s7 = { beats: [0, 2.4], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('估計', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(440, 680, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 640, 120, [['點估計：一個數', 38, COL.pink], ['x̄ = 90.2', 28, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 640, 120, [['區間估計：範圍 + 信心', 38, COL.blue], ['(89.39, 91.01)，95%', 28, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('標準誤愈小，估得愈準', 1400, 150, 44, { p: prog(lt, 2.5, .6), color: COL.black });
+  } };
+  const order = [[s1, 7], [s2, 9], [s3, 9], [s4, 10], [s5, 9], [s6, 11], [s7, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP1, dur: t, tag: '高等體育統計｜第 3 章 EP1　估計與信賴區間', scenes,
+    sources: ['資料來源', 'Neyman (1937) Phil. Trans. R. Soc. A 236:333–380；USU Statistics History', '講義例：40 位小運動員跳高 90.2 cm、σ 2.6（p.12）；課程網站 Chapter 03 計算核對', '100 條區間：以母體平均 90、σ 2.6、n 40 模擬', '林老師講義〈估計及檢定〉'] };
+})();
+EPISODES['c3e1'] = C3E1;
+
+// ============ 第 3 章 EP2：假設檢定與 P 值 ============
+function normCdf(z) { const t = 1 / (1 + .2316419 * Math.abs(z)); const d = .3989423 * Math.exp(-z * z / 2); const p = d * t * (.3193815 + t * (-.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; }
+const C3E2 = (() => {
+  function teacup(x, y, s, milk, k = 1) {
+    appear(k, () => {
+      ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+      shape(ellPts(0, 40, 70, 14, 0, 7, 20), { fill: COL.white, w: 3 });
+      shape([[-60, -20], [60, -20], [48, 40], [-48, 40]], { fill: COL.white, w: 3.5 });
+      shape(ellPts(0, -20, 60, 14, 0, 7, 20), { fill: milk ? '#e8d3b0' : '#8a5a33', w: 3 });
+      ink(ellPts(72, 8, 18, 22, -P / 2, P / 2, 12), { w: 3.5 });
+      ctx.restore();
+    });
+  }
+  const s1 = { beats: [0, 3.2], draw(lt) {
+    ground(lt);
+    txt('1920 年代・英國洛桑農業試驗站：女士品茶', 960, 130, 48, { p: prog(lt, .2, .9), color: COL.black });
+    bristol(380, GY, .85, { ra: [-.3, -.45], rhand: 'open', look: 1, mouth: 'smile', bob: idle(RLT) * .3 });
+    fisher(1560, GY, .9, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: lt > 3.2 ? 'smile' : 'flat' });
+    bubble(560, 330, 620, 120, 430, 480, '「先加奶」和「先加茶」，我喝得出來！', 30, prog(lt, .6, .6));
+    const order = [1, 0, 0, 1, 0, 1, 1, 0];
+    order.forEach((m, i) => teacup(700 + i * 80, 690, .55, m, prog(lt, 3.3 + i * .15, .4)));
+    txt('8 杯：4 杯先加奶、4 杯先加茶，隨機排列', 960, 790, 32, { color: COL.black, p: prog(lt, 4.6, .5) });
+    noteBox(1540, 330, 560, 90, [['費雪：那就來做實驗', 32], ['（1935《實驗設計》）', 26, COL.gray]], '#fff8e2', prog(lt, 3.4, .6));
+  } };
+  const s2 = { beats: [0, 2.6, 5.0], draw(lt) {
+    txt('如果她只是亂猜，全部答對的機率有多大？', 960, 130, 48, { p: prog(lt, .2, .9), color: COL.black });
+    const k = prog(lt, .5, .8);
+    // 70 little arrangements as dots grid, one highlighted
+    for (let i = 0; i < 70; i++) { const kk = clamp(k * 70 - i + 1); if (kk > 0) shape(rectPts(300 + (i % 14) * 64, 260 + Math.floor(i / 14) * 64, 50, 50), { fill: i === 23 ? COL.pink : COL.white, smooth: false, w: 2.5, alpha: kk }); }
+    txt('8 杯選 4 杯當「先加奶」：C(8,4) = 70 種排法', 740, 620, 34, { color: COL.black, p: prog(lt, 1.6, .5) });
+    noteBox(1520, 360, 600, 130, [['只有 1 種全對', 34, COL.pink], ['1/70 = 0.014', 40, COL.pink]], '#fff8e2', prog(lt, 2.7, .6));
+    noteBox(960, 760, 1200, 110, [['虛無假設 H₀：她只是亂猜。', 34], ['若 H₀ 成立，全對這麼極端的事只有 1.4% 的機會 → 證據不利於 H₀', 30, COL.blue]], COL.white, prog(lt, 5.1, .7));
+  } };
+  const s3 = { beats: [0, 2.8], draw(lt) {
+    txt('兩個假設', 960, 130, 56, { p: prog(lt, .2, .8), color: COL.black });
+    const cards = [[480, 'H₀ 虛無假設', '維持原狀、沒有差別', COL.gray, '乳清蛋白與否，跳高能力相同', '貼布無療效'], [1440, 'Hₐ 對立假設', '研究者想證明的', COL.pink, '跳高能力不同', '貼布有療效']];
+    cards.forEach(([x, t, sub, col, e1, e2], i) => {
+      const k = prog(lt, .5 + i * 2.3, .7);
+      appear(k, () => { shape(rectPts(x - 400, 220, 800, 560), { fill: '#fffdf6', smooth: false, w: 4 }); txt(t, x, 300, 48, { color: col }); txt(sub, x, 360, 32, { color: COL.gray }); inkLine(x - 340, 400, x + 340, 400, { w: 3 }); txt('例 1：' + e1, x, 500, 30, { color: COL.black }); txt('例 2：' + e2, x, 580, 30, { color: COL.black }); });
+    });
+    const ka = prog(lt, 1.6, .5);
+    if (ka > 0) txt('⇄', 960, 510, 80, { color: COL.blue, p: ka });
+    txt('決策只有兩種：拒絕 H₀，或無法拒絕 H₀', 960, 880, 36, { color: COL.blue, p: prog(lt, 5.0, .6) });
+  } };
+  const s4 = { beats: [0, 2.6, 5.4], draw(lt) {
+    txt('講義例：30 人收縮壓平均 138.5，是否高於 130？（σ = 20）', 960, 130, 44, { p: prog(lt, .2, .9), color: COL.black });
+    noteBox(960, 230, 900, 80, [['H₀：μ ≤ 130　　Hₐ：μ > 130　（右尾）', 36, COL.blue]], '#fff8e2', prog(lt, .6, .6));
+    const base = 700, cx = 760, wh = 480, hs = 300, X = z => cx + z / 3.6 * wh;
+    const k = prog(lt, 1.2, .8);
+    if (k > 0) {
+      shadeUnder(cx, base, wh, hs, normalPdf, 1.645, 3.6, COL.pinkL, { alpha: .9 });
+      axis(240, 1320, base, { p: k }); curve(cx, base, wh, hs, normalPdf, { w: 5, p: k, range: 3.6 });
+      txt('H₀ 成立時，z 的分布', cx, 360, 30, { color: COL.gray, p: k });
+      [[0, '0'], [1.645, '1.645']].forEach(([z, lab]) => { inkLine(X(z), base - 8, X(z), base + 8, { w: 3, p: k }); txt(lab, X(z), base + 36, 26, { p: k }); });
+      txt('拒絕域 α = 0.05', X(2.4), base + 80, 28, { color: COL.pink, p: prog(lt, 1.8, .5) });
+    }
+    const k2 = prog(lt, 2.7, .8);
+    if (k2 > 0) {
+      noteBox(1560, 420, 620, 130, [['z = (138.5 − 130) ÷ (20/√30)', 30, COL.red], ['= 8.5 ÷ 3.65 = 2.33', 36, COL.red]], COL.white, k2);
+      ink([[X(2.33), base], [X(2.33), 420]], { w: 6, color: COL.red, p: prog(lt, 3.4, .5) }); txt('2.33', X(2.33), 400, 28, { color: COL.red, p: prog(lt, 3.4, .5) });
+      shadeUnder(cx, base, wh, hs, normalPdf, 2.33, 3.6, COL.red, { alpha: .8 * prog(lt, 3.8, .5) });
+    }
+    const k3 = prog(lt, 5.5, .8);
+    if (k3 > 0) { noteBox(1560, 640, 620, 130, [['右尾 P = 0.00996 < 0.05', 34, COL.red], ['拒絕 H₀：有證據支持 μ > 130', 30, COL.blue]], '#fff8e2', k3); txt('（課程網站更正值；原投影片 z = 5.06 不符題目數據）', 760, 830, 26, { color: COL.gray, p: prog(lt, 6.4, .5) }); }
+  } };
+  const s5 = { beats: [0, 3.0], draw(lt) {
+    ground(lt, 1500, 1800);
+    dad(1700, GY, .75, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: 'smile' });
+    txt('P 值到底是什麼？', 760, 140, 56, { p: prog(lt, .2, .8), color: COL.black });
+    const Q = [[.6, 'H₀（和模型假設）成立時，出現「這麼極端或更極端」結果的機率', true], [3.1, 'H₀ 為真的機率', false], [4.3, '這次拒絕 H₀ 會出錯的機率', false]];
+    Q.forEach(([at, q, ok], i) => { const k = prog(lt, at, .6), y = 300 + i * 170; appear(k, () => { shape(rectPts(160, y - 55, 1040, 110), { fill: COL.white, smooth: false, w: 3.5 }); txt(q, 680, y + 10, 30, { color: COL.black }); }); const ka = prog(lt, at + .6, .5); if (ka > 0) (ok ? check : cross)(1270, y, 1, ka); });
+    noteBox(760, 800, 1000, 80, [['P 值小 → 資料和 H₀ 很不一致 → 拒絕 H₀ 的「風險」小', 30, COL.blue]], '#fff8e2', prog(lt, 5.4, .6));
+  } };
+  const s6 = { beats: [0, 2.0, 4.0, 6.0], draw(lt) {
+    txt('檢定四步驟', 960, 130, 56, { p: prog(lt, .2, .8), color: COL.black });
+    const steps = [['① 設假設', 'H₀、Hₐ，並訂 α'], ['② 選統計量', 'z、t…及其抽樣分布'], ['③ 找拒絕域', '依 α 與分布'], ['④ 算 P 值', '下結論、解釋']];
+    steps.forEach(([t, d], i) => { const k = prog(lt, .4 + i * 2.0, .6), x = 330 + i * 420; appear(k, () => { shape(roundRectPts(x - 180, 320, 360, 260, 24), { fill: i === 3 ? COL.pinkL : '#fffdf6', w: 4 }); txt(t, x, 400, 40, { color: COL.black }); txt(d, x, 480, 28, { color: COL.gray }); }); if (i < 3) arrow(x + 190, 450, x + 230, 450, { w: 4, head: 14, p: prog(lt, 1.2 + i * 2.0, .4) }); });
+    noteBox(960, 760, 900, 80, [['P < α → 拒絕 H₀；P ≥ α → 無法拒絕 H₀', 36, COL.blue]], '#fff8e2', prog(lt, 6.4, .6));
+  } };
+  const s7 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('假設檢定', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['P < α：拒絕 H₀', 38, COL.pink], ['資料與 H₀ 不一致', 28, COL.gray]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['P ≥ α：無法拒絕 H₀', 38, COL.blue], ['≠ 證明 H₀ 正確', 28, COL.red]], '#fff8e2', prog(lt, .9, .6));
+    txt('用證據做決策', 1400, 150, 44, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 7], [s2, 8], [s3, 7], [s4, 9], [s5, 8], [s6, 9], [s7, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP2, dur: t, tag: '高等體育統計｜第 3 章 EP2　假設檢定與 P 值', scenes,
+    sources: ['資料來源', 'Fisher (1935) The Design of Experiments；Wikipedia: Muriel Bristol（1/70 = 1/C(8,4)）', '講義例：30 人收縮壓 138.5 vs 130、σ 20（p.25–26）；課程網站 Chapter 03 更正 z = 2.33', '林老師講義〈估計及檢定〉p.14–25'] };
+})();
+EPISODES['c3e2'] = C3E2;
+
+// ============ 第 3 章 EP3：型一、型二錯誤與檢定力 ============
+const C3E3 = (() => {
+  const s1 = { beats: [0, 3.0], draw(lt) {
+    ground(lt);
+    txt('1933・奈曼與皮爾森：兩種錯誤與檢定力', 960, 130, 48, { p: prog(lt, .2, .9), color: COL.black });
+    neyman(400, GY, .9, { ra: [-.3, -.45], rhand: 'open', look: 1, bob: idle(RLT) * .3 });
+    epearson(760, GY, .9, { look: -1, mouth: 'smile', bob: idle(RLT, 1) * .3 });
+    fisher(1560, GY, .9, { la: [P - .3, P - .2], lhand: 'open', look: -1 });
+    noteBox(1120, 330, 560, 130, [['型一錯誤 α', 34, COL.red], ['型二錯誤 β・檢定力 1 − β', 30, COL.blue]], '#fff8e2', prog(lt, .8, .6));
+    noteBox(1560, 330, 480, 110, [['費雪 1925：', 28, COL.gray], ['α = 0.05 成為慣例', 32, COL.mustardD]], COL.white, prog(lt, 3.1, .6));
+  } };
+  const s2 = { beats: [0, 2.6, 5.2], draw(lt) {
+    txt('決策 × 事實', 960, 120, 52, { p: prog(lt, .2, .8), color: COL.black });
+    const X0 = 560, Y0 = 220, CW = 520, RH = 220;
+    const kh = prog(lt, .5, .6);
+    appear(kh, () => {
+      txt('事實：H₀ 為真', X0 + CW * .5, Y0 - 20, 30, { color: COL.gray }); txt('事實：Hₐ 為真', X0 + CW * 1.5, Y0 - 20, 30, { color: COL.gray });
+      txt('不拒絕 H₀', X0 - 160, Y0 + RH * .5 + 10, 30, { color: COL.gray }); txt('拒絕 H₀', X0 - 160, Y0 + RH * 1.5 + 10, 30, { color: COL.gray });
+      inkLine(X0 - 300, Y0 + 10, X0 + CW * 2, Y0 + 10, { w: 3.5 }); inkLine(X0, Y0 - 50, X0, Y0 + RH * 2 + 10, { w: 3.5 }); inkLine(X0 - 300, Y0 + RH + 10, X0 + CW * 2, Y0 + RH + 10, { w: 2.5 }); inkLine(X0 + CW, Y0 - 50, X0 + CW, Y0 + RH * 2 + 10, { w: 2.5 });
+    });
+    const cells = [[0, 0, '決策正確', '1 − α', COL.green, 1.0], [1, 1, '決策正確（檢定力）', '1 − β', COL.green, 1.4], [0, 1, '型一錯誤', 'α', COL.red, 2.7], [1, 0, '型二錯誤', 'β', COL.blue, 5.3]];
+    cells.forEach(([r, c, t, sym, col, at]) => { const k = prog(lt, at, .6); appear(k, () => { shape(rectPts(X0 + c * CW + 20, Y0 + r * RH + 30, CW - 40, RH - 40), { fill: col === COL.green ? COL.greenL : col === COL.red ? COL.pinkL : COL.blueL, smooth: false, w: 3 }); txt(t, X0 + c * CW + CW / 2, Y0 + r * RH + RH / 2 - 10, 34, { color: col }); txt(sym, X0 + c * CW + CW / 2, Y0 + r * RH + RH / 2 + 50, 40, { color: col }); }); });
+    noteBox(960, 760, 1000, 80, [['型一：冤枉好人（H₀ 真卻拒絕）　型二：放過壞人（Hₐ 真卻沒拒絕）', 28, COL.black]], '#fff8e2', prog(lt, 6.0, .6));
+  } };
+  // glucose curves
+  function glucose(lt, C, kAll, showAreas) {
+    const base = 700, X = v => 300 + (v - 70) / 90 * 1200, sd = 10, hs = 320;
+    axis(260, 1560, base, { p: kAll });
+    [80, 100, 115, 126, 140, 150].forEach(v => { if (v === 115 && Math.abs(C - 115) > 2) return; inkLine(X(v), base - 8, X(v), base + 8, { w: 3, p: kAll }); txt(String(v), X(v), base + 36, 26, { p: kAll, color: v === 100 ? COL.blue : v === 126 ? COL.pink : COL.black }); });
+    txt('mg/dl', 1570, base + 36, 22, { p: kAll });
+    const wh = 3 * sd / 90 * 1200;
+    if (showAreas) {
+      shadeUnder(X(100), base, wh, hs, normalPdf, (C - 100) / sd, 3, COL.red, { alpha: .75 });
+      shadeUnder(X(126), base, wh, hs, normalPdf, -3, (C - 126) / sd, COL.blue, { alpha: .75 });
+    }
+    curve(X(100), base, wh, hs, normalPdf, { w: 5, color: COL.blue, p: kAll, range: 3 }); curve(X(126), base, wh, hs, normalPdf, { w: 5, color: COL.pink, p: kAll, range: 3 });
+    txt('正常人 平均 100', X(100), 330, 30, { color: COL.blue, p: kAll }); txt('糖尿病 平均 126', X(126), 330, 30, { color: COL.pink, p: kAll });
+    ink([[X(C), base], [X(C), 280]], { w: 6, color: COL.red }); txt('切點 C = ' + Math.round(C), X(C), 255, 30, { color: COL.red });
+    return X;
+  }
+  const s3 = { beats: [0, 3.0], draw(lt) {
+    txt('講義例：用空腹血糖診斷糖尿病（兩曲線標準差以 10 示意）', 960, 130, 42, { p: prog(lt, .2, .9), color: COL.black });
+    const k = prog(lt, .5, .8); if (k <= 0) return;
+    glucose(lt, 115, k, lt > 3.1);
+    const ka = prog(lt, 3.1, .6);
+    noteBox(1700, 420, 400, 110, [['紅：型一錯誤 α', 28, COL.red], ['正常人被判有病', 24, COL.gray]], COL.white, ka);
+    noteBox(1700, 600, 400, 110, [['藍：型二錯誤 β', 28, COL.blue], ['病人被判沒病', 24, COL.gray]], COL.white, prog(lt, 3.8, .6));
+    txt('血糖 > C 判定有病', 960, 820, 32, { color: COL.black, p: prog(lt, 1.4, .5) });
+  } };
+  const s4 = { beats: [0, 2.8, 5.6], draw(lt) {
+    txt('切點往右移：α 變小、β 變大；往左移則相反', 960, 130, 44, { p: prog(lt, .2, .9), color: COL.black });
+    const u = lt < 2.8 ? 115 : lt < 5.6 ? lerp(115, 120, easeOut(prog(lt, 2.8, 1.5))) : lerp(120, 110, easeOut(prog(lt, 5.6, 1.5)));
+    glucose(lt, u, 1, true);
+    const a = 1 - normCdf((u - 100) / 10), b = normCdf((u - 126) / 10);
+    noteBox(1700, 420, 400, 110, [['α = ' + a.toFixed(2), 36, COL.red], ['型一錯誤', 24, COL.gray]], COL.white, 1);
+    noteBox(1700, 600, 400, 110, [['β = ' + b.toFixed(2), 36, COL.blue], ['型二錯誤', 24, COL.gray]], COL.white, 1);
+    noteBox(960, 860, 1000, 80, [['兩種錯誤此消彼長，不會同時發生，也不能同時歸零', 32, COL.black]], '#fff8e2', prog(lt, 7.2, .6));
+  } };
+  const s5 = { beats: [0, 3.0], draw(lt) {
+    txt('怎麼同時降低兩種錯誤？增加樣本數', 960, 130, 46, { p: prog(lt, .2, .9), color: COL.black });
+    const base = 700, X = v => 300 + (v - 70) / 90 * 1200, hs = 320, C = 113;
+    const n = lt < 3.0 ? 1 : lerp(1, 4, easeOut(prog(lt, 3.0, 2.0)));
+    const sd = 10 / Math.sqrt(n), wh = 3 * sd / 90 * 1200, k = prog(lt, .5, .8);
+    axis(260, 1560, base, { p: k });
+    [100, 126].forEach(v => { inkLine(X(v), base - 8, X(v), base + 8, { w: 3, p: k }); txt(String(v), X(v), base + 36, 26, { p: k }); });
+    if (k > 0) {
+      shadeUnder(X(100), base, wh, hs * Math.sqrt(n) * .5, normalPdf, (C - 100) / sd, 3, COL.red, { alpha: .75 });
+      shadeUnder(X(126), base, wh, hs * Math.sqrt(n) * .5, normalPdf, -3, (C - 126) / sd, COL.blue, { alpha: .75 });
+      curve(X(100), base, wh, hs * Math.sqrt(n) * .5, normalPdf, { w: 5, color: COL.blue, p: k, range: 3 }); curve(X(126), base, wh, hs * Math.sqrt(n) * .5, normalPdf, { w: 5, color: COL.pink, p: k, range: 3 });
+      ink([[X(C), base], [X(C), 300]], { w: 5, color: COL.red, p: k });
+      txt('樣本平均的標準誤 = 10/√n', 960, 260, 32, { color: COL.gray, p: k });
+    }
+    const a = 1 - normCdf((C - 100) / sd), b = normCdf((C - 126) / sd);
+    noteBox(1700, 400, 400, 180, [['n = ' + Math.round(n), 36, COL.black], ['α = ' + a.toFixed(3), 30, COL.red], ['β = ' + b.toFixed(3), 30, COL.blue]], COL.white, k);
+    noteBox(1700, 640, 400, 100, [['檢定力 1 − β', 30, COL.green], ['= ' + (1 - b).toFixed(3), 34, COL.green]], '#fff8e2', prog(lt, 3.2, .6));
+    txt('曲線變窄、分開 → β 變小、檢定力變大', 960, 860, 34, { color: COL.black, p: prog(lt, 5.0, .6) });
+  } };
+  const s6 = { beats: [0, 3.0], draw(lt) {
+    ground(lt, 1500, 1800);
+    mom(1700, GY, .8, { la: [P - .3, P - .2], lhand: 'open', look: -1, mouth: 'smile', bob: idle(RLT) * .3 });
+    txt('作業 4、5：α 與 P 值，哪裡不一樣？', 760, 140, 48, { p: prog(lt, .2, .8), color: COL.black });
+    noteBox(760, 330, 1100, 150, [['顯著水準 α：事前設定', 38, COL.red], ['可以容忍的型一錯誤率（常用 0.05）', 30, COL.gray]], '#fff8e2', prog(lt, .6, .6));
+    noteBox(760, 560, 1100, 150, [['P 值：事後算出', 38, COL.blue], ['資料與 H₀ 不一致的程度', 30, COL.gray]], '#fff8e2', prog(lt, 1.4, .6));
+    noteBox(760, 800, 1100, 100, [['P < α → 拒絕 H₀，接受對立假設；P ≥ α → 無法拒絕 H₀', 32, COL.black]], COL.white, prog(lt, 3.1, .6));
+  } };
+  const s7 = { beats: [0, 2.6], draw(lt) {
+    ground(lt, 140, 1000);
+    txt('兩種錯誤', 560, 170, 72, { p: prog(lt, .1, .6), color: COL.black });
+    underline(380, 740, 220, { p: prog(lt, .6, .4), color: COL.mustardD });
+    dad(330, GY, .8, DANCE_DAD(RLT)); kid(560, GY, 1.0, { bob: -Math.abs(Math.sin(RLT * 6)) * 20 }); mom(790, GY, .8, DANCE_MOM(RLT));
+    noteBox(1400, 300, 660, 120, [['α 顧「冤枉」', 38, COL.red], ['β 顧「放過」', 38, COL.blue]], '#fff8e2', prog(lt, .4, .6));
+    noteBox(1400, 460, 660, 120, [['樣本數是調節兩者的旋鈕', 34, COL.green], ['檢定力 = 1 − β', 28, COL.gray]], '#fff8e2', prog(lt, .9, .6));
+    txt('抓得到真正的差異，才是好檢定', 1400, 150, 42, { p: prog(lt, 2.7, .6), color: COL.black });
+  } };
+  const order = [[s1, 7], [s2, 9], [s3, 7], [s4, 9], [s5, 8], [s6, 7], [s7, 5]];
+  let t = 0; const scenes = order.map(([s, d]) => { const o = { ...s, t0: t, t1: t + d }; t += d; return o; });
+  return { ...EP3, dur: t, tag: '高等體育統計｜第 3 章 EP3　型一、型二錯誤與檢定力', scenes,
+    sources: ['資料來源', 'Neyman & Pearson (1933)；Fisher (1925) Statistical Methods for Research Workers', '講義例：空腹血糖 100 vs 126 mg/dl、切點 115（p.20–21；標準差 10 為示意）', '林老師講義〈估計及檢定〉p.17–21、作業 4–5'] };
+})();
+EPISODES['c3e3'] = C3E3;
