@@ -1,0 +1,25 @@
+威爾考森與曼惠特尼的秩次檢定。當資料偏斜或樣本很小，不比平均比排名：以 PPHN 出生體重與運動代表隊資料示範無母數檢定。
+
+國立體育大學 競技與教練科學研究所「高等體育統計」｜林彥光 老師
+第4章 單樣本及雙樣本檢定・第 2 集（共 3 集）
+課程網站：https://advanced-sports-statistics-course.robbinlin.chatgpt.site
+
+章節
+0:00 作業資料的偏斜分布
+0:21 1945 年 Wilcoxon 的秩次想法
+0:34 Wilcoxon 符號等級檢定
+1:12 Mann–Whitney U 檢定
+1:43 總結：何時用無母數
+
+本集重點
+・資料不常態、有離群值、樣本又小？
+・改用排名的無母數檢定：單樣本或成對用 Wilcoxon，兩組獨立用 Mann–Whitney。
+
+資料來源
+・課堂資料：PPHN 新生兒（131 位）
+・作業資料：109 學年大專運動代表隊（1,846 隊）
+・Significance〈How Frank Wilcoxon helped statisticians…〉
+・Mann & Whitney (1947), Ann. Math. Stat. 18
+
+手繪動畫・繁體中文字幕・中文旁白。角色：阿統（爸爸）、小檢（媽媽）、小樣（小孩）。
+#統計學 #體育統計 #Statistics #高等體育統計

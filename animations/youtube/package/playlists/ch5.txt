@@ -1,0 +1,6 @@
+高等體育統計 第5章 平均數檢定：多組樣本
+
+第5章 平均數檢定：多組樣本。變異數分析、Bonferroni 事後比較、Kruskal–Wallis 與作業解析。
+
+國立體育大學 競技與教練科學研究所「高等體育統計」｜林彥光 老師
+課程網站：https://advanced-sports-statistics-course.robbinlin.chatgpt.site

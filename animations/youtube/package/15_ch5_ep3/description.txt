@@ -1,0 +1,25 @@
+克魯斯卡與瓦利斯 1952 年的秩次版 ANOVA。以存活資料示範 Kruskal–Wallis，並完整解作業：26 位選手四種營養補充品的 ANOVA、K-W 與 Bonferroni。
+
+國立體育大學 競技與教練科學研究所「高等體育統計」｜林彥光 老師
+第5章 平均數檢定：多組樣本・第 3 集（共 3 集）
+課程網站：https://advanced-sports-statistics-course.robbinlin.chatgpt.site
+
+章節
+0:00 1952 年克魯斯卡與瓦利斯
+0:19 存活資料的 Kruskal–Wallis
+0:52 作業：四種營養補充品 ANOVA 與 K-W
+1:34 作業 Bonferroni：6 對
+1:55 總結
+
+本集重點
+・常態、變異數相同用 ANOVA；否則用 Kruskal–Wallis，每組至少 5 人。
+・整體顯著，再做 Bonferroni 事後比較：先整體，再兩兩。
+
+資料來源
+・Kruskal & Wallis (1952) JASA 47:583–621
+・課堂 survival.csv（K-W H = 14.95）；作業 26 位選手增重（講義 p.24–25；課程網站 SPS）
+・作業重算：F = 25.4、H = 18.6、Bonferroni 6 對
+・林老師講義〈第五章 平均數檢定：多組樣本〉
+
+手繪動畫・繁體中文字幕・中文旁白。角色：阿統（爸爸）、小檢（媽媽）、小樣（小孩）。
+#統計學 #體育統計 #Statistics #高等體育統計

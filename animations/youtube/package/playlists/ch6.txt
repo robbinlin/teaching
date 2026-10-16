@@ -1,0 +1,6 @@
+高等體育統計 第6章 兩個類別變數之檢定
+
+第6章 兩個類別變數之檢定。卡方獨立性檢定、葉氏校正與費雪精確檢定、疫苗資料與 McNemar。
+
+國立體育大學 競技與教練科學研究所「高等體育統計」｜林彥光 老師
+課程網站：https://advanced-sports-statistics-course.robbinlin.chatgpt.site
