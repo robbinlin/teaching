@@ -1,1 +1,1 @@
-高等體育統計, 統計學, 體育統計, 生物統計, Statistics, Biostatistics, 國立體育大學, 手繪動畫, 統計教學, 變異數分析, ANOVA, 事後檢定, Bonferroni, Kruskal-Wallis, 多重比較, 第5章
+﻿高等體育統計, 統計學, 體育統計, 生物統計, Statistics, Biostatistics, 國立體育大學, 手繪動畫, 統計教學, 變異數分析, ANOVA, 事後檢定, Bonferroni, Kruskal-Wallis, 多重比較, 第5章
