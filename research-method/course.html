@@ -1,0 +1,428 @@
+<title>論文五章工作坊</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: five "lanes" (chapters) on the home screen; each chapter opens into modules; each module is a short sequence: read, judge, order, write, check, feedback. */
+:root{
+  --bg:#F1F4F7; --surface:#FFFFFF; --ink:#12202E; --muted:#5A6B7B; --line:#D8DFE6;
+  --accent:#D4401C; --accent-ink:#FFFFFF; --navy:#1C3557;
+  --ok:#1E7A4F; --okbg:#E2F2E9; --bad:#B3261E; --badbg:#FBE7E4; --paper:#FAFBFC;
+  --serif:'Noto Serif TC','Songti TC','PMingLiU',serif;
+  --sans:'Noto Sans TC','PingFang TC','Microsoft JhengHei',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1620; --surface:#15222F; --ink:#E7EDF3; --muted:#9BACBC; --line:#28394A;
+  --accent:#F27350; --accent-ink:#1A0B06; --navy:#8DB2E3;
+  --ok:#62C792; --okbg:#143324; --bad:#F0877F; --badbg:#3A1C1A; --paper:#101C28; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1620; --surface:#15222F; --ink:#E7EDF3; --muted:#9BACBC; --line:#28394A;
+  --accent:#F27350; --accent-ink:#1A0B06; --navy:#8DB2E3;
+  --ok:#62C792; --okbg:#143324; --bad:#F0877F; --badbg:#3A1C1A; --paper:#101C28; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.75 var(--sans);padding-block:20px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--serif);margin:0;line-height:1.35;text-wrap:balance}
+h1{font-size:28px;font-weight:800}
+h2{font-size:20px;font-weight:800}
+h3{font-size:16px;font-weight:600}
+p{margin:0}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.muted{color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.link{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;font-size:14px}
+.back{background:none;border:0;padding:4px 0;color:var(--muted);font-size:14px;align-self:flex-start}
+.top{display:flex;flex-direction:column;gap:8px}
+.lede{color:var(--muted)}
+
+/* lanes */
+.lanes{display:flex;flex-direction:column;gap:10px}
+.lane{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 14px;align-items:center;text-align:left;width:100%;
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.lane .no{grid-row:1/3;font-family:var(--mono);font-weight:500;font-size:30px;color:var(--navy);line-height:1}
+.lane .nm{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.lane .nm b{font-family:var(--serif);font-size:17px}
+.lane .nm span{font-size:12px;color:var(--muted);white-space:nowrap}
+.lane.planned .no,.lane.planned .nm b{opacity:.55}
+.track{position:relative;height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.track i{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.track::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(20% - 3px),var(--surface) calc(20% - 3px) 20%)}
+
+/* rows */
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 14px}
+.row .id{font-family:var(--mono);font-size:14px;color:var(--navy)}
+.row .t{font-weight:500}
+.row .d{font-size:13px;color:var(--muted)}
+.row.locked{opacity:.55;cursor:default}
+.chip{font-size:12px;padding:2px 10px;border-radius:99px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.run{border-color:var(--accent);color:var(--accent)}
+.chip.done{background:var(--okbg);border-color:transparent;color:var(--ok)}
+
+/* module */
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+.step>header{display:flex;gap:10px;align-items:baseline}
+.step>header .mono{color:var(--accent)}
+.tip{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px}
+.q{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--paper)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 16px;min-height:40px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.verdict{font-size:14px;border-radius:8px;padding:8px 10px}
+.verdict.ok{background:var(--okbg);color:var(--ok)}
+.verdict.bad{background:var(--badbg);color:var(--bad)}
+.verdict b{margin-right:4px}
+.score{font-size:14px;color:var(--muted)}
+.slots{display:flex;flex-direction:column;gap:6px}
+.slot{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;align-items:center;text-align:left;width:100%;
+  border:1px dashed var(--line);border-radius:8px;padding:8px 10px;min-height:44px;background:transparent}
+.slot .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.slot.filled{border-style:solid;background:var(--paper)}
+.slot.ok{border-color:var(--ok);background:var(--okbg)}
+.slot.bad{border-color:var(--bad);background:var(--badbg)}
+.pool{display:flex;flex-wrap:wrap;gap:8px}
+.chipbtn{border:1px solid var(--navy);color:var(--ink);background:var(--surface);border-radius:8px;padding:8px 12px;text-align:left;min-height:40px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-weight:500}
+.field .hint{font-size:13px;color:var(--muted)}
+textarea,input[type=text],select{width:100%;font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+textarea{min-height:84px;resize:vertical}
+.paper{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:6px;padding:14px 14px;
+  font-family:var(--serif);font-weight:600;font-size:15px;line-height:1.95;white-space:pre-wrap;overflow-wrap:anywhere}
+.paper.empty{border-left-color:var(--line)}
+.checks{display:flex;flex-direction:column;gap:8px}
+.checks label{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.checks input{margin-top:6px;width:18px;height:18px;accent-color:var(--accent)}
+.ai{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px}
+.nav{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));max-width:calc(100% - 32px);
+  background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;z-index:20}
+.note{font-size:13px;color:var(--muted)}
+.video{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--navy);color:#fff;border-radius:10px;padding:12px 14px}
+:root[data-theme="dark"] .video{color:#0D1620}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .video{color:#0D1620}}
+.video .mono{color:inherit;opacity:.75}
+.video .chip{border-color:currentColor;color:inherit}
+.vbtn{text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
+.play{width:44px;height:44px;border-radius:50%;background:var(--accent);position:relative}
+.play::after{content:"";position:absolute;left:17px;top:13px;border-left:14px solid var(--accent-ink);border-top:9px solid transparent;border-bottom:9px solid transparent}
+</style>
+
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const P=s=>/[。！？＿]$/.test(s)?s:s+'。';
+const KEY='rm-course-v1';
+let S={judge:{},order:{},tpl:{},checks:{},ai:{}};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+
+/* ---------- 第一章教材 ---------- */
+const MODS=[
+{id:'1.1',title:'研究背景與動機',desc:'從現象走到缺口',
+ focus:'背景要像漏斗：從具體現象，到已知研究，到尚未解決的缺口，最後帶出本研究。',
+ lead:'研究背景不是寫你為什麼喜歡這個主題，而是讓讀者相信這個問題值得被研究。常見的路徑是四步：現象、已知、缺口、本研究。',
+ tip:'缺口句常以「然而」「但是」開頭，並指出對象、情境或方法上少了什麼。',
+ judge:{prompt:'下面四句，哪些可以當作研究背景的段落？',items:[
+  {text:'近年來，台灣青少年棒球投手的肩肘傷害比例逐年增加，賽季中的投球量管理成為教練團隊的重要課題。',good:true,why:'從具體現象切入，有對象也有議題。'},
+  {text:'運動很重要，所以我想研究運動。',good:false,why:'範圍太大，沒有切入點，也看不出問題。'},
+  {text:'我很喜歡打籃球，所以決定研究籃球。',good:false,why:'個人興趣不是研究動機，需要補上實務或學術上的缺口。'},
+  {text:'雖然已有研究探討高強度間歇訓練對最大攝氧量的效果，但針對女性大專划船選手的證據仍有限。',good:true,why:'先交代已知，再指出對象上的缺口。'}]},
+ order:{prompt:'把四句話排成背景的邏輯順序。',parts:[
+  '近年大專運動員的賽季訓練量持續提高，運動傷害與疲勞累積受到關注。',
+  '過去研究多以心率與主觀疲勞量表監測訓練負荷。',
+  '然而，結合睡眠與肌肉負荷的多指標監測，在大專選手身上的證據仍少。',
+  '因此，本研究欲探討多指標監測與賽季疲勞的關聯。'],
+  why:'現象 → 已知 → 缺口 → 本研究，是背景最穩的順序。'},
+ tpl:{fields:[
+  {id:'a',label:'現象或趨勢',hint:'寫一句完整的話，交代對象與議題。',ph:'近年大專划船選手的賽季訓練量持續提高，疲勞累積受到關注。',type:'area'},
+  {id:'b',label:'已知的研究',hint:'過去研究做了什麼。',ph:'過去研究多以心率與主觀疲勞量表監測訓練負荷。',type:'area'},
+  {id:'c',label:'缺口',hint:'以「然而」開頭，指出缺少什麼。',ph:'然而，針對女性選手的多指標監測證據仍少。',type:'area'},
+  {id:'d',label:'本研究要做什麼',hint:'接在「因此，本研究」後面。',ph:'欲探討睡眠與賽季疲勞之間的關聯',type:'area',min:6}],
+  compose:v=>`${P(v.a)}${P(v.b)}${P(v.c)}因此，本研究${P(v.d)}`},
+ checks:['有具體的對象或情境','已知與缺口之間有轉折','缺口是能被這個研究回答的']},
+{id:'1.2',title:'研究問題',desc:'把想法寫成可回答的問句',
+ focus:'研究問題要有對象、變項與關係，能用資料回答。',
+ lead:'好的研究問題讓人一讀就知道你要找誰、量什麼、比較什麼。太大的問題無法回答，太小的問題不值得研究。',
+ tip:'試著用這個句型：（對象）的（變項一）與（變項二）是否有（關係）？',
+ judge:{prompt:'哪些問句適合當研究問題？',items:[
+  {text:'運動訓練好不好？',good:false,why:'沒有對象、沒有指標，無法用資料回答。'},
+  {text:'八週高強度間歇訓練是否能改善大專男子划船選手的 2000 公尺測驗成績？',good:true,why:'介入、對象、結果指標都很清楚。'},
+  {text:'為什麼選手會受傷？',good:false,why:'原因太多，範圍過大。'},
+  {text:'大專田徑選手的睡眠時數與賽季疲勞分數是否有關聯？',good:true,why:'兩個變項、一個對象，可以直接蒐集資料。'}]},
+ order:{prompt:'把縮小題目的四個步驟排好。',parts:[
+  '主題：運動員的疲勞管理',
+  '對象：大專划船選手',
+  '變項：睡眠時數與疲勞分數',
+  '問句：睡眠時數與賽季疲勞分數是否有關聯？'],
+  why:'由大到小：主題、對象、變項，最後寫成問句。'},
+ tpl:{fields:[
+  {id:'pop',label:'研究對象',hint:'誰？越具體越好。',ph:'大專划船選手',type:'text',min:2},
+  {id:'x',label:'變項一',hint:'你要看的因子。',ph:'睡眠時數',type:'text',min:2},
+  {id:'y',label:'變項二或結果',hint:'你要測的結果。',ph:'賽季疲勞分數',type:'text',min:2},
+  {id:'rel',label:'關係',hint:'選一種你要檢驗的關係。',type:'select',opts:['是否有關聯','是否有顯著差異','能否有效預測'],min:2}],
+  compose:v=>`本研究的研究問題為：${v.pop}的${v.x}與${v.y}${v.rel}？`},
+ checks:['對象具體','兩個變項都能被測量','答案不是只有「是」或「否」的常識']},
+{id:'1.3',title:'研究目的',desc:'用動詞開頭的目的句',
+ focus:'目的句以動詞開頭，並與研究問題一一對應。',
+ lead:'研究目的是研究問題的陳述版。每一條目的都用動詞開頭，例如探討、比較、驗證、建立，並且能用結果回答。',
+ tip:'目的的數量通常是兩到三條，太多代表研究範圍太散。',
+ judge:{prompt:'哪些句子可以當作研究目的？',items:[
+  {text:'探討八週肌力訓練對大專排球選手垂直跳高度的影響。',good:true,why:'動詞、對象、介入與結果都有。'},
+  {text:'讓大家更重視運動。',good:false,why:'這是願景，不是能用資料回答的目的。'},
+  {text:'了解、研究、看看相關情形。',good:false,why:'動詞太模糊，沒有對象與變項。'},
+  {text:'比較有無血流限制訓練的兩組選手在下肢肌力的差異。',good:true,why:'清楚指出比較的組別與指標。'}]},
+ order:{prompt:'把四個片段拼成一句目的。',parts:['探討','大專排球選手','八週肌力訓練','對垂直跳高度的影響'],
+  why:'動詞 → 對象 → 介入 → 結果，是目的句最常用的骨架。'},
+ tpl:{fields:[
+  {id:'p1',label:'目的一',hint:'以動詞開頭。',ph:'探討八週肌力訓練對大專排球選手垂直跳高度的影響。',type:'area',min:8},
+  {id:'p2',label:'目的二',hint:'可以是比較、驗證或建立。',ph:'比較不同訓練頻率對下肢爆發力的差異。',type:'area',min:8}],
+  compose:v=>`本研究之目的如下：\n（一）${P(v.p1)}\n（二）${P(v.p2)}`},
+ checks:['每條都以動詞開頭','能對應到研究問題','資料蒐集後可以回答']},
+{id:'1.4',title:'研究假設與名詞定義',desc:'把概念變成可測量的說法',
+ focus:'名詞要寫成操作型定義，假設要有方向與比較對象。',
+ lead:'「疲勞」「表現」這類詞每個人理解不同。操作型定義說明你用什麼工具、在什麼時間、得到什麼數值。假設則是對結果方向的預測。',
+ tip:'操作型定義三件事：工具、時間點、數值代表什麼。',
+ judge:{prompt:'哪些寫法合格？',items:[
+  {text:'疲勞：選手感到很累的狀態。',good:false,why:'無法測量，沒有工具與時間點。'},
+  {text:'疲勞：以 Borg CR-10 量表，於訓練後 30 分鐘內測得之自覺疲勞分數。',good:true,why:'工具、時間點、數值都交代了。'},
+  {text:'H1：訓練組的成績會比較好。',good:false,why:'沒有時間點、指標與比較對象。'},
+  {text:'H1：八週訓練後，實驗組的 2000 公尺成績進步幅度顯著大於控制組。',good:true,why:'時間、組別、指標、方向俱全。'}]},
+ order:{prompt:'把假設句的四個部分排好。',parts:['八週訓練後，','實驗組','的 2000 公尺成績進步幅度','顯著大於控制組。'],
+  why:'時間點 → 組別 → 指標 → 方向，句子才完整。'},
+ tpl:{fields:[
+  {id:'term',label:'要定義的名詞',hint:'一個你研究中的關鍵詞。',ph:'疲勞',type:'text',min:2},
+  {id:'def',label:'操作型定義',hint:'工具、時間點、數值意義。',ph:'以 Borg CR-10 量表於訓練後 30 分鐘內測得之自覺疲勞分數，分數越高代表越疲勞。',type:'area',min:10},
+  {id:'hyp',label:'研究假設',hint:'寫出時間、組別、指標與方向。',ph:'H1：八週訓練後，實驗組的疲勞分數顯著低於控制組。',type:'area',min:10}],
+  compose:v=>`名詞操作型定義\n${v.term}：${P(v.def)}\n\n研究假設\n${P(v.hyp)}`},
+ checks:['定義裡有工具名稱','假設有方向','假設能被資料推翻']},
+{id:'1.5',title:'範圍、限制與重要性',desc:'誠實交代邊界，說清價值',
+ focus:'範圍交代誰、何時、何地；限制說明推論邊界；重要性分理論與實務。',
+ lead:'範圍是你刻意選擇的邊界，限制是你控制不了的部分。重要性不要誇大，說清楚誰可以用這個結果做什麼。',
+ tip:'重要性可以分成理論貢獻與實務應用兩句。',
+ judge:{prompt:'哪些句子寫得恰當？',items:[
+  {text:'本研究對象限於 2026 年就讀北部大專院校之男女划船校隊選手，推論至其他族群時須謹慎。',good:true,why:'範圍明確，也交代推論邊界。'},
+  {text:'本研究沒有任何限制。',good:false,why:'每個研究都有限制，說沒有會降低可信度。'},
+  {text:'本研究可以讓全世界的選手都變強。',good:false,why:'過度推論，與研究設計不相稱。'},
+  {text:'研究結果可提供教練調整賽季訓練量之實證參考。',good:true,why:'指出使用者與用途，語氣適中。'}]},
+ order:{prompt:'把這一節的四個部分排成常見順序。',parts:[
+  '範圍：對象、時間與地點',
+  '限制：取樣與測量上的邊界',
+  '重要性：對理論的貢獻',
+  '重要性：對實務的應用'],
+  why:'先界定範圍，再坦白限制，最後談價值，由理論到實務。'},
+ tpl:{fields:[
+  {id:'scope',label:'研究範圍',hint:'對象、時間、地點。',ph:'本研究對象為 2026 年就讀北部大專院校之划船校隊選手。',type:'area',min:8},
+  {id:'limit',label:'研究限制',hint:'取樣方式或測量上的限制。',ph:'因採方便取樣，結果推論至其他族群時須謹慎。',type:'area',min:8},
+  {id:'sig',label:'研究重要性',hint:'理論一句、實務一句。',ph:'本研究可補充女性選手疲勞監測的證據，並提供教練調整訓練量的參考。',type:'area',min:8}],
+  compose:v=>`研究範圍\n${P(v.scope)}\n\n研究限制\n${P(v.limit)}\n\n研究重要性\n${P(v.sig)}`},
+ checks:['限制是真的限制，不是優點','重要性沒有誇大','範圍與研究問題一致']}
+];
+const PLAN=[
+ {n:2,name:'文獻探討',mods:[['2.1','如何搜尋文獻'],['2.2','閱讀與摘要'],['2.3','文獻整理矩陣'],['2.4','撰寫文獻評析'],['2.5','由文獻導出假設']]},
+ {n:3,name:'研究方法',mods:[['3.1','研究設計'],['3.2','參與者與取樣'],['3.3','測量工具與信效度'],['3.4','實驗程序'],['3.5','資料處理與統計']]},
+ {n:4,name:'研究結果',mods:[['4.1','描述性統計'],['4.2','圖表設計'],['4.3','推論統計報告'],['4.4','效果量與信賴區間'],['4.5','結果文字撰寫']]},
+ {n:5,name:'研究討論',mods:[['5.1','主要發現'],['5.2','與文獻對話'],['5.3','機制解釋'],['5.4','限制與未來研究'],['5.5','結論與建議']]}
+];
+const CH=[{n:1,name:'緒論',open:true,mods:MODS}].concat(PLAN.map(c=>({n:c.n,name:c.name,open:false,mods:c.mods.map(m=>({id:m[0],title:m[1]}))})));
+const NUM=['','一','二','三','四','五'];
+
+/* ---------- 狀態計算 ---------- */
+const vals=m=>{const t=S.tpl[m.id]||{},o={};m.tpl.fields.forEach(f=>{o[f.id]=(t[f.id]||'').trim()||'＿＿'});return o};
+const tplDone=m=>{const t=S.tpl[m.id]||{};return m.tpl.fields.every(f=>(t[f.id]||'').trim().length>=(f.min||4))};
+const judgeDone=m=>{const a=S.judge[m.id]||{};return m.judge.items.every((_,i)=>a[i]!==undefined)};
+const orderDone=m=>!!(S.order[m.id]&&S.order[m.id].done);
+const steps=m=>(judgeDone(m)?1:0)+(orderDone(m)?1:0)+(tplDone(m)?1:0);
+const status=m=>{const s=steps(m);return s===0?['未開始','']:s===3?['已完成','done']:['進行中','run']};
+const chPct=c=>c.open?Math.round(c.mods.reduce((a,m)=>a+steps(m),0)/(c.mods.length*3)*100):0;
+const chDone=c=>c.open?c.mods.filter(m=>steps(m)===3).length:0;
+const snippet=m=>m.tpl.compose(vals(m));
+const chapterText=c=>`第${NUM[c.n]}章　${c.name}\n\n`+c.mods.map(m=>`${m.id} ${m.title}\n${tplDone(m)?snippet(m):'（尚未完成）'}`).join('\n\n');
+
+/* ---------- 路由與畫面 ---------- */
+let view={n:'home'};let ord={};let sampleNS=null,dlNS=null;
+const app=document.getElementById('app');
+const go=v=>{view=v;render();window.scrollTo(0,0)};
+const modById=id=>MODS.find(m=>m.id===id);
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{e.hidden=true},2600)}
+
+function render(){
+  if(view.n==='home')app.innerHTML=homeHTML();
+  else if(view.n==='ch')app.innerHTML=chHTML(CH[view.c-1]);
+  else if(view.n==='mod')app.innerHTML=modHTML(modById(view.id));
+  else if(view.n==='sum')app.innerHTML=sumHTML(CH[view.c-1]);
+}
+function homeHTML(){
+  return `<div class="top"><span class="mono">研究法 · 五章工作坊</span><h1>玩完五章，手上就有論文骨架</h1>
+  <p class="lede">每一章拆成幾個小單元。每個單元有重點、判斷題、排序和寫作練習，完成後得到一段可以直接用的草稿。</p></div>
+  <div class="lanes">${CH.map(c=>`<button class="lane ${c.open?'':'planned'}" data-act="ch" data-c="${c.n}">
+    <span class="no">${c.n}</span>
+    <span class="nm"><b>${esc(c.name)}</b><span>${c.open?`${chDone(c)} / ${c.mods.length} 單元完成`:'規劃中'}</span></span>
+    <span class="track"><i style="width:${chPct(c)}%"></i></span></button>`).join('')}</div>
+  <p class="note">作答只存在這台裝置的瀏覽器。換裝置或清除瀏覽資料後會消失，記得用各章的「匯出草稿」帶走。</p>`;
+}
+function chHTML(c){
+  const rows=c.mods.map(m=>{
+    if(!c.open)return `<div class="row locked"><span class="id">${m.id}</span><span><span class="t">${esc(m.title)}</span></span><span class="chip">尚未開放</span></div>`;
+    const st=status(m);
+    return `<button class="row" data-act="mod" data-id="${m.id}"><span class="id">${m.id}</span><span><div class="t">${esc(m.title)}</div><div class="d">${esc(m.desc)}</div></span><span class="chip ${st[1]}">${st[0]}</span></button>`}).join('');
+  return `<button class="back" data-act="home">← 全部章節</button>
+  <div class="top"><span class="mono">第 ${c.n} 章</span><h1>${esc(c.name)}</h1>
+  ${c.open?`<p class="lede">五個單元依序完成，每個單元會產出一段草稿，最後自動合成第${NUM[c.n]}章。</p>`:`<p class="lede">這一章還在規劃，單元會沿用第一章的做法：先玩、再寫、最後合成。</p>`}</div>
+  <div class="list">${rows}</div>
+  ${c.open?`<button class="btn pri" data-act="sum" data-c="${c.n}">查看第${NUM[c.n]}章草稿（${chDone(c)} / ${c.mods.length}）</button>`:''}`;
+}
+function modHTML(m){
+  const i=MODS.indexOf(m),prev=MODS[i-1],next=MODS[i+1];
+  const ck=S.checks[m.id]||[];
+  return `<button class="back" data-act="ch" data-c="1">← 第一章　緒論</button>
+  <div class="top"><span class="mono">${m.id} · <span id="prog">${steps(m)} / 3 完成</span></span><h1>${esc(m.title)}</h1></div>
+  <section class="step"><header><span class="mono">1</span><h3>先看重點</h3></header>
+    <p>${esc(m.lead)}</p><div class="tip">${esc(m.tip)}</div>${videoHTML(m)}</section>
+  <section class="step"><header><span class="mono">2</span><h3>判斷題</h3></header><div id="sec-judge">${judgeHTML(m)}</div></section>
+  <section class="step"><header><span class="mono">3</span><h3>排序</h3></header><div id="sec-order">${orderHTML(m)}</div></section>
+  <section class="step"><header><span class="mono">4</span><h3>寫出你的片段</h3></header>
+    ${m.tpl.fields.map(f=>fieldHTML(m,f)).join('')}
+    <h3>目前的片段</h3><div id="sec-prev">${prevHTML(m)}</div></section>
+  <section class="step"><header><span class="mono">5</span><h3>自我檢核</h3></header>
+    <div class="checks">${m.checks.map((t,k)=>`<label><input type="checkbox" data-act="chk" data-id="${m.id}" data-k="${k}" ${ck[k]?'checked':''}><span>${esc(t)}</span></label>`).join('')}</div></section>
+  <section class="step"><header><span class="mono">6</span><h3>請 Claude 給回饋</h3></header>
+    <p class="note">寫完片段後可以請 Claude 指出需要修改的地方。你的片段文字會送給 Claude 處理。</p>
+    <div class="btnrow"><button class="btn pri" id="aibtn" data-act="ai" data-id="${m.id}" ${tplDone(m)?'':'disabled'}>取得回饋</button></div>
+    <div class="ai" id="aiout" ${S.ai[m.id]?'':'hidden'}>${esc(S.ai[m.id]||'')}</div></section>
+  <div class="nav">${prev?`<button class="btn" data-act="mod" data-id="${prev.id}">← ${prev.id} ${esc(prev.title)}</button>`:'<span></span>'}
+  ${next?`<button class="btn" data-act="mod" data-id="${next.id}">${next.id} ${esc(next.title)} →</button>`:`<button class="btn pri" data-act="sum" data-c="1">查看第一章草稿</button>`}</div>`;
+}
+/* 教學影片：把 YouTube 連結填進 url 即可顯示「觀看」按鈕（頁面內無法嵌入播放器，會在新分頁開啟） */
+const VIDEOS={'1.1':{t:'研究背景：從現象走到缺口',url:''},'1.2':{t:'研究問題：把想法寫成問句',url:''},'1.3':{t:'研究目的：動詞開頭的目的句',url:''},'1.4':{t:'研究假設與操作型定義',url:''},'1.5':{t:'範圍、限制與重要性',url:''}};
+function videoHTML(m){
+  const v=VIDEOS[m.id]||{};
+  const body=v.url?`<a class="btn pri vbtn" href="${esc(v.url)}" target="_blank" rel="noopener">在 YouTube 觀看</a>`:`<span class="chip">影片製作中</span>`;
+  return `<div class="video"><span class="play" aria-hidden="true"></span><div class="vt"><span class="mono">教學影片</span><div>${esc(v.t||m.title)}</div></div>${body}</div>`;
+}
+function fieldHTML(m,f){
+  const v=(S.tpl[m.id]||{})[f.id]||'';
+  let input;
+  if(f.type==='select')input=`<select id="f-${m.id}-${f.id}" data-f="${f.id}" data-m="${m.id}"><option value="">請選擇</option>${f.opts.map(o=>`<option ${o===v?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+  else if(f.type==='text')input=`<input type="text" id="f-${m.id}-${f.id}" data-f="${f.id}" data-m="${m.id}" value="${esc(v)}" placeholder="${esc(f.ph||'')}">`;
+  else input=`<textarea id="f-${m.id}-${f.id}" data-f="${f.id}" data-m="${m.id}" placeholder="${esc(f.ph||'')}">${esc(v)}</textarea>`;
+  return `<div class="field"><label for="f-${m.id}-${f.id}">${esc(f.label)}</label><span class="hint">${esc(f.hint)}${f.ph?'　例：'+esc(f.ph):''}</span>${input}</div>`;
+}
+function prevHTML(m){const any=Object.values(S.tpl[m.id]||{}).some(x=>x&&x.trim());
+  return `<div class="paper ${any?'':'empty'}">${esc(snippet(m))}</div>${tplDone(m)?'<p class="note">這一段已存入草稿。</p>':'<p class="note">每一欄寫到足夠長度才算完成。</p>'}`}
+function judgeHTML(m){
+  const a=S.judge[m.id]||{};let right=0,ans=0;
+  const cards=m.judge.items.map((it,i)=>{
+    let body;
+    if(a[i]===undefined)body=`<div class="btnrow"><button class="btn" data-act="ans" data-i="${i}" data-v="1">可以用</button><button class="btn" data-act="ans" data-i="${i}" data-v="0">要修改</button></div>`;
+    else{const ok=a[i]===it.good;ans++;if(ok)right++;
+      body=`<div class="verdict ${ok?'ok':'bad'}"><b>${ok?'答對了':'再想想'}</b>這句${it.good?'可以用':'要修改'}。${esc(it.why)}</div>`}
+    return `<div class="q"><p>${esc(it.text)}</p>${body}</div>`}).join('');
+  const done=ans===m.judge.items.length;
+  return `<p class="lede">${esc(m.judge.prompt)}</p>${cards}${done?`<div class="score">答對 ${right} / ${ans}　<button class="link" data-act="resetj">重玩</button></div>`:''}`;
+}
+const PERM=[2,0,3,1];
+function orderHTML(m){
+  const n=m.order.parts.length,parts=m.order.parts;
+  if(orderDone(m)){
+    return `<div class="slots">${parts.map((p,i)=>`<div class="slot filled ok"><span class="n">${i+1}</span><span>${esc(p)}</span></div>`).join('')}</div>
+    <div class="verdict ok"><b>排對了</b>${esc(m.order.why)}</div><div><button class="link" data-act="reseto">再玩一次</button></div>`;
+  }
+  const pl=ord[m.id]||[];const full=pl.length===n;
+  const slots=parts.map((_,i)=>{
+    if(pl[i]!==undefined){const cls=full?(pl[i]===i?'ok':'bad'):'';
+      return `<button class="slot filled ${cls}" data-act="unplace" data-i="${i}"><span class="n">${i+1}</span><span>${esc(parts[pl[i]])}</span></button>`}
+    return `<div class="slot"><span class="n">${i+1}</span><span class="muted">從下面點選放進來</span></div>`}).join('');
+  const pool=PERM.filter(x=>!pl.includes(x)).map(x=>`<button class="chipbtn" data-act="place" data-p="${x}">${esc(parts[x])}</button>`).join('');
+  const wrong=full?pl.filter((x,i)=>x!==i).length:0;
+  return `<p class="lede">${esc(m.order.prompt)}</p><div class="slots">${slots}</div>
+  ${pool?`<div class="pool">${pool}</div>`:''}
+  ${full?`<div class="verdict bad"><b>有 ${wrong} 格不對</b>點紅色的格子取下，再重排。</div><div><button class="link" data-act="clearo">全部清除</button></div>`:''}`;
+}
+function sumHTML(c){
+  const done=chDone(c);
+  return `<button class="back" data-act="ch" data-c="${c.n}">← 第${NUM[c.n]}章單元</button>
+  <div class="top"><span class="mono">第 ${c.n} 章 · ${done} / ${c.mods.length} 單元完成</span><h1>第${NUM[c.n]}章草稿</h1>
+  <p class="lede">這是你各單元片段合成的結果。尚未完成的單元會顯示空白。</p></div>
+  <div class="paper" id="sumtext">${esc(chapterText(c))}</div>
+  <div class="btnrow"><button class="btn pri" data-act="copy" data-c="${c.n}">複製全文</button><button class="btn" data-act="dl" data-c="${c.n}">下載 Markdown</button></div>`;
+}
+
+/* ---------- 事件 ---------- */
+function refreshProg(m){const p=document.getElementById('prog');if(p)p.textContent=steps(m)+' / 3 完成'}
+function curMod(){return modById(view.id)}
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-act]');if(!t)return;const act=t.dataset.act;
+  if(act==='home')return go({n:'home'});
+  if(act==='ch')return go({n:'ch',c:+t.dataset.c});
+  if(act==='mod')return go({n:'mod',id:t.dataset.id});
+  if(act==='sum')return go({n:'sum',c:+t.dataset.c});
+  if(act==='chk')return; // handled in change
+  const m=view.n==='mod'?curMod():null;
+  if(act==='ans'){const a=S.judge[m.id]=S.judge[m.id]||{};a[+t.dataset.i]=t.dataset.v==='1';save();
+    document.getElementById('sec-judge').innerHTML=judgeHTML(m);refreshProg(m)}
+  else if(act==='resetj'){S.judge[m.id]={};save();document.getElementById('sec-judge').innerHTML=judgeHTML(m);refreshProg(m)}
+  else if(act==='place'){const pl=ord[m.id]=ord[m.id]||[];pl.push(+t.dataset.p);
+    if(pl.length===m.order.parts.length&&pl.every((x,i)=>x===i)){S.order[m.id]={done:true};save();refreshProg(m)}
+    document.getElementById('sec-order').innerHTML=orderHTML(m)}
+  else if(act==='unplace'){const pl=ord[m.id]||[];pl.splice(+t.dataset.i,1);document.getElementById('sec-order').innerHTML=orderHTML(m)}
+  else if(act==='clearo'){ord[m.id]=[];document.getElementById('sec-order').innerHTML=orderHTML(m)}
+  else if(act==='reseto'){S.order[m.id]={};ord[m.id]=[];save();document.getElementById('sec-order').innerHTML=orderHTML(m);refreshProg(m)}
+  else if(act==='ai')runAI(m);
+  else if(act==='copy'){const c=CH[+t.dataset.c-1],txt=chapterText(c);
+    try{await navigator.clipboard.writeText(txt);toast('已複製')}catch(err){
+      const r=document.createRange();r.selectNodeContents(document.getElementById('sumtext'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('請長按已選取的文字複製')}}
+  else if(act==='dl'){const c=CH[+t.dataset.c-1];
+    if(!dlNS)return toast('這個畫面不支援下載，請改用複製全文');
+    try{await dlNS.save({filename:`第${NUM[c.n]}章草稿.md`,data:`# ${chapterText(c).replace('\n\n','\n\n').replace(/^(第.章.*)\n/,'$1\n')}`});toast('已存檔')}
+    catch(err){if(err&&err.code!=='declined')toast('下載失敗，請改用複製全文')}}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.act==='chk'){const a=S.checks[t.dataset.id]=S.checks[t.dataset.id]||[];a[+t.dataset.k]=t.checked;save()}
+});
+document.addEventListener('input',e=>{
+  const t=e.target;if(!t.dataset.f)return;
+  const m=modById(t.dataset.m);const o=S.tpl[m.id]=S.tpl[m.id]||{};o[t.dataset.f]=t.value;save();
+  document.getElementById('sec-prev').innerHTML=prevHTML(m);refreshProg(m);
+  const b=document.getElementById('aibtn');if(b)b.disabled=!tplDone(m);
+});
+
+async function runAI(m){
+  if(!tplDone(m))return toast('先把片段寫完整');
+  if(!sampleNS)return toast('目前無法連線 Claude，稍後再試');
+  const out=document.getElementById('aiout'),b=document.getElementById('aibtn');
+  out.hidden=false;out.textContent='Claude 正在閱讀你的片段…';b.disabled=true;
+  const prompt=`你是研究法課程的助教，協助體育與運動科學領域的研究生修改論文草稿。
+章節：第一章 緒論／${m.id} ${m.title}
+這一節的寫作重點：${m.focus}
+學生寫的片段：
+"""
+${snippet(m)}
+"""
+請用繁體中文，總長 280 字內，依下列格式回覆：
+【做得好的地方】一點
+【需要修正】最多兩點，引用學生的具體句子
+【改寫示範】只改寫最需要修正的那一句
+不要重寫整段，不要過度稱讚。`;
+  try{
+    const r=await sampleNS(prompt,{cache:false,onText:({text})=>{out.textContent=text}});
+    S.ai[m.id]=r.text;save();out.textContent=r.text;
+  }catch(err){
+    out.textContent=S.ai[m.id]||'';out.hidden=!S.ai[m.id];
+    toast(err&&err.code==='rate_limited'?'請求太頻繁，稍等一下再試':err&&err.code==='not_granted'?'需要允許 Claude 回饋才能使用':'取得回饋失敗，請再試一次');
+  }finally{b.disabled=!tplDone(m)}
+}
+
+render();
+if(window.claude&&claude.use){
+  claude.use('sample').then(s=>{sampleNS=s}).catch(()=>{});
+  claude.use('downloads').then(d=>{dlNS=d}).catch(()=>{});
+}
+</script>
