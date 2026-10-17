@@ -276,7 +276,7 @@ footer{border-top:1px solid var(--line);padding-block:20px 32px;font-size:13px;c
       <span class="label">CH 01 / 08 · 描述統計</span>
       <h1>描述資料特徵的統計量及圖表</h1>
       <p>先看三集動畫，再用課堂的 478 位肺癌病人資料動手玩：拖動資料點、切換圖形，看平均數、中位數與 IQR 怎麼變。之後對照講義與 SPSS 步驟完成作業。</p>
-      <div class="facts"><span><b>3</b> 集動畫</span><span><b>38</b> 張投影片</span><span><b>92</b> 張 SPSS 截圖</span><span><b>8</b> 題自我檢測</span><span><b>6</b> 題作業</span></div>
+      <div class="facts"><span><b>3</b> 集動畫</span><span><b>35</b> 張投影片</span><span><b>92</b> 張 SPSS 截圖</span><span><b>8</b> 題自我檢測</span><span><b>6</b> 題作業</span></div>
     </div>
     <ul aria-label="學習目標">
       <li><span>目標 1</span>辨識資料尺度與合適的描述統計量</li>
@@ -322,11 +322,11 @@ footer{border-top:1px solid var(--line);padding-block:20px 32px;font-size:13px;c
 
 <!-- 2 SLIDES -->
 <section class="stage" data-stage="slides" aria-labelledby="h-slides" hidden>
-  <div class="stage-head"><span class="label">步驟 2</span><h2 id="h-slides">課程投影片</h2><p>第一章描述資料特徵的統計量及圖表（lin20260306），共 38 張。用左右鍵或下方縮圖翻頁；翻到最後一張即完成本步驟。</p></div>
+  <div class="stage-head"><span class="label">步驟 2</span><h2 id="h-slides">課程投影片</h2><p>第一章描述資料特徵的統計量及圖表（lin20260306），共 35 張（頁碼沿用原講義）。用左右鍵或下方縮圖翻頁；翻到最後一張即完成本步驟。</p></div>
   <div class="viewer">
     <div class="slide-frame"><img id="slideImg" alt="" src="slides/s-01.jpg"></div>
     <div class="slide-nav">
-      <span class="count" id="slideCount">1 / 38</span>
+      <span class="count" id="slideCount">1 / 35</span>
       <button class="btn" id="slidePrev" aria-label="上一張"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>上一張</button>
       <button class="btn" id="slideNext" aria-label="下一張">下一張<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
     </div>
@@ -605,22 +605,22 @@ function drawW2(){
 }
 
 /* ---------- slides ---------- */
-const NSL=38;let slide=1;
+const SL=[1,...Array.from({length:34},(_,i)=>i+5)],NSL=SL.length;let slide=1;
 function renderSlides(){
-  $('#slideStrip').innerHTML=Array.from({length:NSL},(_,i)=>`<button data-s="${i+1}" aria-label="第 ${i+1} 張"><img src="slides/s-${String(i+1).padStart(2,'0')}.jpg" alt="" loading="lazy"></button>`).join('');
+  $('#slideStrip').innerHTML=SL.map(n=>`<button data-s="${n}" aria-label="第 ${n} 張"><img src="slides/s-${String(n).padStart(2,'0')}.jpg" alt="" loading="lazy"></button>`).join('');
   $('#slideStrip').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)goSlide(+b.dataset.s);});
-  $('#slidePrev').addEventListener('click',()=>goSlide(slide-1));$('#slideNext').addEventListener('click',()=>goSlide(slide+1));
-  document.addEventListener('keydown',e=>{if($('[data-stage="slides"]').hidden)return;if(e.target.closest('input,textarea'))return;if(e.key==='ArrowRight')goSlide(slide+1);if(e.key==='ArrowLeft')goSlide(slide-1);});
+  $('#slidePrev').addEventListener('click',()=>goSlide(SL[SL.indexOf(slide)-1]||1));$('#slideNext').addEventListener('click',()=>goSlide(SL[SL.indexOf(slide)+1]||SL[NSL-1]));
+  document.addEventListener('keydown',e=>{if($('[data-stage="slides"]').hidden)return;if(e.target.closest('input,textarea'))return;if(e.key==='ArrowRight')goSlide(SL[SL.indexOf(slide)+1]||SL[NSL-1]);if(e.key==='ArrowLeft')goSlide(SL[SL.indexOf(slide)-1]||1);});
   goSlide(1,true);
 }
 function goSlide(n,silent){
-  slide=Math.max(1,Math.min(NSL,n));const pad=String(slide).padStart(2,'0');
+  slide=SL.find(x=>x>=n)||SL[NSL-1];const pos=SL.indexOf(slide)+1;const pad=String(slide).padStart(2,'0');
   $('#slideImg').src='slides/s-'+pad+'.jpg';$('#slideImg').alt='第一章投影片第 '+slide+' 張';
-  $('#slideCount').textContent=slide+' / '+NSL;$('#slidePrev').disabled=slide===1;$('#slideNext').disabled=slide===NSL;
+  $('#slideCount').textContent=pos+' / '+NSL;$('#slidePrev').disabled=pos===1;$('#slideNext').disabled=pos===NSL;
   $$('#slideStrip button').forEach(b=>b.setAttribute('aria-current',+b.dataset.s===slide?'true':'false'));
   const cur=$(`#slideStrip [data-s="${slide}"]`);if(cur&&!silent)cur.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
-  if(slide>(S.slideMax||1))S.slideMax=slide;
-  if(slide===NSL&&!S.slidesDone){S.slidesDone=true;toast('投影片看完了，步驟 2 完成。');}
+  if(pos>(S.slideMax||1))S.slideMax=pos;
+  if(pos===NSL&&!S.slidesDone){S.slidesDone=true;toast('投影片看完了，步驟 2 完成。');}
   save();progress();
 }
 
