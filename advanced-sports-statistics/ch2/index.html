@@ -471,18 +471,18 @@ W.condprob=(w)=>{
 /* ---------- ch2: binom ---------- */
 W.binom=(w)=>{
   const defs=[{id:'bn',label:'試驗次數 n',min:1,max:50,step:1,value:30},{id:'bp',label:'成功機率 p',min:0.05,max:0.95,step:0.05,value:0.2,fmt:v=>v.toFixed(2)}];let k=3;
-  w.innerHTML=`<div class="widget-title"><strong>二項分配 Binomial(n, p)</strong><span class="note">預設：30 位選手、受傷機率 0.2</span></div>${sliders(defs)}${SV('0 0 640 280','二項分配長條圖')}<div id="bS"></div><p class="readout" id="bM"></p>`;
+  w.innerHTML=`<div class="widget-title"><strong>二項分配 Binomial(n, p)</strong><span class="note">預設：30 位選手、受傷機率 0.2</span></div>${sliders(defs)}<div class="slider-row" style="align-items:center"><label for="bk" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span>X 的值 k</span><input type="number" id="bk" min="0" max="30" step="1" value="3" inputmode="numeric" style="width:84px;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)"><span class="note">輸入 0–n 的整數，或直接點長條</span></label></div>${SV('0 0 640 280','二項分配長條圖')}<div id="bS"></div><p class="readout" id="bM"></p>`;
   const svg=w.querySelector('svg');
-  const draw=()=>{const n=val(w,'bn'),p=val(w,'bp');if(k>n)k=n;svg.innerHTML='';const L=48,R=625,T=20,B=240;const pr=[];for(let i=0;i<=n;i++)pr.push(ST.dbinom(i,n,p));const ym=Math.max(...pr);const ys=ym>0.2?0.1:ym>0.08?0.02:0.01;const yt=Math.ceil(ym/ys)*ys;
+  const kin=w.querySelector('#bk');const draw=()=>{const n=val(w,'bn'),p=val(w,'bp');if(k>n)k=n;kin.max=n;if(+kin.value!==k)kin.value=k;svg.innerHTML='';const L=48,R=625,T=20,B=240;const pr=[];for(let i=0;i<=n;i++)pr.push(ST.dbinom(i,n,p));const ym=Math.max(...pr);const ys=ym>0.2?0.1:ym>0.08?0.02:0.01;const yt=Math.ceil(ym/ys)*ys;
     const x=i=>L+(i+0.5)/(n+1)*(R-L),y=v=>B-v/yt*(B-T),bw=Math.max(2,(R-L)/(n+1)-2);
     axisY(svg,y,0,yt,L,ys,v=>v.toFixed(2),'P(X=k)',T);
     pr.forEach((v,i)=>{const r=el('rect',{x:x(i)-bw/2,y:y(v),width:bw,height:B-y(v),class:'bar'+(i===k?' sel':''),'data-k':i,style:'cursor:pointer'},svg);if(i===k)r.setAttribute('style','cursor:pointer;fill:var(--amber);opacity:.85');const tt=el('title',{},r);tt.textContent=`P(X=${i}) = ${v.toFixed(4)}`;});
     el('line',{x1:L,x2:R,y1:B,y2:B,class:'axis'},svg);const st=n>30?5:n>12?2:1;for(let i=0;i<=n;i+=st){const t=el('text',{x:x(i),y:B+16,'text-anchor':'middle'},svg);t.textContent=i;}const lb=el('text',{x:R,y:B+32,'text-anchor':'end'},svg);lb.textContent='成功次數 k';
     el('line',{x1:x(n*p-0.0),x2:x(n*p),y1:T,y2:B,class:'mean'},svg);
     const cum=pr.slice(0,k+1).reduce((s,v)=>s+v,0);
-    w.querySelector('#bS').innerHTML=statsHTML([['P(X='+k+')',pr[k].toFixed(4),'med'],['P(X≤'+k+')',cum.toFixed(4)],['平均數 np',f2(n*p,2),'mean'],['變異數 np(1−p)',f2(n*p*(1-p),2)],['標準差',f2(Math.sqrt(n*p*(1-p)),3)]]);
-    w.querySelector('#bM').textContent=`點長條可換 k。虛線是平均數 np = ${f2(n*p,2)}。n=30、p=0.2 時，恰有 3 人受傷的機率約 0.0785，平均 6 人、變異數 4.8。`;};
-  svg.addEventListener('click',e=>{const r=e.target.closest('[data-k]');if(r){k=+r.dataset.k;draw();}});
+    w.querySelector('#bS').innerHTML=statsHTML([['P(X='+k+')',pr[k].toFixed(4),'med'],['P(X≤'+k+')',cum.toFixed(4)],['P(X≥'+k+')',Math.max(0,1-cum+pr[k]).toFixed(4)],['平均數 np',f2(n*p,2),'mean'],['變異數 np(1−p)',f2(n*p*(1-p),2)],['標準差',f2(Math.sqrt(n*p*(1-p)),3)]]);
+    w.querySelector('#bM').textContent=`在「X 的值 k」輸入數字或點長條可換 k。虛線是平均數 np = ${f2(n*p,2)}。n=30、p=0.2 時，恰有 3 人受傷的機率約 0.0785，平均 6 人、變異數 4.8。`;};
+  svg.addEventListener('click',e=>{const r=e.target.closest('[data-k]');if(r){k=+r.dataset.k;draw();}});kin.addEventListener('input',()=>{const n=val(w,'bn');const v=Math.round(+kin.value);if(kin.value===''||!isFinite(v))return;k=Math.max(0,Math.min(n,v));draw();});kin.addEventListener('change',()=>{kin.value=k;});
   bindSliders(w,defs,draw);draw();
 };
 
