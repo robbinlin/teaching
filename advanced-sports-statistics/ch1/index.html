@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>高等體育統計 第1章</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}
+
+/* Layout: one chapter, five stages as tabs under a sticky bar; each stage is one focused page with prev/next. Paper ground, deep-teal ink, two analytic marks (teal = mean, amber = median). */
+:root{
+  --bg:#F5F4EE; --surface:#FFFFFF; --ink:#152826; --muted:#566865; --line:#D8DCD4;
+  --accent:#0B7A80; --accent-ink:#FFFFFF; --amber:#B4530A; --soft:#E7EEEB;
+  --ok:#1E7B45; --bad:#B42318; --band:#163533; --band-ink:#E8F1EE; --band-muted:#9FBDB7;
+  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1716; --surface:#152220; --ink:#E4ECE9; --muted:#9AAEA9; --line:#2B3B38;
+  --accent:#45C1C6; --accent-ink:#04201F; --amber:#F0A24A; --soft:#1B2C2A;
+  --ok:#5BC98A; --bad:#F2877D; --band:#0A2321; --band-ink:#DDEBE7; --band-muted:#86A8A2; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1716; --surface:#152220; --ink:#E4ECE9; --muted:#9AAEA9; --line:#2B3B38;
+  --accent:#45C1C6; --accent-ink:#04201F; --amber:#F0A24A; --soft:#1B2C2A;
+  --ok:#5BC98A; --bad:#F2877D; --band:#0A2321; --band-ink:#DDEBE7; --band-muted:#86A8A2; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
+.hero>*,.top>*,.concept>*,.guide-layout>*{min-width:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--band)}
+a{color:var(--accent)}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* top band */
+.band{background:var(--band);color:var(--band-ink)}
+.top{display:flex;align-items:center;gap:16px;padding-block:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand-mark{font-family:var(--mono);font-size:12px;border:1px solid var(--band-muted);padding:4px 6px;letter-spacing:.06em}
+.brand strong{display:block;font-size:15px;line-height:1.2}
+.brand small{display:block;font-size:12px;color:var(--band-muted)}
+.meter{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--band-muted)}
+.meter-track{width:140px;height:6px;background:rgba(255,255,255,.14);border-radius:3px;overflow:hidden}
+.meter-fill{height:100%;background:var(--band-ink);width:0;transition:width .3s ease}
+.meter b{color:var(--band-ink);font-family:var(--mono);font-weight:500}
+.hero{padding-block:28px 34px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:32px;align-items:end}
+.hero .label{color:var(--band-muted)}
+.hero h1{font-family:var(--display);font-size:clamp(28px,4.4vw,44px);line-height:1.2;margin:8px 0 10px;font-weight:700}
+.hero p{margin:0;color:var(--band-muted);max-width:56ch}
+.hero ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:14px}
+.hero li{display:flex;gap:10px;align-items:baseline;border-top:1px solid rgba(255,255,255,.12);padding-top:8px}
+.hero li span{font-family:var(--mono);font-size:12px;color:var(--band-muted)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:16px;font-size:13px;color:var(--band-muted)}
+.facts b{color:var(--band-ink);font-family:var(--mono);font-weight:500}
+
+/* stage bar */
+.stagebar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.stages{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-block:8px}
+.stages::-webkit-scrollbar{display:none}
+.stage-tab{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1px solid transparent;background:none;padding:8px 12px;border-radius:8px;font-size:15px;color:var(--muted);transition:background .2s,color .2s}
+.stage-tab:hover{background:var(--soft);color:var(--ink)}
+.stage-tab[aria-current="page"]{background:var(--surface);border-color:var(--line);color:var(--ink);font-weight:700}
+.stage-tab .n{font-family:var(--mono);font-size:12px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line)}
+.stage-tab.done .n{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+
+main{padding-block:28px 64px}
+.stage{display:grid;gap:28px}
+.stage[hidden]{display:none}
+.stage-head h2{font-family:var(--display);font-size:clamp(24px,3.2vw,32px);line-height:1.25;margin-top:4px}
+.stage-head p{margin:8px 0 0;color:var(--muted);max-width:65ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.panel h3{font-size:18px;margin-bottom:6px}
+.prose{max-width:68ch}
+.prose p{margin:0 0 10px}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:10px 16px;font-weight:500;border:1px solid var(--line);background:var(--surface);transition:background .2s,border-color .2s,transform .2s}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+.btn svg{width:16px;height:16px;flex:0 0 auto}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:20px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:7px 12px;font-size:14px;color:var(--muted);transition:background .2s,color .2s}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.controls label{font-size:14px;color:var(--muted);display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:var(--accent)}
+
+/* videos */
+.videos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.video{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.video .thumb{position:relative;display:block;aspect-ratio:16/9;max-width:100%;background:var(--soft)}
+.video .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.video .play{position:absolute;inset:auto 12px 12px auto;width:44px;height:44px;border-radius:50%;background:rgba(10,20,20,.78);display:grid;place-items:center;transition:transform .2s}
+.video .thumb:hover .play{transform:translateY(-2px)}
+.video .play svg{width:18px;height:18px;fill:#fff;margin-left:3px}
+.video .seen{position:absolute;left:10px;top:10px;font-size:12px;background:var(--ok);color:var(--bg);padding:2px 8px;border-radius:20px}
+.video .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.video h3{font-size:16px;line-height:1.4}
+.video p{margin:0;font-size:14px;color:var(--muted)}
+.chips{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:2px}
+.chips a{display:grid;grid-template-columns:44px 1fr;gap:8px;text-decoration:none;color:var(--ink);font-size:13px;padding:4px 6px;border-radius:6px;transition:background .2s}
+.chips a:hover{background:var(--soft)}
+.chips .t{font-family:var(--mono);color:var(--accent)}
+.note{font-size:13px;color:var(--muted)}
+
+/* concepts */
+.concept{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:24px;align-items:start}
+.concept-text .num{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.06em}
+.concept-text h3{font-family:var(--display);font-size:22px;margin:4px 0 8px}
+.concept-text p{margin:0 0 10px;color:var(--ink)}
+.concept-text .tip{font-size:14px;color:var(--muted);border-left:2px solid var(--line);padding-left:12px}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;min-width:0}
+.widget-title{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.widget-title strong{font-size:15px}
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:300px}
+.chart text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+.chart .axis{stroke:var(--line)}
+.chart .grid{stroke:var(--line);stroke-dasharray:2 4}
+.chart .bar{fill:var(--accent);opacity:.28}
+.chart .bar:hover{opacity:.45}
+.chart .mean{stroke:var(--accent);stroke-width:2;stroke-dasharray:6 4}
+.chart .median{stroke:var(--amber);stroke-width:2}
+.chart .meanlab{fill:var(--accent);font-weight:500}
+.chart .medlab{fill:var(--amber);font-weight:500}
+.chart .box{fill:var(--soft);stroke:var(--ink);stroke-width:1.2}
+.chart .whisk{stroke:var(--ink);stroke-width:1.2}
+.chart .out{fill:var(--surface);stroke:var(--ink);stroke-width:1.2;cursor:pointer}
+.chart .out.ext{fill:var(--ink)}
+.chart .out:hover,.chart .out.sel{stroke:var(--amber);stroke-width:2.5}
+.chart .grp{fill:var(--ink);font-size:12px}
+.chart .dot{fill:var(--ink);cursor:grab;transition:fill .15s}
+.chart .dot:hover,.chart .dot.active{fill:var(--amber)}
+.chart .iqr{fill:var(--amber);opacity:.12}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px}
+.stat{border-top:1px solid var(--line);padding-top:6px}
+.stat span{display:block;font-size:12px;color:var(--muted)}
+.stat b{font-family:var(--mono);font-weight:500;font-size:16px;font-variant-numeric:tabular-nums}
+.stat.mean b{color:var(--accent)} .stat.med b{color:var(--amber)}
+.readout{font-size:14px;background:var(--soft);border-radius:8px;padding:10px 12px;margin:0}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:500;color:var(--muted);font-size:13px}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+th.n{text-align:right}
+.example{background:var(--band);color:var(--band-ink);border-radius:var(--r);padding:20px 22px;display:grid;gap:6px}
+.example .label{color:var(--band-muted)}
+.example p{margin:0;max-width:70ch}
+
+/* slides */
+.viewer{display:grid;gap:12px}
+.slide-frame{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;aspect-ratio:16/9;max-width:100%}
+.slide-frame img{width:100%;height:100%;object-fit:contain;display:block}
+.slide-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.slide-nav .count{font-family:var(--mono);font-size:14px;margin-right:auto}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.strip button{flex:0 0 auto;width:112px;border:2px solid transparent;border-radius:6px;padding:0;background:var(--surface);overflow:hidden;opacity:.7;transition:opacity .2s,border-color .2s}
+.strip button img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.strip button[aria-current="true"]{border-color:var(--accent);opacity:1}
+.strip button:hover{opacity:1}
+.dl-row{display:flex;flex-wrap:wrap;gap:10px}
+
+/* spss */
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.file{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface)}
+.file .ext{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:2px 5px;color:var(--muted);flex:0 0 auto;margin-top:2px}
+.file div{min-width:0;flex:1}
+.file strong{display:block;font-size:14px;font-weight:500;line-height:1.45}
+.file small{display:block;font-size:12px;color:var(--muted);word-break:break-all}
+.file button{margin-top:6px;border:0;background:none;color:var(--accent);padding:0;font-size:13px;font-weight:500}
+.file .inzip{margin-top:6px;font-size:12px;color:var(--muted)}
+.guide-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;align-items:start}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);display:grid;gap:2px;font-size:14px}
+.toc a{display:flex;gap:8px;text-decoration:none;color:var(--muted);padding:6px 8px;border-radius:6px;transition:background .2s,color .2s}
+.toc a:hover{background:var(--soft);color:var(--ink)}
+.toc a.done{color:var(--ok)}
+.toc a .ck{width:14px;flex:0 0 auto}
+.sec{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);margin-bottom:12px;scroll-margin-top:80px}
+.sec>summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;gap:12px;align-items:center;font-weight:700;font-size:17px}
+.sec>summary::-webkit-details-marker{display:none}
+.sec>summary .chev{margin-left:auto;transition:transform .2s;width:18px;height:18px;flex:0 0 auto}
+.sec[open]>summary .chev{transform:rotate(180deg)}
+.sec>summary .badge{font-size:12px;font-weight:500;color:var(--ok);font-family:var(--mono)}
+.sec-body{padding:0 18px 18px;border-top:1px solid var(--line)}
+.sec-body h3{font-size:17px;margin:22px 0 8px}
+.sec-body h4{font-size:15px;margin:18px 0 6px;color:var(--accent)}
+.sec-body p,.sec-body li{max-width:72ch}
+.sec-body p{margin:0 0 10px}
+.sec-body ol,.sec-body ul{margin:0 0 10px;padding-left:22px}
+.sec-body code{font-family:var(--mono);font-size:.88em;background:var(--soft);padding:1px 5px;border-radius:4px}
+.code{position:relative;background:var(--band);color:var(--band-ink);border-radius:8px;padding:14px 16px;margin:6px 0 12px;overflow-x:auto}
+.code pre{margin:0;font-family:var(--mono);font-size:13px;line-height:1.6}
+.code button{position:absolute;right:8px;top:8px;font-size:12px;border:1px solid var(--band-muted);background:none;color:var(--band-ink);border-radius:6px;padding:2px 8px}
+figure{margin:8px 0 16px}
+figure img{display:block;max-width:100%;height:auto;border:1px solid var(--line);border-radius:6px;cursor:zoom-in;background:var(--soft)}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.borrowed{font-size:12px;color:var(--amber);margin:0 0 6px}
+.sec-done{display:flex;justify-content:flex-end;margin-top:12px}
+.slideref{border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;background:var(--soft);padding:12px 14px;margin:6px 0 14px;display:grid;gap:8px}
+.slideref .label{color:var(--amber)}
+.slideref p{margin:0;font-size:14px}
+.slideref .pics{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.slideref figure{margin:0}
+.slideref img{border-radius:4px}
+.slideref figcaption{display:flex;justify-content:space-between;gap:8px}
+.slideref figcaption a{font-size:13px}
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(5,12,12,.86);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lightbox img{max-width:100%;max-height:85vh;border-radius:6px;background:#fff}
+.lightbox p{color:#e8f1ee;font-size:14px;margin:10px 0 0;text-align:center}
+.lightbox button{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:calc(env(safe-area-inset-right,0px) + 12px);background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:8px;padding:8px 12px}
+
+/* quiz & homework */
+.qlist{display:grid;gap:14px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:10px}
+.q legend,.q .prompt{font-weight:500;font-size:16px;padding:0;display:flex;gap:10px}
+.q .qn{font-family:var(--mono);font-size:13px;color:var(--accent);flex:0 0 auto;padding-top:2px}
+fieldset.q{margin:0;min-width:0}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:9px 12px;cursor:pointer;transition:border-color .2s,background .2s}
+.opt:hover{border-color:var(--accent)}
+.opt input{margin-top:5px;accent-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,transparent)}
+.fb{border-radius:8px;padding:10px 12px;font-size:14px;margin:0}
+.fb.ok{background:color-mix(in srgb,var(--ok) 12%,transparent)}
+.fb.no{background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.fb b{display:block;margin-bottom:2px}
+.fb.ok b{color:var(--ok)} .fb.no b{color:var(--bad)}
+.numrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.numrow input{font:inherit;font-family:var(--mono);width:160px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{font:inherit;width:100%;min-height:120px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+textarea:focus,.numrow input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.ref{border-left:3px solid var(--accent);background:var(--soft);border-radius:0 8px 8px 0;padding:12px 14px;font-size:14px}
+.ref h4{font-size:14px;margin-bottom:6px;color:var(--accent)}
+.ref p{margin:0 0 6px}
+.ref table{font-size:13px;background:var(--surface)}
+.score{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.score b{font-family:var(--mono);font-size:28px;font-weight:500}
+.status-line{font-size:13px;color:var(--muted)}
+.confirm{display:inline-flex;gap:8px;align-items:center;font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:60;max-width:calc(100% - 32px)}
+footer{border-top:1px solid var(--line);padding-block:20px 32px;font-size:13px;color:var(--muted)}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;gap:20px}
+  .videos{grid-template-columns:1fr}
+  .concept{grid-template-columns:1fr}
+  .guide-layout{grid-template-columns:1fr}
+  .toc{position:static;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .meter-track{width:90px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.chapnav{display:flex;gap:4px;flex-wrap:wrap;align-items:center;padding-bottom:4px}
+.chapnav a,.chapnav span{font-family:var(--mono);font-size:12px;text-decoration:none;color:var(--band-muted);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:3px 7px;transition:color .2s,border-color .2s}
+.chapnav a:hover{color:var(--band-ink);border-color:var(--band-muted)}
+.chapnav .cur{color:var(--band);background:var(--band-ink);border-color:var(--band-ink)}
+.chapnav .home{font-family:var(--body);font-size:13px}
+</style>
+
+<div class="band">
+  <div class="wrap top">
+    <div class="brand"><span class="brand-mark">ASS</span><span><strong>高等體育統計</strong><small>國立體育大學 競技與教練科學研究所・林彥光 老師</small></span></div>
+    <div class="meter" aria-live="polite"><span>本章進度</span><span class="meter-track"><span class="meter-fill" id="meterFill"></span></span><b id="meterPct">0%</b></div>
+  </div>
+  <div class="wrap"><nav class="chapnav" aria-label="課程章節"><a class="home" href="../">課程首頁</a><span class="cur" aria-current="page">CH01</span><a href="../ch2/">CH02</a><a href="../ch3/">CH03</a><a href="../ch4/">CH04</a><a href="../ch5/">CH05</a><a href="../ch6/">CH06</a><a href="../ch7/">CH07</a><a href="../ch8/">CH08</a></nav></div>
+  <div class="wrap hero">
+    <div>
+      <span class="label">CH 01 / 08 · 描述統計</span>
+      <h1>描述資料特徵的統計量及圖表</h1>
+      <p>先看三集動畫，再用課堂的 478 位肺癌病人資料動手玩：拖動資料點、切換圖形，看平均數、中位數與 IQR 怎麼變。之後對照講義與 SPSS 步驟完成作業。</p>
+      <div class="facts"><span><b>3</b> 集動畫</span><span><b>38</b> 張投影片</span><span><b>92</b> 張 SPSS 截圖</span><span><b>8</b> 題自我檢測</span><span><b>6</b> 題作業</span></div>
+    </div>
+    <ul aria-label="學習目標">
+      <li><span>目標 1</span>辨識資料尺度與合適的描述統計量</li>
+      <li><span>目標 2</span>計算平均數、中位數、變異數、IQR 與五數摘要</li>
+      <li><span>目標 3</span>以盒鬚圖、直方圖與散佈圖描述資料特徵</li>
+    </ul>
+  </div>
+</div>
+
+<div class="stagebar"><nav class="wrap stages" aria-label="本章學習階段" id="stageNav"></nav></div>
+
+<main class="wrap">
+
+<!-- 1 LEARN -->
+<section class="stage" data-stage="learn" aria-labelledby="h-learn">
+  <div class="stage-head"><span class="label">步驟 1</span><h2 id="h-learn">影片與概念</h2><p>三集動畫各約兩分鐘。點時間碼可直接跳到那一段（會在 YouTube 開啟）。看完回來，用下面兩個小工具驗證影片裡的說法。</p></div>
+  <div class="videos" id="videos"></div>
+
+  <article class="concept">
+    <div class="concept-text"><span class="num">概念 1</span><h3>先看變數，再選摘要</h3>
+      <p>類別變數以人數與比例摘要；連續變數則觀察分布，再選平均數與標準差，或中位數與四分位距。</p>
+      <p class="tip">數字代碼不一定是可計算平均的測量值。例如性別 gender_n 的 0／1 只是代碼，算出「平均性別 0.48」沒有意義。</p></div>
+    <div class="widget" id="w0"></div>
+  </article>
+
+  <article class="concept">
+    <div class="concept-text"><span class="num">概念 2</span><h3>中心與分散要一起讀</h3>
+      <p>右偏資料的少數高值常會拉高平均數。中位數對極端值較不敏感；IQR＝第三四分位數−第一四分位數，描述中間 50% 資料的跨度。</p>
+      <p class="tip">試試看：把最右邊那一點往右拖到 200 月。平均數跟著跑，中位數和 IQR 幾乎不動。</p></div>
+    <div class="widget" id="w1"></div>
+  </article>
+
+  <article class="concept">
+    <div class="concept-text"><span class="num">概念 3</span><h3>圖形回答不同問題</h3>
+      <p>直方圖看單一變數的分布；箱形圖比較位置、分散及異常值。圖上的離群標記是核對線索，不是刪除指令。</p>
+      <p class="tip">這是課堂 lung_cancer_study 的真實資料（478 位）。切到「依醫院比較」，點一個離群點，看看旁邊的數字代表什麼。</p></div>
+    <div class="widget" id="w2"></div>
+  </article>
+
+  <div class="example"><span class="label">帶著例子理解</span><p>比較男女收縮壓時，先核對各組有效人數，再並列中心、分散與箱形圖；只比較兩個平均數會漏掉分布差異。</p></div>
+  <div class="pager"><span></span><a class="btn primary" href="#slides">下一步：投影片 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<!-- 2 SLIDES -->
+<section class="stage" data-stage="slides" aria-labelledby="h-slides" hidden>
+  <div class="stage-head"><span class="label">步驟 2</span><h2 id="h-slides">課程投影片</h2><p>第一章描述資料特徵的統計量及圖表（lin20260306），共 38 張。用左右鍵或下方縮圖翻頁；翻到最後一張即完成本步驟。</p></div>
+  <div class="viewer">
+    <div class="slide-frame"><img id="slideImg" alt="" src="slides/s-01.jpg"></div>
+    <div class="slide-nav">
+      <span class="count" id="slideCount">1 / 38</span>
+      <button class="btn" id="slidePrev" aria-label="上一張"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>上一張</button>
+      <button class="btn" id="slideNext" aria-label="下一張">下一張<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+    <div class="strip" id="slideStrip" aria-label="投影片縮圖"></div>
+    <div class="dl-row">
+      <button class="btn" data-dl="slides/ch1.pptx" data-name="第一章描述資料特徵的統計量及圖表_lin20260306.pptx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>下載 PPTX 原檔</button>
+      <button class="btn" data-dl="slides/ch1.pdf" data-name="第一章描述資料特徵的統計量及圖表_lin20260306.pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>下載 PDF</button>
+    </div>
+  </div>
+  <div class="pager"><a class="btn" href="#learn">上一步：影片與概念</a><a class="btn primary" href="#spss">下一步：SPSS 操作 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<!-- 3 SPSS -->
+<section class="stage" data-stage="spss" aria-labelledby="h-spss" hidden>
+  <div class="stage-head"><span class="label">步驟 3</span><h2 id="h-spss">SPSS 操作指南</h2><p>先下載資料，再依各節步驟在自己的 SPSS 操作，把輸出和截圖對照。每節做完按「完成這一節」，進度會記在這台裝置的瀏覽器。</p></div>
+  <div class="panel">
+    <div class="widget-title"><h3>本章資料</h3><button class="btn primary" data-dl="CH01_data.zip" data-name="高等體育統計_CH01_資料.zip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>下載全部（ZIP，8 個檔）</button></div>
+    <p class="note" style="margin:4px 0 12px">CSV 可單獨下載；SAV、SPS、XLS 檔包含在 ZIP 內。SPS 語法裡的路徑要改成自己的下載位置。</p>
+    <div class="files" id="files"></div>
+  </div>
+  <div class="guide-layout">
+    <nav class="toc" id="toc" aria-label="指南章節"></nav>
+    <div id="guide"></div>
+  </div>
+  <div class="pager"><a class="btn" href="#slides">上一步：投影片</a><a class="btn primary" href="#quiz">下一步：自我檢測 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<!-- 4 QUIZ -->
+<section class="stage" data-stage="quiz" aria-labelledby="h-quiz" hidden>
+  <div class="stage-head"><span class="label">步驟 4</span><h2 id="h-quiz">自我檢測</h2><p>選完立刻知道對錯和理由，可以重選。題目的數字都來自課堂資料與 SPSS 指南的實際輸出。</p></div>
+  <div class="panel score"><div><span class="label">目前答對</span><div><b id="quizScore">0</b> <span class="mono">/ 8</span></div></div><p class="status-line" id="quizStatus" style="margin:0">全部答對即完成本步驟。</p></div>
+  <div class="qlist" id="quiz"></div>
+  <div class="panel">
+    <h3>思考題（不計分）</h3>
+    <p style="margin:0 0 10px">若存活時間明顯右偏，平均數與中位數可能有何差異？請說明 IQR 與箱形圖各能提供什麼資訊。</p>
+    <textarea id="thinkText" aria-label="思考題作答" placeholder="寫下你的判斷…"></textarea>
+    <div style="margin-top:10px"><button class="btn" id="thinkBtn" aria-expanded="false" aria-controls="thinkRef">查看參考答案與自我檢核</button></div>
+    <div class="ref" id="thinkRef" hidden style="margin-top:12px">
+      <h4>參考答案</h4>
+      <p>右偏時，平均數通常高於中位數，因為高值較容易拉高平均。這是常見型態，不是所有資料的必然關係。</p>
+      <p>IQR 描述中間 50% 的跨度；箱形圖同時呈現中位數、箱體、鬚與可能的離群觀察值。</p>
+      <p>應連同樣本數、缺漏值與單位報告，不因箱形圖標記便刪除觀測。</p>
+      <h4 style="margin-top:10px">自我檢核</h4>
+      <p>有沒有區分中心位置與分散程度？有沒有避免把所有右偏資料都當成同一種分布？</p>
+    </div>
+  </div>
+  <div class="pager"><a class="btn" href="#spss">上一步：SPSS 操作</a><a class="btn primary" href="#homework">下一步：章節作業 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<!-- 5 HOMEWORK -->
+<section class="stage" data-stage="homework" aria-labelledby="h-hw" hidden>
+  <div class="stage-head"><span class="label">步驟 5 · 教材第 35–36 頁</span><h2 id="h-hw">章節作業：Adult Income 與 CVD_All 描述統計</h2><p>選擇題與數值題可立即核對。文字題先寫下自己的結果，再展開 SPSS 實際輸出對照。作答只存在這台裝置的瀏覽器，不會傳給老師。</p></div>
+  <div class="qlist" id="hw"></div>
+  <div class="panel score"><div><span class="label">作業狀態</span><div class="status-line" id="hwStatus">0 / 6 題已作答</div></div><span class="confirm" id="hwClear"><button class="btn" id="hwClearBtn">清除我的作答</button></span></div>
+  <div class="pager"><a class="btn" href="#quiz">上一步：自我檢測</a><a class="btn primary" href="../ch2/">下一章：第 2 章</a></div>
+</section>
+
+</main>
+<footer><div class="wrap">高等體育統計・第 1 章樣板。資料：lung_cancer_study（478 位）、Adult Income（31,947 筆）、CVD_All。數值核對自本章 SPSS 指南之實際輸出。進度與作答只保存在你目前使用的瀏覽器。</div></footer>
+
+<script type="application/json" id="lungData">[["DFCI","Female",55.0,110.0],["DFCI","Female",41.0,98.0],["DFCI","Male",47.0,110.0],["DFCI","Male",73.0,66.0],["DFCI","Female",63.0,29.0],["DFCI","Male",72.0,7.0],["DFCI","Female",57.0,53.0],["DFCI","Female",55.0,63.0],["DFCI","Male",64.0,23.0],["DFCI","Female",40.0,62.0],["DFCI","Male",53.0,79.0],["DFCI","Female",75.0,7.0],["DFCI","Male",60.0,26.0],["DFCI","Male",59.0,107.0],["DFCI","Female",66.0,6.0],["DFCI","Male",60.0,105.0],["DFCI","Male",75.0,25.0],["DFCI","Female",70.0,95.0],["DFCI","Male",71.0,13.0],["DFCI","Male",68.0,38.0],["DFCI","Male",65.0,15.0],["DFCI","Female",60.0,96.0],["DFCI","Male",59.0,37.0],["DFCI","Female",60.0,87.0],["DFCI","Male",62.0,13.0],["DFCI","Male",54.0,71.0],["DFCI","Female",53.0,74.0],["DFCI","Male",61.0,76.0],["DFCI","Female",62.0,34.0],["DFCI","Female",58.0,40.0],["DFCI","Male",64.0,30.0],["DFCI","Male",62.0,40.0],["DFCI","Female",66.0,85.0],["DFCI","Male",35.0,88.0],["DFCI","Male",66.0,9.0],["DFCI","Female",52.0,9.0],["DFCI","Male",57.0,64.0],["DFCI","Female",73.0,59.0],["DFCI","Male",63.0,74.0],["DFCI","Male",75.0,84.0],["DFCI","Male",76.0,18.0],["DFCI","Female",59.0,25.0],["DFCI","Male",54.0,80.0],["DFCI","Male",74.0,12.0],["DFCI","Female",70.0,32.0],["DFCI","Female",68.0,105.0],["DFCI","Male",69.0,81.0],["DFCI","Male",75.0,75.0],["DFCI","Male",64.0,97.0],["DFCI","Male",79.0,18.0],["DFCI","Male",69.0,32.0],["DFCI","Male",77.0,10.0],["DFCI","Female",60.0,90.0],["DFCI","Male",54.0,8.0],["DFCI","Female",51.0,90.0],["DFCI","Female",53.0,85.0],["DFCI","Male",67.0,4.0],["DFCI","Female",56.0,71.0],["DFCI","Male",62.0,36.0],["DFCI","Female",52.0,65.0],["DFCI","Male",61.0,64.0],["DFCI","Female",61.0,9.0],["DFCI","Female",40.0,97.0],["DFCI","Male",60.0,68.0],["DFCI","Male",76.0,11.0],["DFCI","Female",46.0,63.0],["DFCI","Male",61.0,44.0],["DFCI","Female",38.0,55.0],["DFCI","Male",43.0,40.0],["DFCI","Male",58.0,36.0],["DFCI","Male",53.0,95.0],["DFCI","Male",68.0,74.0],["DFCI","Female",72.0,57.0],["DFCI","Female",68.0,56.0],["DFCI","Male",65.0,48.0],["DFCI","Female",68.0,49.0],["DFCI","Male",68.0,28.0],["DFCI","Female",57.0,36.0],["DFCI","Female",56.0,40.0],["DFCI","Male",56.0,37.0],["DFCI","Female",51.0,40.0],["DFCI","Female",68.0,23.0],["HLM","Female",66.0,44.94],["HLM","Male",53.0,150.18],["HLM","Male",65.0,18.2],["HLM","Male",79.0,34.76],["HLM","Male",72.0,22.74],["HLM","Male",75.0,15.47],["HLM","Female",71.0,24.74],["HLM","Female",69.0,4.14],["HLM","Female",72.0,19.84],["HLM","Female",79.0,12.88],["HLM","Female",66.0,3.75],["HLM","Male",67.0,8.61],["HLM","Female",79.0,0.53],["HLM","Male",36.0,16.49],["HLM","Female",74.0,37.55],["HLM","Male",50.0,106.58],["HLM","Male",40.0,123.3],["HLM","Male",79.0,56.8],["HLM","Male",74.0,30.72],["HLM","Female",75.0,30.12],["HLM","Male",70.0,31.84],["HLM","Female",64.0,13.33],["HLM","Female",77.0,105.99],["HLM","Female",51.0,79.54],["HLM","Male",55.0,57.33],["HLM","Female",66.0,44.42],["HLM","Male",49.0,20.86],["HLM","Male",62.0,27.63],["HLM","Male",66.0,74.18],["HLM","Female",87.0,96.0],["HLM","Male",82.0,null],["HLM","Female",62.0,41.33],["HLM","Male",82.0,5.65],["HLM","Male",77.0,0.43],["HLM","Female",61.0,16.56],["HLM","Male",81.0,61.21],["HLM","Female",72.0,104.47],["HLM","Female",60.0,null],["HLM","Female",68.0,8.94],["HLM","Female",67.0,70.6],["HLM","Female",74.0,3.52],["HLM","Female",64.0,17.54],["HLM","Female",65.0,27.56],["HLM","Male",76.0,16.39],["HLM","Female",68.0,26.38],["HLM","Female",66.0,77.7],["HLM","Male",70.0,94.16],["HLM","Female",66.0,73.4],["HLM","Male",70.0,45.24],["HLM","Male",63.0,0.03],["HLM","Female",68.0,75.73],["HLM","Female",57.0,null],["HLM","Male",76.0,39.06],["HLM","Male",49.0,77.6],["HLM","Male",61.0,2.27],["HLM","Male",71.0,84.44],["HLM","Male",60.0,42.18],["HLM","Female",73.0,85.65],["HLM","Male",47.0,92.52],["HLM","Male",64.0,39.36],["HLM","Female",66.0,82.5],["HLM","Male",48.0,31.7],["HLM","Male",79.0,42.02],["HLM","Female",68.0,5.78],["HLM","Female",68.0,7.69],["HLM","Female",82.0,47.9],["HLM","Male",70.0,58.84],["HLM","Male",75.0,81.54],["HLM","Female",63.0,24.51],["HLM","Female",81.0,7.03],["HLM","Female",75.0,9.63],["HLM","Female",60.0,40.21],["HLM","Male",58.0,11.33],["HLM","Female",60.0,66.69],["HLM","Male",57.0,52.07],["HLM","Female",71.0,40.97],["HLM","Male",73.0,76.12],["HLM","Male",77.0,72.64],["HLM","Male",50.0,11.99],["HLM","Female",59.0,6.24],["HLM","Male",73.0,38.77],["HLM","Male",70.0,21.88],["HLM","Male",58.0,78.85],["HLM","Female",68.0,null],["HLM","Male",67.0,null],["HLM","Male",67.0,null],["HLM","Male",60.0,72.05],["HLM","Male",72.0,28.25],["HLM","Male",73.0,3.25],["HLM","Female",62.0,53.39],["HLM","Female",70.0,12.02],["HLM","Female",74.0,70.37],["HLM","Female",77.0,39.03],["HLM","Male",72.0,null],["HLM","Male",82.0,52.2],["HLM","Male",69.0,65.77],["HLM","Male",73.0,15.77],["HLM","Female",53.0,null],["HLM","Female",57.0,27.66],["HLM","Male",73.0,29.67],["MI","Male",59.0,23.2],["MI","Female",63.0,27.1],["MI","Female",63.0,5.8],["MI","Male",66.0,50.2],["MI","Female",52.0,73.0],["MI","Female",62.0,34.8],["MI","Male",60.0,27.6],["MI","Female",66.0,48.8],["MI","Female",61.0,66.6],["MI","Female",68.0,10.1],["MI","Female",48.0,8.7],["MI","Female",74.0,105.6],["MI","Female",76.0,47.27],["MI","Male",70.0,59.11],["MI","Male",58.0,51.58],["MI","Female",48.0,36.25],["MI","Male",82.0,6.6],["MI","Male",62.0,54.93],["MI","Male",82.0,9.74],["MI","Male",68.0,58.88],["MI","Male",58.0,51.81],["MI","Female",75.0,61.2],["MI","Male",63.0,21.48],["MI","Male",78.0,6.38],["MI","Female",57.0,69.01],["MI","Female",77.0,64.14],["MI","Female",86.0,32.24],["MI","Female",78.0,null],["MI","Male",73.0,56.35],["MI","Female",70.0,69.05],["MI","Female",50.0,132.2],["MI","Female",75.0,56.32],["MI","Female",49.0,61.25],["MI","Female",51.0,50.43],["MI","Male",66.0,73.36],["MI","Female",76.0,66.74],["MI","Female",78.0,72.8],["MI","Male",76.0,19.9],["MI","Female",75.0,128.8],["MI","Female",60.0,31.28],["MI","Male",73.0,45.33],["MI","Female",70.0,28.68],["MI","Female",72.0,83.95],["MI","Female",55.0,12.63],["MI","Female",64.0,77.89],["MI","Female",53.0,11.18],["MI","Female",77.0,30.53],["MI","Female",55.0,73.59],["MI","Female",72.0,43.8],["MI","Male",67.0,11.68],["MI","Male",53.0,52.01],["MI","Female",70.0,74.61],["MI","Female",72.0,31.94],["MI","Female",57.0,59.9],["MI","Male",43.0,2.24],["MI","Female",64.0,21.7],["MI","Female",65.0,73.22],["MI","Female",66.0,79.05],["MI","Female",52.0,8.85],["MI","Female",69.0,92.2],["MI","Female",72.0,5.9],["MI","Female",33.0,90.07],["MI","Male",59.0,24.97],["MI","Male",62.0,42.04],["MI","Male",70.0,12.2],["MI","Male",71.0,2.4],["MI","Male",74.0,2.7],["MI","Male",46.0,96.0],["MI","Male",67.0,66.1],["MI","Male",60.0,68.6],["MI","Male",75.0,48.0],["MI","Male",62.0,30.7],["MI","Male",72.0,80.9],["MI","Male",69.0,11.7],["MI","Male",68.0,33.2],["MI","Male",58.0,17.6],["MI","Male",57.0,42.5],["MI","Male",69.0,122.4],["MI","Male",58.0,30.2],["MI","Male",72.0,78.5],["MI","Male",47.0,73.2],["MI","Male",64.0,65.2],["MI","Male",47.0,73.2],["MI","Male",59.0,145.8],["MI","Male",69.0,73.7],["MI","Male",63.0,16.3],["MI","Male",77.0,3.3],["MI","Male",77.0,19.5],["MI","Male",70.0,8.4],["MI","Male",57.0,26.9],["MI","Male",67.0,129.8],["MI","Male",66.0,19.6],["MI","Male",78.0,105.4],["MI","Male",46.0,157.5],["MI","Male",62.0,120.5],["MI","Male",66.0,47.8],["MI","Female",74.0,29.6],["MI","Male",65.0,130.0],["MI","Female",46.0,52.3],["MI","Female",63.0,69.4],["MI","Male",60.0,25.95],["MI","Male",77.0,121.8],["MI","Male",44.0,32.6],["MI","Male",76.0,81.2],["MI","Male",49.0,40.2],["MI","Male",70.0,14.5],["MI","Male",68.0,9.2],["MI","Male",66.0,19.0],["MI","Male",74.0,121.2],["MI","Male",80.0,11.6],["MI","Male",62.0,9.0],["MI","Male",81.0,97.6],["MI","Male",59.0,59.0],["MI","Male",65.0,175.9],["MI","Male",61.0,45.3],["MI","Male",71.0,92.6],["MI","Female",45.0,4.0],["MI","Female",78.0,16.8],["MI","Male",75.0,62.0],["MI","Male",61.0,62.3],["MI","Male",65.0,71.8],["MI","Male",69.0,84.0],["MI","Male",73.0,18.6],["MI","Female",74.0,25.2],["MI","Male",51.0,45.8],["MI","Female",63.0,20.6],["MI","Male",60.0,110.5],["MI","Male",42.0,133.6],["MI","Male",56.0,70.5],["MI","Female",69.0,52.1],["MI","Female",58.0,17.6],["MI","Male",62.0,16.9],["MI","Female",62.0,86.8],["MI","Male",65.0,103.4],["MI","Female",74.0,64.8],["MI","Female",73.0,117.6],["MI","Female",52.0,115.8],["MI","Male",72.0,19.0],["MI","Male",65.0,84.1],["MI","Female",65.0,153.3],["MI","Female",59.0,153.9],["MI","Female",62.0,162.6],["MI","Male",63.0,63.8],["MI","Female",54.0,132.5],["MI","Female",57.0,130.8],["MI","Female",82.0,69.2],["MI","Female",59.0,159.6],["MI","Female",48.0,157.7],["MI","Female",44.0,76.3],["MI","Female",40.0,105.9],["MI","Male",64.0,28.2],["MI","Male",69.0,7.2],["MI","Male",67.0,79.5],["MI","Female",62.0,82.3],["MI","Male",60.0,101.2],["MI","Male",46.0,168.1],["MI","Female",59.0,33.9],["MI","Male",77.0,14.9],["MI","Male",56.0,9.6],["MI","Female",53.0,95.0],["MI","Male",51.0,62.4],["MI","Female",63.0,64.3],["MI","Female",85.0,20.9],["MI","Female",60.0,22.3],["MI","Male",58.0,67.9],["MI","Male",81.0,36.3],["MI","Female",52.0,22.7],["MI","Female",60.0,83.0],["MI","Female",81.0,32.9],["MI","Female",57.0,38.1],["MI","Female",76.0,54.2],["MI","Female",60.0,96.1],["MI","Female",62.0,53.2],["MI","Male",68.0,12.5],["MI","Male",73.0,29.5],["MI","Male",71.0,37.0],["MI","Female",65.0,107.5],["MI","Female",54.0,69.2],["MI","Male",63.0,53.7],["MI","Male",70.0,21.8],["MI","Male",78.0,55.8],["MI","Male",54.0,21.0],["MI","Female",43.0,56.7],["MI","Male",78.0,7.3],["MI","Male",66.0,159.9],["MI","Male",72.0,60.8],["MI","Female",81.0,21.2],["MI","Female",69.0,53.6],["MI","Male",55.0,28.0],["MSKCC","Female",64.0,48.0],["MSKCC","Female",58.0,57.0],["MSKCC","Male",57.0,43.0],["MSKCC","Female",57.0,41.0],["MSKCC","Male",69.0,34.0],["MSKCC","Male",69.0,24.0],["MSKCC","Male",67.0,43.0],["MSKCC","Female",75.0,32.0],["MSKCC","Male",65.0,92.0],["MSKCC","Male",62.0,65.0],["MSKCC","Male",71.0,43.0],["MSKCC","Female",82.0,69.0],["MSKCC","Male",68.0,40.0],["MSKCC","Female",48.0,21.0],["MSKCC","Female",82.0,29.0],["MSKCC","Male",64.0,26.0],["MSKCC","Male",68.0,77.0],["MSKCC","Male",58.0,2.0],["MSKCC","Male",64.0,16.0],["MSKCC","Male",73.0,66.0],["MSKCC","Female",52.0,14.0],["MSKCC","Male",62.0,33.0],["MSKCC","Male",51.0,85.0],["MSKCC","Male",62.0,66.0],["MSKCC","Female",50.0,15.0],["MSKCC","Male",65.0,91.0],["MSKCC","Male",74.0,68.0],["MSKCC","Female",55.0,33.0],["MSKCC","Male",54.0,24.0],["MSKCC","Male",62.0,72.0],["MSKCC","Male",76.0,62.0],["MSKCC","Female",64.0,114.0],["MSKCC","Female",58.0,4.0],["MSKCC","Male",70.0,20.0],["MSKCC","Female",57.0,52.0],["MSKCC","Female",67.0,93.0],["MSKCC","Male",40.0,51.0],["MSKCC","Female",74.0,14.0],["MSKCC","Female",59.0,100.0],["MSKCC","Female",66.0,33.0],["MSKCC","Female",70.0,47.0],["MSKCC","Male",67.0,32.0],["MSKCC","Female",57.0,60.0],["MSKCC","Male",64.0,50.0],["MSKCC","Female",59.0,15.0],["MSKCC","Female",76.0,37.0],["MSKCC","Female",82.0,54.0],["MSKCC","Male",58.0,31.0],["MSKCC","Male",65.0,38.0],["MSKCC","Female",49.0,115.0],["MSKCC","Female",71.0,36.0],["MSKCC","Male",67.0,52.0],["MSKCC","Female",61.0,48.0],["MSKCC","Male",75.0,19.0],["MSKCC","Female",46.0,91.0],["MSKCC","Female",74.0,204.0],["MSKCC","Female",51.0,50.0],["MSKCC","Male",54.0,80.0],["MSKCC","Female",50.0,42.0],["MSKCC","Female",69.0,60.0],["MSKCC","Female",63.0,26.0],["MSKCC","Female",76.0,62.0],["MSKCC","Female",56.0,39.0],["MSKCC","Female",72.0,22.0],["MSKCC","Female",70.0,63.0],["MSKCC","Male",76.0,68.0],["MSKCC","Female",81.0,7.0],["MSKCC","Female",61.0,52.0],["MSKCC","Female",53.0,36.0],["MSKCC","Female",72.0,15.0],["MSKCC","Female",53.0,20.0],["MSKCC","Male",61.0,41.0],["MSKCC","Male",66.0,25.0],["MSKCC","Male",57.0,66.0],["MSKCC","Female",74.0,42.0],["MSKCC","Female",48.0,51.0],["MSKCC","Female",65.0,50.0],["MSKCC","Female",70.0,57.0],["MSKCC","Female",79.0,13.0],["MSKCC","Male",67.0,78.0],["MSKCC","Male",77.0,48.0],["MSKCC","Female",63.0,33.0],["MSKCC","Female",76.0,37.0],["MSKCC","Male",72.0,17.0],["MSKCC","Female",81.0,44.0],["MSKCC","Female",51.0,24.0],["MSKCC","Female",63.0,44.0],["MSKCC","Female",80.0,30.0],["MSKCC","Female",74.0,50.0],["MSKCC","Female",58.0,88.0],["MSKCC","Female",62.0,42.0],["MSKCC","Female",67.0,46.0],["MSKCC","Female",71.0,56.0],["MSKCC","Female",61.0,40.0],["MSKCC","Female",38.0,38.0],["MSKCC","Female",65.0,70.0],["MSKCC","Female",72.0,43.0],["MSKCC","Female",43.0,55.0],["MSKCC","Female",65.0,17.0],["MSKCC","Female",54.0,36.0],["MSKCC","Female",79.0,10.0],["MSKCC","Male",61.0,23.0],["MSKCC","Male",74.0,62.0],["MSKCC","Male",74.0,64.0],["MSKCC","Female",80.0,85.0],["MSKCC","Female",68.0,47.0],["MSKCC","Female",73.0,75.0]]</script>
+<script type="application/json" id="guideData">"# 第 1 章：描述資料特徵的統計量及圖表—SPSS 詳細操作\n\n依據最新版「第一章描述資料特徵的統計量及圖表_lin20260306.pptx」整理。描述統計、箱形圖、直方圖與堆疊長條圖使用 lung_cancer_study.csv；Rank分組散佈圖使用教師補充的 sport-injury-Lin-Robbin.xls。Rank代表受測者成績；兩份檔案SITE標示不同，請依各節指定資料操作。\n\n## 分析前：核對目前資料與分析狀態\n\n每次開啟肺癌、Adult Income或CVD資料，先點選要分析的資料編輯器，核對標題與欄位，再完成以下設定。下列四張為第6、8章已驗證的真實共通介面截圖，只示範選項；背景資料與既有sex、count條件不屬於第1章，也不是本章已套用設定的證明。\n\n1. 選「資料 → 選取觀察值」。分割檔案與加權觀察值也在同一選單。\n\n![資料選單入口：沿用第6章共通介面](截圖/ch06-menu-weight-20261001.png)\n\n2. 在「選取觀察值」選「所有觀察值」，按「確定」。圖中第8章已選所有觀察值，但套用前仍顯示舊篩選狀態。回到自己的資料檢視，確認列號沒有篩選斜線、狀態列沒有篩選啟用提示。若先前已刪除個案，取消篩選無法復原，需重新開啟原始資料。\n\n![所有觀察值設定：沿用第8章套用前畫面](截圖/ch08-hw-poisson-filter-off-settings-final.png)\n\n3. 選「資料 → 分割檔案」，選「分析所有觀察值，不建立群組」，按「確定」。圖中第8章狀態已關閉，只用來示範目標選項。\n\n![不分割資料：沿用第8章共通設定](截圖/ch08-lecture-match-split-off.png)\n\n4. 選「資料 → 加權觀察值」，選「不加權觀察值」，按「確定」。圖中第6章尚未套用，狀態仍顯示舊count加權；套用後確認自己的資料編輯器沒有加權啟用提示。\n\n![不加權：沿用第6章套用前設定](截圖/ch06-hw-weight-off-selected-20261001.png)\n\n這些是全體分析的起始設定。Adult作業要求分性別或篩選低薪者時，依該節暫時變更，再依重設步驟恢復。CVD五數摘要以Explore的sex因子分組，不需同時開啟分割檔案。學生壓力資料只有五列彙總人數，其圖表依該節使用每組單列count的平均值，不要再啟用count加權而重複計數。\n\n## 課堂示範\n\n### 步驟 1：開啟資料並確認變項\n\n本節使用下載區「課堂：截圖同版SPSS資料（含gender_n）」CH01_capture_ready.sav，與後續描述統計及圖表的變數名稱一致。這是由lung_cancer_study.csv整理的SPSS資料；第7步Rank分組圖另用教師提供的Excel。\n\n1. 下載CH01_capture_ready.sav，記住自己的存放資料夾。\n2. 在SPSS資料編輯器選「檔案 → 開啟 → 資料」（Ctrl+O）。檔案類型選SPSS Statistics（*.sav、*.zsav），選取下載的SAV，按「開啟」。圖中路徑是示範電腦的位置，請使用自己的路徑。\n\n![開啟第一章SAV資料的實際對話框](截圖/ch01-lung-open-sav-20261012.png)\n\n3. 開啟後核對標題列CH01_capture_ready.sav。資料集名稱如「資料集3」由SPSS依開檔次序命名，不必與截圖完全相同。資料應分欄顯示，右上角為15個變數；前兩筆AGE為55、41，SITE均為DFCI，gender_n均為0。\n\n![SAV開啟後的資料檢視](截圖/ch01-lung-open-sav-loaded-20261012.png)\n\n4. 確認AGE為年齡、SURVIVAL_MONTHS為存活月數、SITE為研究地點、gender_n為性別數值代碼。橫向捲動可查看右側欄位，後續統計輸出再核對AGE有效478筆，SURVIVAL_MONTHS有效469筆、遺漏9筆。\n\n![第一章分析用資料欄位](截圖/ch01-step-01-lung-cancer-data-final.png)\n\nSAV已保留變數型態與名稱，開啟時不需再設定分隔符號或第一列標題。原始CSV同時有GENDER與gender、RT與rt、Vital.Status與vital_status；SPSS名稱不區分大小寫，因此本SAV將數值欄命名為gender_n、rt_n、vital_status_n，文字欄保留。gender_n對應CSV第三欄gender（0/1），不是新計算的結果。若另自行匯入原始CSV，SPSS自動改名可能不同，須依欄位位置與值核對。\n\n### 步驟 2：設定次數分配表及描述統計量\n\n1. 選擇「分析」→「描述統計」→「次數分配表」。\n2. 將 `AGE` 與 `SURVIVAL_MONTHS` 移入變項框。\n3. 按「統計量」，勾選平均數、中位數、眾數、變異數、標準差、四分位數、最小值、最大值及總和。\n4. 按「繼續」返回主視窗，取消「顯示次數表格」，再按「確定」。取消次數表只省略逐值人數表，仍會輸出勾選的統計量。\n\n對應語法：\n\n```spss\nFREQUENCIES VARIABLES=AGE SURVIVAL_MONTHS\n /FORMAT=NOTABLE\n /STATISTICS=MEAN MEDIAN MODE VARIANCE STDDEV MINIMUM MAXIMUM SUM\n /PERCENTILES=25 50 75.\n```\n\n截圖：\n- ![SPSS ch01 step 02 analyze menu final](截圖/ch01-step-02-analyze-menu-final.png)\n- ![SPSS ch01 step 02 descriptive submenu final](截圖/ch01-step-02-descriptive-submenu-final.png)\n- ![SPSS ch01 step 02 frequencies dialog final](截圖/ch01-step-02-frequencies-dialog-final.png)\n\n下圖同時勾選四分位數、平均數、中位數、眾數、標準差、變異數、最小值、最大值與總和。SPSS 25繁體介面將變異數顯示為「變異」。\n\n![描述統計包含總和的完整設定](截圖/ch01-step-02-statistics-with-sum-final.png)\n\n按「繼續」後確認變數框為 AGE 與 SURVIVAL_MONTHS，取消「顯示次數表格」，按「確定」。\n\n![描述統計執行前主視窗](截圖/ch01-step-02-sum-run-settings-final.png)\n\n### 步驟 3：解讀描述統計表\n\n輸出顯示：\n\n- 年齡：平均數 64.44、中位數 65、眾數 62、標準差 10.090、變異數 101.798、最小值 33、最大值 87。\n- 存活月數：平均數 51.7828、中位數 45.8、眾數 40、標準差 35.77085、變異數 1279.553、最小值 0.03、最大值 204。\n- 存活月數平均數高於中位數，初步顯示分配可能右偏，仍應搭配直方圖判斷。\n\n![包含總和與四分位數的實際輸出](截圖/ch01-step-03-statistics-with-sum-final.png)\n\n「總和」列顯示 AGE=30,802、SURVIVAL_MONTHS=24,286.12；講義第23張把存活月數總和顯示為整數24,286。本次保留小數，並非資料不同。總和是各有效觀察值相加，平均數則是總和除以各變數的有效 N；兩欄 N 不同，不能使用同一分母。\n\n讀表時先看有效 N：年齡為478，存活月數為469，後者有9筆遺漏，因此兩欄統計量使用的有效人數不同。平均數、中位數、眾數描述中心位置；標準差描述資料分散，變異數是標準差的平方，單位也會平方，不能把兩者當成同一數值。\n\n本次完整輸出同時顯示四分位數：AGE 的 Q1=58、Q2=65、Q3=72，IQR=72−58=14歲；SURVIVAL_MONTHS 的 Q1=23.1、Q2=45.8、Q3=73.2，IQR=73.2−23.1=50.1月。IQR 描述中間50%資料的跨度，不能從平均數或標準差推算。\n\n### 步驟 4：以 SITE 比較存活時間的箱形圖\n\n1. 選擇「圖形」→「圖表建立器」。\n2. 在圖庫選擇「箱形圖」，將簡單箱形圖拖到預覽區。\n3. 將 `SITE` 拖到 X 軸，將 `SURVIVAL_MONTHS` 拖到 Y 軸。\n4. 按「確定」。\n5. 比較各研究地點的中位數、四分位距、鬚線與離群值；不可只比較箱子的高度。\n\n截圖：\n- ![SPSS ch01 step 04 boxplot dialog final](截圖/ch01-step-04-boxplot-dialog-final.png)（圖表建立器：`SITE`＝X 軸、`SURVIVAL_MONTHS`＝Y 軸）\n- ![SPSS ch01 step 04 site survival boxplot final](截圖/ch01-step-04-site-survival-boxplot-final.png)（探索分析的實際輸出）\n\n截圖來源說明：上圖示範圖表建立器的軸設定；下圖是相同變數分組的「探索」分析輸出，不是上方建立器按確定後的直接截圖。若要重現下圖，可選「分析 → 描述統計 → 探索」，依變數放 SURVIVAL_MONTHS、因子放 SITE，在「圖形」選擇依因子層級呈現箱形圖，再執行分析。兩條操作路徑的版面可能不同，請按軸標籤與組別核對。\n\n實際輸出包含 DFCI、HLM、MI、MSKCC 四個地點。HLM 的中位數較低，MSKCC 箱體較短，表示其中間50%的存活月數較集中；MI 與 MSKCC 可見高值離群點。離群點旁如427等數字是觀察值標記，不是月數，讀值應看 Y 軸。這是描述性比較，不能只從箱體差異判定統計顯著。\n\n### 步驟 5：繪製存活時間直方圖\n\n1. 選擇「分析」→「描述統計」→「次數分配表」。\n2. 選擇 `SURVIVAL_MONTHS`，按「圖表」。\n3. 選擇「直方圖」，並勾選顯示常態曲線。\n4. 按「繼續」→「確定」。\n5. 圖形呈明顯右偏，右側有少數很長的存活時間；因此平均數被較大值往右拉，高於中位數。\n\n截圖：\n- ![SPSS ch01 step 05 frequencies dialog final](截圖/ch01-step-05-frequencies-dialog-final.png)（選取 `SURVIVAL_MONTHS`）\n- ![SPSS ch01 step 05 histogram dialog final](截圖/ch01-step-05-histogram-dialog-final.png)（直方圖及常態曲線選項）\n- ![SPSS ch01 step 05 survival histogram final](截圖/ch01-step-05-survival-histogram-final.png)（輸出）\n\n右上角標示 N=469、平均數51.78月、標準差35.771月，與描述統計表相同，僅顯示小數位數不同。橫軸為存活月數、縱軸為每個區間的人數；右尾延伸到200月以上。黑色曲線是常態分配參考線，不能因已勾選此線就宣稱資料為常態分配。\n\n### 步驟 6：繪製 SITE × 性別堆疊長條圖\n\n1. 選擇「圖形」→「圖表建立器」。\n2. 選擇「長條圖」中的堆疊長條圖，拖到預覽區。\n3. 將 `SITE` 拖到 X 軸，將性別 `gender_n` 拖到堆疊色彩區。\n4. Y 軸使用個案數（計數），不要將 `gender_n` 放到 Y 軸；它必須放進右上角「堆疊：設定顏色」。確認圖例出現性別類別，且 Y 軸為計數後，按「確定」。\n5. 比較地點間樣本數與性別組成；若要比較比例而非人數，須將統計量改為百分比。\n\n截圖：\n- ![SITE與性別堆疊長條圖正確設定](截圖/ch01-step-06-stacked-bar-dialog-final.png)（SITE 在 X 軸、gender_n 在右上角堆疊分色欄，Y 軸與統計量均為計數，確定按鈕已啟用。預覽使用範例資料，實際性別類別與地點數以下方輸出為準。）\n- ![SPSS ch01 step 06 site gender stacked bar final](截圖/ch01-step-06-site-gender-stacked-bar-final.png)（輸出）\n\n### 步驟 7：依 Rank 成績分組的年齡與存活時間散佈圖\n\n本節對應講義第33–34張。下載教師補充原始檔 sport-injury-Lin-Robbin.xls。教師已說明 Rank 代表受測者成績；保留0、1、2原始代碼，不自行命名等級或切分數值。工作表名為 lung_cancer_study。AGE、SURVIVAL_MONTHS及gender與原課堂CSV逐列一致，但SITE使用A、B、C、D，其他課堂圖表仍依原CSV操作。\n\n1. 選「檔案 → 開啟 → 資料」，選下載的Excel。未顯示時將檔案類型改為Excel，或輸入完整XLS路徑。\n2. 在「讀取Excel檔案」選 lung_cancer_study（A1:H479），範圍留空、勾選從第一列讀取變數名稱，按「確定」。截圖本機檔名附有日期，內容與下載原始檔一致。\n\n![Rank原始Excel匯入設定](截圖/ch01-rank-excel-import-20261012.png)\n\n3. 確認8欄為SITE、gender、AGE、Warm、Injury、SMOKING、Rank、SURVIVAL_MONTHS。AGE及SURVIVAL_MONTHS為數值尺度，Rank作為分組。Rank有11筆遺漏，不能補成0；0是有效代碼。\n\n![Rank匯入後實際資料](截圖/ch01-rank-imported-data-20261012.png)\n\n4. 選「圖形 → 舊式對話框 → 散佈圖/點狀圖」。本節使用舊式對話框完成三組分色，入口與圖表建立器不同。\n\n![散佈圖入口](截圖/ch01-rank-scatter-menu-20261012.png)\n\n5. 選「簡式散佈圖」，按「定義」。\n\n![散佈圖類型](截圖/ch01-rank-scatter-type-20261012.png)\n\n6. SURVIVAL_MONTHS放入Y軸，AGE放入X軸，Rank放入「設定標記方式」。標註觀察值與畫面方式的列、欄留空，按「確定」。\n\n![Rank完整分組設定](截圖/ch01-rank-scatter-settings-20261012.png)\n\n7. 核對輸出橫軸AGE、縱軸SURVIVAL_MONTHS，Rank圖例為0、1、2。檢視器標題沿用先前CH08輸出容器名稱，但此圖使用新匯入的「資料集4」，不是第8章資料。\n\n![Rank三組實際SPSS散佈圖](截圖/ch01-rank-scatter-output-20261012.png)\n\n原始478筆中，Rank=0有317筆、1有24筆、2有126筆，另11筆遺漏。本次整列排除任一分析變數遺漏者，AGE、SURVIVAL_MONTHS、Rank均有效共463筆，三組分別316、24、123筆。點可能重疊，不能目測點數當作樣本數。\n\n觀察各組點雲的方向、分散與離群值；相近年齡仍有不同存活月數。圖形不含相關係數或p值，不能單憑此圖判定顯著性或因果。SPSS實際產生的語法如下：\n\n```spss\nGRAPH\n /SCATTERPLOT(BIVAR)=AGE WITH SURVIVAL_MONTHS BY Rank\n /MISSING=LISTWISE.\n```\n\n## 課堂補充：學生每天感受壓力時間長條圖\n\n此例對應最新版講義第12張。資料為五個時間區間的人數彙總，並非每位學生的原始紀錄。使用本章下載區的 CH01_stress_duration.sav；這份檔案依講義數字建立，已包含值標籤。\n\n### 步驟 1：開啟資料並核對五列人數\n\n1. 在 SPSS 選「檔案 → 開啟 → 資料」，選擇下載的 CH01_stress_duration.sav，按「開啟」。\n2. 在「資料視圖」核對 time_group 依序為1至5，count 是各區間人數。五列相加為2,599人；資料列数是5，不能誤當成只有5位學生。\n\n|代碼|時間區間|人數|\n|---|---|---|\n|1|<1小時|1525|\n|2|1–2小時|527|\n|3|2–3小時|242|\n|4|3–4小時|109|\n|5|>4小時|196|\n\n![五列學生壓力時間彙總資料](截圖/ch01-stress-data-final.png)\n\n### 步驟 2：確認測量層次與值標籤\n\n1. 切到「變數視圖」。time_group 標籤為「時間選項」、測量層次為「序數」；count 標籤為「人數」、測量層次為「尺度」。兩者皆為數值、無小數。\n\n![時間選項與人數的變數屬性](截圖/ch01-stress-variables-final.png)\n\n2. 點 time_group 的「值」儲存格，再點右侧省略號，確認1至5依序對應五個時間區間。若自行輸入資料，在「值」輸入代碼、「標籤」輸入區間，每組按「新增」，完成後按「確定」。下載檔已設定，不需重複新增。\n\n![五個時間區間的值標籤](截圖/ch01-stress-value-labels-final.png)\n\n### 步驟 3：選擇簡單長條圖\n\n1. 選「圖形 → 圖表建立器」。若出現測量層次提醒，確認前一步已設定後按「確定」。\n\n![開啟圖表建立器的選單](截圖/ch01-stress-chart-menu-final.png)\n\n2. 在下方「展示區」選「長條圖」，把第一個簡單長條圖圖示拖到上方預覽區。\n\n![簡單長條圖樣式放入預覽區](截圖/ch01-stress-bar-template-final.png)\n\n### 步驟 4：設定時間 X 軸與人數 Y 軸\n\n1. 將左側「時間選項 [time_group]」拖至 X 軸。此時預設統計量仍是「計數」，尚未完成；直接執行會數資料列，每組只有1列。\n\n![先將時間選項放到X軸](截圖/ch01-stress-x-axis-final.png)\n\n2. 將「人數 [count]」拖至 Y 軸。右側「元素內容」選「長條圖1」，確認變數為人數、統計量為「平均值」，不勾選誤差長條，按「確定」。\n3. 本例每一時間區間僅有一列彙總值，因此該組 count 的平均值就是該列人數，能重現講義的圖。不要另外加權，也不要把 count 留在左側而使用計數。\n\n![時間X軸人數Y軸及平均值的完整設定](截圖/ch01-stress-mean-settings-final.png)\n\n圖表建立器使用範例資料，預覽長條高度不是本題結果；須看執行後的輸出。\n\n### 步驟 5：核對結果與解讀\n\n![學生每天感受壓力時間的SPSS實際長條圖](截圖/ch01-stress-bar-output-final.png)\n\n五組長條依序為1,525、527、242、109、196人；最多為小於1小時，最少為3–4小時。Y軸的「平均值人數」是前一步的彙總設定名稱，不是每位學生的平均壓力時間。這是分組人數的長條圖，長條之間有間隔。\n\n若以0.5、1.5、2.5、3.5、4.5小時代表各區間，近似平均為 (0.5×1525+1.5×527+2.5×242+3.5×109+4.5×196)÷2599=1.3165小時，四捨五入到兩位為1.32小時。講義寫1.31；依列出的數字計算如上。最高組為開放區間，取4.5只是示例假設，無法由這份彙總資料得知精確平均時間；單位是小時。\n\n## 作業操作\n\n### 作業 1：Adult Income\n\n#### Adult Income資料載入：先執行載入語法\n\n下載本章 adult income1.csv 與 CH01_adult_import_final.sps。此語法只匯入資料及設定型態，不計算作業答案。執行前先保存其他未存資料；語法使用CH01AdultImportFinal資料集，重跑前應先保存同名資料集的修改。\n\n1. 選「檔案 → 開啟 → 語法」；在語法編輯器可按Ctrl+O。選下載的SPS，類型為語法（*.sps）、編碼Unicode（UTF-8），按「開啟」。下圖是同一載入流程先前日期版檔名，請選本章下載的CH01_adult_import_final.sps。\n\n![開啟Adult載入語法](截圖/ch01-adult-import-open-20261013.png)\n\n2. 將 /FILE= 後單引號內的路徑改成自己 adult income1.csv 的完整路徑，保留單引號。其餘保留UTF8、逗號分隔、雙引號文字限定符、FIRSTCASE=2及12欄定義。第一列是欄名，因此從第2列讀取；不可把整列資料讀成一欄。\n\n![Adult載入語法路徑與欄位](截圖/ch01-adult-import-path-final-20261013.png)\n\n3. 選「執行 → 全部」。不要只選取路徑那一行執行。前兩行建立並啟用獨立資料集，避免替換其他名稱的既有資料；若已有同名資料集，先保存其修改。\n\n![執行全部載入語法](截圖/ch01-adult-import-run-all-20261013.png)\n\n4. 切到CH01AdultImportFinal資料編輯器。資料檢視右上角應顯示12個變數；第一筆age=17、fnlwgt=148522，資料分欄顯示。\n\n![Adult成功載入的資料檢視](截圖/ch01-adult-import-data-20261013.png)\n\n5. 點左下角「變數視圖」，確認age、income為數值且測量層次為尺度，sex為字串、名義。CSV中的education.num及marital.status等欄名，在語法中依同一欄位順序使用底線命名。\n\n![Adult12欄的型態與測量層次](截圖/ch01-adult-import-variables-20261013.png)\n\n6. 返回資料視圖，點資料儲存格後按Ctrl+End，可到最後一筆：列號31,947。income儲存格顯示44546.98，但上方完整值為44546.9791；小數兩位只是顯示格式，沒有把原始值四捨五入後再儲存。若跳到末列暫時出現問號，點該儲存格待畫面更新，應核對實際值後才繼續分析。\n\n![Adult最後一列與完整income值](截圖/ch01-adult-import-last-row-20261013.png)\n\n完成後依本章分析前設定確認所有觀察值、不分割、不加權，再執行下列作業。後續舊截圖資料集名稱CH01AdultCapture使用相同CSV與欄位設定；資料集名稱差異不影響結果。\n\n#### Adult Income作業步驟 1：匯入資料並計算全體描述統計\n\n1. 依前節載入 adult income1.csv，確認 income 與 age 為數值變項。\n2. 「分析」→「描述統計」→「次數分配表」。\n3. 選取 `income`、`age`；在「統計量」勾選平均數、中位數、變異數及四分位數，按「繼續」返回主視窗，再按「確定」。\n4. 以 `Q3-Q1` 計算 IQR，並分別報告薪資與年齡結果。\n\n![Adult作業選取age與income](截圖/ch01-hw01-frequencies-variables-final.png)\n\n變數框應只有 age 與 income；此圖依選取順序先放 age，因此輸出欄位順序可能與下方舊圖相反，數值應按變數名稱核對。按右側「統計資料」設定所需統計量。\n\n![Adult作業平均數中位數變異數與四分位數設定](截圖/ch01-hw01-statistics-options-final.png)\n\n勾選「四分位數」、「平均值」、「中位數」與「變異」，再按「繼續 → 確定」。IQR 沒有獨立勾選項，需以輸出的75百分位數減25百分位數。下方已更新為本次設定的實際輸出，兩欄有效 N 均為31,947，平均數、中位數、變異數及25、50、75百分位數皆完整列出。\n\n實際輸出：\n\n- 薪資平均數 47,388.5391、中位數 46,556.1762、變異數 26,668,972.96、Q1 43,262.2907、Q3 49,869.4392，因此 IQR = 6,607.1485。\n- 年齡平均數 38.57、中位數 37、變異數 186.221、Q1 28、Q3 48，因此 IQR = 20。\n\n截圖：\n- ![SPSS ch01 hw01 step 01 adult income data final](截圖/ch01-hw01-step-01-adult-income-data-final.png)\n- ![SPSS ch01 hw01 step 02 overall statistics final](截圖/ch01-hw01-step-02-overall-statistics-final.png)\n\n舊資料畫面另有衍生欄位 mean_income；本節操作只使用原始 age、income，無須建立 mean_income。新匯入資料為12欄，與舊圖多出的輔助欄位不矛盾。\n\n#### Adult Income作業步驟 2：依性別分割並比較描述統計\n\n1. 「資料」→「分割檔案」。\n2. 選擇「依群組組織輸出」，將 `sex` 放入群組變項，保留「依分組變數對檔案排序」，按「確定」。\n3. 重做前述次數分配表，輸出會依男女分層。\n4. 完成後回到「分割檔案」，選擇「分析所有觀察值，不建立群組」，按「確定」，避免影響後續分析。\n\n![SPSS ch01 hw01 step 03 data menu final](截圖/ch01-hw01-step-03-data-menu-final.png)\n\n![SPSS ch01 hw01 step 03 split file sex final](截圖/ch01-hw01-step-03-split-file-sex-final.png)\n\n設定圖底部仍顯示「依群組分析已關閉」，表示尚未按確定套用；不能只設定 sex 就直接切到輸出。\n\n實際輸出：\n\n- 女性 10,598 人：薪資平均數 46,055.7176、中位數 45,497.6282、變異數 17,929,194.94、Q1 42,804.4287、Q3 48,381.7659，IQR = 5,577.3372；年齡平均數 36.85、中位數 35、變異數 196.257、Q1 25、Q3 46，IQR = 21。\n- 男性 21,349 人：薪資平均數 48,050.1739、中位數 47,211.1243、變異數 29,688,924.16、Q1 43,552.9403、Q3 51,849.9792，IQR = 8,297.0389；年齡平均數 39.42、中位數 38、變異數 179.061、Q1 29、Q3 48，IQR = 19。\n\n下方輸出把 Female 與 Male 放在同一張表中，來自「比較群組」的分層表格格式；上方設定圖選「依群組組織輸出」時，SPSS 會將兩組分開呈現。兩種格式均依 sex 計算相同統計量，核對各組 N 與數值即可；若要與此輸出版面一致，改選「比較群組」。\n\n![SPSS ch01 hw01 step 03 by sex statistics final](截圖/ch01-hw01-step-03-by-sex-statistics-final.png)\n\n先恢復不分組：選「資料 → 分割檔案 → 分析所有觀察值，不建立群組」，按「確定」。下圖示範正確的關閉設定；底部「依群組分析已關閉」表示補拍當下本來就未分組，不是剛完成男女分析的證據。\n\n![Adult取消分割檔案設定](截圖/ch01-hw01-split-off-setting-final.png)\n\n#### Adult Income作業步驟 3：篩選低於平均薪資者並分析年齡\n\n1. 先到「資料 → 分割檔案」，選「分析所有觀察值，不建立群組」，按「確定」。使用步驟 1 全體資料取得的薪資平均數。\n2. 「資料」→「選取觀察值」→「如果條件滿足」。\n3. 輸入 `income < 47388.5391`，與下方條件截圖一致，按「繼續」返回選取觀察值主視窗；採「過濾掉未選取的觀察值」，按「確定」。這個界線取自全體薪資平均數，不可改用各性別平均數。\n4. 對篩選後個案計算 `age` 的平均數、中位數、變異數及 IQR。\n\n![SPSS ch01 hw01 step 04 select income condition final](截圖/ch01-hw01-step-04-select-income-condition-final.png)\n\n上圖是條件子視窗，尚未套用篩選；完成「繼續 → 確定」後才重新分析 age。\n\n返回主視窗後，核對條件為 `income < 47388.5391`，並選「過濾掉未選取的觀察值」。下圖底部仍顯示「不過濾觀察值」，因為這是按「確定」前的設定；按確定後才會啟用篩選。\n\n![Adult低於平均薪資篩選主視窗](截圖/ch01-hw01-filter-main-setting-final.png)\n\n按「確定」後切到「資料視圖」。下圖左側部分列號出現斜線，右下角顯示過濾已啟用；這些列仍保留在資料中，但不參與接下來的分析。此畫面確認篩選生效，樣本數仍須從重新產生的統計表核對。\n\n![Adult薪資篩選已生效](截圖/ch01-hw01-filter-applied-final.png)\n\n篩選生效後開啟「分析 → 敘述統計 → 次數分配表」，將 income 移回左側，變數框只保留 age；取消「顯示次數表格」。按「統計資料」確認四分位數、平均值、中位數、變異數已勾選，再「繼續 → 確定」。\n\n![篩選後只分析年齡的設定](截圖/ch01-hw01-filter-age-settings-final.png)\n\n實際輸出：薪資低於全體平均數者共 17,933 人；年齡平均數 36.78、中位數 34、變異數 198.545、Q1 25、Q3 46，因此 IQR = 21。\n\n![SPSS ch01 hw01 step 04 below mean age statistics final](截圖/ch01-hw01-step-04-below-mean-age-statistics-final.png)\n\n完成後選「資料 → 選取觀察值 → 所有觀察值」。下圖是按確定前的設定，因此底部目前狀態仍顯示 filter_$。\n\n![恢復所有觀察值設定](截圖/ch01-hw01-all-cases-setting-final.png)\n\n按「確定」後，資料列號的斜線與右下角過濾提示消失；filter_$ 欄位可保留，關閉篩選不需要刪除欄位。\n\n![取消篩選已生效](截圖/ch01-hw01-all-cases-applied-final.png)\n\n重新選「分析 → 敘述統計 → 次數分配表」，保留 age 與原來的四分位數、平均數、中位數、變異數設定，按「確定」。本次重新執行確認有效 N=31,947、遺漏 0，平均數 38.57、中位數 37、變異數 186.221、Q1=28、Q3=48，IQR=20；與全體資料的原始結果一致。\n\n![恢復全體後年齡統計](截圖/ch01-hw01-all-cases-restored-statistics-final.png)\n\n\n\n### 作業 2–5：CVD_All\n\n### CVD資料載入：語法與CSV\n\n第1章CVD作業先下載 `CH07_class_CVD_data_only.sps` 及 `CVD_All_spss.csv`。語法只載入全體資料與變數標籤，不會執行第7章分析。以下沿用第7章同一份CSV與SPS的已驗證真實截圖；CH07檔名與CH07Class資料集名稱不影響第1章使用。執行前請先儲存其他尚未保存的資料。完成後依第1章作業進行五數摘要與圖形分析。\n\n1. 在 SPSS 選「檔案 → 開啟 → 語法」；若已在語法編輯器，可按 Ctrl+O。選下載的 SPS，檔案類型為「語法（*.sps）」、編碼為 Unicode（UTF-8），按「開啟」。圖中的資料夾是示範環境，請使用自己的下載位置。\n\n![選取資料載入語法檔及UTF-8編碼](截圖/ch07-import-open-syntax-20261005.png)\n\n2. 找到 `/FILE=` 那一行，只把單引號內的路徑改為自己 CSV 的完整路徑，保留前後單引號。檔名必須是英文欄位版 `CVD_All_spss.csv`。其餘設定保留：UTF-8、逗號分隔、第一筆資料從第2列開始，以及16個數值變數。\n\n![匯入語法的CSV路徑與欄位設定](截圖/ch07-import-syntax-path-20261005.png)\n\n3. 選「執行 → 全部」，執行整份資料載入語法。不要只選取 `/FILE=` 單行執行。若提示找不到檔案，先修正路徑再重新執行。\n\n![執行全部資料載入語法](截圖/ch07-import-run-all-20261005.png)\n\n4. 切換到新建立的 `CH07Class` 資料編輯器。在「變數檢視」確認16欄均為數值，age、waist、sbp、dbp、glucose、hdl、triglyceride 為尺度變數；在「資料檢視」核對第一筆 age=51、waist=81、sbp=138、dbp=87，資料不應全部擠在一欄。可用左下角分頁或 Ctrl+T 切換兩種檢視。\n\n![匯入後的16個變數及測量層級](截圖/ch07-import-variable-view-20261005.png)\n\n![匯入後的資料列核對](截圖/ch07-class-01-data-final.png)\n\n\n#### CVD作業步驟 1：計算三個變數的五數摘要\n\n1. 依前節載入 `CVD_All_spss.csv` 後，先確認沒有沿用前一作業的薪資篩選或分割檔案。\n2. 選「分析 → 敘述統計 → 探索」（SPSS 25中文版稱「預檢資料」），將 `sbp`、`glucose`、`triglyceride` 放入依變數清單。先讓因子清單保持空白，產生全體結果。\n3. 在「統計資料」選敘述統計及百分位數，讀最小值、25百分位數、50百分位數、75百分位數、最大值，依序組成五數摘要。對應輸出使用整列排除遺漏值；同次分析中三個變數都有效者才納入，不能混用另一種遺漏值處理的樣本數。\n4. 再進入相同探索視窗，將 `sex` 放入「因子清單」，按確定產生各性別結果。下列part1與part2設定圖呈現的是這次分組分析；不必另外開啟Split File。全體分析時須把sex移回左側，不能把分組表當成全體表。\n\n全體分析設定：因子清單保持空白。下列兩張連續畫面分別顯示收縮壓（Systolic blood pressure）、血糖（Blood glucose）及三酸甘油酯（Triglyceride）；清單只有兩列高，第三個變數需捲動查看。畫面背景的 CH07HomeworkCapture 是本次補拍使用的 CVD 資料集名稱。\n\n![ch01-hw02-overall-factor-empty-part1-final.png](截圖/ch01-hw02-overall-factor-empty-part1-final.png)\n\n![ch01-hw02-overall-factor-empty-part2-final.png](截圖/ch01-hw02-overall-factor-empty-part2-final.png)\n\n按「統計資料」，勾選「敘述統計」與「百分位數」，按「繼續」。平均值信賴區間保留 95%；這是平均值的區間設定，與五數摘要的百分位數不同。\n\n![ch01-hw02-explore-statistics-percentiles-final.png](截圖/ch01-hw02-explore-statistics-percentiles-final.png)\n\n按「選項」，選「整批排除觀察值」（Listwise），按「繼續」返回主視窗，再按「確定」執行。本步驟會排除三個分析變數中任一值遺漏的觀察值；之後分性別分析沿用相同選項。\n\n![ch01-hw02-explore-missing-listwise-final.png](截圖/ch01-hw02-explore-missing-listwise-final.png)\n\n全體五數摘要依「最小值、Q1、中位數、Q3、最大值」讀取：\n\n- sbp：70、108.5、120.5、135、276；IQR = 26.5。\n- glucose：49、81、87、94、606；IQR = 13。\n- triglyceride：11、63、92、142、4,137；IQR = 79。\n\n先讀「百分位數」表的 25、50、75 欄，再從同次分析的「敘述統計」表取得最小值與最大值。此處兩種百分位數算法的結果相同。\n\n![全體三變數四分位數](截圖/ch01-hw02-five-number-overall-quartiles-final.png)\n\n![全體收縮壓與血糖極值](截圖/ch01-hw02-five-number-overall-extremes-final.png)\n\n![全體血糖與三酸甘油酯極值](截圖/ch01-hw02-five-number-overall-extremes-part2-final.png)\n\n分性別分析：返回探索主視窗，保留三個依變數，將 sex 放入因子清單，沿用整批排除遺漏值，再按「確定」。以下兩張圖連續顯示完整依變數清單及分組設定。\n\n![分性別探索設定第一部分](截圖/ch01-hw02-explore-dialog-part1-final.png)\n\n![分性別探索設定第二部分](截圖/ch01-hw02-explore-dialog-part2-final.png)\n\n分組的「百分位數」表同時列出「加權平均（定義 1）」與「Tukey 的樞紐」。本題一致採加權平均（定義 1）；sex=1 的 sbp 第 75 百分位數為 140.25，Tukey 的樞紐則為 140，不能將兩種方法混用。\n\n- sex=0：sbp 的 Q1／中位數／Q3 為 105／116／130，IQR=25；glucose 為 81／87／94，IQR=13；triglyceride 為 58／82／124，IQR=66。\n- sex=1：sbp 的 Q1／中位數／Q3 為 116／127／140.25，IQR=24.25；glucose 為 82／88／96，IQR=14；triglyceride 為 77／113／173，IQR=96。\n\n![分性別三變數四分位數](截圖/ch01-hw02-five-number-by-sex-part1-final.png)\n\n本次以三個依變數、sex 因子及整批排除遺漏值重新執行，sex=0 有效 37,584 人、排除 2,854 人；sex=1 有效 22,297 人、排除 1,754 人。三個變數在各組採同一批有效個案。\n\n![三變數分性別有效人數](截圖/ch01-hw02-grouped-valid-n-final.png)\n\n結合前述四分位數與下列同次分析的極值，完整五數摘要依「最小值、Q1、中位數、Q3、最大值」列出：\n\n- sex=0：sbp 為 70、105、116、130、276；glucose 為 49、81、87、94、532；triglyceride 為 15、58、82、124、3,080。\n- sex=1：sbp 為 71、116、127、140.25、254；glucose 為 51、82、88、96、606；triglyceride 為 11、77、113、173、4,137。\n\n以下為同一張敘述統計長表的連續截圖；部分續頁不重複變數名稱，請依前一張的變數名稱和 sex 組別銜接閱讀。\n\n![分組極值連續截圖 1](截圖/ch01-hw02-grouped-sbp-sex0-extremes-final.png)\n\n![分組極值連續截圖 2](截圖/ch01-hw02-grouped-sbp-sex1-extremes-final.png)\n\n![分組極值連續截圖 3](截圖/ch01-hw02-grouped-glucose-extremes-final.png)\n\n![分組極值連續截圖 4](截圖/ch01-hw02-grouped-triglyceride-sex0-extremes-final.png)\n\n![分組極值連續截圖 5](截圖/ch01-hw02-grouped-triglyceride-sex1-extremes-final.png)\n\n#### CVD作業步驟 2：繪製依性別分組的收縮壓箱形圖\n\n選「圖形 → 圖表建立器」，在圖庫「箱型圖」將簡單箱形圖拖入預覽區，Y軸放 `sbp`、X軸放 `sex`。比較兩組中位數、四分位距與離群值；箱形圖顯示的是分布，不可只從圖形宣稱平均數顯著不同。\n\n![SPSS ch01 hw03 boxplot dialog final](截圖/ch01-hw03-boxplot-dialog-final.png)\n\n核對 X 軸 sex、Y 軸 sbp 後按「確定」。建立器預覽使用範例資料，預覽中的三個箱子不是實際性別組數；須到檢視器讀取實際兩組結果。\n\n截圖來源說明：下方箱形圖與敘述統計表來自「探索」分析，並非上方圖表建立器的直接輸出。若要重現下方圖表，選「分析 → 描述統計 → 探索」，依變數只放 sbp、因子放 sex，在「圖形」選擇依因子層級呈現箱形圖，再按「繼續 → 確定」。此處不放入 glucose、triglyceride，避免沿用前一題三變數整批排除的樣本範圍。\n\n![SPSS ch01 hw03 sbp by sex boxplot final](截圖/ch01-hw03-sbp-by-sex-boxplot-final.png)\n\n下列敘述統計截圖屬於此處只分析 sbp 的分性別箱形圖分析。其有效個案範圍與前面三變數整批排除的分析不同，例如 sex=0 的 IQR 顯示 25.50；不要將這張表的極值或 IQR 搬到前面的三變數五數摘要。\n\n![單一收縮壓分性別箱形圖分析的敘述統計](截圖/ch01-hw02-five-number-by-sex-part2-final.png)\n\n輸出顯示 sex=1 組的收縮壓中位數與整個箱體位置高於 sex=0 組；兩組均有離群值，因此解釋時須同時報告中位數與 IQR，不能只比較平均數。\n\n離群點旁的數字是觀察值標記，不是血壓值；血壓應讀 Y 軸。鬚線端點不一定是全組的最小值與最大值，存在離群點時尤其不能混用。\n\n#### CVD作業步驟 3：繪製 sbp 與 dbp 直方圖\n\n1. 選「分析 → 敘述統計 → 次數分配表」，將 `sbp` 與 `dbp` 移入變數框；若框內有 `id`，先選取並移回左側。\n2. 核對變數框只含 `sbp` 與 `dbp`，按「圖表」，選「直方圖」，勾「在直方圖上顯示常態曲線」。\n3. 按「繼續」回主視窗，再按「確定」，產生兩張圖。常態曲線只是依資料平均數與標準差疊加的參考曲線，勾選它不代表資料已通過常態性檢定。\n\n下圖已選取 Systolic blood pressure（sbp）與 Diastolic blood pressure（dbp）；id 留在左側，不納入分析。背景 CH07HomeworkCapture 是補拍時使用的 CVD 資料集名稱。\n\n- ![CVD直方圖正確選取收縮壓與舒張壓](截圖/ch01-hw04-frequencies-dialog-final.png)\n- ![SPSS ch01 hw04 histogram dialog final](截圖/ch01-hw04-histogram-dialog-final.png)\n- ![SPSS ch01 hw04 sbp histogram final](截圖/ch01-hw04-sbp-histogram-final.png)\n- ![SPSS ch01 hw04 dbp histogram final](截圖/ch01-hw04-dbp-histogram-final.png)\n\n輸出顯示 `sbp` 平均數約 123.27、標準差約 20.823；`dbp` 平均數約 78.07、標準差約 11.976。sbp 圖的有效 N=63,256，dbp 圖的有效 N=63,245；各圖依各自變數的有效值繪製，不能把兩個 N 當成相同樣本數。兩者都有右尾，但收縮壓的高值範圍及分散程度較大。\n\n#### CVD作業步驟 4：繪製 sbp與dbp散佈圖\n\n選「圖形 → 圖表建立器」，在「散佈圖／點圖」將簡單散佈圖拖入預覽區，X軸放 `sbp`、Y軸放 `dbp`。用點雲方向描述關聯的正負與大致線性，但本步驟尚未進行相關係數或迴歸顯著性檢定。\n\n![SPSS ch01 hw05 scatter dialog final](截圖/ch01-hw05-scatter-dialog-final.png)\n\n核對 X 軸 sbp、Y 軸 dbp 後按「確定」。建立器預覽使用範例資料，點的方向不代表本題的真實關係；以下方輸出檢視器的實際點雲為準。\n\n![SPSS ch01 hw05 sbp dbp scatter final](截圖/ch01-hw05-sbp-dbp-scatter-final.png)\n\n散佈圖顯示收縮壓與舒張壓呈明顯正向關係，但仍存在少數遠離主要資料雲的觀察值；此圖只支持相關描述，不能單獨證明因果。\n\nCVD 直方圖主視窗已補拍並修正為 sbp/dbp，與題目變數一致。Explore 的依變項框高度只能同時顯示兩列，因此以 part1、part2 兩張連續畫面證明 `triglyceride`、`glucose`、`sbp` 三個變項與 `sex` 分組均已設定。\n\n## 儲存本章資料與分析輸出\n\n下列六張為第7章已驗證的共通介面實拍，示範相同SPSS版本的儲存入口。畫面內的CVD資料與CH07檔名屬第7章，不是本章的儲存完成證明；操作時請切回自己的第1章資料與輸出視窗。\n\n### 1. 儲存資料檔（SAV）\n\n回到要保存的資料編輯器，核對是本章肺癌、Adult Income、CVD或壓力彙總資料。選「檔案」→「另存新檔」。\n\n![資料編輯器另存新檔入口：第7章共通示範](截圖/ch07-data-save-menu-20261003.png)\n\n選擇自己的資料夾，輸入例如CH01_lung.sav，檔案類型選SPSS Statistics (*.sav)，按「儲存」。此檔名為本章建議命名，請勿照抄圖中的CH07檔名。\n\n![SAV儲存位置、名稱與檔案類型：第7章共通示範](截圖/ch07-data-save-dialog-20261003.png)\n\n返回資料編輯器，核對標題列的檔名與儲存位置。下圖僅示範第7章存檔後的標題列；本章應顯示剛才輸入的CH01檔名。其餘資料分別另存，例如CH01_adult.sav、CH01_CVD.sav及CH01_stress.sav；檔名須能區分資料，不要相互覆蓋。儲存前依分析目的確認篩選、分割及加權狀態；重開SAV後仍需再檢查。\n\n![存檔後核對標題列：第7章共通示範](截圖/ch07-data-saved-20261003.png)\n\n### 2. 儲存輸出檔（SPV）\n\n切至包含本章分析的輸出檢視器，先核對左側表格清單，選「檔案」→「另存新檔」。SAV保存資料及變數設定，SPV保存分析表格與圖形，兩者需分別儲存。\n\n![輸出檢視器另存新檔入口：第7章共通示範](截圖/ch07-output-save-menu-20261003.png)\n\n選資料夾，輸入例如CH01_results.spv，類型選SPSS Viewer (*.spv)，按「儲存」。若課堂與作業分別位於不同輸出視窗，兩個視窗需各自另存，不會因存了其中一個就自動保存另一個。\n\n![SPV儲存對話框：第7章共通示範](截圖/ch07-output-save-dialog-20261003.png)\n\n核對檢視器標題列已更新為自己的檔名；後續新增分析後再儲存。以下實拍是第7章的存檔結果，不代表已替你保存第1章檔案。\n\n![輸出存檔後核對檔名：第7章共通示範](截圖/ch07-output-saved-20261003.png)\n\n\n## 本章核對狀態\n\n已依最新版講義完成本章課堂與作業的SPSS操作核對，涵蓋資料載入、分析設定、執行結果、解讀，以及篩選、分割、加權與儲存的共通步驟。指南包含92張真實SPSS介面與輸出截圖；跨章共用介面均標明來源及適用範圍。\n\nRank分組圖使用教師補充原始Excel，保留成績代碼0、1、2；Adult匯入已確認31,947筆及12個欄位。各分析的遺漏值排除方式與有效樣本數依該節說明核對，不能混用不同分析的N。\n\n本頁提供操作與結果對照；學生仍需在自己的SPSS執行並保存SAV與SPV。\n"</script>
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const NS='http://www.w3.org/2000/svg';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString('zh-TW',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+
+/* ---------- state ---------- */
+const KEY='ass-ch1-v2';
+let S={videos:{},slidesDone:false,slideMax:1,spss:{},quiz:{},hw:{},think:''};
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+let toastTimer;
+function toast(msg){let t=$('.toast');if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true},2600);}
+
+/* ---------- stats helpers (SPSS 加權平均法 定義1) ---------- */
+function sorted(a){return a.slice().sort((x,y)=>x-y)}
+function pct(s,p){const n=s.length;if(!n)return NaN;const k=p*(n+1);const i=Math.floor(k);const f=k-i;if(i<1)return s[0];if(i>=n)return s[n-1];return s[i-1]+f*(s[i]-s[i-1]);}
+function describe(a){const s=sorted(a);const n=s.length;const mean=s.reduce((t,x)=>t+x,0)/n;const v=s.reduce((t,x)=>t+(x-mean)**2,0)/(n-1);const q1=pct(s,.25),q3=pct(s,.75);return{n,mean,median:pct(s,.5),sd:Math.sqrt(v),q1,q3,iqr:q3-q1,min:s[0],max:s[n-1],s};}
+function niceStep(range,target){const raw=range/target;const p=Math.pow(10,Math.floor(Math.log10(raw)));const m=raw/p;return (m<1.5?1:m<3?2:m<7?5:10)*p;}
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+
+/* ---------- data ---------- */
+const LUNG=JSON.parse($('#lungData').textContent); // [site,sex,age,months]
+const SITES=['DFCI','HLM','MI','MSKCC'];
+
+/* ---------- stages / router ---------- */
+const STAGES=[['learn','影片與概念'],['slides','投影片'],['spss','SPSS 操作'],['quiz','自我檢測'],['homework','章節作業']];
+const nav=$('#stageNav');
+nav.innerHTML=STAGES.map(([id,lab],i)=>`<a class="stage-tab" href="#${id}" data-tab="${id}"><span class="n">${i+1}</span>${lab}</a>`).join('');
+function route(){
+  let h=(location.hash||'').slice(1);let sub=null;
+  if(/^spss-\d+$/.test(h)){sub=h;h='spss';}
+  if(!STAGES.some(s=>s[0]===h))h='learn';
+  $$('.stage').forEach(s=>s.hidden=s.dataset.stage!==h);
+  $$('.stage-tab').forEach(t=>{if(t.dataset.tab===h)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
+  const cur=$(`.stage-tab[data-tab="${h}"]`);if(cur)cur.scrollIntoView({block:'nearest',inline:'nearest'});
+  if(sub){const d=document.getElementById(sub);if(d){d.open=true;setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'start'}),30);}}
+  else window.scrollTo({top:0});
+}
+window.addEventListener('hashchange',route);
+
+/* ---------- progress ---------- */
+const SPSS_TRACK=[]; // filled when guide renders
+function progress(){
+  const v=['ep1','ep2','ep3'].filter(k=>S.videos[k]).length;
+  const sp=SPSS_TRACK.filter(k=>S.spss[k]).length;
+  const qz=QUIZ.filter(q=>S.quiz[q.id]&&S.quiz[q.id].ok).length;
+  const hwDone=HW.filter(q=>answered(q)).length;
+  const done={learn:v===3,slides:!!S.slidesDone,spss:SPSS_TRACK.length>0&&sp===SPSS_TRACK.length,quiz:qz===QUIZ.length,homework:hwDone===HW.length};
+  const units=(v/3)+(S.slidesDone?1:0)+(SPSS_TRACK.length?sp/SPSS_TRACK.length:0)+(qz/QUIZ.length)+(hwDone/HW.length);
+  const p=Math.round(units/5*100);
+  $('#meterFill').style.width=p+'%';$('#meterPct').textContent=p+'%';
+  for(const k in done){const t=$(`.stage-tab[data-tab="${k}"]`);if(t)t.classList.toggle('done',done[k]);}
+}
+
+/* ---------- downloads ---------- */
+const dlP=(window.claude&&window.claude.use)?window.claude.use('downloads').catch(()=>null):Promise.resolve(null);
+async function download(path,name){
+  {const a=document.createElement('a');a.href=path;a.download=name;document.body.appendChild(a);a.click();a.remove();return;}
+  const dl=await dlP;
+  if(!dl){toast('這個檢視無法下載檔案，請在 claude.ai 開啟本頁。');return;}
+  try{let blob;if(/\.b64\.txt$/.test(path)){const txt=(await fetch(path).then(r=>{if(!r.ok)throw new Error(r.status);return r.text();})).trim();const bin=atob(txt);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);blob=new Blob([u]);}else blob=await fetch(path).then(r=>{if(!r.ok)throw new Error(r.status);return r.blob();});
+    const res=await dl.save({filename:name,data:blob});if(res&&res.status==='saved')toast('已儲存 '+name);}
+  catch(e){const c=e&&e.code;if(c==='declined')return;if(c==='rate_limited'){toast('上一個下載確認還沒結束，稍後再試。');return;}toast('下載沒有完成，請再試一次。');}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-dl]');if(b){e.preventDefault();download(b.dataset.dl,b.dataset.name);}});
+
+/* ---------- videos ---------- */
+const VIDEOS=[
+ {k:'ep1',id:'cGBos2P2D4Y',t:'EP1 集中趨勢：平均數、中位數、眾數',d:'從 1906 年高爾頓的猜牛重比賽說起，用壓力時間、薪資、478 位肺癌病人年齡說明分布形狀決定要看哪個代表值。',c:[['0:00','高爾頓的猜牛重比賽'],['0:29','壓力時間的平均數與眾數'],['0:52','中位數怎麼找'],['1:16','薪資：平均數 vs 中位數'],['1:40','478 位肺癌病人的三個代表值'],['1:58','總結：先看分布形狀']]},
+ {k:'ep2',id:'BEqGcWpOaK0',t:'EP2 分散程度：全距、IQR、標準差、盒鬚圖',d:'兩隊平均身高一樣卻差很多？用全距、四分位距、標準差量「散」，再以 Tukey 的盒鬚圖比較四家醫院。',c:[['0:00','平均一樣，分散不一樣'],['0:14','全距與四分位距'],['0:45','標準差怎麼算'],['1:10','1977 年 Tukey 的盒鬚圖'],['1:39','四家醫院並排比較']]},
+ {k:'ep3',id:'qC_1KbaHv-M',t:'EP3 看圖說話：直方圖、長條圖、散佈圖',d:'1786 年 Playfair 畫出第一張長條圖。用存活月數畫直方圖、四家醫院長條圖，再看收縮壓對舒張壓的散佈圖。',c:[['0:00','Playfair 的第一張長條圖'],['0:14','直方圖：存活月數'],['0:34','長條圖：醫院依性別堆疊'],['0:51','散佈圖：收縮壓對舒張壓'],['1:07','作業預告：五數總結']]}
+];
+const secs=t=>{const [m,s]=t.split(':').map(Number);return m*60+s;};
+function renderVideos(){
+  $('#videos').innerHTML=VIDEOS.map(v=>`<article class="video">
+   <a class="thumb" href="https://youtu.be/${v.id}" target="_blank" rel="noopener" data-video="${v.k}" aria-label="在 YouTube 觀看 ${esc(v.t)}">
+     <img src="thumbs/${v.k}.jpg" alt="" loading="lazy">${S.videos[v.k]?'<span class="seen">已觀看</span>':''}
+     <span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span></a>
+   <div class="body"><h3>${esc(v.t)}</h3><p>${esc(v.d)}</p>
+   <ul class="chips">${v.c.map(([t,l])=>`<li><a href="https://youtu.be/${v.id}?t=${secs(t)}" target="_blank" rel="noopener" data-video="${v.k}"><span class="t">${t}</span><span>${esc(l)}</span></a></li>`).join('')}</ul></div></article>`).join('');
+}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-video]');if(a){S.videos[a.dataset.video]=true;save();setTimeout(()=>{renderVideos();progress();},400);}});
+
+/* ---------- W0: 變數類型 ---------- */
+function renderW0(){
+  const vars=[['SITE','研究地點','DFCI、HLM…','類別'],['GENDER','性別','Female／Male','類別'],['gender_n','性別代碼','0／1','類別'],['AGE','年齡','33–87 歲','連續'],['SURVIVAL_MONTHS','存活月數','0.03–204 月','連續'],['N_STAGE','淋巴結分期','N0、N1…','類別（序位）']];
+  const w=$('#w0');
+  w.innerHTML=`<div class="widget-title"><strong>這些欄位該用什麼摘要？</strong><span class="note">課堂資料 15 個欄位中的 6 個</span></div>
+   <div class="tbl-wrap"><table><thead><tr><th>欄位</th><th>內容</th><th>例子</th><th>你的判斷</th></tr></thead><tbody>${vars.map((v,i)=>`<tr><td class="mono">${v[0]}</td><td>${v[1]}</td><td>${v[2]}</td><td><div class="seg" role="group" aria-label="${v[0]} 的摘要方式"><button data-w0="${i}" data-a="cat" aria-pressed="false">人數與比例</button><button data-w0="${i}" data-a="num" aria-pressed="false">平均／中位數</button></div></td></tr>`).join('')}</tbody></table></div>
+   <p class="readout" id="w0out">每一列選一個。選完會告訴你對不對。</p>`;
+  const ans={};
+  w.addEventListener('click',e=>{const b=e.target.closest('[data-w0]');if(!b)return;const i=+b.dataset.w0;ans[i]=b.dataset.a;
+    $$(`[data-w0="${i}"]`,w).forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+    const right=vars.map(v=>v[3].startsWith('連續')?'num':'cat');
+    const n=Object.keys(ans).length;const ok=Object.entries(ans).filter(([k,a])=>right[k]===a).length;
+    const wrong=Object.entries(ans).filter(([k,a])=>right[k]!==a).map(([k])=>vars[k][0]);
+    $('#w0out').innerHTML=n<vars.length?`已判斷 ${n} / ${vars.length}，目前答對 ${ok}。`:(ok===vars.length?'<b>全對。</b>gender_n 雖然是數字，仍是類別代碼；N_STAGE 有順序，可報人數、比例或中位數分期，但不算平均。':`答對 ${ok} / ${vars.length}。再想想：${wrong.join('、')}。提示：數字代碼不代表可以平均。`);
+  });
+}
+
+/* ---------- W1: 拖曳資料點 ---------- */
+const W1_BASE=[12,18,23,27,31,36,40,44,52,61,96];
+let w1=W1_BASE.slice();
+function renderW1(){
+  const w=$('#w1');
+  w.innerHTML=`<div class="widget-title"><strong>中心會被誰拉走？</strong><div class="seg" role="group" aria-label="範例資料"><button data-w1="reset" aria-pressed="false">重設</button><button data-w1="tail" aria-pressed="false">拉長右尾</button><button data-w1="sym" aria-pressed="false">改成對稱</button></div></div>
+   <div class="chart"><svg id="w1svg" viewBox="0 0 640 170" role="img" aria-label="11 位病人的存活月數點圖，可拖曳"></svg></div>
+   <div class="stats" id="w1stats"></div><p class="readout" id="w1msg"></p>
+   <p class="note" style="margin:0">拖曳圓點（或點一下後用左右鍵）。11 個值是示範用存活月數。</p>`;
+  w.addEventListener('click',e=>{const b=e.target.closest('[data-w1]');if(!b)return;const a=b.dataset.w1;
+    if(a==='reset')w1=W1_BASE.slice();if(a==='tail')w1=[12,18,23,27,31,36,40,44,52,140,204];if(a==='sym')w1=[20,28,34,38,42,46,50,54,58,64,72];drawW1();});
+  drawW1();
+}
+function drawW1(active){
+  const svg=$('#w1svg');svg.innerHTML='';const L=30,R=620,Y=78,max=220;const x=v=>L+(v/max)*(R-L);
+  const d=describe(w1);
+  el('rect',{x:x(d.q1),y:Y-26,width:Math.max(0,x(d.q3)-x(d.q1)),height:52,class:'iqr'},svg);
+  el('line',{x1:L,x2:R,y1:Y+30,y2:Y+30,class:'axis'},svg);
+  for(let t=0;t<=max;t+=20){el('line',{x1:x(t),x2:x(t),y1:Y+30,y2:Y+35,class:'axis'},svg);const tx=el('text',{x:x(t),y:Y+50,'text-anchor':'middle'},svg);tx.textContent=t;}
+  const tl=el('text',{x:R,y:Y+66,'text-anchor':'end'},svg);tl.textContent='存活月數';
+  el('line',{x1:x(d.median),x2:x(d.median),y1:Y-40,y2:Y+30,class:'median'},svg);
+  el('line',{x1:x(d.mean),x2:x(d.mean),y1:Y-40,y2:Y+30,class:'mean'},svg);
+  const ml=el('text',{x:x(d.median),y:Y-46,'text-anchor':x(d.median)<x(d.mean)?'end':'start',class:'medlab',dx:x(d.median)<x(d.mean)?-4:4},svg);ml.textContent='中位數 '+fmt(d.median,1);
+  const mn=el('text',{x:x(d.mean),y:Y-46,'text-anchor':x(d.median)<x(d.mean)?'start':'end',class:'meanlab',dx:x(d.median)<x(d.mean)?4:-4},svg);mn.textContent='平均數 '+fmt(d.mean,1);
+  const il=el('text',{x:(x(d.q1)+x(d.q3))/2,y:Y+24,'text-anchor':'middle'},svg);il.textContent='IQR';
+  // stack points that overlap
+  const order=w1.map((v,i)=>[v,i]).sort((a,b)=>a[0]-b[0]);const lanes=[];
+  order.forEach(([v,i])=>{let lane=0;while(lanes[lane]!==undefined&&x(v)-lanes[lane]<14)lane++;lanes[lane]=x(v);
+    const c=el('circle',{cx:x(v),cy:Y-lane*14+4,r:7,class:'dot'+(i===active?' active':''),tabindex:0,role:'slider','aria-label':'第 '+(i+1)+' 點','aria-valuenow':Math.round(v),'aria-valuemin':0,'aria-valuemax':max,'data-i':i},svg);});
+  const pt=(ev)=>{const r=svg.getBoundingClientRect();const vx=(ev.clientX-r.left)/r.width*640;return Math.max(0,Math.min(max,(vx-L)/(R-L)*max));};
+  $$('.dot',svg).forEach(c=>{const i=+c.dataset.i;
+    c.addEventListener('pointerdown',ev=>{ev.preventDefault();c.setPointerCapture(ev.pointerId);const mv=e2=>{w1[i]=Math.round(pt(e2));drawW1(i);};const up=()=>{svg.removeEventListener('pointermove',mv);svg.removeEventListener('pointerup',up);drawW1();};svg.addEventListener('pointermove',mv);svg.addEventListener('pointerup',up);});
+    c.addEventListener('keydown',ev=>{if(ev.key==='ArrowRight'||ev.key==='ArrowLeft'){ev.preventDefault();w1[i]=Math.max(0,Math.min(max,w1[i]+(ev.key==='ArrowRight'?4:-4)));drawW1(i);const n=$(`.dot[data-i="${i}"]`,svg);if(n)n.focus();}});
+  });
+  $('#w1stats').innerHTML=[['平均數',d.mean,'mean',1],['中位數',d.median,'med',1],['標準差',d.sd,'',1],['Q1',d.q1,'',1],['Q3',d.q3,'',1],['IQR',d.iqr,'',1]].map(([l,v,c,k])=>`<div class="stat ${c}"><span>${l}</span><b>${fmt(v,k)}</b></div>`).join('');
+  const gap=d.mean-d.median;
+  $('#w1msg').textContent=Math.abs(gap)<3?`平均數與中位數只差 ${fmt(Math.abs(gap),1)} 月，分布大致對稱。`:gap>0?`平均數比中位數高 ${fmt(gap,1)} 月：少數大值把平均數往右拉，屬於右偏型態。中位數仍停在 ${fmt(d.median,1)}。`:`平均數比中位數低 ${fmt(-gap,1)} 月：少數小值把平均數往左拉。`;
+}
+
+/* ---------- W2: 真實資料 ---------- */
+let w2={v:'months',view:'hist',bin:20,sel:null};
+function w2values(site){const idx=w2.v==='months'?3:2;return LUNG.map((r,i)=>({v:r[idx],i,site:r[0]})).filter(o=>o.v!==null&&(!site||o.site===site));}
+function renderW2(){
+  const w=$('#w2');
+  w.innerHTML=`<div class="widget-title"><strong>課堂資料：lung_cancer_study</strong><span class="note">N = 478，存活月數遺漏 9 筆</span></div>
+   <div class="controls"><div class="seg" role="group" aria-label="變數"><button data-w2v="months">存活月數</button><button data-w2v="age">年齡</button></div>
+     <div class="seg" role="group" aria-label="圖形"><button data-w2g="hist">直方圖</button><button data-w2g="box">依醫院比較</button></div>
+     <label id="binLab">組距 <input type="range" id="w2bin" min="5" max="40" step="5"> <span class="mono" id="w2binv"></span></label></div>
+   <div class="chart"><svg id="w2svg" viewBox="0 0 640 300" role="img"></svg></div>
+   <div id="w2below"></div><p class="readout" id="w2msg"></p>`;
+  w.addEventListener('click',e=>{const a=e.target.closest('[data-w2v]'),b=e.target.closest('[data-w2g]');
+    if(a){w2.v=a.dataset.w2v;w2.bin=w2.v==='months'?20:5;w2.sel=null;drawW2();}
+    if(b){w2.view=b.dataset.w2g;w2.sel=null;drawW2();}});
+  $('#w2bin').addEventListener('input',e=>{w2.bin=+e.target.value;drawW2();});
+  drawW2();
+}
+function drawW2(){
+  $$('[data-w2v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.w2v===w2.v?'true':'false'));
+  $$('[data-w2g]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.w2g===w2.view?'true':'false'));
+  const unit=w2.v==='months'?'月':'歲',name=w2.v==='months'?'存活月數':'年齡';
+  const bin=$('#w2bin');bin.min=w2.v==='months'?5:1;bin.max=w2.v==='months'?40:10;bin.step=w2.v==='months'?5:1;bin.value=w2.bin;$('#w2binv').textContent=w2.bin+' '+unit;
+  $('#binLab').hidden=w2.view!=='hist';
+  const svg=$('#w2svg');svg.innerHTML='';
+  const L=48,R=625,T=28,B=262;
+  if(w2.view==='hist'){
+    const vals=w2values().map(o=>o.v);const d=describe(vals);
+    const lo=0,hi=Math.ceil(d.max/w2.bin)*w2.bin;const nb=Math.max(1,Math.round((hi-lo)/w2.bin));const cnt=new Array(nb).fill(0);
+    vals.forEach(v=>{let k=Math.floor((v-lo)/w2.bin);if(k>=nb)k=nb-1;cnt[k]++;});
+    const ymax=Math.max(...cnt);const ys=niceStep(ymax,4);const ytop=Math.ceil(ymax/ys)*ys;
+    const x=v=>L+(v-lo)/(hi-lo)*(R-L),y=c=>B-(c/ytop)*(B-T);
+    for(let t=0;t<=ytop;t+=ys){el('line',{x1:L,x2:R,y1:y(t),y2:y(t),class:'grid'},svg);const tx=el('text',{x:L-8,y:y(t)+4,'text-anchor':'end'},svg);tx.textContent=t;}
+    cnt.forEach((c,k)=>{const r=el('rect',{x:x(lo+k*w2.bin)+1,y:y(c),width:Math.max(1,x(lo+(k+1)*w2.bin)-x(lo+k*w2.bin)-2),height:B-y(c),class:'bar'},svg);const tt=el('title',{},r);tt.textContent=`${lo+k*w2.bin}–${lo+(k+1)*w2.bin} ${unit}：${c} 人`;});
+    el('line',{x1:L,x2:R,y1:B,y2:B,class:'axis'},svg);
+    const xs=niceStep(hi-lo,8);for(let t=lo;t<=hi+1e-9;t+=xs){const tx=el('text',{x:x(t),y:B+18,'text-anchor':'middle'},svg);tx.textContent=Math.round(t);}
+    const xl=el('text',{x:R,y:B+34,'text-anchor':'end'},svg);xl.textContent=name+'（'+unit+'）';
+    const yl=el('text',{x:L-8,y:T-12,'text-anchor':'end'},svg);yl.textContent='人數';
+    const left=d.mean<d.median;
+    el('line',{x1:x(d.median),x2:x(d.median),y1:T,y2:B,class:'median'},svg);el('line',{x1:x(d.mean),x2:x(d.mean),y1:T,y2:B,class:'mean'},svg);
+    const a=el('text',{x:x(d.median)+(left?6:-6),y:T+8,'text-anchor':left?'start':'end',class:'medlab'},svg);a.textContent='中位數 '+fmt(d.median,1);
+    const b=el('text',{x:x(d.mean)+(left?-6:6),y:T+8,'text-anchor':left?'end':'start',class:'meanlab'},svg);b.textContent='平均數 '+fmt(d.mean,w2.v==='months'?2:2);
+    svg.setAttribute('aria-label',`${name}直方圖，有效 N ${d.n}`);
+    $('#w2below').innerHTML=`<div class="stats">${[['有效 N',d.n,0,''],['平均數',d.mean,2,'mean'],['中位數',d.median,1,'med'],['標準差',d.sd,2,''],['Q1',d.q1,1,''],['Q3',d.q3,1,''],['IQR',d.iqr,1,'']].map(([l,v,k,c])=>`<div class="stat ${c}"><span>${l}</span><b>${fmt(v,k)}</b></div>`).join('')}</div>`;
+    const gap=d.mean-d.median;
+    $('#w2msg').textContent=w2.v==='months'?`平均數比中位數高 ${fmt(gap,1)} 月，右尾延伸到 ${fmt(d.max,0)} 月：典型右偏。這組數字和 SPSS 指南第 3 步的輸出一致（平均 51.78、中位數 45.8、IQR 50.1）。改組距看看，形狀判斷會不會變。`:`年齡平均 ${fmt(d.mean,2)}、中位數 ${fmt(d.median,0)}，兩者接近，分布大致對稱。全部 478 位都有年齡，沒有遺漏。`;
+  } else {
+    const groups=SITES.map(s=>{const o=w2values(s);const d=describe(o.map(z=>z.v));const fl=d.q1-1.5*d.iqr,fh=d.q3+1.5*d.iqr;const inside=o.filter(z=>z.v>=fl&&z.v<=fh).map(z=>z.v);return{s,d,lo:Math.min(...inside),hi:Math.max(...inside),out:o.filter(z=>z.v<fl||z.v>fh).map(z=>({...z,ext:z.v>d.q3+3*d.iqr||z.v<d.q1-3*d.iqr}))};});
+    const all=LUNG.map(r=>w2.v==='months'?r[3]:r[2]).filter(v=>v!==null);const vmax=Math.max(...all);const ys=niceStep(vmax,5);const ytop=Math.ceil(vmax/ys)*ys;
+    const y=v=>B-(v/ytop)*(B-T);const cw=(R-L)/groups.length;
+    for(let t=0;t<=ytop;t+=ys){el('line',{x1:L,x2:R,y1:y(t),y2:y(t),class:'grid'},svg);const tx=el('text',{x:L-8,y:y(t)+4,'text-anchor':'end'},svg);tx.textContent=t;}
+    const yl=el('text',{x:L-8,y:T-12,'text-anchor':'end'},svg);yl.textContent=name+'（'+unit+'）';
+    groups.forEach((g,k)=>{const cx=L+cw*(k+.5),bw=Math.min(70,cw*.45);
+      el('line',{x1:cx,x2:cx,y1:y(g.hi),y2:y(g.d.q3),class:'whisk'},svg);el('line',{x1:cx,x2:cx,y1:y(g.d.q1),y2:y(g.lo),class:'whisk'},svg);
+      el('line',{x1:cx-bw/4,x2:cx+bw/4,y1:y(g.hi),y2:y(g.hi),class:'whisk'},svg);el('line',{x1:cx-bw/4,x2:cx+bw/4,y1:y(g.lo),y2:y(g.lo),class:'whisk'},svg);
+      el('rect',{x:cx-bw/2,y:y(g.d.q3),width:bw,height:Math.max(1,y(g.d.q1)-y(g.d.q3)),class:'box'},svg);
+      el('line',{x1:cx-bw/2,x2:cx+bw/2,y1:y(g.d.median),y2:y(g.d.median),class:'median'},svg);
+      g.out.forEach(o=>{const c=el('circle',{cx:cx,cy:y(o.v),r:4.5,class:'out'+(o.ext?' ext':'')+(w2.sel===o.i?' sel':''),tabindex:0,'data-o':o.i,'aria-label':`觀察值 ${o.i+1}，${o.v} ${unit}`},svg);const tt=el('title',{},c);tt.textContent=`觀察值 ${o.i+1}：${o.v} ${unit}`;});
+      if(w2.sel!==null){const o=g.out.find(z=>z.i===w2.sel);if(o){const lab=el('text',{x:cx+9,y:y(o.v)+4,'text-anchor':'start',class:'medlab'},svg);lab.textContent=String(o.i+1);}}
+      const gt=el('text',{x:cx,y:B+20,'text-anchor':'middle',class:'grp'},svg);gt.textContent=g.s;
+      const gn=el('text',{x:cx,y:B+35,'text-anchor':'middle'},svg);gn.textContent='n='+g.d.n;});
+    el('line',{x1:L,x2:R,y1:B,y2:B,class:'axis'},svg);
+    svg.setAttribute('aria-label',`${name}依研究地點的箱形圖`);
+    $$('.out',svg).forEach(c=>{const pick=()=>{w2.sel=+c.dataset.o;drawW2();};c.addEventListener('click',pick);c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});});
+    $('#w2below').innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>地點</th><th class="n">有效 N</th><th class="n">中位數</th><th class="n">Q1</th><th class="n">Q3</th><th class="n">IQR</th><th class="n">離群</th></tr></thead><tbody>${groups.map(g=>`<tr><td>${g.s}</td><td class="n">${g.d.n}</td><td class="n">${fmt(g.d.median,1)}</td><td class="n">${fmt(g.d.q1,1)}</td><td class="n">${fmt(g.d.q3,1)}</td><td class="n">${fmt(g.d.iqr,1)}</td><td class="n">${g.out.length}</td></tr>`).join('')}</tbody></table></div>`;
+    let msg;
+    if(w2.sel!==null){const r=LUNG[w2.sel];const v=w2.v==='months'?r[3]:r[2];msg=`你點的點旁邊標著 ${w2.sel+1}。這是「觀察值編號」（資料第 ${w2.sel+1} 列，${r[0]}，${r[1]==='Male'?'男':'女'}），不是${name}。它的${name}是 ${v} ${unit}，要看 Y 軸。離群點是核對線索：先確認資料沒輸入錯，再決定怎麼報告，不是直接刪除。`;}
+    else if(w2.v==='months'){const hl=groups.find(g=>g.s==='HLM'),ms=groups.find(g=>g.s==='MSKCC');msg=`HLM 的中位數最低（${fmt(hl.d.median,1)} 月）；MSKCC 箱體最短（IQR ${fmt(ms.d.iqr,1)}），中間 50% 最集中。空心圓是離群值，實心點是極端值（超過 3 倍 IQR）。點一個離群點試試。`;}
+    else msg='四家醫院的年齡中位數差距不大；比較時同樣要看箱體位置、長度和離群點，不只看中位數。';
+    $('#w2msg').textContent=msg;
+  }
+}
+
+/* ---------- slides ---------- */
+const NSL=38;let slide=1;
+function renderSlides(){
+  $('#slideStrip').innerHTML=Array.from({length:NSL},(_,i)=>`<button data-s="${i+1}" aria-label="第 ${i+1} 張"><img src="slides/s-${String(i+1).padStart(2,'0')}.jpg" alt="" loading="lazy"></button>`).join('');
+  $('#slideStrip').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)goSlide(+b.dataset.s);});
+  $('#slidePrev').addEventListener('click',()=>goSlide(slide-1));$('#slideNext').addEventListener('click',()=>goSlide(slide+1));
+  document.addEventListener('keydown',e=>{if($('[data-stage="slides"]').hidden)return;if(e.target.closest('input,textarea'))return;if(e.key==='ArrowRight')goSlide(slide+1);if(e.key==='ArrowLeft')goSlide(slide-1);});
+  goSlide(1,true);
+}
+function goSlide(n,silent){
+  slide=Math.max(1,Math.min(NSL,n));const pad=String(slide).padStart(2,'0');
+  $('#slideImg').src='slides/s-'+pad+'.jpg';$('#slideImg').alt='第一章投影片第 '+slide+' 張';
+  $('#slideCount').textContent=slide+' / '+NSL;$('#slidePrev').disabled=slide===1;$('#slideNext').disabled=slide===NSL;
+  $$('#slideStrip button').forEach(b=>b.setAttribute('aria-current',+b.dataset.s===slide?'true':'false'));
+  const cur=$(`#slideStrip [data-s="${slide}"]`);if(cur&&!silent)cur.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  if(slide>(S.slideMax||1))S.slideMax=slide;
+  if(slide===NSL&&!S.slidesDone){S.slidesDone=true;toast('投影片看完了，步驟 2 完成。');}
+  save();progress();
+}
+
+/* ---------- SPSS files ---------- */
+const FILES=[
+ ['CSV','課堂：肺癌研究資料','lung_cancer_study.csv','data/lung_cancer_study.csv'],
+ ['CSV','作業：Adult Income','adult income1.csv','data/adult_income1.csv'],
+ ['CSV','CVD：與截圖相同欄位名稱的資料','CVD_All_spss.csv','data/CVD_All_spss.csv'],
+ ['SAV','課堂：截圖同版 SPSS 資料（含 gender_n）','CH01_capture_ready.sav',null],
+ ['SPS','課堂：載入全體 CVD 與變數標籤（先改 CSV 路徑）','CH07_class_CVD_data_only.sps',null],
+ ['SAV','課堂：講義第 12 張學生壓力時間五組彙總','CH01_stress_duration.sav',null],
+ ['XLS','課堂：教師補充 Rank 成績分組原始資料','sport-injury-Lin-Robbin.xls',null],
+ ['SPS','作業：Adult 資料載入語法（先改 CSV 路徑）','CH01_adult_import_final.sps',null]
+];
+function renderFiles(){
+  $('#files').innerHTML=FILES.map(([e,l,f,p])=>`<div class="file"><span class="ext">${e}</span><div><strong>${esc(l)}</strong><small>${esc(f)}</small>${p?`<button data-dl="${esc(p)}" data-name="${esc(f)}">下載 CSV</button>`:'<span class="inzip">在 ZIP 內</span>'}</div></div>`).join('');
+}
+
+/* ---------- SPSS guide (markdown) ---------- */
+function inline(t){return esc(t).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');}
+const STEP_REF=[['步驟 2：設定次數分配表',[22],'講義寫的路徑是「分析方法 → 摘要統計 → 次數分配表」，SPSS 25 中文版顯示為「分析 → 描述統計 → 次數分配表」。'],
+ ['步驟 3：解讀描述統計表',[23],'講義第 23 張的輸出表與下方 SPSS 實際輸出逐格對照；講義的總和顯示為整數 24,286。'],
+ ['步驟 4：以 SITE',[24,25],'講義用「圖表建立器」做盒鬚圖，第 25 張是講義的輸出。'],
+ ['步驟 5：繪製存活時間直方圖',[28,29],'講義第 28 張的步驟對應下方設定，第 29 張是講義的直方圖輸出。'],
+ ['步驟 6：繪製 SITE',[30,31],'講義第 30 張的四個步驟對應下方圖表建立器設定，第 31 張是講義的堆疊長條圖。'],
+ ['步驟 7：依 Rank',[33,34],'講義第 33 張的步驟用圖表建立器；下方實拍改用舊式對話框完成三組分色，第 34 張是講義輸出。']];
+const SEC_REF=[['課堂補充',[12],'講義第 12 張：學生每天感受壓力時間的長條圖與平均時間算式。'],['作業操作',[35,36],'講義第 35–36 張的作業題目，下面依題目順序操作。']];
+function slideRef(nums,note){return `<div class="slideref"><span class="label">講義對照 · 第 ${nums.join('、')} 張</span><p>${esc(note)}</p><div class="pics">${nums.map(n=>`<figure><img src="slides/s-${String(n).padStart(2,'0')}.jpg" alt="講義第 ${n} 張" loading="lazy" data-zoom><figcaption><span>講義第 ${n} 張</span><a href="#slides" data-goslide="${n}">在投影片檢視器開啟</a></figcaption></figure>`).join('')}</div></div>`;}
+function blocks(text){
+  const lines=text.split('\n');let h='';let list=null;
+  const close=()=>{if(list){h+=`</${list}>`;list=null;}};
+  for(let i=0;i<lines.length;i++){
+    const raw=lines[i];const line=raw.trim();
+    if(!line){close();continue;}
+    if(line.startsWith('```')){close();const code=[];while(++i<lines.length&&!lines[i].trim().startsWith('```'))code.push(lines[i]);h+=`<div class="code"><button type="button" data-copy>複製</button><pre>${esc(code.join('\n'))}</pre></div>`;continue;}
+    const shot=/!\[([^\]]*)\]\(截圖\/([^)]+)\)/.exec(line);
+    if(shot){close();const file=shot[2];const src='spss/'+file;const ch=Number((/^ch(\d+)/.exec(file)||[])[1]);
+      const rest=line.replace(shot[0],'').replace(/^[-*]\s*/,'').trim();
+      const alt=/\.png$/i.test(shot[1])||/^SPSS ch/i.test(shot[1])?(rest.replace(/^（|）$/g,'')||'SPSS 操作畫面'):shot[1];
+      h+=`<figure>${ch&&ch!==1?`<p class="borrowed">共用介面示意：本圖來自第 ${ch} 章。請依本節文字選擇資料與變數，勿照填背景欄位。</p>`:''}<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" data-zoom><figcaption>${inline(alt)}${rest&&alt!==rest.replace(/^（|）$/g,'')?'　'+inline(rest):''}</figcaption></figure>`;continue;}
+    const hd=/^(#{1,6}) (.*)/.exec(line);
+    if(hd){close();const lv=hd[1].length;h+=lv<=3?`<h3>${inline(hd[2])}</h3>`:`<h4>${inline(hd[2])}</h4>`;const m=STEP_REF.find(r=>hd[2].startsWith(r[0]));if(m)h+=slideRef(m[1],m[2]);continue;}
+    if(line.startsWith('|')){close();const rows=[line];while(i+1<lines.length&&lines[i+1].trim().startsWith('|'))rows.push(lines[++i].trim());const cells=rows.filter(r=>!/^\|[\s:|-]+\|$/.test(r)).map(r=>r.replace(/^\||\|$/g,'').split('|'));h+=`<div class="tbl-wrap"><table>${cells.map((r,j)=>`<tr>${r.map(c=>j===0?`<th>${inline(c.trim())}</th>`:`<td>${inline(c.trim())}</td>`).join('')}</tr>`).join('')}</table></div>`;continue;}
+    const ol=/^\d+\.\s+(.*)/.exec(line),ul=/^[-*]\s+(.*)/.exec(line);
+    if(ol){if(list!=='ol'){close();h+='<ol>';list='ol';}h+=`<li>${inline(ol[1])}</li>`;continue;}
+    if(ul){if(list!=='ul'){close();h+='<ul>';list='ul';}h+=`<li>${inline(ul[1])}</li>`;continue;}
+    close();h+=`<p>${inline(line)}</p>`;
+  }
+  close();return h;
+}
+function renderGuide(){
+  const md=JSON.parse($('#guideData').textContent);
+  const parts=md.split(/^## /m);const intro=parts.shift().replace(/^# .*\n/,'').trim();
+  const secsArr=parts.map(p=>{const nl=p.indexOf('\n');return{title:p.slice(0,nl).trim(),body:p.slice(nl+1)};});
+  const ck='<svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>';
+  const chev='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
+  let html=`<p class="prose" style="margin:0 0 14px">${inline(intro)}</p>`;
+  secsArr.forEach((s,k)=>{const id='spss-'+(k+1);const track=!/核對狀態/.test(s.title);if(track)SPSS_TRACK.push(id);
+    const nimg=(s.body.match(/!\[/g)||[]).length;
+    html+=`<details class="sec" id="${id}"${k===0?' open':''}><summary><span class="mono" style="color:var(--muted);font-size:13px">${String(k+1).padStart(2,'0')}</span><span>${inline(s.title)}</span><span class="badge" data-badge="${id}"></span>${chev}</summary><div class="sec-body">${(()=>{const r=SEC_REF.find(x=>s.title.startsWith(x[0]));return r?slideRef(r[1],r[2]):'';})()}${blocks(s.body)}${track?`<div class="sec-done"><button class="btn" data-done="${id}"></button></div>`:''}</div></details>`;});
+  $('#guide').innerHTML=html;
+  $('#toc').innerHTML='<span class="label" style="padding:0 8px 6px">本頁章節</span>'+secsArr.map((s,k)=>`<a href="#spss-${k+1}" data-toc="spss-${k+1}">${ck}<span>${inline(s.title)}</span></a>`).join('');
+  refreshSpss();
+}
+function refreshSpss(){
+  SPSS_TRACK.forEach(id=>{const d=!!S.spss[id];const b=$(`[data-done="${id}"]`);if(b)b.innerHTML=d?'已完成 · 取消標記':'完成這一節';if(b)b.classList.toggle('primary',!d);
+    const bd=$(`[data-badge="${id}"]`);if(bd)bd.textContent=d?'已完成':'';const t=$(`[data-toc="${id}"]`);if(t)t.classList.toggle('done',d);});
+  $$('#toc a .ck').forEach(c=>c.style.visibility=c.parentElement.classList.contains('done')?'visible':'hidden');
+}
+document.addEventListener('click',e=>{
+  const d=e.target.closest('[data-done]');if(d){const id=d.dataset.done;S.spss[id]=!S.spss[id];save();refreshSpss();progress();if(S.spss[id]){const sec=document.getElementById(id);if(sec)sec.open=false;}return;}
+  const c=e.target.closest('[data-copy]');if(c){const txt=c.nextElementSibling.textContent;const ok=()=>{c.textContent='已複製';setTimeout(()=>c.textContent='複製',1500);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok).catch(()=>selectText(c.nextElementSibling));}else selectText(c.nextElementSibling);return;}
+  const z=e.target.closest('[data-zoom]');if(z){openLight(z.src,z.alt);return;}
+  const gs=e.target.closest('[data-goslide]');if(gs){const n=+gs.dataset.goslide;setTimeout(()=>goSlide(n),60);return;}
+  const t=e.target.closest('[data-toc]');if(t){const sec=document.getElementById(t.dataset.toc);if(sec)sec.open=true;}
+});
+function selectText(n){const r=document.createRange();r.selectNodeContents(n);const s=getSelection();s.removeAllRanges();s.addRange(r);toast('已選取，請按 Ctrl+C 複製');}
+function openLight(src,alt){const o=document.createElement('div');o.className='lightbox';o.setAttribute('role','dialog');o.setAttribute('aria-label','放大檢視');
+  o.innerHTML=`<button type="button">關閉</button><div><img src="${esc(src)}" alt="${esc(alt)}"><p>${esc(alt)}</p></div>`;
+  const close=()=>{o.remove();document.removeEventListener('keydown',k);};const k=e=>{if(e.key==='Escape')close();};
+  o.addEventListener('click',e=>{if(e.target===o||e.target.tagName==='BUTTON')close();});document.addEventListener('keydown',k);document.body.appendChild(o);o.querySelector('button').focus();}
+
+/* ---------- quiz ---------- */
+const QUIZ=[
+ {id:'q1',p:'存活月數有效 N=469，平均數 51.78、中位數 45.8。這個分布最可能是？',o:['右偏（右尾較長）','左偏（左尾較長）','完全對稱','無法判斷，平均數一定小於中位數'],a:0,e:'平均數高於中位數，表示少數很長的存活時間把平均往右拉，初步判斷右偏；仍要用直方圖確認（概念 3 的工具可以看）。'},
+ {id:'q2',p:'同一份資料，年齡的有效 N 是 478，存活月數只有 469。原因是？',o:['存活月數有 9 筆遺漏值','SPSS 自動刪除了離群值','年齡有 9 筆重複','兩個變數取樣不同'],a:0,e:'讀表先看有效 N。兩欄的統計量使用不同人數，因此平均數的分母也不同，不能套用同一個 N。'},
+ {id:'q3',p:'年齡的 Q1=58、Q3=72。IQR 是多少歲？',num:14,tol:0.01,e:'IQR＝Q3−Q1＝72−58＝14 歲，描述中間 50% 的跨度。IQR 不能從平均數或標準差推算。'},
+ {id:'q4',p:'年齡的變異數 101.798、標準差 10.090。兩者的關係是？',o:['變異數是標準差的平方，單位也跟著平方','標準差是變異數的兩倍','兩者是同一個數，只是小數位不同','變異數＝標準差 ÷ 平均數'],a:0,e:'10.090²≈101.8。變異數單位是「歲²」，所以描述分散時通常報標準差，單位和原資料相同。'},
+ {id:'q5',p:'SPSS 箱形圖上，離群點旁標著「427」。這個數字代表？',o:['觀察值編號（資料第 427 列）','存活 427 個月','第 427 百分位數','離群的程度分數'],a:0,e:'數字是觀察值標記，讀值要看 Y 軸。概念 3 的工具裡點一下離群點就能看到。'},
+ {id:'q6',p:'箱形圖出現離群標記時，比較恰當的處理是？',o:['先核對資料來源與輸入，連同樣本數一起報告','直接刪除，讓結果比較好看','把它改成平均數','改用圓餅圖就不會有離群值'],a:0,e:'離群標記是核對線索，不是刪除指令。確認不是輸入錯誤後，通常保留並在解讀時說明。'},
+ {id:'q7',p:'學生壓力時間資料只有 5 列（每列是一個時間區間的人數 count）。要畫出講義的長條圖，Y 軸應該怎麼設？',o:['把 count 放 Y 軸，統計量選「平均值」','Y 軸用「計數」','先用 count 加權，再把 count 放 Y 軸取平均值','把 time_group 放 Y 軸'],a:0,e:'每組只有一列，count 的平均值就是該組人數。用「計數」會數資料列（每組都是 1）；再加權會重複計數。'},
+ {id:'q8',p:'四家醫院的存活月數，哪一家的中位數最低？（可用概念 3 的「依醫院比較」查）',o:['HLM','DFCI','MI','MSKCC'],a:0,e:'HLM 中位數約 38 個月，MI 約 53 個月；MSKCC 的箱體最短，分散最小。這也是 EP2 影片最後一段的內容。'}
+];
+function renderQuiz(){
+  $('#quiz').innerHTML=QUIZ.map((q,k)=>{const st=S.quiz[q.id]||{};
+    const body=q.num!==undefined?`<div class="numrow"><input id="in-${q.id}" inputmode="decimal" aria-label="${esc(q.p)}" value="${st.v!==undefined?esc(st.v):''}"><button class="btn" data-qnum="${q.id}">檢查</button><span class="note">單位：歲</span></div>`:
+      `<div class="opts">${q.o.map((o,i)=>`<label class="opt${st.v===i?(i===q.a?' right':' wrong'):''}"><input type="radio" name="${q.id}" value="${i}"${st.v===i?' checked':''}><span>${esc(o)}</span></label>`).join('')}</div>`;
+    return `<fieldset class="q" id="card-${q.id}"><legend><span class="qn">${String(k+1).padStart(2,'0')}</span><span>${esc(q.p)}</span></legend>${body}<div data-fb="${q.id}">${fb(q,st)}</div></fieldset>`;}).join('');
+  updQuiz();
+}
+function fb(q,st){if(st.v===undefined||st.v==='')return '';return st.ok?`<p class="fb ok"><b>答對了</b>${esc(q.e)}</p>`:`<p class="fb no"><b>再想想</b>${q.num!==undefined?'提示：用 Q3 減 Q1。':'這個選項不對，換一個試試。'}</p>`;}
+function setQ(q,v,ok){S.quiz[q.id]={v,ok};save();const card=$('#card-'+q.id);$(`[data-fb="${q.id}"]`,card).innerHTML=fb(q,S.quiz[q.id]);
+  $$('.opt',card).forEach((l,i)=>{l.classList.remove('right','wrong');if(i===v)l.classList.add(ok?'right':'wrong');});updQuiz();progress();}
+function updQuiz(){const n=QUIZ.filter(q=>S.quiz[q.id]&&S.quiz[q.id].ok).length;$('#quizScore').textContent=n;$('#quizStatus').textContent=n===QUIZ.length?'全部答對，步驟 4 完成。':`還有 ${QUIZ.length-n} 題沒答對。全部答對即完成本步驟。`;}
+document.addEventListener('change',e=>{const r=e.target;if(r.type==='radio'){const q=QUIZ.find(x=>x.id===r.name);if(q){const v=+r.value;setQ(q,v,v===q.a);}}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-qnum]');if(!b)return;const q=QUIZ.find(x=>x.id===b.dataset.qnum);const raw=$('#in-'+q.id).value.trim();const v=Number(raw);
+  if(raw===''||!Number.isFinite(v)){toast('請輸入數字');return;}setQ(q,raw,Math.abs(v-q.num)<=q.tol);});
+
+/* ---------- homework ---------- */
+const SBP_T=`<div class="tbl-wrap"><table><thead><tr><th>變數（整批排除）</th><th class="n">最小值</th><th class="n">Q1</th><th class="n">中位數</th><th class="n">Q3</th><th class="n">最大值</th></tr></thead><tbody>
+<tr><td>全體 sbp</td><td class="n">70</td><td class="n">108.5</td><td class="n">120.5</td><td class="n">135</td><td class="n">276</td></tr>
+<tr><td>全體 glucose</td><td class="n">49</td><td class="n">81</td><td class="n">87</td><td class="n">94</td><td class="n">606</td></tr>
+<tr><td>全體 triglyceride</td><td class="n">11</td><td class="n">63</td><td class="n">92</td><td class="n">142</td><td class="n">4,137</td></tr>
+<tr><td>sex=0 sbp</td><td class="n">70</td><td class="n">105</td><td class="n">116</td><td class="n">130</td><td class="n">276</td></tr>
+<tr><td>sex=0 glucose</td><td class="n">49</td><td class="n">81</td><td class="n">87</td><td class="n">94</td><td class="n">532</td></tr>
+<tr><td>sex=0 triglyceride</td><td class="n">15</td><td class="n">58</td><td class="n">82</td><td class="n">124</td><td class="n">3,080</td></tr>
+<tr><td>sex=1 sbp</td><td class="n">71</td><td class="n">116</td><td class="n">127</td><td class="n">140.25</td><td class="n">254</td></tr>
+<tr><td>sex=1 glucose</td><td class="n">51</td><td class="n">82</td><td class="n">88</td><td class="n">96</td><td class="n">606</td></tr>
+<tr><td>sex=1 triglyceride</td><td class="n">11</td><td class="n">77</td><td class="n">113</td><td class="n">173</td><td class="n">4,137</td></tr></tbody></table></div>`;
+const HW=[
+ {id:'h1',type:'multi',p:'Adult Income 資料中，薪資與年紀各需計算哪些統計量？（可複選）',o:['平均數','中位數','變異數','IQR','勝算比'],a:[0,1,2,3],e:'平均數、中位數、變異數與 IQR。勝算比用於兩個類別變數（例如 2×2 表），不是連續變數的描述統計。SPSS 輸出：薪資平均 47,388.54、中位數 46,556.18、IQR 6,607.15；年齡平均 38.57、中位數 37、IQR 20。'},
+ {id:'h2',type:'long',p:'請分別呈現男性與女性的薪資、年紀描述統計結果，並解釋主要差異。',ref:`<h4>SPSS 實際輸出（依 sex 分割）</h4><div class="tbl-wrap"><table><thead><tr><th></th><th class="n">女性 n=10,598</th><th class="n">男性 n=21,349</th></tr></thead><tbody>
+<tr><td>薪資平均數</td><td class="n">46,055.72</td><td class="n">48,050.17</td></tr><tr><td>薪資中位數</td><td class="n">45,497.63</td><td class="n">47,211.12</td></tr><tr><td>薪資變異數</td><td class="n">17,929,194.94</td><td class="n">29,688,924.16</td></tr><tr><td>薪資 IQR</td><td class="n">5,577.34</td><td class="n">8,297.04</td></tr>
+<tr><td>年齡平均數</td><td class="n">36.85</td><td class="n">39.42</td></tr><tr><td>年齡中位數</td><td class="n">35</td><td class="n">38</td></tr><tr><td>年齡變異數</td><td class="n">196.257</td><td class="n">179.061</td></tr><tr><td>年齡 IQR</td><td class="n">21</td><td class="n">19</td></tr></tbody></table></div><p style="margin-top:8px">解讀方向：男性薪資的中心位置較高，分散（變異數、IQR）也較大；女性平均較年輕，年齡分散略大。記得報告各組人數，並在分析後把分割檔案關閉。</p>`},
+ {id:'h3',type:'num',p:'請填入「薪資低於整體平均數」族群的年紀平均數（小數兩位）。',num:36.78,tol:0.005,hint:'篩選條件：income < 47388.5391（全體平均，不是各性別平均）',e:'36.78 歲。符合條件者 17,933 人；年齡中位數 34、變異數 198.545、IQR 21。做完記得「選取觀察值 → 所有觀察值」恢復全體。'},
+ {id:'h4',type:'long',p:'使用 CVD_All，列出收縮壓、空腹血糖、三酸甘油酯的五數摘要，並分性別呈現。',ref:`<h4>SPSS 實際輸出（探索，整批排除遺漏值）</h4>${SBP_T}<p style="margin-top:8px">分組百分位數採「加權平均（定義 1）」；sex=1 的 sbp Q3 是 140.25，Tukey 樞紐則為 140，兩種方法不要混用。sex=0 有效 37,584 人、sex=1 有效 22,297 人。</p>`},
+ {id:'h5',type:'single',p:'探討男女資料分散程度差異，教材要求使用哪一種圖？',o:['盒鬚圖','圓餅圖','Kaplan–Meier curve','森林圖'],a:0,e:'盒鬚圖（箱形圖）可並排比較兩組的中位數、IQR、鬚與離群值。SPSS 輸出顯示 sex=1 的收縮壓中位數與箱體位置都高於 sex=0。'},
+ {id:'h6',type:'long',p:'比較收縮壓與舒張壓直方圖，並以 2D 散佈圖探討兩變數相關性。',ref:`<h4>SPSS 實際輸出</h4><p>sbp：平均約 123.27、標準差約 20.823，有效 N=63,256。dbp：平均約 78.07、標準差約 11.976，有效 N=63,245。兩者都有右尾，收縮壓的高值範圍與分散較大；兩張圖的 N 不同，不能當成同一批樣本。</p><p>散佈圖（X=sbp、Y=dbp）呈明顯正向關係，仍有少數遠離主要點雲的觀察值。此圖只支持相關描述，尚未做相關係數檢定，也不能證明因果。</p>`}
+];
+function answered(q){const v=S.hw[q.id];if(q.type==='multi')return Array.isArray(v)&&v.length>0;if(q.type==='single')return v!==undefined&&v!==null;return typeof v==='string'&&v.trim().length>0;}
+function renderHW(){
+  $('#hw').innerHTML=HW.map((q,k)=>{const v=S.hw[q.id];let body='';
+    if(q.type==='multi')body=`<div class="opts">${q.o.map((o,i)=>`<label class="opt"><input type="checkbox" data-hwm="${q.id}" value="${i}"${Array.isArray(v)&&v.includes(i)?' checked':''}><span>${esc(o)}</span></label>`).join('')}</div><div><button class="btn" data-hwcheck="${q.id}">核對答案</button></div>`;
+    if(q.type==='single')body=`<div class="opts">${q.o.map((o,i)=>`<label class="opt"><input type="radio" name="hw-${q.id}" data-hws="${q.id}" value="${i}"${v===i?' checked':''}><span>${esc(o)}</span></label>`).join('')}</div>`;
+    if(q.type==='num')body=`<div class="numrow"><input id="hw-${q.id}" inputmode="decimal" aria-label="${esc(q.p)}" value="${typeof v==='string'?esc(v):''}"><button class="btn" data-hwcheck="${q.id}">核對答案</button></div><span class="note">${esc(q.hint)}</span>`;
+    if(q.type==='long')body=`<textarea data-hwt="${q.id}" aria-label="${esc(q.p)}" placeholder="寫下分析步驟、結果與解釋…">${typeof v==='string'?esc(v):''}</textarea><div><button class="btn" data-hwref="${q.id}" aria-expanded="false">對照 SPSS 實際輸出</button></div><div class="ref" data-ref="${q.id}" hidden>${q.ref}</div>`;
+    return `<fieldset class="q" id="hwcard-${q.id}"><legend><span class="qn">${String(k+1).padStart(2,'0')}</span><span>${esc(q.p)}</span></legend>${body}<div data-hwfb="${q.id}"></div></fieldset>`;}).join('');
+  HW.forEach(q=>{if((q.type==='single'&&S.hw[q.id]!==undefined)||(S.hwChecked&&S.hwChecked[q.id]))checkHW(q,true);});
+  updHW();
+}
+function checkHW(q,quiet){const box=$(`[data-hwfb="${q.id}"]`);const card=$('#hwcard-'+q.id);let ok=false;
+  if(q.type==='multi'){const v=(S.hw[q.id]||[]).slice().sort();ok=v.length===q.a.length&&v.every((x,i)=>x===q.a[i]);
+    $$('.opt',card).forEach((l,i)=>{l.classList.remove('right','wrong');const sel=v.includes(i),should=q.a.includes(i);if(sel&&should)l.classList.add('right');else if(sel!==should)l.classList.add('wrong');});}
+  if(q.type==='single'){const v=S.hw[q.id];ok=v===q.a;$$('.opt',card).forEach((l,i)=>{l.classList.remove('right','wrong');if(i===v)l.classList.add(ok?'right':'wrong');});}
+  if(q.type==='num'){const v=Number(S.hw[q.id]);ok=Number.isFinite(v)&&Math.abs(v-q.num)<=q.tol;}
+  box.innerHTML=ok?`<p class="fb ok"><b>正確</b>${esc(q.e)}</p>`:`<p class="fb no"><b>還不對</b>${q.type==='multi'?'標紅的選項要再想想：有該選沒選的，也有不該選的。':q.type==='num'?'檢查篩選條件是否用全體平均數、篩選是否已生效，以及小數位數。':'再想想哪種圖能並排比較分散程度。'}</p>`;
+  if(!quiet){S.hwChecked=S.hwChecked||{};S.hwChecked[q.id]=true;save();}
+}
+function updHW(){const n=HW.filter(answered).length;$('#hwStatus').textContent=n===HW.length?'6 / 6 題已作答，步驟 5 完成。':`${n} / ${HW.length} 題已作答`;progress();}
+let hwTimer;
+document.addEventListener('input',e=>{const t=e.target;
+  if(t.dataset.hwt){S.hw[t.dataset.hwt]=t.value;clearTimeout(hwTimer);hwTimer=setTimeout(()=>{save();updHW();},400);}
+  if(t.id&&t.id.startsWith('hw-')&&t.tagName==='INPUT'&&t.type!=='radio'){S.hw[t.id.slice(3)]=t.value;save();updHW();}
+  if(t.id==='thinkText'){S.think=t.value;save();}
+});
+document.addEventListener('change',e=>{const t=e.target;
+  if(t.dataset.hwm){const id=t.dataset.hwm;const v=$$(`[data-hwm="${id}"]`).filter(x=>x.checked).map(x=>+x.value);S.hw[id]=v;save();updHW();}
+  if(t.dataset.hws){const q=HW.find(x=>x.id===t.dataset.hws);S.hw[q.id]=+t.value;save();checkHW(q);updHW();}
+});
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-hwcheck]');if(c){const q=HW.find(x=>x.id===c.dataset.hwcheck);if(!answered(q)){toast('先作答再核對');return;}checkHW(q);return;}
+  const r=e.target.closest('[data-hwref]');if(r){const box=$(`[data-ref="${r.dataset.hwref}"]`);box.hidden=!box.hidden;r.setAttribute('aria-expanded',String(!box.hidden));r.textContent=box.hidden?'對照 SPSS 實際輸出':'收起對照';return;}
+  if(e.target.id==='hwClearBtn'){const w=$('#hwClear');w.innerHTML='<span>確定清除這 6 題的作答？</span><button class="btn" id="hwYes">清除</button><button class="btn" id="hwNo">取消</button>';return;}
+  if(e.target.id==='hwNo'){$('#hwClear').innerHTML='<button class="btn" id="hwClearBtn">清除我的作答</button>';return;}
+  if(e.target.id==='hwYes'){S.hw={};S.hwChecked={};save();renderHW();$('#hwClear').innerHTML='<button class="btn" id="hwClearBtn">清除我的作答</button>';toast('已清除作答');return;}
+  if(e.target.id==='thinkBtn'){const box=$('#thinkRef');box.hidden=!box.hidden;e.target.setAttribute('aria-expanded',String(!box.hidden));e.target.textContent=box.hidden?'查看參考答案與自我檢核':'收起參考答案';}
+});
+
+/* ---------- boot ---------- */
+renderVideos();renderW0();renderW1();renderW2();renderSlides();renderFiles();renderGuide();renderQuiz();renderHW();
+$('#thinkText').value=S.think||'';
+route();progress();
+})();
+</script>
+</html>
