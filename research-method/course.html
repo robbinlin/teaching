@@ -123,6 +123,7 @@ details.lec summary,details.rel summary{cursor:pointer;font-weight:500;padding:8
 .nextbox{border:1px solid var(--ok);background:var(--okbg);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
 .nextbox b{color:var(--ok)}
 .resume{border-left:4px solid var(--accent)}
+.noai #s-ai .btnrow,.noai #s-ai .ai,.noai #consbtn,.noai #critai{display:none}.aioff{display:none}.noai .aioff{display:block}
 details.lec ul{margin:10px 0 0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
 .ex{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
 .gpts{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}.gpts li div{margin-top:4px;font-size:14px;line-height:1.7}
@@ -961,7 +962,7 @@ function modHTML(m){
   <section class="step" id="s-check"><header><span class="mono">5</span><h3>自我檢核</h3></header>
     <div class="checks">${m.checks.map((t,k)=>`<label><input type="checkbox" data-act="chk" data-id="${m.id}" data-k="${k}" ${ck[k]?'checked':''}><span>${esc(t)}</span></label>`).join('')}</div></section>
   <section class="step" id="s-ai"><header><span class="mono">6</span><h3>請 Claude 給回饋</h3></header>
-    <p class="note">寫完片段後可以請 Claude 指出需要修改的地方。你的片段文字會送給 Claude 處理。</p>
+    <p class="note">寫完片段後可以請 Claude 指出需要修改的地方。你的片段文字會送給 Claude 處理。</p><p class="note aioff">這個網址沒有連上 Claude，AI 回饋只在 Claude 網站版提供；可以先用第 5 步的自我檢核。</p>
     <div class="btnrow"><button class="btn pri" id="aibtn" data-act="ai" data-id="${m.id}" ${tplDone(m)?'':'disabled'}>取得回饋</button><span class="note" id="aihint" ${tplDone(m)?'hidden':''}>把第 4 步的每一欄都寫完，按鈕才會亮起。</span></div>
     <div class="ai" id="aiout" ${S.ai[m.id]?'':'hidden'}>${esc(S.ai[m.id]||'')}</div></section>
   <div class="nav">${prev?`<button class="btn" data-act="mod" data-id="${prev.id}">← ${prev.id} ${esc(prev.title)}</button>`:'<span></span>'}
@@ -1571,9 +1572,9 @@ function lecHTML(m){const L=LEC[m.id];if(!L)return '';
 
 /* ========== 本所論文怎麼寫（GIACS 論文逐章對照） ========== */
 const GIACS=[
- {cite:'莊盛傑（2025）。學生規律運動與體育學習認知在區域性差異探討〔碩士論文，國立體育大學〕。',
+ {cite:'本所 2025 碩士論文',
   kind:'碩士論文・次級資料分析',
-  sum:'本所 2025 年的碩士論文（指導教授：林彥光）。作者分析中研院釋出的 111 學年各級學校學生運動參與調查（有效樣本 37,965 人），用卡方檢定、t 檢定與二元羅吉斯迴歸，比較不同學制與都市化程度學生的規律運動，以及規律運動和體育學習認知的關係。結果：大專生、參加運動社團、自覺運動足夠與多數體育學習認知題目，都和較高的規律運動比例有關。',
+  sum:'國立體育大學競技與教練科學研究所 2025 年的碩士論文。作者分析中研院釋出的 111 學年各級學校學生運動參與調查（有效樣本 37,965 人），用卡方檢定、t 檢定與二元羅吉斯迴歸，比較不同學制與都市化程度學生的規律運動，以及規律運動和體育學習認知的關係。結果：大專生、參加運動社團、自覺運動足夠與多數體育學習認知題目，都和較高的規律運動比例有關。',
   ch:{1:{part:'第壹章 緒論（研究背景與動機、研究目的、研究範圍與限制、名詞解釋）',pts:[
  ['ok','1.0','題目點出了研究對象（學生）、兩個主要變項（規律運動、體育學習認知）與比較的面向（區域），讀者一看就知道要研究什麼。'],
  ['fix','1.0','題目的文法有點拗口，「區域性差異」也不完全符合內容：分析主要比較學制與都市化程度，縣市只做描述。可改成「各級學校學生規律運動的相關因素：都市化程度與體育學習認知」之類，讓題目和分析對齊。'],
@@ -1619,9 +1620,9 @@ const GIACS=[
  ['fix','5.5','結論「越核心的區域不代表較多人規律運動，都市化不高的區域有較大空間與時間」，根據只是第一層對第六層一個 p ≈ .04、OR = 0.88 的比較，其他層都不顯著。結論的強度要和證據相稱。'],
  ['ok','5.6','中英文摘要依「目的、背景、方法、結果、結論」分段，方法交代了資料來源與四種統計方法。'],
  ['fix','5.6','摘要寫「運動天數」是影響規律運動的重要因子；但規律運動本身就是用「每週運動 3 天以上」定義的，運動天數不能拿來解釋規律運動，表 26 也沒有這個變項。關鍵詞「體育素養」和題目的「體育學習認知」也要統一。']]}}},
- {cite:'陳建霖（2024）。基於可解釋性人工智慧模型探討棒球比賽勝負關鍵〔博士論文，國立體育大學〕。',
+ {cite:'本所 2024 博士論文',
   kind:'博士論文・機器學習',
-  sum:'本所 2024 年的博士論文（指導教授：林彥光）。作者整理 2021–2023 年中華職棒 869 場例行賽的攻守數據，分成傳統數據與加入進階數據兩個資料集，比較九種機器學習模型的分類表現，再用 XGBoost 的特徵重要度、SHAP 值與決策樹找出和勝負最有關的指標，結果以投手防禦率、wRC+、wOBA 最重要。',
+  sum:'國立體育大學競技與教練科學研究所 2024 年的博士論文。作者整理 2021–2023 年中華職棒 869 場例行賽的攻守數據，分成傳統數據與加入進階數據兩個資料集，比較九種機器學習模型的分類表現，再用 XGBoost 的特徵重要度、SHAP 值與決策樹找出和勝負最有關的指標，結果以投手防禦率、wRC+、wOBA 最重要。',
   ch:{1:{part:'第壹章 緒論（研究背景與動機、研究目的、研究重要性、名詞解釋）',pts:[
  ['ok','1.0','題目包含方法（可解釋性人工智慧）、對象（棒球比賽）與依變項（勝負），讀者一看就知道研究什麼。'],
  ['fix','1.0','「勝負關鍵」帶有因果意味，但資料只能找出和勝負最相關的指標。可改成「與勝負最相關的指標」，或在題目加上「中華職棒」與資料年份。'],
@@ -1674,14 +1675,14 @@ function gPts(pts,self){return `<ul class="gpts">${pts.map(([k,u,t])=>`<li><span
 function giacsCardHTML(c){const L=GIACS.filter(g=>g.ch[c.n]);if(!L.length)return '';
   return `<section class="step"><header><span class="mono">本所論文怎麼寫</span><h3>國體競技所的論文，第${NUM[c.n]}章寫得怎樣？</h3></header>
   <p>兩本本所論文的逐點評註：先看哪裡寫得好，再看口試之後還可以怎麼更好。寫自己的論文時，拿同一把尺量一次。</p>
-  ${L.map(g=>`<details class="lec"><summary>${esc(g.cite.split('〔')[0])}　<span class="mono">${esc(g.kind)}・${g.ch[c.n].pts.length} 點</span></summary>
-   <p class="note" style="margin-top:8px">${esc(g.cite)}</p><p style="margin-top:6px;font-size:14px">${esc(g.sum)}</p>
+  ${L.map(g=>`<details class="lec"><summary>${esc(g.cite)}　<span class="mono">${esc(g.kind)}・${g.ch[c.n].pts.length} 點</span></summary>
+   <p style="margin-top:8px;font-size:14px">${esc(g.sum)}</p>
    <p class="mono" style="margin-top:8px">對應：${esc(g.ch[c.n].part)}</p>${gPts(g.ch[c.n].pts)}</details>`).join('')}
-  <p class="note">網站只放書目與老師的評註，不提供全文。</p></section>`}
+  <p class="note">為保護作者，網站不列出作者與題目，只放老師的評註。</p></section>`}
 function giacsModHTML(m){const n=chOf(m).n;
   const L=GIACS.map(g=>[g,(g.ch[n]?g.ch[n].pts:[]).filter(p=>p[1]===m.id)]).filter(x=>x[1].length);if(!L.length)return '';
   return `<details class="lec"><summary>本所論文怎麼寫　<span class="mono">${L.reduce((a,x)=>a+x[1].length,0)} 點評註</span></summary>
-  ${L.map(([g,pts])=>`<p class="mono" style="margin-top:10px">${esc(g.cite.split('。')[0])}</p>${gPts(pts,m.id)}`).join('')}</details>`}
+  ${L.map(([g,pts])=>`<p class="mono" style="margin-top:10px">${esc(g.cite)}</p>${gPts(pts,m.id)}`).join('')}</details>`}
 
 /* ========== 讀一篇真論文（Article Critique） ========== */
 const READ={
@@ -1865,6 +1866,7 @@ ${snippet(m)}
 }
 
 try{view=dec(location.hash)}catch(e){}
+if(!(window.claude&&claude.use))document.documentElement.classList.add('noai');
 render();
 if(window.claude&&claude.use){
   claude.use('sample').then(s=>{sampleNS=s}).catch(()=>{});
