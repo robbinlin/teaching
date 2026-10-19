@@ -1044,10 +1044,10 @@ function startHero(){
     return [x,g.cy+(y-g.cy)*g.s]};
   const lanePath=(g,r,from,to)=>{ctx.beginPath();const n=Math.max(2,Math.ceil((to-from)*160));for(let k=0;k<=n;k++){const [x,y]=at(g,r,from+(to-from)*k/n);k?ctx.lineTo(x,y):ctx.moveTo(x,y)}};
   const alpha=(c,a)=>{ctx.globalAlpha=a;return c};
-  let t0=null,last=0;
+  let t0=null,last=0,forceT=null,waiting=false;
   function frame(now){
     if(!document.body.contains(cv))return;
-    if(t0===null)t0=now;const T=reduce?9:(now-t0)/1000,dt=Math.min(.05,(now-last)/1000||0);last=now;
+    if(t0===null)t0=now;const T=forceT!==null?forceT:reduce?9:(now-t0)/1000,dt=Math.min(.05,(now-last)/1000||0);last=now;
     const g=geo(),ease=x=>1-Math.pow(1-Math.min(1,Math.max(0,x)),3);
     ctx.clearRect(0,0,W,H);ctx.globalAlpha=1;ctx.lineCap='round';
     const draw=ease(T/1.4);
@@ -1079,12 +1079,16 @@ function startHero(){
       ctx.globalAlpha=go;ctx.fillStyle=col['--ink'];ctx.beginPath();ctx.arc(p[0],p[1],Math.max(2.4,g.lw*.27),0,7);ctx.fill();
       ctx.fillStyle=col['--surface'];ctx.beginPath();ctx.arc(p[0],p[1],Math.max(1,g.lw*.11),0,7);ctx.fill()});
     ctx.globalAlpha=1;
-    if(!reduce&&!document.hidden)heroRAF=requestAnimationFrame(frame);
-    else if(!reduce)document.addEventListener('visibilitychange',()=>{if(!document.hidden){last=performance.now();heroRAF=requestAnimationFrame(frame)}},{once:true});
+    if(reduce)return;
+    if(document.hidden){if(!waiting){waiting=true;document.addEventListener('visibilitychange',function vis(){if(document.hidden)return;document.removeEventListener('visibilitychange',vis);waiting=false;
+      if(forceT!==null){forceT=null;t0=null}last=performance.now();heroRAF=requestAnimationFrame(frame)})}}
+    else if(forceT===null)heroRAF=requestAnimationFrame(frame);
   }
-  if(window.ResizeObserver){const ro=new ResizeObserver(()=>{if(!document.body.contains(cv)){ro.disconnect();return}size();if(reduce)frame(performance.now())});ro.observe(cv)}
+  if(window.ResizeObserver){const ro=new ResizeObserver(()=>{if(!document.body.contains(cv)){ro.disconnect();return}size();if(reduce||document.hidden||forceT!==null){forceT=9;frame(performance.now())}});ro.observe(cv)}
   if(window.matchMedia){const mq=matchMedia('(prefers-color-scheme: dark)');mq.addEventListener&&mq.addEventListener('change',tok)}
-  heroRAF=requestAnimationFrame(frame);
+  // 先畫出完成狀態，分頁在背景或動畫被延後時也不會是空白
+  forceT=9;frame(performance.now());
+  if(!reduce&&!document.hidden){forceT=null;t0=null;heroRAF=requestAnimationFrame(frame)}
 }
 function homeHTML(){
   const last=S.last&&modById(S.last),nx=last||ALLMODS.find(m=>m.tpl&&steps(m)<3)||ALLMODS[0];
