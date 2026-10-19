@@ -185,6 +185,26 @@ textarea{min-height:84px;resize:vertical}
 .toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));max-width:calc(100% - 32px);
   background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;z-index:20}
 .note{font-size:13px;color:var(--muted)}
+.pblist{display:flex;flex-direction:column;gap:8px}
+details.pbi{border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:4px 12px}
+details.pbi>summary{cursor:pointer;padding:8px 0;min-height:44px;display:flex;flex-direction:column;justify-content:center;gap:2px;list-style-position:inside}
+details.pbi>summary span{font-size:13px;color:var(--muted)}
+.pbtext{max-height:300px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.75;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin:4px 0 8px}
+.pbtext mark{background:#FFE58A;color:#3A2A00;border-radius:3px;padding:0 2px}
+.pbstrict{display:flex;gap:8px;align-items:flex-start;font-size:14px;margin:8px 0 12px;cursor:pointer}.pbstrict input{margin-top:4px;width:18px;height:18px;flex:none;accent-color:var(--accent)}
+details.pbi .btnrow{margin-bottom:8px}
+h2.pbh{font-size:18px;margin:22px 0 8px;display:flex;gap:10px;align-items:baseline}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 4px}
+.fchip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:6px 14px;min-height:36px;font-size:14px;cursor:pointer}
+.fchip.on{background:var(--navy);border-color:var(--navy);color:var(--bg);font-weight:600}
+.cars{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cars button{text-align:left;border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--paper);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;color:var(--ink);cursor:pointer;font:inherit}
+.cars span{font-size:13px;color:var(--muted)}
+.fwgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fw{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.fw>b{font-family:var(--mono);font-size:16px;color:var(--accent)}.fw ul{margin:6px 0 0;padding-left:1.1em;font-size:13px}
+@media (max-width:640px){.cars,.fwgrid{grid-template-columns:1fr}}
+
 .video{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--navy);color:#fff;border-radius:10px;padding:12px 14px}.video+.video{margin-top:8px}
 :root[data-theme="dark"] .video{color:#0D1620}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .video{color:#0D1620}}
@@ -960,6 +980,7 @@ const status=m=>{const s=steps(m);return s===0?['未開始','']:s===3?['已完�
 const chPct=c=>c.open?Math.round(c.mods.reduce((a,m)=>a+steps(m),0)/(c.mods.length*3)*100):0;
 const chDone=c=>c.open?c.mods.filter(m=>steps(m)===3).length:0;
 const snippet=m=>m.tpl.compose(vals(m));
+const tplAny=m=>!!m&&Object.values(S.tpl[m.id]||{}).some(v=>v&&String(v).trim());
 const chapterText=c=>`第${NUM[c.n]}章　${c.name}\n\n`+c.mods.map(m=>`${m.id} ${SEC[m.id]||m.title}\n${tplDone(m)?snippet(m):'（尚未完成）'}`).join('\n\n');
 const fieldVal=(id,f)=>((S.tpl[id]||{})[f]||'').trim();
 const thesisText=()=>{
@@ -983,11 +1004,11 @@ async function getSample(){if(sampleNS)return sampleNS;if(!(window.claude&&claud
 const NOAI='目前無法使用 Claude 回饋。在課程的 Claude 頁面上，第一次使用時會跳出授權視窗，請按允許後再按一次；GitHub 公開版沒有這個功能。';
 const aiErr=err=>err&&err.code==='rate_limited'?'請求太頻繁，請稍等一分鐘再按一次。':err&&err.code==='not_granted'?'Claude 回饋沒有被允許。請在頁面的權限設定中允許後再試。':'取得回饋失敗，請再按一次。';
 const app=document.getElementById('app');
-const enc=v=>v.n==='mod'?`#mod/${v.id}`:v.n==='thesis'?'#thesis':v.n==='home'?'#home':`#${v.n}/${v.c}`;
+const enc=v=>v.n==='mod'?`#mod/${v.id}`:v.n==='thesis'?'#thesis':v.n==='prompts'?'#prompts':v.n==='home'?'#home':`#${v.n}/${v.c}`;
 const dec=h=>{const [n,a]=String(h||'').replace(/^#/,'').split('/');
   if(n==='mod'&&modById(a))return {n:'mod',id:a};
   if((n==='ch'||n==='sum'||n==='read')&&+a>=1&&+a<=CH.length&&CH[+a-1].open&&(n!=='read'||READ[+a]))return {n,c:+a};
-  if(n==='thesis')return {n:'thesis'};return {n:'home'}};
+  if(n==='thesis')return {n:'thesis'};if(n==='prompts')return {n:'prompts'};return {n:'home'}};
 function hideToast(){const e=document.getElementById('toast');if(e){clearTimeout(toast.t);e.hidden=true}}
 const go=v=>{view=v;lastCarry=null;hideToast();if(v.n==='mod'){S.last=v.id;save()}
   try{const h=enc(v);if(location.hash!==h)location.hash=h}catch(e){}
@@ -997,7 +1018,105 @@ window.addEventListener('hashchange',()=>{let h='';try{h=location.hash}catch(e){
 const modById=id=>ALLMODS.find(m=>m.id===id);
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{e.hidden=true},2600)}
 
-const DEPTH={home:0,ch:1,thesis:1,sum:2,read:2,mod:2};let lastDepth=null,lastKey='';
+const PB=[["pre","研究缺口地圖","分析領域內的研究空白，分類並確立你的研究價值","分析 [學科／情境] 領域中有關 [主題] 的研究文獻，聚焦於 [年份] 至 [年份] 間發表的論文。僅根據我提供的文獻，找出 3–5 個研究缺口，並將每個缺口分類為：理論缺口、方法論缺口、實證缺口、研究族群缺口或情境缺口。針對每個缺口，請說明：目前已知的內容、仍不確定之處、支持證據所在的文獻、此缺口的重要性，以及一個可填補此缺口的可行研究設計。請勿捏造任何來源，或在缺乏證據的情況下主張研究缺口存在。"],["pre","研究問題發展","將模糊的研究主題轉化為5個具體、可執行的研究問題","我的廣泛研究主題是 [主題]，欲探討的問題是 [問題]，研究對象是 [母體]，情境為 [地點／背景]。請發展 5 個聚焦的研究問題——要求具體、可研究，且在 [時間／經費／資料等限制條件] 下具可行性。針對每個研究問題，請指出：主要概念或變項、所需的適當資料、建議的研究方法，以及可能的研究貢獻。請從可行性高至低排列各研究問題，並說明排列依據。"],["pre","問題陳述精煉","評估並重寫你的問題陳述，使其更具學術說服力","批判性評估以下問題陳述：[貼上你的問題陳述]。請確認它是否清楚建立了以下要素：研究背景、記錄在案的問題、受影響的研究族群、問題重要性的佐證、研究缺口，以及若問題未被解決的後果。請指出模糊論述、缺乏支持的假設，以及遺漏的證據。接著以學術正式語言將其改寫為 [字數] 字，保留我的原意，並在需要補充引用的地方標記 [需補充引用]。"],["pre","理論框架選擇","比較多個理論並找出最適合你研究的框架","我的研究探討 [母體] 在 [情境] 中的 [現象／關係]。請比較以下理論：[理論一]、[理論二] 與 [理論三]。根據以下面向評估每個理論：核心概念、與我的研究問題的契合度、解釋優勢、侷限性，以及它如何影響資料蒐集與分析。推薦最適合的理論，說明它優於其他選項的原因，並提供一個簡單的概念模型，將該理論與我的研究變項或主題連結起來。"],["1","Move 1 — 建立研究領域","宣示研究主題的重要性，回顧該領域的核心研究","請為 [學科] 領域中有關 [主題] 的學術論文撰寫開頭段落（建立研究領域）。主張此主題的核心地位，提出 2–3 個立基於前人文獻的主題概述，並簡要回顧過去研究的主要脈絡。請使用如「近年來，學者們日益關注……」及「累積的研究文獻已確立……」等學術慣用語。每個需要引用的位置請標記為 [需補充引用]，不得捏造任何文獻來源。"],["1","Move 2 — 建立研究缺口","在現有文獻中指出研究空白，建立你的研究必要性","請撰寫有關 [主題] 研究的學術緒論缺口建立段落（第二步驟）。透過指出現有文獻中仍不明確、有爭議或尚未探索的內容，對現有研究提出反論——僅根據我所辨識的以下研究缺口：[列出你的研究缺口]。請使用委婉語如「然而，鮮少有研究探討……」、「目前仍不清楚……」或「迄今為止，尚無研究直接探討……」。所有引用位置請標記為 [需補充引用]，不得捏造缺乏證據支持的缺口。"],["1","Move 3 — 宣告研究目的","清楚陳述本研究的目的、研究問題與論文結構","請撰寫學術緒論的研究目的宣告段落（第三步驟）。清楚陳述本研究的目的：[你的研究目的]。納入我的研究問題：[列出你的研究問題]。簡要說明主要研究取向，提及主要研究發現（若已完成資料蒐集），並說明論文的架構安排。請使用如「本研究旨在……」、「具體而言，本研究探討以下問題：」以及「本文其餘部分的架構如下……」等句式。此段落請保持簡潔（150–250 字）。"],["1","引言鉤句設計","設計三種不同風格的開場鉤句，吸引讀者並引發對主題的關注","請為我針對 [主題] 的論文撰寫三個不同版本的開場引言鉤句（各約 50–80 字），以吸引讀者注意並引發對此主題的關注。請分別嘗試以下三種策略：\n(1) 引用一個令人震驚的統計數字或事實（標記 [需補充引用]）\n(2) 提出一個發人深省的問題，直指問題的核心\n(3) 描述一個能說明研究問題重要性的真實情境或案例\n\n完成後，請為每個版本說明其優缺點，並建議哪一個最適合學術受眾。"],["1","研究範疇與排除說明","清楚劃定研究邊界，說明本研究涵蓋與不涵蓋的內容","請為我的 [主題] 研究撰寫「研究範疇與限制」段落（約 150–200 字）。本研究聚焦於：[描述你的聚焦範疇]；不包括：[說明排除在外的內容及原因]。請清楚劃定研究邊界，說明本研究探討的對象、時間範圍與地點，以及有意排除的內容及其依據。語氣請保持中立學術風格，避免使研究看起來不完整或倉促。"],["1","關鍵術語定義","為論文中使用的核心專業術語撰寫清晰的學術定義","請為以下在我的論文中使用的關鍵術語，各撰寫一段學術定義（約 2–3 句話）。每個定義應說明：術語的含義、在我的研究領域中的用法，以及與我研究的相關性。標記每個需要引用的術語為 [需補充引用]，請勿捏造任何學者或著作。\n\n術語列表：[列出你的關鍵術語，每行一個]"],["1","研究目標陳述","根據研究問題撰寫可測量、具操作性的研究目標","請根據以下研究問題，撰寫 3–5 個清晰、可測量的研究目標：\n\n研究問題：[列出你的研究問題]\n研究主題：[你的研究主題]\n研究情境：[研究對象與場域]\n\n每個研究目標請以動詞開頭（如：分析、評估、比較、探討、檢驗），並確保目標：\n(1) 直接呼應相對應的研究問題\n(2) 具有可操作性，能指引資料蒐集方向\n(3) 在研究的時間與資源範圍內可行\n(4) 清楚界定研究的範疇與對象\n\n完成後，請逐一確認每個目標與其研究問題的對應關係，確保研究目標與研究問題在邏輯上緊密連結。"],["1","歷史研究趨勢概述","梳理研究主題在學術史上的發展脈絡，從早期研究到當代趨勢","請概述 [學科] 領域中有關 [主題] 的研究發展歷程，時間範圍約從 [起始年代] 至今。請以歷時性方式組織內容，說明：\n\n(1) 該主題的早期研究焦點與主要觀點\n(2) 推動研究典範轉移的關鍵時期或代表性研究\n(3) 近年來的研究趨勢與新興議題\n(4) 研究方法論在此期間的演變\n\n請以 300–450 字撰寫，使用正式學術語言，引用位置標記為 [需補充引用]，請勿捏造任何文獻或學者姓名。"],["1","研究主題選擇理由","撰寫選擇此研究主題的學術理由，說明其時代意義與個人動機","請協助我撰寫選擇 [主題] 作為論文研究主題的學術理由（約 200–300 字）。請從以下幾個層面說明：\n\n(1) 此主題在 [學科／領域] 中的學術重要性\n(2) 目前文獻對此主題的研究仍存在哪些缺口或未解問題\n(3) 此主題在當前社會、政策或實務情境中的時代意義\n(4) 本研究潛在的理論貢獻或實踐影響\n\n請以正式學術語氣撰寫，保持客觀論述，避免過度強調個人偏好。引用位置標記為 [需補充引用]。"],["1","全球研究背景說明","說明研究主題在全球情境下的重要性，建立跨文化或跨地域的研究視野","請撰寫一段說明 [主題] 在全球情境下之重要性的段落（約 200–300 字）。請說明：\n\n(1) 此議題在全球層次上的影響範疇（如：影響的地區、人口或系統）\n(2) 不同國家或文化情境對此議題的回應方式有何異同\n(3) 為何此全球視野對於理解 [你的研究情境或地點] 特別重要\n(4) 國際研究趨勢如何呼應並支持本研究的必要性\n\n請使用正式學術語言，以有說服力的方式建立本研究的全球關聯性。引用位置標記為 [需補充引用]，請勿捏造任何統計數字或資料來源。"],["2","論文分析①：摘要一句話摘要","將論文摘要壓縮為一句話，掌握核心目的與結論","請以一句話概括這篇研究論文的摘要，突出其主要研究目的與結果。"],["2","論文分析②：研究方法萃取","提取論文中的研究設計、樣本及分析工具","請從這篇研究論文中提取研究方法細節，包括：所使用的資料、樣本規模與特徵，以及研究中採用的工具或技術。"],["2","論文分析③：關鍵發現整理","列出論文的主要研究發現與核心洞見","請以簡潔的條列方式列出這篇研究論文的關鍵發現，聚焦於研究結果與獲得的洞見。"],["2","論文分析④：研究缺口辨識","從論文的限制與結論中找出研究缺口及其重要性","請根據本論文討論的研究發現與研究限制，辨識其中的研究缺口，並說明此缺口的重要性。"],["2","論文分析⑤：未來研究建議","整理論文中提及的未來研究方向與探索空間","請整理並強調本論文中提及的未來研究建議，聚焦於值得進一步探索的領域。"],["2","文獻比較矩陣","將多篇論文整理成結構化比較表，找出共識、矛盾與研究空白","請閱讀我所附的 [篇數] 篇有關 [主題] 的論文，建立一個比較表格，包含以下欄位：引用資訊、研究目的、理論基礎、樣本、研究地點、研究方法、變項／主題、主要發現、研究限制，以及與本研究的相關性。完成表格後，請指出各文獻之間的共識、矛盾、反覆出現的限制，以及尚未充分研究的問題。若某篇論文缺乏特定資訊，請清楚標記，勿自行猜測填補。"],["2","主題式文獻綜合寫作","將文獻矩陣轉化為有論點的文獻探討章節，避免逐篇摘要的寫法","請扮演學術寫作專家的角色。根據我提供的文獻比較矩陣，撰寫一篇有關 [主題／議題] 的文獻綜合段落（約 [600–900] 字）。\n\n規則：請勿逐篇摘要論文，而應按主題分組整合。指出學者們在哪些地方達成共識、在哪些地方出現分歧，以及哪些地方的證據薄弱或缺失。文章應朝向清楚闡明當前知識狀態的論點推進。請使用適當的學術慣用語（如「與此觀點一致……」、「相較之下，其他學者主張……」、「目前仍存在一個關鍵缺口……」）。缺少引用的位置請標記 [需補充引用]。\n\n文獻比較矩陣：[在此貼上你的矩陣]"],["2","概念演化歷程分析","追溯某一理論或概念在學術史上的演化脈絡","請追溯 [概念／理論] 在 [學科] 領域的演化歷程，說明此概念如何隨時間發展、轉變或被重新定義。請以時間序列方式組織你的回答（例如：早期定義 → 批判性修正 → 當代理解），並指出推動概念演化的關鍵轉折點或代表性學者。標記引用位置為 [需補充引用]，請勿捏造任何學者姓名或著作。"],["2","矛盾研究發現整合","分析文獻中相互矛盾的研究結果，找出分歧原因並定位你的研究","在有關 [主題] 的研究文獻中，不同研究對於 [具體問題] 存在矛盾的發現。根據我提供的以下文獻資訊，請：\n(1) 整理並呈現各方的主要立場與其支持論據\n(2) 分析造成矛盾的可能原因（如：方法論差異、樣本特性、情境因素）\n(3) 評估哪方的論據較為充分，或說明目前尚無定論\n(4) 說明這些矛盾如何為我的研究提供依據\n\n文獻資訊：[貼上相關文獻摘要或筆記]"],["2","帶注釋書目條目","為每篇文獻撰寫包含摘要、評估與相關性說明的帶注釋書目","請為以下文獻撰寫帶注釋的書目條目（Annotated Bibliography Entry）：\n\n文獻資訊：[提供作者、年份、標題、期刊等書目資訊]\n我的研究主題：[你的研究主題]\n\n每個條目請包含：\n(1) 格式正確的引用（使用 [APA／MLA／Chicago] 格式）\n(2) 內容摘要（50–75 字）：本文的核心論點、研究方法與主要結論\n(3) 評估（50–75 字）：此文的研究品質、方法論嚴謹度與可信度\n(4) 相關性（50–75 字）：此文如何支持或挑戰我的研究，以及對我論文的具體貢獻\n\n請保持客觀學術語氣，若書目資訊不完整，請標記 [資訊待補]，請勿自行捏造出版細節。"],["2","核心概念關聯分析","釐清兩個核心概念在文獻中的關係，建立清晰的理論連結","請根據我提供的以下文獻資訊，說明 [核心概念一] 與 [核心概念二] 在 [學科] 領域文獻中的理論關係（約 250–350 字）：\n\n文獻資訊：[在此貼上相關文獻摘要或筆記]\n\n請說明：\n(1) 這兩個概念各自的核心定義（根據文獻）\n(2) 學界如何理解兩者之間的關聯性（因果、相關、中介、調節等）\n(3) 不同學者或研究流派對此關聯的詮釋是否存在分歧\n(4) 此概念關係如何為我的研究框架提供理論基礎\n\n引用位置標記為 [需補充引用]，請勿自行捏造兩者之間不存在於文獻中的關聯。"],["2","研究方法論趨勢分析","分析某領域內研究方法論的演變趨勢與方法論缺口","請根據我提供的以下文獻資訊，分析 [主題] 領域在 [年份] 至 [年份] 間的研究方法論演變趨勢：\n\n文獻資訊：[在此貼上你的文獻摘要或筆記]\n\n請辨識並說明：\n(1) 該領域最常見的研究方法類型（量化、質性、混合等）及其比例變化趨勢\n(2) 研究方法論的演變脈絡（如：從橫斷面研究轉向縱貫研究、從實驗法轉向田野研究）\n(3) 各類方法論的優勢、侷限與學界常見批評\n(4) 方法論缺口——哪些研究取向尚未被充分採用，我的研究如何回應此缺口\n\n請以 300–400 字撰寫，引用位置標記為 [需補充引用]。"],["3","研究設計推薦","根據研究問題與限制條件，推薦最適合的研究設計並說明理由","請扮演研究方法顧問的角色。根據我的研究問題 [問題]、研究族群 [族群]、可用資料 [資料]，以及研究限制 [時間／經費／取得管道等限制]，推薦一個適合的研究設計。請說明：研究取向、抽樣方法、納入標準、預估樣本規模及其依據、資料蒐集程序、分析技術、效度或可信度評估措施、倫理考量，以及可能的研究限制。請解釋每個選擇為何契合研究問題，並提出一個替代設計及其利弊取捨。"],["3","研究工具設計","設計問卷、訪談大綱或焦點團體指引，確保題目中立且有效","請設計一份 [問卷調查／半結構式訪談指引／焦點團體指引]，用以研究 [研究族群] 中的 [研究目的]。請按 [關鍵變項／主題] 分節整理，並納入措辭清晰、中立的題目，避免雙管齊下式、引導性或令人困惑的問句。每道題目請說明其所測量的研究目的或變項。請加入適合的作答選項或追問探詞、介紹與知情同意說明、預估填答時間，以及 5 項試行測試的檢查要點。請勿納入蒐集不必要敏感資訊的題目。"],["3","資料分析計畫","為你的研究問題建立逐步的資料分析計畫，包含軟體操作步驟","我的研究使用 [質性／量化／混合] 資料，以回答以下研究問題：[列出你的研究問題]。我的變項、主題或資料欄位為 [列出它們]。請建立一個逐步的資料分析計畫，涵蓋：資料清理、遺漏值處理、編碼或統計檢定、假設檢驗、[SPSS／R／NVivo／ATLAS.ti／其他] 的操作步驟、結果詮釋，以及建議的表格或圖表。請將每個研究問題對應至其分析方法，並說明為何該方法適用。如有開始分析前需要確認的資訊，請一併標示。"],["3","混合研究設計說明","撰寫混合方法研究的設計理由與整合邏輯","我的研究採用混合研究設計，同時蒐集量化與質性資料，以回答以下研究問題：[列出研究問題]。請撰寫一段說明混合方法研究設計的段落（約 300–400 字），涵蓋：\n(1) 採用混合設計的理由（為何單一方法不足夠？）\n(2) 具體的設計類型（如：解釋性序列、探索性序列、並行三角測量等）及其選擇依據\n(3) 量化與質性成分如何整合與補充\n(4) 此設計的主要限制\n\n請使用正式學術語言，並標記引用位置為 [需補充引用]。"],["3","信度與效度評估","說明研究設計的信效度威脅與對應的品質保證措施","請針對我的研究設計（[量化／質性／混合]），撰寫一段說明信度與效度（量化），或可信賴度與可靠性（質性）的段落（約 250–350 字）。我採用的資料蒐集工具為：[描述你的工具]，研究族群為：[描述你的族群]。請說明：\n- 本研究面臨的主要信／效度威脅\n- 我採取的具體措施以確保研究品質（如：三角測量、成員確認、Cronbach's α 等）\n- 研究結論的推論範疇\n\n請使用適合 [量化／質性] 研究典範的專業術語。"],["3","研究倫理考量說明","撰寫符合學術規範的研究倫理段落，涵蓋知情同意、隱私保護等要素","請為我的研究撰寫研究倫理考量段落（約 250–350 字），本研究涉及：\n- 研究族群：[如：大學生、醫療病患、兒童等，請說明是否涉及弱勢族群]\n- 資料蒐集方式：[訪談、問卷、觀察、文件分析等]\n- 可能的敏感議題：[若有，請說明；若無，可略]\n\n請說明本研究如何落實以下倫理原則：\n(1) 知情同意的取得方式（若涉及未成年人，如何處理監護人同意？）\n(2) 隱私保護與資料匿名化措施\n(3) 自願參與及隨時退出研究的保障\n(4) 資料的安全儲存與保管期限\n(5) 利益衝突的識別與處理（若適用）\n\n請使用正式學術語言，並說明本研究是否已通過 [學校名稱] 研究倫理審查委員會（IRB）的審核。"],["3","訪談研究方案設計","設計完整的半結構式訪談指引，包含核心問題、追問探詞與知情同意說明","請為我針對 [研究主題] 的質性研究設計一份半結構式訪談方案。研究族群為：[描述受訪者特徵]，研究目的為：[列出研究目的或問題]。\n\n訪談方案請包含：\n(1) 訪談簡介與知情同意說明（約 80–120 字）\n(2) 暖身問題（2–3 個，用以建立融洽關係，降低受訪者的戒備感）\n(3) 核心訪談問題（8–12 個，按研究主題分組排列）\n(4) 每道核心問題建議的追問探詞（probes），以引導受訪者深入回應\n(5) 結束問題（1–2 個，讓受訪者補充重要觀點或提出疑問）\n(6) 預估完整訪談所需時間\n\n請確保所有問題措辭開放、中立，避免引導性語氣。每道問題請標注對應的研究目的或研究問題。"],["4","結果章節引言段落","撰寫結果章節的開頭段落，說明章節結構與呈現邏輯","請為我針對 [主題] 的研究撰寫結果章節的引言段落（約 150–200 字）。本章需呈現以下研究問題的發現：\n\n研究問題：[列出你的研究問題]\n資料類型：[量化／質性／混合]\n章節結構：[說明本章如何分節，如：依研究問題分節、依主題分節等]\n\n此引言段落應：\n(1) 簡要說明本章的目的（呈現研究發現）\n(2) 說明本章的組織架構，讓讀者了解發現的呈現順序\n(3) 若有必要，提醒讀者本章不進行詮釋（詮釋留待討論章節）\n\n請使用現在式或過去式（依你的論文慣例），保持簡潔清晰的學術語氣。"],["4","量化結果呈現","將統計數據組織成清晰的結果章節段落，對應各研究問題","請呈現我針對 [主題] 所進行之研究的量化發現，依研究問題分節整理：\n[研究問題一：……]\n[研究問題二：……]\n\n我的統計結果：[在此貼上你的結果]\n\n針對每個研究問題，請清楚陳述發現內容，報告相關統計數值（均值、標準差、p 值、效果量等），並以 [表格 X] 或 [圖 X] 格式引用表格或圖形。請使用過去式，以中立的報告語氣撰寫。本節請勿詮釋或解釋發現——只呈現資料所顯示的內容。"],["4","質性發現呈現","將編碼後的主題整理成有架構的質性研究結果段落","請根據以下我從資料中辨識的主題，撰寫質性研究結果段落：\n\n主題：[列出你的主題／編碼]\n研究問題：[列出你的研究問題]\n受訪者引述樣本：[在此貼上具代表性的引述]\n\n針對每個主題：以標題呈現主題名稱，以 2–3 句話說明主題內容，並以 1–2 段受訪者直接引述加以例證（使用化名或受訪者代號）。請勿詮釋或評價引述——只呈現並簡要描述受訪者所說的內容。全文使用過去式。"],["4","描述統計摘要","將描述統計數據整理成段落文字，並建議合適的圖表","請將以下資料集的描述統計以敘事方式摘要整理，使其適合呈現於研究結果段落。請強調集中趨勢（均值、中位數）、變異性（標準差、全距），以及任何值得注意的分佈特徵或離群值。建議哪些變項最適合以表格或圖形呈現，並為每項建議最合適的圖表類型。請保持客觀、中立的語氣。\n\n資料：[在此貼上你的描述統計數據]"],["4","意外發現分析","處理研究中出現的預期之外發現，提供合理解釋與呈現建議","在我針對 [主題] 的研究中，出現了以下預期之外的發現：[描述意外發現]。\n\n請協助我分析此發現：\n(1) 說明它為何出乎預料（與原先假設或文獻有何出入）\n(2) 提供 2–3 個可能的解釋\n(3) 評估此發現對我的整體研究結論是否構成挑戰，或提供了額外的洞見\n(4) 建議如何在研究結果或討論章節中適當呈現此發現\n\n請使用謹慎的學術語氣，避免過度詮釋。"],["4","假設驗證說明","撰寫假設檢驗結果段落，清楚報告統計數值並說明假設是否獲得支持","我的研究針對以下假設進行了檢驗：\n\n假設：[列出你的研究假設，如：H1：X 與 Y 之間存在顯著正相關]\n統計結果：[在此貼上你的統計輸出或數值]\n\n請協助我撰寫假設驗證的結果段落（約 200–300 字），依序說明：\n(1) 所使用的統計檢定方式及其選擇依據\n(2) 關鍵統計數值（如：t 值、F 值、r 值、p 值、效果量等）\n(3) 假設是否獲得支持（接受或拒絕虛無假設）\n(4) 以清晰易懂的語言解釋統計結果的實質意義\n\n請使用過去式，保持客觀報告語氣，本段落請勿詮釋發現的意涵（留待討論章節處理）。"],["4","資料模式與趨勢描述","識別並描述資料中的主要規律、趨勢與異常現象","請根據以下我的研究資料，撰寫一段描述資料模式與趨勢的結果段落（約 250–350 字）：\n\n資料類型：[量化數據／質性主題]\n資料摘要：[在此貼上你的統計數值、主題代碼或資料摘要]\n研究問題：[相關研究問題]\n\n請識別並描述：\n(1) 資料中的主要規律與趨勢\n(2) 不同變項或主題之間的關聯模式\n(3) 任何明顯的異常值、例外情況或不一致之處\n(4) 資料模式與原始研究假設或文獻預期的異同\n\n請使用過去式，以客觀、中立的報告語氣撰寫，不在本段落進行詮釋性分析（保留至討論章節）。"],["5","詮釋研究發現","解釋每個主要發現的意義，並與過去研究進行有深度的對話","請為我針對 [主題] 進行的研究撰寫討論段落（約 [800–1200] 字）。\n\n主要發現：[列出你的主要發現]\n相關前人文獻：[簡述相關的前人研究發現]\n\n針對每項發現：(1) 簡要重述發現內容，(2) 用你自己的話解釋其意義，(3) 與前人文獻連結——說明異同之處（引用位置標記為 [需補充引用]），(4) 運用 [你的理論框架] 提供理論層次的解釋。最後以一段話說明對理論與實務的意涵。全文請使用委婉語（如「這些發現顯示……」、「一個可能的解釋是……」、「此結果與……一致」）。"],["5","與前人研究比較","將本研究結果與相關前人研究的發現進行系統性比較","請協助我撰寫一段將本研究結果與前人研究進行比較的段落（約 250–350 字）：\n\n本研究主要發現：[列出你的主要結果]\n相關前人研究發現：[簡述你想比較的前人研究結果，並標明來源]\n研究情境差異（若有）：[說明樣本、地點、時期或方法的差異]\n\n請說明：\n(1) 本研究結果與前人研究一致之處，及其意義\n(2) 本研究結果與前人研究不同之處，及可能的解釋（方法論差異、情境差異等）\n(3) 比較後對本研究發現的可信度有何啟示\n\n請使用過去式，引用位置標記為 [需補充引用]。注意：本段落仍屬結果章節，應以呈現比較為主，較深層的詮釋留至討論章節。"],["5","研究限制陳述","坦誠且有策略地陳述研究限制，不削弱研究的整體價值","請為我針對 [主題] 進行的研究撰寫研究限制段落。我的研究設計：[描述你的設計]。請考量以下面向的限制：樣本規模與代表性、研究設計的侷限、資料蒐集程序、研究者立場，以及研究發現的推論範疇。針對每項限制，請簡要說明其影響，並在可能的情況下指出為緩解此限制所採取的措施。請以坦誠但有節制的學術語氣撰寫——誠實承認限制，同時不削弱研究的整體價值。"],["5","研究意涵撰寫","闡述研究發現對理論發展與實際應用的貢獻與啟示","請為我針對 [主題] 進行的研究撰寫研究意涵段落，主要發現如下：[摘要你的發現]。\n\n請分別說明兩類意涵：\n\n1. 理論意涵：這些發現如何延伸、挑戰或精進現有理論？哪些特定理論或模型受到影響？\n\n2. 實務意涵：實務工作者、政策制定者或教育工作者應根據這些發現採取哪些具體行動？主要受益者是誰？\n\n請使用學術寫作中適當的委婉語，避免誇大研究發現的重要性。每類意涵約 [200–350] 字。"],["5","政策意涵撰寫","將研究發現轉化為具體可行的政策建議","根據我針對 [主題] 的研究發現（[摘要主要發現]），請撰寫一段政策意涵（約 200–300 字）。請具體說明：\n(1) 哪些政策層面應根據此研究結果進行調整或改進？\n(2) 政策制定者應採取哪些具體行動？\n(3) 這些建議應優先針對哪些目標族群或機構？\n\n請使用學術寫作中適當的委婉語（如「研究結果顯示，政策制定者或可考慮……」），避免使用過於武斷的命令式語氣。"],["5","研究強項陳述","以謙遜有力的學術語氣陳述本研究的優勢，平衡限制說明","請協助我撰寫一段強調本研究優勢的段落（約 200–250 字），以平衡討論章節中對研究限制的說明。本研究的主要強項包括：\n\n研究設計面：[描述研究設計的優點，如：嚴謹的取樣程序、大樣本規模、縱貫設計等]\n方法論面：[描述方法論的優勢，如：混合方法設計、三角測量、標準化工具等]\n研究貢獻面：[說明本研究填補的特定缺口或創新之處]\n\n請以謙遜但有說服力的學術語氣撰寫，突顯本研究的獨特價值及相較於前人研究的優勢，同時避免過度誇大。引用位置標記為 [需補充引用]。"],["5","研究更廣泛意義陳述","超越單一學科，說明本研究對更廣泛社會、知識或實踐領域的貢獻","請協助我撰寫一段陳述本研究更廣泛意義的段落（約 200–300 字），作為討論章節的收尾或過渡到結論的橋接段落。本研究主要針對 [主題]，主要發現為：[摘要主要發現]。\n\n請從以下層面說明本研究的更廣泛意義：\n(1) 對 [學科] 領域的知識累積有何長遠貢獻\n(2) 對解決 [相關社會／實務問題] 具有哪些潛在啟示\n(3) 本研究如何為後續研究者開啟新的探索方向\n\n請使用有力但謹慎的學術語氣，展現研究的視野與雄心，同時避免誇大其詞或超越資料所能支撐的範圍。"],["5","跨學科意涵撰寫","說明研究發現對相鄰學科或跨領域應用的潛在貢獻","請根據我針對 [主題] 的研究發現（[摘要主要發現]），撰寫一段跨學科意涵（約 200–300 字）。\n\n請說明本研究的發現如何：\n(1) 與 [相鄰學科一] 的理論或實務產生對話與連結\n(2) 對 [相鄰學科二或實務領域] 的工作者、教育者或政策制定者具有參考價值\n(3) 促進不同學科之間的知識整合或方法論交流\n\n請使用適當的學術委婉語（如「本研究的發現或可為……領域提供參考」、「本研究結果對……具有初步的啟示意義」），避免過度宣稱跨學科影響力。引用位置標記為 [需補充引用]。"],["5","未來研究建議","提出具體、可執行的未來研究方向，而非泛泛而談","根據我針對 [主題] 所進行的研究，以及我所辨識的以下研究限制：[列出你的限制]，請提出 5 項具體、可執行的未來研究建議。針對每項建議：\n- 說明促成此建議的特定缺口或限制\n- 描述一個可填補此缺口的具體研究設計（研究問題、研究族群、研究方法）\n- 說明此研究將帶來的學術貢獻\n\n請避免「未來研究可以進一步探索此主題」這類模糊的建議。每項建議應足夠具體，讓其他研究者得以據此提出新的研究計畫。"],["abs","學術摘要撰寫","生成符合學術規範的摘要，包含背景、目的、方法、發現與結論","請為我針對 [主題] 撰寫的論文撰寫一篇結構完整的學術摘要（約 [250–300] 字）。請以單一流暢的段落（除非期刊或學校要求使用小標題）涵蓋以下五個要素：\n\n1. 背景與重要性：為何此問題值得研究？[你的研究背景]\n2. 研究目的與問題：本研究旨在達成什麼？[你的研究目的與研究問題]\n3. 研究方法：如何進行研究？[研究取向、樣本、分析方式]\n4. 主要發現：主要研究結果為何？[你的主要發現]\n5. 結論與意涵：這些發現代表什麼意義？誰應該關心？[你的結論]\n\n盡可能使用主動語態。避免使用同一廣泛領域的非專業讀者難以理解的術語。摘要中請勿包含引用資訊，也請勿直接複製論文正文中的句子。"],["rev","章節審查（模擬口委視角）","找出章節中最重要的弱點，並獲得具體的修改建議與範例改寫","請評估以下 [緒論／文獻探討／研究方法／研究結果／討論] 章節：[在此貼上你的章節全文]\n\n請針對以下面向進行評估：論點清晰度、邏輯結構、證據品質、批判性分析、方法論一致性、重複內容、缺乏支撐的主張，以及與我的研究問題的一致性：[列出你的研究問題]。\n\n請以四個部分回覆評估結果：\n(1) 最重要的五個缺點，依嚴重性排列\n(2) 需要修改的具體段落，直接引自我的文章\n(3) 修正結構問題的改善大綱\n(4) 最弱的三個段落之範例改寫\n\n請勿重寫整章或在未說明理由的情況下更動我的核心論點。"],["rev","引用文獻稽核","逐一核查每個重要論點與其引用來源，標記需人工確認的內容","請審查以下草稿與參考文獻清單：[在此同時貼上你的草稿與參考文獻清單]\n\n請建立一個論點—佐證稽核表，包含以下欄位：\n| 論點（來自文章）| 引用來源 | 評估 | 需採取的行動 |\n\n針對每個重要論點，請說明：論點內容、引用來源、該來源是否能充分支持此論點，以及需要採取的行動。\n\n請標記以下問題：缺少引用、引用與內容不符、過度概化、過時證據（此領域超過 [X] 年的研究），以及文章中提及但未出現在參考文獻清單中的文獻。\n\n重要原則：請勿捏造任何引用資訊、DOI、引述、頁碼或出版細節。無法核實的內容請標記為 [需人工確認]。"],["rev","草稿筆記轉學術論證","將你零散的筆記或大綱轉化為有結構、有論點的學術段落","以下是我針對 [章節名稱／主題] 所做的粗略筆記或大綱：\n\n[在此貼上你的粗略筆記]\n\n第一步——請先幫我強化論點架構，不要直接撰寫段落：\n(1) 指出我的筆記中哪些論點最有說服力，哪些較為薄弱或缺乏支撐\n(2) 識別邏輯缺口——哪些論點之間的銜接不夠清晰？\n(3) 建議更強而有力的論點排列順序\n\n確認論點架構後，再將筆記轉化為有結構的學術論證段落（約 [400–600] 字）：\n- 建立清楚的中心論點\n- 以邏輯順序組織各個次要論點\n- 確保段落之間有適當的連接語\n- 使用正式學術語言\n- 在需要補充引用的地方標記 [需補充引用]\n\n請保留我筆記中的核心意思，但升級其學術表達方式。"],["rev","學術語氣潤稿升級","將你的初稿改寫為博士論文學術語氣，去除口語化與 AI 腔","以下是我撰寫的論文段落：\n\n[在此貼上你的文字]\n\n請以博士論文的學術語氣重寫這段文字，要求：\n1. 保留我的原始論點與內容，不增加新的論述\n2. 使用正式、精準的學術用語\n3. 避免口語化表達、模糊用詞或過於簡單的句構\n4. 不要使用 AI 寫作常見的誇大語氣（如「深刻的」、「值得注意的是」、「顯著地」等被過度濫用的詞彙）\n5. 確保每個論點都有清晰的邏輯依據\n6. 保持客觀、有節制的學術語氣\n\n完成重寫後，請另外列出 5 個在改寫前後文字中，聽起來像 AI 生成的慣用詞語或句式，並為每個提供更自然、更具個人學術風格的替代說法。請同時提供一份簡短的修改說明，指出你更動了哪些語言特徵及原因。"]];
+const PBFW=[{"name":"APE","expand":"Action · Purpose · Expectation","items":[["Action","定義任務或活動"],["Purpose","說明目的或意圖"],["Expectation","陳述期望的結果"]]},{"name":"RACE","expand":"Role · Action · Context · Expectation","items":[["Role","指定 AI 扮演的角色"],["Action","說明需要的行動"],["Context","提供情境背景"],["Expectation","描述預期結果"]]},{"name":"COAST","expand":"Context · Objective · Actions · Scenario · Task","items":[["Context","設定對話背景"],["Objective","描述目標"],["Actions","說明需要的行動"],["Scenario","描述情境"],["Task","說明具體任務"]]},{"name":"TAG","expand":"Task · Action · Goal","items":[["Task","定義具體任務"],["Action","描述需要完成的事"],["Goal","說明最終目標"]]},{"name":"RISE","expand":"Role · Input · Steps · Expectation","items":[["Role","指定 AI 角色"],["Input","描述提供的資訊"],["Steps","要求詳細步驟"],["Expectation","描述期望結果"]]},{"name":"TRACE","expand":"Task · Request · Action · Context · Example","items":[["Task","定義具體任務"],["Request","描述所需項目"],["Action","說明需要的行動"],["Context","提供情境"],["Example","舉例說明"]]}];
+const PBSEC=[['pre','選題前'],['1','第一章 緒論'],['2','第二章 文獻探討'],['3','第三章 研究方法'],['4','第四章 研究結果'],['5','第五章 討論與結論'],['abs','摘要'],['rev','修訂與審查']];
+const PBU={'1.0':['研究缺口地圖','研究問題發展'],'1.1':['Move 1 — 建立研究領域','Move 2 — 建立研究缺口','問題陳述精煉'],'1.2':['研究問題發展'],'1.3':['研究目標陳述','Move 3 — 宣告研究目的'],'1.4':['關鍵術語定義'],'1.5':['研究範疇與排除說明'],
+ '2.2':['論文分析①：摘要一句話摘要','論文分析②：研究方法萃取','論文分析③：關鍵發現整理','論文分析④：研究缺口辨識','論文分析⑤：未來研究建議','帶注釋書目條目'],'2.3':['文獻比較矩陣'],'2.4':['主題式文獻綜合寫作','矛盾研究發現整合','核心概念關聯分析'],'2.5':['理論框架選擇'],'2.6':['引用文獻稽核'],
+ '3.1':['研究設計推薦','混合研究設計說明'],'3.3':['研究工具設計','信度與效度評估'],'3.5':['資料分析計畫'],'3.6':['研究倫理考量說明'],
+ '4.1':['描述統計摘要','資料模式與趨勢描述'],'4.3':['假設驗證說明','量化結果呈現'],'4.4':['假設驗證說明'],'4.5':['結果章節引言段落','意外發現分析'],
+ '5.1':['詮釋研究發現'],'5.2':['與前人研究比較'],'5.3':['研究意涵撰寫','研究更廣泛意義陳述'],'5.4':['研究限制陳述','未來研究建議'],'5.5':['政策意涵撰寫'],'5.6':['學術摘要撰寫'],
+ thesis:['章節審查（模擬口委視角）','引用文獻稽核','學術語氣潤稿升級']};
+const pbBy=t=>PB.find(p=>p[1]===t);
+const STRICT='\n\n（請注意：論文正文我會自己寫。請不要產生可以直接貼進論文的完整段落；請改用條列給建議：這段應該包含哪些要素、結構可以怎麼安排、哪些地方需要補文獻。若我附上了草稿，請逐點指出我的草稿缺了什麼、哪一句可以改得更好以及理由。）';
+const pbWrites=t=>/撰寫|寫作|起草|草擬|改寫|潤稿|重寫/.test(t);
+let pbStrict=true,pbF='all';
+function pbVals(){const q=Q(),v={},put=(ks,val)=>{if(val&&String(val).trim())ks.forEach(k=>v[k]=String(val).trim())};
+  const sn=id=>{const m=modById(id);return m&&tplAny(m)?snippet(m):''};
+  const p13=[g('1.3','p1'),g('1.3','p2')].filter(Boolean).join('；');
+  const rq=has(q.pop,q.x,q.y,q.rel)?rqSentence(Object.assign({idx:g('1.2','idx')},q)):'';
+  put(['主題','你的主題','你的研究主題','研究主題','主題／議題'],g('1.0','title'));
+  put(['學科','你的學科','學科／領域'],'運動科學（競技與教練科學）');
+  put(['母體','研究族群','族群','描述你的族群','研究對象與場域'],q.pop);
+  put(['列出你的研究問題','問題','列出研究問題'],rq);
+  put(['研究目的','你的研究目的','你的目的','本研究旨在達成的目標'],p13);
+  put(['你的研究目的與研究問題','列出研究目的或問題'],[p13,rq].filter(Boolean).join('；'));
+  put(['列出你的研究假設，如：H1：X 與 Y 之間存在顯著正相關'],g('2.5','h')||g('1.4','hyp'));
+  put(['列出你的關鍵術語，每行一個'],[g('1.4','term'),q.x,q.y].filter(Boolean).filter((x,i,a)=>a.indexOf(x)===i).join('\n'));
+  put(['貼上你的問題陳述'],sn('1.1'));
+  put(['列出你的研究缺口','文獻中缺少的部分'],g('2.3','gap')||g('1.1','c'));
+  put(['說明本研究填補的特定缺口或創新之處','說明你的研究如何填補現有缺口'],g('1.1','d'));
+  put(['在此貼上你的矩陣'],(S.mx||[]).filter(r=>Object.values(r).some(Boolean)).map(r=>MXC.map(([k,l])=>`${l}：${r[k]||''}`).join('｜')).join('\n'));
+  put(['描述你的設計'],[g('3.1','design'),g('3.1','why')].filter(Boolean).join('；'));
+  put(['描述你的工具'],[g('3.3','tool'),g('3.3','score')].filter(Boolean).join('；'));
+  put(['描述你的聚焦範疇'],g('1.5','scope'));
+  put(['在此貼上你的描述統計數據'],sn('4.1'));
+  put(['在此貼上你的結果','在此貼上你的統計輸出或數值','在此貼上你的統計數值、主題代碼或資料摘要'],sn('4.3'));
+  put(['列出你的主要發現','你的主要發現','列出 3–5 個最重要的發現','摘要你的發現','摘要主要發現','列出你的主要結果'],sn('4.5'));
+  put(['列出你的限制'],[g('5.4','l1'),g('5.4','l2')].filter(Boolean).join('；')||g('1.5','limit'));
+  put(['你的結論'],g('5.5','con'));
+  put(['簡述相關的前人研究發現','簡述你想比較的前人研究結果，並標明來源'],g('5.2','lit'));
+  put(['在此貼上你的文獻摘要或筆記','貼上你的文獻筆記或摘要','貼上相關文獻摘要或筆記','在此貼上相關文獻摘要或筆記'],sn('2.2'));
+  put(['提供作者、年份、標題、期刊等書目資訊'],g('2.2','cite'));
+  return v}
+function pbText(t,m){const v=pbVals();if(m){const s=tplAny(m)?snippet(m):'';if(s){v['在此貼上你的文字']=s;v['在此貼上你的章節全文']=s;v['在此貼上你的粗略筆記']=s}}
+  let out=t.replace(/\[([^\]]+)\]/g,(a,k)=>v[k]?v[k]:a);
+  if(pbStrict&&pbWrites(t)){out+=STRICT;const s=m&&tplAny(m)?snippet(m):'';if(s&&!out.includes(s))out+='\n\n我的草稿：\n'+s}
+  return out}
+const PBKEEP=/^\[(需補充引用|需人工確認|資訊待補|圖 X|表格 X|X)\]$/;
+const pbMark=s=>esc(s).replace(/\[[^\]]+\]/g,a=>PBKEEP.test(a)?a:`<mark>${a}</mark>`);
+function pbCheckPrompt(m){const s=tplAny(m)?snippet(m):'',ti=g('1.0','title');
+  return `我是競技與教練科學研究所的研究生，正在寫論文${ti?`〈${ti}〉`:''}的「${m.title}」這一段（第${NUM[chOf(m).n]}章 ${chOf(m).name}）。以下是我自己寫的草稿。\n\n請你扮演指導教授，不要替我重寫整段，只要：\n1. 依照下列檢核標準逐條判斷「做到／部分做到／沒做到」，並引用我的原句說明；\n2. 指出最需要修改的兩個地方與理由；\n3. 標出需要補文獻的句子，不要捏造任何文獻。\n\n檢核標準：\n${m.checks.map((c,i)=>`${i+1}. ${c}`).join('\n')}\n\n我的草稿：\n${s||'[在此貼上你的草稿]'}`}
+let pbStore={};
+function pbItem(key,title,desc,text,open){pbStore[key]=text;
+  return `<details class="pbi"${open?' open':''}><summary><b>${esc(title)}</b>${desc?`<span>${esc(desc)}</span>`:''}</summary>
+   <div class="pbtext">${pbMark(text)}</div>
+   <div class="btnrow"><button class="btn sm pri" data-act="pbcopy" data-k="${esc(key)}">複製 prompt</button>${(text.match(/\[[^\]]+\]/g)||[]).some(x=>!PBKEEP.test(x))?'<span class="note">黃色標記的地方要你自己補上</span>':''}</div></details>`}
+function pbStrictHTML(){return `<label class="pbstrict"><input type="checkbox" data-act="pbstrict" ${pbStrict?'checked':''}><span>要求 AI 只給建議、不代寫段落（會在 prompt 最後加上這個要求）</span></label>`}
+function pbModHTML(m){const L=(PBU[m.id]||[]).map(pbBy).filter(Boolean);pbStore={};
+  const done=tplAny(m);
+  return `<section class="step" id="s-pb"><header><span class="mono">7</span><h3>帶去其他 AI 工具用的 prompt</h3></header>
+   <p class="note">先自己寫完第 4 步，再把 prompt 貼到 ChatGPT、Claude 或其他工具。方括號裡的資料已從你前面的作答自動帶入；${done?'':'<b>你還沒寫第 4 步，所以草稿位置是空的。</b>'}黃色標記的地方要你自己補上。</p>
+   ${pbStrictHTML()}
+   <div class="pblist" id="pblist">${pbItem('chk','檢查我的草稿（建議先用這個）','依本單元的自我檢核標準請 AI 逐條判斷，不改寫',pbCheckPrompt(m),true)}
+   ${L.map((p,i)=>pbItem('u'+i,p[1],p[2],pbText(p[3],m))).join('')}</div>
+   <p class="note">AI 的回覆只是參考：數字、文獻一定要自己查證，論文正文用自己的話寫。若有使用 AI，請依學校規定在論文中說明用途。 <button class="link" data-act="prompts">看全部 ${PB.length} 個 prompt →</button></p></section>`}
+function pbThesisHTML(){const L=PBU.thesis.map(pbBy).filter(Boolean);
+  return `<section class="step" id="s-pb"><header><h3>初稿寫完之後：請 AI 模擬口委審查</h3></header>
+   <p class="note">把你下載的章節貼進 prompt 中的標記位置。只請 AI 指出問題，修改由你自己動手。</p>${pbStrictHTML()}
+   <div class="pblist" id="pblist">${L.map((p,i)=>pbItem('t'+i,p[1],p[2],pbText(p[3]))).join('')}</div>
+   <p class="note"><button class="link" data-act="prompts">看全部 ${PB.length} 個 prompt →</button></p></section>`}
+function pbLibList(){pbStore={};const L=PB.map((p,i)=>[p,i]).filter(([p])=>pbF==='all'||p[0]===pbF);
+  return PBSEC.filter(([k])=>pbF==='all'||k===pbF).map(([k,l])=>{const it=L.filter(([p])=>p[0]===k);if(!it.length)return '';
+    const us=Object.keys(PBU).filter(u=>u!=='thesis'&&PBU[u].some(t=>it.some(([p])=>p[1]===t)));
+    return `<h2 class="pbh">${esc(l)}<span class="note">${it.length} 個</span></h2>
+    ${it.map(([p,i])=>{const u=Object.keys(PBU).filter(u=>u!=='thesis'&&PBU[u].includes(p[1]));
+      return pbItem('L'+i,p[1],p[2]+(u.length?`（單元 ${u.join('、')}）`:''),pbText(p[3]))}).join('')}`}).join('')}
+function promptsHTML(){
+  return `<button class="back" data-act="home">← 首頁</button>
+  <div class="top"><span class="mono">研究生論文 Prompt 手冊</span><h1>寫完再問 AI</h1>
+   <p class="lede">${PB.length} 個整理好的 prompt，依論文章節分類。每個單元的第 7 步也會列出相關的 prompt，並自動帶入你前面寫過的內容。</p></div>
+  <section class="step"><header><h3>用 AI 的三個原則</h3></header>
+   <ol class="howlist"><li><b>先自己寫</b><span>先在單元裡寫出自己的版本，再請 AI 檢查與比較。讓 AI 代寫整段，口試時說不出為什麼這樣寫。</span></li>
+    <li><b>文獻自己查</b><span>AI 會編出看起來很真的文獻與數字。所有引用都要回到原文確認，prompt 裡已經要求它標記「需補充引用」。</span></li>
+    <li><b>說明用途</b><span>依學校與期刊規定，在論文中說明哪些地方使用了 AI 工具、用來做什麼。</span></li></ol>${pbStrictHTML()}</section>
+  <section class="step"><header><h3>CARS 模式：緒論的三步</h3></header>
+   <p class="note">Swales 的 Create a Research Space 模式，本課程的 1.1 與 1.3 就是照這個順序設計。</p>
+   <div class="cars"><button data-act="mod" data-id="1.1"><b>Move 1 · 建立領域</b><span>這個主題為什麼重要、前人做了什麼（1.1 現象與已知研究）</span></button>
+    <button data-act="mod" data-id="1.1"><b>Move 2 · 指出缺口</b><span>以「然而」開頭，說出還缺什麼（1.1 缺口）</span></button>
+    <button data-act="mod" data-id="1.3"><b>Move 3 · 占據缺口</b><span>本研究要做什麼、目的是什麼（1.1 最後一句、1.3 研究目的）</span></button></div></section>
+  <section class="step"><header><h3>自己寫 prompt 的六種框架</h3></header>
+   <div class="fwgrid">${PBFW.map(f=>`<div class="fw"><b>${esc(f.name)}</b><span class="mono">${esc(f.expand)}</span><ul>${f.items.map(([a,b])=>`<li><b>${esc(a)}</b> ${esc(b)}</li>`).join('')}</ul></div>`).join('')}</div></section>
+  <div class="chips" role="group" aria-label="依章節篩選">${[['all','全部']].concat(PBSEC).map(([k,l])=>`<button class="fchip ${pbF===k?'on':''}" data-act="pbf" data-k="${k}" aria-pressed="${pbF===k}">${esc(l)}</button>`).join('')}</div>
+  <div class="pblist" id="pblist">${pbLibList()}</div>
+  <p class="note">Prompt 內容整理自「研究生論文 Prompt 手冊」，原始靈感來自 <a href="https://github.com/LeSinus/chatgpt-prompts-for-academic-writing" target="_blank" rel="noopener">100 Essential Prompts for Academic Writing</a> 與「7 天完成博士論文」；本課程刪去了讓 AI 代寫整章的 prompt。</p>`}
+async function copyText(s){try{await navigator.clipboard.writeText(s);return true}catch(e){}
+  try{const ta=document.createElement('textarea');ta.value=s;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
+function refreshPB(){const y=window.scrollY;if(view.n==='prompts'){const l=document.getElementById('pblist');if(l)l.innerHTML=pbLibList();return}
+  const s=document.getElementById('s-pb');if(!s)return;const open=[...s.querySelectorAll('details.pbi')].map(d=>d.open);
+  const tmp=document.createElement('div');tmp.innerHTML=view.n==='thesis'?pbThesisHTML():pbModHTML(curMod());const n=tmp.firstElementChild;
+  n.querySelectorAll('details.pbi').forEach((d,i)=>{d.open=!!open[i]});s.replaceWith(n);window.scrollTo(0,y)}
+const DEPTH={home:0,ch:1,thesis:1,prompts:1,sum:2,read:2,mod:2};let lastDepth=null,lastKey='';
 function animateView(){const k=JSON.stringify(view),d=DEPTH[view.n]??1;
   if(k===lastKey)return;let dir=lastDepth===null?'up':d>lastDepth?'fwd':d<lastDepth?'back':'up';
   if(view.n==='mod'&&animateView.id)dir=view.id>animateView.id?'fwd':'back';
@@ -1010,6 +1129,7 @@ function render(){
   else if(view.n==='sum')app.innerHTML=sumHTML(CH[view.c-1]);
   else if(view.n==='thesis')app.innerHTML=thesisHTML();
   else if(view.n==='read')app.innerHTML=readHTML(view.c);
+  else if(view.n==='prompts')app.innerHTML=promptsHTML();
   animateView();
   if(view.n==='home')startHero();
 }
@@ -1097,7 +1217,7 @@ function homeHTML(){
     <h1 class="home-h1">玩完五章，手上就有論文初稿</h1>
     <p class="lede">從選題到摘要，五章拆成 29 個小單元。每個單元先看重點與影片，再做判斷題與排序，最後寫出一段可以直接放進論文的草稿。</p>
     <div class="btnrow"><button class="btn pri" data-act="mod" data-id="${nx.id}">${last?'繼續：':'開始：'}${nx.id} ${esc(nx.title)} →</button>
-     <button class="btn" data-act="thesis">論文初稿</button></div>
+     <button class="btn" data-act="thesis">論文初稿</button><button class="btn" data-act="prompts">Prompt 手冊</button></div>
     <div class="stats">
      <div class="stat"><b>${allDrafts()}<small> / ${ALLMODS.length}</small></b><span>已寫草稿</span></div>
      <div class="stat"><b>${allDone()}<small> / ${ALLMODS.length}</small></b><span>完成單元</span></div>
@@ -1156,9 +1276,10 @@ function modHTML(m){
   <section class="step" id="s-check"><header><span class="mono">5</span><h3>自我檢核</h3></header>
     <div class="checks">${m.checks.map((t,k)=>`<label><input type="checkbox" data-act="chk" data-id="${m.id}" data-k="${k}" ${ck[k]?'checked':''}><span>${esc(t)}</span></label>`).join('')}</div></section>
   <section class="step" id="s-ai"><header><span class="mono">6</span><h3>請 Claude 給回饋</h3></header>
-    <p class="note aion">寫完片段後可以請 Claude 指出需要修改的地方。你的片段文字會送給 Claude 處理。</p><p class="note aioff">這個網址沒有連上 Claude，AI 回饋只在 Claude 網站版提供；可以先用第 5 步的自我檢核。</p>
+    <p class="note aion">寫完片段後可以請 Claude 指出需要修改的地方。你的片段文字會送給 Claude 處理。</p><p class="note aioff">這個網址沒有連上 Claude，AI 回饋只在 Claude 網站版提供；可以先用第 5 步的自我檢核，或用第 7 步的 prompt 帶到其他 AI 工具。</p>
     <div class="btnrow"><button class="btn pri" id="aibtn" data-act="ai" data-id="${m.id}">取得回饋</button><span class="note" id="aihint" ${tplDone(m)?'hidden':''}>把第 4 步的每一欄都寫完，再按「取得回饋」。</span></div>
     <div class="ai" id="aiout" ${S.ai[m.id]?'':'hidden'}>${esc(S.ai[m.id]||'')}</div></section>
+  ${pbModHTML(m)}
   <div class="nav">${prev?`<button class="btn" data-act="mod" data-id="${prev.id}">← ${prev.id} ${esc(prev.title)}</button>`:'<span></span>'}
   ${next?`<button class="btn pri" data-act="mod" data-id="${next.id}">${next.id} ${esc(next.title)} →</button>`:`<button class="btn pri" data-act="sum" data-c="${c.n}">查看第${NUM[c.n]}章草稿</button>`}</div>`;
 }
@@ -1233,6 +1354,7 @@ function thesisHTML(){
     ${[['school','學校'],['dept','系所'],['degree','學位論文'],['student','研究生'],['advisor','指導教授'],['date','年月（例：中華民國 115 年 6 月）']].map(([k,l])=>`<div class="field"><label for="meta-${k}">${l}</label><input type="text" id="meta-${k}" data-meta="${k}" value="${esc(META[k])}"></div>`).join('')}
     <div class="btnrow"><button class="btn pri" data-act="docx">下載 Word 論文檔（.docx）</button><button class="btn" data-act="copyt">複製全文</button><button class="btn" data-act="dlt">下載 Markdown</button></div></section>
   ${consHTML()}
+  ${pbThesisHTML()}
   <h3>純文字預覽</h3>
   <div class="paper" id="sumtext">${esc(thesisText())}</div>`;
 }
@@ -1962,7 +2084,7 @@ ${critText(n)}
 /* ---------- 事件 ---------- */
 function refreshProg(m){const p=document.getElementById('prog');if(p)p.textContent=progText(m);const b=document.getElementById('stepbar');if(b)b.innerHTML=stepbarHTML(m)}
 function stepbarHTML(m){const L=[['s-read','重點'],['s-judge','判斷',judgeDone(m)],['s-order','排序',orderDone(m)]];
-  if(TOOLS[m.id])L.push(['toolsec','工具']);L.push(['s-write','寫草稿',tplDone(m)],['s-check','檢核'],['s-ai','回饋']);
+  if(TOOLS[m.id])L.push(['toolsec','工具']);L.push(['s-write','寫草稿',tplDone(m)],['s-check','檢核'],['s-ai','回饋'],['s-pb','Prompt']);
   return L.map(([id,l,d])=>`<button type="button" class="${d?'ok':''}" data-act="jump" data-to="${id}">${d?'✓ ':''}${l}</button>`).join('')}
 function flash(el){if(!el)return;try{el.scrollIntoView({behavior:'smooth',block:'center'})}catch(e){el.scrollIntoView()}el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}
 function curMod(){return modById(view.id)}
@@ -1974,6 +2096,10 @@ document.addEventListener('click',async e=>{
   if(act==='sum')return go({n:'sum',c:+t.dataset.c});
   if(act==='thesis')return go({n:'thesis'});
   if(act==='read')return go({n:'read',c:+t.dataset.c});
+  if(act==='prompts')return go({n:'prompts'});
+  if(act==='pbcopy'){const s=pbStore[t.dataset.k];if(s==null)return;toast(await copyText(s)?'已複製，貼到 AI 工具後記得補上黃色標記的地方':'無法複製，請手動選取上面的文字');return}
+  if(act==='pbf'){pbF=t.dataset.k;document.querySelectorAll('.fchip').forEach(b=>{const on=b.dataset.k===pbF;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});document.getElementById('pblist').innerHTML=pbLibList();return}
+  if(act==='pbstrict')return;
   if(act==='jump'){const el=document.getElementById(t.dataset.to);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(act==='consai')return runConsAI();
   if(act==='critai')return runCritAI(+t.dataset.c);
@@ -2031,6 +2157,7 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('change',e=>{
   const t=e.target;
+  if(t.dataset.act==='pbstrict'){pbStrict=t.checked;document.querySelectorAll('[data-act=pbstrict]').forEach(x=>x.checked=pbStrict);refreshPB();return}
   if(t.dataset.act==='chk'){const a=S.checks[t.dataset.id]=S.checks[t.dataset.id]||[];a[+t.dataset.k]=t.checked;save()}
 });
 document.addEventListener('input',e=>{
