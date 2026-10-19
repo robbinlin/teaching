@@ -509,7 +509,7 @@ const MODS2=[
   {id:'gap',label:'不一致或缺口',hint:'為什麼還需要檢驗。',ph:'技術性項目未見此關聯（Wang, 2022），划船選手證據仍少',type:'area',min:10},
   {id:'h',label:'研究假設（H1）',hint:'有方向、有指標。',ph:'H1：睡眠時數較少的大專划船選手，賽季疲勞分數顯著較高。',type:'area',min:10},
   {id:'h0',label:'統計假設（H0）',hint:'與研究假設相反、沒有方向。',ph:'H0：睡眠時數與賽季疲勞分數無關聯。',type:'area',min:8}],
-  compose:v=>`根據${P(v.ev)}然而，${P(v.gap)}據此，本研究提出${P(v.h)}對應之統計假設為${P(v.h0)}`},
+  compose:v=>`過去研究指出，${P(v.ev)}然而，${P(v.gap)}據此，本研究之研究假設為${P(v.h)}對應之統計假設為${P(v.h0)}`},
  checks:['假設有方向','每條假設有文獻依據','缺口與假設對得上']},
 {id:'2.6',title:'APA 引註與參考文獻',desc:'引得對，查得到',
  focus:'內文引註標作者與年份，直接節錄加頁碼，第二手要寫「引自」；參考文獻四要素：作者、年份、題名、出處。',
@@ -979,17 +979,25 @@ const steps=m=>m.tpl?(judgeDone(m)?1:0)+(orderDone(m)?1:0)+(tplDone(m)?1:0):0;
 const status=m=>{const s=steps(m);return s===0?['未開始','']:s===3?['已完成','done']:tplDone(m)?['草稿已寫','run']:['進行中','run']};
 const chPct=c=>c.open?Math.round(c.mods.reduce((a,m)=>a+steps(m),0)/(c.mods.length*3)*100):0;
 const chDone=c=>c.open?c.mods.filter(m=>steps(m)===3).length:0;
-const snippet=m=>m.tpl.compose(vals(m));
+const tidy=s=>String(s).replace(/(然而|因此|但是|此外|不過)，\s*\1，?/g,'$1，').replace(/因此，\s*(然而|但是|不過)，/g,'$1，').replace(/(本研究)\s*\1/g,'$1').replace(/。\s*。/g,'。').replace(/，\s*。/g,'。');
+const snippet=m=>tidy(m.tpl.compose(vals(m)));
+const core=s=>String(s||'').replace(/[（(][^）)]*[）)]/g,'').trim();
+const EXT={'1.4':'再加一個名詞或假設','2.2':'再加一篇文獻','3.3':'再加一個變項的測量工具','4.3':'再加一條假設的結果'};
+const OPTF={'1.4':{hyp:1}};
+const extList=id=>((S.ext||{})[id]||[]);
+const extFilled=e=>Object.values(e||{}).some(v=>v&&String(v).trim());
+const valsOf=(m,e)=>{const o={};m.tpl.fields.forEach(f=>{o[f.id]=(e[f.id]||'').trim()||'＿＿'});return o};
+function fullSnippet(m){const ex=extList(m.id).filter(extFilled);if(!ex.length)return snippet(m);
+  if(m.id==='1.4'){const all=[S.tpl['1.4']||{}].concat(ex),v=o=>valsOf(m,o);
+    const terms=all.filter(o=>(o.term||'').trim()).map(o=>{const x=v(o);return `${x.term}：概念性定義為${P(x.con)}本研究之操作性定義為${P(x.def)}`});
+    const hyps=all.map(o=>(o.hyp||'').trim()).filter(Boolean).map(P);
+    return tidy(`名詞釋義\n${terms.join('\n')||'＿＿'}\n\n研究假設\n${hyps.join('\n')||'＿＿'}`)}
+  return [snippet(m)].concat(ex.map(e=>tidy(m.tpl.compose(valsOf(m,e))))).join('\n')}
 const tplAny=m=>!!m&&Object.values(S.tpl[m.id]||{}).some(v=>v&&String(v).trim());
-const chapterText=c=>`第${NUM[c.n]}章　${c.name}\n\n`+c.mods.map(m=>`${m.id} ${SEC[m.id]||m.title}\n${tplDone(m)?snippet(m):'（尚未完成）'}`).join('\n\n');
+const chapterText=c=>{const C=thesisParts().chapters.find(x=>x.n===c.n);return `第${NUM[c.n]}章　${c.name}\n\n`+(C?C.secs:[]).map(s=>`第${CNUM[s.no]}節　${s.title}\n${s.text}`).join('\n\n')};
 const fieldVal=(id,f)=>((S.tpl[id]||{})[f]||'').trim();
-const thesisText=()=>{
-  const m10=modById('1.0'),m56=modById('5.6'),m26=modById('2.6');
-  const title=fieldVal('1.0','title')||'（論文題目尚未填寫）';
-  const abs=m56&&tplDone(m56)?snippet(m56):'（摘要尚未完成）';
-  const rl=allRefs();const refs=rl.length?rl.join('\n'):'（參考文獻尚未完成）';
-  return `${title}\n\n${abs}\n\n`+CH.filter(c=>c.open).map(chapterText).join('\n\n\n')+`\n\n\n參考文獻\n${refs}`;
-};
+const thesisText=()=>{const T=thesisParts();
+  return `${T.title}\n\n摘要\n${T.abs?T.abs.text+'\n關鍵字：'+T.abs.kw:'（摘要尚未完成）'}\n\n`+T.chapters.map(c=>`第${NUM[c.n]}章　${c.name}\n\n`+c.secs.map(s=>`第${CNUM[s.no]}節　${s.title}\n${s.text}`).join('\n\n')).join('\n\n\n')+`\n\n\n參考文獻\n${T.refs.length?T.refs.join('\n'):'（參考文獻尚未完成）'}`};
 const allDone=()=>ALLMODS.filter(m=>steps(m)===3).length;
 const allDrafts=()=>ALLMODS.filter(m=>m.tpl&&tplDone(m)).length;
 const chDrafts=c=>c.open?c.mods.filter(m=>m.tpl&&tplDone(m)).length:0;
@@ -1032,7 +1040,7 @@ const STRICT='\n\n（請注意：論文正文我會自己寫。請不要產生�
 const pbWrites=t=>/撰寫|寫作|起草|草擬|改寫|潤稿|重寫/.test(t);
 let pbStrict=true,pbF='all';
 function pbVals(){const q=Q(),v={},put=(ks,val)=>{if(val&&String(val).trim())ks.forEach(k=>v[k]=String(val).trim())};
-  const sn=id=>{const m=modById(id);return m&&tplAny(m)?snippet(m):''};
+  const sn=id=>{const m=modById(id);return m&&tplAny(m)?fullSnippet(m):''};
   const p13=[g('1.3','p1'),g('1.3','p2')].filter(Boolean).join('；');
   const rq=has(q.pop,q.x,q.y,q.rel)?rqSentence(Object.assign({idx:g('1.2','idx')},q)):'';
   put(['主題','你的主題','你的研究主題','研究主題','主題／議題'],g('1.0','title'));
@@ -1215,7 +1223,7 @@ function homeHTML(){
    <div class="herotext">
     <span class="mono">高等體育研究法 · 競技與教練科學研究所</span>
     <h1 class="home-h1">玩完五章，手上就有論文初稿</h1>
-    <p class="lede">從選題到摘要，五章拆成 29 個小單元。每個單元先看重點與影片，再做判斷題與排序，最後寫出一段可以直接放進論文的草稿。</p>
+    <p class="lede">從選題到摘要，五章拆成 29 個小單元。每個單元先看重點與影片，再做判斷題與排序，最後寫出一段可以直接放進論文的草稿。五章做完，你會有每一節都有內容的初稿骨架，再照同樣格式擴寫成完整論文。</p>
     <div class="btnrow"><button class="btn pri" data-act="mod" data-id="${nx.id}">${last?'繼續：':'開始：'}${nx.id} ${esc(nx.title)} →</button>
      <button class="btn" data-act="thesis">論文初稿</button><button class="btn" data-act="prompts">Prompt 手冊</button></div>
     <div class="stats">
@@ -1272,6 +1280,7 @@ function modHTML(m){
     <div class="tip"><b>這段會進論文的哪裡：</b>${esc(OUT[m.id]||'')}</div>
     ${relatedHTML(m)}${carryHTML(m)}
     ${m.tpl.fields.map(f=>fieldHTML(m,f)).join('')}
+    <div id="extbox">${extHTML(m)}</div>
     <h3>目前的片段</h3><div id="sec-prev">${prevHTML(m)}</div></section>
   <section class="step" id="s-check"><header><span class="mono">5</span><h3>自我檢核</h3></header>
     <div class="checks">${m.checks.map((t,k)=>`<label><input type="checkbox" data-act="chk" data-id="${m.id}" data-k="${k}" ${ck[k]?'checked':''}><span>${esc(t)}</span></label>`).join('')}</div></section>
@@ -1300,8 +1309,15 @@ function fieldHTML(m,f){
   else input=`<textarea id="f-${m.id}-${f.id}" data-f="${f.id}" data-m="${m.id}">${esc(v)}</textarea>`;
   return `<div class="field"><label for="f-${m.id}-${f.id}">${esc(f.label)}</label><span class="hint">${esc(f.hint)}${f.ph?'　例：'+esc(f.ph):''}</span>${input}</div>`;
 }
+function extHTML(m){if(!EXT[m.id])return '';const L=extList(m.id);
+  return `${L.map((e,i)=>`<div class="mxrow ext"><div class="mxhead"><b>第 ${i+2} 筆</b><button class="link" data-act="extdel" data-i="${i}">刪除這筆</button></div>
+   ${m.tpl.fields.map(f=>{const v=e[f.id]||'',idf=`x-${m.id}-${i}-${f.id}`,lab=esc(f.label)+(OPTF[m.id]&&OPTF[m.id][f.id]?'（可留空）':'');
+    const inp=f.type==='select'?`<select id="${idf}" data-xm="${m.id}" data-xi="${i}" data-xf="${f.id}"><option value="">請選擇</option>${f.opts.map(o=>`<option ${o===v?'selected':''}>${esc(o)}</option>`).join('')}</select>`
+     :f.type==='text'?`<input type="text" id="${idf}" data-xm="${m.id}" data-xi="${i}" data-xf="${f.id}" value="${esc(v)}">`:`<textarea id="${idf}" data-xm="${m.id}" data-xi="${i}" data-xf="${f.id}">${esc(v)}</textarea>`;
+    return `<div class="field"><label for="${idf}">${lab}</label>${inp}</div>`}).join('')}</div>`).join('')}
+  <div class="btnrow"><button class="btn" data-act="extadd">＋ ${esc(EXT[m.id])}</button><span class="note">論文裡通常不只一筆，照同樣格式多寫幾筆，會依序接在這一節。</span></div>`}
 function prevHTML(m){const any=Object.values(S.tpl[m.id]||{}).some(x=>x&&x.trim());
-  return `<div class="paper ${any?'':'empty'}">${esc(snippet(m))}</div>${snippet(m).includes('【')?'<p class="verdict bad">片段裡還有【】標記的待補內容。</p>':''}${tplDone(m)?nextBoxHTML(m):'<p class="note">每一欄寫到足夠長度才算完成。</p>'}`}
+  return `<div class="paper ${any?'':'empty'}">${esc(fullSnippet(m))}</div>${fullSnippet(m).includes('【')?'<p class="verdict bad">片段裡還有【】標記的待補內容。</p>':''}${tplDone(m)?nextBoxHTML(m):'<p class="note">每一欄寫到足夠長度才算完成。</p>'}`}
 function nextBoxHTML(m){const c=chOf(m),L=c.mods,nx=L[L.indexOf(m)+1];
   const miss=[[judgeDone(m),'判斷題','s-judge'],[orderDone(m),'排序','s-order']].filter(x=>!x[0]);
   return `<div class="nextbox"><b>這一段已存入第${NUM[c.n]}章草稿。</b>
@@ -1374,7 +1390,7 @@ function thesisParts(){
   const title=fieldVal('1.0','title')||'（論文題目尚未填寫）';
   const abs=m56&&tplDone(m56)?{text:[fieldVal('5.6','aim'),fieldVal('5.6','met'),fieldVal('5.6','res'),fieldVal('5.6','con')].map(P).join(''),kw:fieldVal('5.6','kw')}:null;
   const SKIP={'1.0':1,'2.6':1,'5.6':1};
-  const chapters=CH.filter(c=>c.open).map(c=>({n:c.n,name:c.name,secs:c.mods.filter(m=>!SKIP[m.id]).map((m,i)=>({no:i+1,title:SEC[m.id]||m.title,text:tplDone(m)?snippet(m):'（尚未完成）'}))}));
+  const chapters=CH.filter(c=>c.open).map(c=>({n:c.n,name:c.name,secs:c.mods.filter(m=>!SKIP[m.id]).map((m,i)=>({no:i+1,title:SEC[m.id]||m.title,text:tplDone(m)?fullSnippet(m):'（尚未完成）'}))}));
   const refs=allRefs();
   return {title,abs,chapters,refs};
 }
@@ -1452,12 +1468,12 @@ const CARRY={
  '1.3':{p1:()=>{const q=Q();return has(q.pop,q.x,q.y)?`探討${relPhrase(q)}。`:''}},
  '1.4':{term:()=>Q().y,hyp:()=>{const q=Q();return has(q.pop,q.x,q.y)?hypSentence(q):''}},
  '1.5':{scope:()=>{const q=Q();return q.pop?`本研究對象為${q.pop}${g('3.1','when')?'，資料蒐集期間為'+g('3.1','when'):''}。`:''}},
- '2.1':{c1:()=>Q().pop,c2:()=>Q().x,c3:()=>Q().y},
- '2.4':{link:()=>g('1.1','c')},
- '2.5':{gap:()=>g('1.1','c'),h:()=>g('1.4','hyp'),h0:()=>{const q=Q();return has(q.pop,q.x,q.y)?h0Sentence(q):''}},
+ '2.1':{c1:()=>core(Q().pop),c2:()=>core(Q().x),c3:()=>core(Q().y)},
+ '2.4':{link:()=>{const d=g('1.1','d');return d?`本研究${d.replace(/^本研究/,'')}`:''}},
+ '2.5':{gap:()=>g('1.1','c').replace(/^(然而|但是|不過)[，,]?\s*/,''),h:()=>g('1.4','hyp'),h0:()=>{const q=Q();return has(q.pop,q.x,q.y)?h0Sentence(q):''}},
  '3.1':{who:()=>Q().pop,vars:()=>{const q=Q();return has(q.x,q.y)?`${q.x} → ${q.y}`:''}},
  '3.2':{irb:()=>g('3.6','irb')},
- '3.3':{var:()=>g('1.4','term')||Q().y,proc:()=>g('1.4','def')},
+ '3.3':{var:()=>core(Q().y)||g('1.4','term'),proc:()=>{const y=core(Q().y),t=g('1.4','term');return y&&t&&(t.includes(y)||y.includes(t))?g('1.4','def'):''}},
  '3.5':{h1:()=>{const h=g('2.5','h')||g('1.4','hyp');return h?`${noDot(h)}，採${NEED}`:''}},
  '3.6':{irb:()=>g('3.2','irb')},
  '4.3':{h:()=>g('2.5','h')||g('1.4','hyp'),method:()=>{const m=methodFrom35();return m&&!m.includes('【')?m:''}},
@@ -1469,7 +1485,7 @@ const CARRY={
  '5.5':{con:()=>g('5.1','yes')},
  '5.6':{aim:()=>g('1.3','p1')?`本研究旨在${noDot(g('1.3','p1'))}`:'',
    met:()=>has(g('3.1','who'),g('3.1','design'))?`以${g('3.1','who')}為對象，採${g('3.1','design')}${g('3.1','when')?'，於'+g('3.1','when'):''}`:'',
-   res:()=>g('4.5','sum')||g('4.5','h1'),con:()=>g('5.5','con'),kw:()=>{const q=Q();return [q.x,q.y,q.pop].filter(Boolean).join('、')}}
+   res:()=>g('4.5','sum')||g('4.5','h1'),con:()=>g('5.5','con'),kw:()=>{const q=Q();return [q.x,q.y,q.pop].map(core).filter(Boolean).join('、')}}
 };
 const RELATED={'1.1':['1.0'],'1.2':['1.0'],'1.3':['1.2'],'1.4':['1.2','1.3'],'1.5':['1.2','1.3'],'2.1':['1.0','1.2'],'2.3':['2.2'],'2.4':['1.1','2.3'],'2.5':['1.4','2.3'],
  '3.1':['1.2','1.3'],'3.2':['3.1'],'3.3':['1.4','3.1'],'3.4':['3.1'],'3.5':['1.4','2.5','3.1'],'3.6':['3.1','3.2'],'4.1':['3.2','3.3'],'4.2':['4.1'],
@@ -1479,7 +1495,7 @@ function relatedHTML(m){
   const ids=(RELATED[m.id]||[]).filter(anyFilled);
   if(!ids.length)return '';
   return `<details class="rel"><summary>你前面寫的相關內容（${ids.length}）</summary>${ids.map(id=>{const r=modById(id);
-    return `<div class="relitem"><span class="mono">${id} ${esc(r.title)}</span><p>${esc(snippet(r))}</p></div>`}).join('')}</details>`;
+    return `<div class="relitem"><span class="mono">${id} ${esc(r.title)}</span><p>${esc(fullSnippet(r))}</p></div>`}).join('')}</details>`;
 }
 const carryList=m=>{const c=CARRY[m.id];if(!c)return [];const t=S.tpl[m.id]||{};
   return Object.keys(c).filter(k=>!(t[k]||'').trim()).map(k=>[k,c[k]()]).filter(([,v])=>v)};
@@ -1504,20 +1520,49 @@ const CHAIN=[
  ['研究目的','1.3',()=>[g('1.3','p1'),g('1.3','p2')].filter(Boolean).join(' ')],
  ['研究假設','2.5',()=>g('2.5','h')||g('1.4','hyp')],
  ['研究設計','3.1',()=>[g('3.1','design'),g('3.1','vars')].filter(Boolean).join('；')],
- ['測量工具','3.3',()=>has(g('3.3','var'),g('3.3','tool'))?`${g('3.3','var')}：${g('3.3','tool')}`:''],
+ ['測量工具','3.3',()=>has(g('3.3','var'),g('3.3','tool'))?[`${g('3.3','var')}：${g('3.3','tool')}`].concat(extList('3.3').filter(e=>e.var&&e.tool).map(e=>`${e.var}：${e.tool}`)).join('；'):'','tool'],
  ['統計方法','3.5',()=>g('3.5','h1')],
  ['假設檢驗結果','4.3',()=>{const m=modById('4.3');return tplDone(m)?snippet(m):''}],
  ['主要發現','5.1',()=>g('5.1','yes')],
  ['結論','5.5',()=>g('5.5','con')]];
+function citesIn(t){const out=[],seen={},add=(a,y)=>{a=a.trim();const k=a+'|'+y;if(a&&!seen[k]){seen[k]=1;out.push([a,y])}};
+  const NM='[A-Z][A-Za-z\\u00C0-\\u024F\'’\\-]+|[\\u4e00-\\u9fff]{2,4}';
+  String(t).replace(/[（(]([^（()）]*\d{4}[^（()）]*)[）)]/g,(_,inner)=>{inner.split(/[;；]/).forEach(seg=>{const mm=seg.match(new RegExp('^\\s*(?:如|例如|參見|見)?\\s*('+NM+')[^,，\\d]*[,，]\\s*(\\d{4})'));if(mm)add(mm[1],mm[2])});return _});
+  String(t).replace(new RegExp('('+NM+')(?:\\s*等人?|\\s+et al\\.|\\s*(?:&|and|、|與)\\s*(?:'+NM+'))?\\s*[（(](\\d{4})[a-z]?[）)]','g'),(_,a,y)=>{add(a,y);return _});
+  return out}
+function refHas(refs,a,y){const zh=/[一-鿿]/.test(a);
+  const keys=zh?Array.from({length:a.length-1},(_,i)=>a.slice(i)):[a];
+  return refs.some(r=>r.includes(y)&&keys.some(k=>r.includes(k)))}
+function checksHTML(){const T=thesisParts(),refs=T.refs,body=T.chapters.flatMap(c=>c.secs.map(s=>s.text)).join('\n')+'\n'+(T.abs?T.abs.text:'');
+  const items=[];
+  const cites=citesIn(body),miss=cites.filter(([a,y])=>!refHas(refs,a,y));
+  const uncited=refs.filter(r=>!cites.some(([a,y])=>r.includes(y)&&(/[一-鿿]/.test(a)?Array.from({length:a.length-1},(_,i)=>a.slice(i)).some(k=>r.includes(k)):r.includes(a))));
+  if(!cites.length)items.push(['','引用與參考文獻','正文裡還沒有找到「作者（年份）」格式的引用。']);
+  else items.push([miss.length?'warn':'done','引用與參考文獻',miss.length?`正文引用了 ${miss.map(([a,y])=>`${a}（${y}）`).join('、')}，但參考文獻清單沒有。請到 2.6 用 APA 產生器加入。`:`正文的 ${cites.length} 筆引用都在參考文獻清單裡。`,'2.6']);
+  if(uncited.length)items.push(['warn','只列不引的文獻',`參考文獻清單有 ${uncited.length} 筆在正文沒有被引用：${uncited.map(r=>r.slice(0,40)+'…').join('；')}。APA 規定清單只列正文引用過的文獻。`,'2.6']);
+  const plan=(()=>{const t=g('3.2','n');const a=t.match(/共\s*(\d+)\s*人/)||t.match(/需\s*(?:要)?\s*(\d+)\s*(?:人|名)/);return a?+a[1]:0})();
+  const got=(()=>{const t=g('4.1','n');const a=t.match(/(\d+)\s*(?:人|名)/);return a?+a[1]:0})();
+  if(plan&&got)items.push([got<plan?'warn':'done','樣本數',got<plan?`3.2 估計需要 ${plan} 人，4.1 的有效樣本只有 ${got} 人。檢定力可能不足，第五章限制要說明，不顯著的結果也要保守解釋。`:`有效樣本 ${got} 人，達到 3.2 估計的 ${plan} 人。`,got<plan?'5.4':'4.1']);
+  const lab=t=>new Set((String(t).match(/H\s*(\d+)/g)||[]).map(x=>'H'+x.replace(/\D/g,'')));
+  const defd=lab([g('1.4','hyp'),g('2.5','h')].concat(extList('1.4').map(e=>e.hyp||'')).join(' '));
+  const used=lab([g('4.3','h')].concat(extList('4.3').map(e=>e.h||''),[g('4.5','h1'),g('4.5','h2')]).join(' '));
+  if(defd.size&&used.size){const nd=[...used].filter(x=>!defd.has(x)),nt=[...defd].filter(x=>!used.has(x));
+    items.push([nd.length||nt.length?'warn':'done','假設與結果',(nd.length?`第四章報告了 ${nd.join('、')}，但第一、二章沒有提出這個假設，請到 1.4 再加一筆。`:'')+(nt.length?`${nd.length?'另外，':''}${nt.join('、')} 提出了，但第四章沒有檢驗結果，請到 4.3 再加一筆。`:'')||'第四章檢驗的假設都在前面提出過，提出的假設也都有結果。',nd.length?'1.4':nt.length?'4.3':'4.3'])}
+  if(!items.length)return '';
+  return `<h3>口試前檢查</h3><div class="cons">${items.map(([k,l,t,id])=>`<div class="crow"><div class="clab"><b>${l}</b>${id?` <button class="link" data-act="mod" data-id="${id}">${id}</button>`:''}</div><div class="ctext">${esc(t)}</div><div>${k==='warn'?'<span class="chip warn">要處理</span>':k==='done'?'<span class="chip done">沒問題</span>':'<span class="chip">尚未檢查</span>'}</div></div>`).join('')}</div>`}
+const keyAlts=(k,extra)=>{const c=core(k),alts=new Set([c]);(String(k).match(/[（(]([^）)]*)[）)]/g)||[]).forEach(p=>p.slice(1,-1).split(/與|和|、|及|或|\//).forEach(x=>{x=x.trim().replace(/組$/,'');if(x.length>=2)alts.add(x)}));
+  [c].concat(extra?[core(extra)]:[]).forEach(x=>{if(!x)return;alts.add(x);const s=x.replace(/(高度|分數|成績|表現|時間|程度|時數|次數)$/,'');if(s.length>=2)alts.add(s)});return [...alts].filter(Boolean)};
 function consHTML(){
-  const q=Q(),keys=[q.x,q.y].filter(Boolean);
-  const rows=CHAIN.map(([lab,id,fn])=>{const t=fn();
-    const miss=t?keys.filter(k=>!t.includes(k)):[];
+  const q=Q(),keys=[q.x,q.y].filter(Boolean),alts={[q.x]:keyAlts(q.x),[q.y]:keyAlts(q.y,g('1.2','idx'))};
+  const exp=/實驗/.test(g('3.1','design'));
+  const rows=CHAIN.map(([lab,id,fn,kind])=>{const t=fn();
+    const miss=t?(kind==='tool'&&exp?[q.y].filter(Boolean):keys).filter(k=>!alts[k].some(a=>t.includes(a))).map(core):[];
     const flag=!t?'<span class="chip">尚未填寫</span>':t.includes('【')?'<span class="chip bad">有待補的欄位</span>':!keys.length?'':miss.length?`<span class="chip warn">沒提到：${esc(miss.join('、'))}</span>`:'<span class="chip done">變項一致</span>';
     return `<div class="crow"><div class="clab"><b>${lab}</b> <button class="link" data-act="mod" data-id="${id}">${id}</button></div><div class="ctext">${t?esc(t):'—'}</div><div>${flag}</div></div>`}).join('');
   return `<section class="step"><header><span class="mono">一致性</span><h3>環環相扣檢查</h3></header>
-   <p class="note">論文要「像套環一樣緊密相接」：研究問題、目的、假設、方法、結果、結論談的是同一件事。下表用你在 1.2 填的兩個變項${keys.length?`（${esc(keys.join('、'))}）`:''}檢查每一環有沒有提到；字面不同但意思相同時可以忽略提示。</p>
+   <p class="note">論文要「像套環一樣緊密相接」：研究問題、目的、假設、方法、結果、結論談的是同一件事。下表用你在 1.2 填的兩個變項${keys.length?`（${esc(keys.map(core).join('、'))}）`:''}檢查每一環有沒有提到，括號裡的組別與 1.2 的指標也算；字面不同但意思相同時可以忽略提示。</p>
    <div class="cons">${rows}</div>
+   ${checksHTML()}
    <div class="btnrow"><button class="btn" id="consbtn" data-act="consai">請 Claude 檢查一致性</button></div>
    <div class="ai" id="consout" ${S.ai.cons?'':'hidden'}>${esc(S.ai.cons||'')}</div></section>`;
 }
@@ -1633,7 +1678,7 @@ function choResult(c){
   if(c.q==='rep'){if(c.scale==='cat')return c.k==='2'?['McNemar 檢定','勝算比','同一群人前後兩次的二分類結果']:['Cochran Q 檢定','Kendall W','同一群人三次以上的二分類結果'];
     if(c.k==='2')return np?['Wilcoxon 符號等級檢定','r = Z / √N','前後差值非常態']:['相依樣本 t 檢定','Cohen dz','前後差值近似常態'];
     return np?['Friedman 檢定','Kendall W','三次以上、非常態']:['重複量數變異數分析','partial η²','球形檢定（Mauchly）；違反時用 Greenhouse-Geisser 校正'];}
-  if(c.q==='mix'){return c.scale==='con'?['二因子混合設計變異數分析（組別 × 時間），或以前測為共變項之共變數分析（ANCOVA）','partial η²','看交互作用；ANCOVA 須檢查迴歸斜率同質']
+  if(c.q==='mix'){return c.scale==='con'?['二因子混合設計變異數分析（組別 × 時間），或以前測為共變項之共變數分析（ANCOVA）','partial η²','混合設計看交互作用；ANCOVA 須檢查迴歸斜率同質。兩種擇一，論文裡只寫你實際採用的那一種',[['以前測為共變項之單因子共變數分析（ANCOVA）','ANCOVA'],['二因子混合設計變異數分析（組別 × 時間）','混合設計 ANOVA']]]
     :['以改變量（後測 − 前測）做 Mann-Whitney U 檢定','r = Z / √N','序位或類別結果的前後測比較'];}
   return null;
 }
@@ -1644,7 +1689,7 @@ function choHTML(){const c=choState(),need=choNeed(c);
   ${block('q','1. 你的研究問題是哪一種？')}${c.q?block('scale','2. 依變項（結果）是什麼尺度？'):''}
   ${c.scale&&need.includes('k')?block('k','3. 有幾組（或測幾次）？'):''}${c.scale&&need.includes('norm')?block('norm',`${need.includes('k')?'4':'3'}. 資料分配如何？`):''}
   ${r?`<div class="result"><div class="big">${esc(r[0])}</div><p>效果量：${esc(r[1])}</p><p class="note">要檢查：${esc(r[2])}</p>
-  <div class="btnrow"><button class="btn pri" data-act="chofill" data-v="${esc(r[0])}">帶入下方「假設一 → 統計方法」</button><button class="link" data-act="choreset">重新選</button></div></div>`:''}</div>`}
+  <div class="btnrow">${(r[3]||[[r[0],'']]).map(([v,l])=>`<button class="btn pri" data-act="chofill" data-v="${esc(v)}">帶入${l?'「'+esc(l)+'」':'下方「假設一 → 統計方法」'}</button>`).join('')}<button class="link" data-act="choreset">重新選</button></div></div>`:''}</div>`}
 
 /* ========== 工具三：文獻整理矩陣 ========== */
 const MXC=[['au','作者（年份）'],['who','對象'],['des','設計'],['vars','變項／工具'],['res','主要結果'],['lim','限制'],['rel','與本研究的關係']];
@@ -2117,6 +2162,8 @@ document.addEventListener('click',async e=>{
   else if(act==='clearo'){ord[m.id]=[];document.getElementById('sec-order').innerHTML=orderHTML(m)}
   else if(act==='reseto'){S.order[m.id]={};ord[m.id]=[];save();document.getElementById('sec-order').innerHTML=orderHTML(m);refreshProg(m)}
   else if(act==='ai')runAI(m);
+  else if(act==='extadd'){S.ext=S.ext||{};(S.ext[m.id]=S.ext[m.id]||[]).push({});save();document.getElementById('extbox').innerHTML=extHTML(m);const b=document.querySelectorAll('#extbox .ext');const el=b[b.length-1];if(el){flash(el);const f=el.querySelector('textarea,input,select');if(f)try{f.focus({preventScroll:true})}catch(e){}}}
+  else if(act==='extdel'){extList(m.id).splice(+t.dataset.i,1);save();document.getElementById('extbox').innerHTML=extHTML(m);document.getElementById('sec-prev').innerHTML=prevHTML(m)}
   else if(act==='carry'){const L=carryList(m);const o=S.tpl[m.id]=S.tpl[m.id]||{};L.forEach(([k,v])=>{o[k]=v});save();
     lastCarry={id:m.id,n:L.length,src:(CSRC[m.id]||[]).filter(anyFilled).map(srcName).join('、')};
     const y=window.scrollY;render();window.scrollTo(0,y);
@@ -2167,6 +2214,7 @@ document.addEventListener('input',e=>{
   if(t.dataset.mx!==undefined){const r=(S.mx||[])[+t.dataset.mx];if(r){r[t.dataset.mxk]=t.value;save()}return}
   if(t.dataset.ap){S.ap=Object.assign(apState(),{[t.dataset.ap]:t.value});save();const o=document.getElementById('apout');if(o)o.innerHTML=apOutHTML();return}
   if(t.dataset.cr){const n=t.dataset.cr;S.crit=S.crit||{};const a=S.crit[n]=S.crit[n]||{};a[t.dataset.crk]=t.value;save();const ct=document.getElementById('crittext');if(ct)ct.textContent=critText(+n);return}
+  if(t.dataset.xm){const m=modById(t.dataset.xm),e=extList(m.id)[+t.dataset.xi];if(e){e[t.dataset.xf]=t.value;save();document.getElementById('sec-prev').innerHTML=prevHTML(m)}return}
   if(!t.dataset.f)return;
   const m=modById(t.dataset.m);const o=S.tpl[m.id]=S.tpl[m.id]||{};o[t.dataset.f]=t.value;save();
   document.getElementById('sec-prev').innerHTML=prevHTML(m);refreshProg(m);
