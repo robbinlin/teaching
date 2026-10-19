@@ -123,7 +123,7 @@ details.lec summary,details.rel summary{cursor:pointer;font-weight:500;padding:8
 .nextbox{border:1px solid var(--ok);background:var(--okbg);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
 .nextbox b{color:var(--ok)}
 .resume{border-left:4px solid var(--accent)}
-.noai #s-ai .btnrow,.noai #s-ai .ai,.noai #consbtn,.noai #critai{display:none}.aioff{display:none}.noai .aioff{display:block}
+.noai #s-ai .btnrow,.noai #s-ai .ai,.noai #consbtn,.noai #critai{display:none}.aioff{display:none}.noai .aioff{display:block}.noai .aion{display:none}
 details.lec ul{margin:10px 0 0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
 .ex{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
 .gpts{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}.gpts li div{margin-top:4px;font-size:14px;line-height:1.7}
@@ -210,7 +210,7 @@ const MODS=[
  tpl:{fields:[
   {id:'a',label:'現象或趨勢',hint:'寫一句完整的話，交代對象與議題。',ph:'近年大專划船選手的賽季訓練量持續提高，疲勞累積受到關注。',type:'area'},
   {id:'b',label:'已知的研究',hint:'過去研究做了什麼。',ph:'過去研究多以心率與主觀疲勞量表監測訓練負荷。',type:'area'},
-  {id:'c',label:'缺口',hint:'以「然而」開頭，指出缺少什麼。',ph:'然而，針對女性選手的多指標監測證據仍少。',type:'area'},
+  {id:'c',label:'缺口',hint:'以「然而」開頭，指出缺少什麼。',ph:'然而，結合睡眠與主觀疲勞的多指標監測證據仍少。',type:'area'},
   {id:'d',label:'本研究要做什麼',hint:'接在「因此，本研究」後面。',ph:'欲探討睡眠與賽季疲勞之間的關聯',type:'area',min:6}],
   compose:v=>`${P(v.a)}${P(v.b)}${P(v.c)}因此，本研究${P(v.d)}`},
  checks:['有具體的對象或情境','已知與缺口之間有轉折','缺口是能被這個研究回答的']},
@@ -220,7 +220,7 @@ const MODS=[
  tip:'句型：（對象）的（變項一）與（變項二）是否有（關係）？若是介入研究，再加上成效方向（增加／減少）與指標。多個研究問題之間要相關但不重疊。',
  judge:{prompt:'哪些問句適合當研究問題？',items:[
   {text:'運動訓練好不好？',good:false,why:'沒有對象、沒有指標，無法用資料回答。'},
-  {text:'八週高強度間歇訓練是否能改善大專男子划船選手的 2000 公尺測驗成績？',good:true,why:'介入、對象、結果指標都很清楚。'},
+  {text:'八週高強度間歇訓練是否能改善大專划船選手的 2000 公尺測驗成績？',good:true,why:'介入、對象、結果指標都很清楚。'},
   {text:'為什麼選手會受傷？',good:false,why:'原因太多，範圍過大。'},
   {text:'大專田徑選手的睡眠時數與賽季疲勞分數是否有關聯？',good:true,why:'兩個變項、一個對象，可以直接蒐集資料。'}]},
  order:{prompt:'把縮小題目的四個步驟排好。',parts:[
@@ -231,12 +231,12 @@ const MODS=[
   why:'由大到小：主題、對象、變項，最後寫成問句。'},
  tpl:{fields:[
   {id:'pop',label:'研究對象',hint:'誰？越具體越好。',ph:'大專划船選手',type:'text',min:2},
-  {id:'x',label:'變項一',hint:'你要看的因子。',ph:'睡眠時數',type:'text',min:2},
+  {id:'x',label:'變項一（自變項）',hint:'你要看的因子；比較差異時寫分組方式，例如「訓練方式」「性別」。',ph:'睡眠時數',type:'text',min:2},
   {id:'y',label:'變項二或結果',hint:'你要測的結果。',ph:'賽季疲勞分數',type:'text',min:2},
   {id:'idx',label:'指標或量數',hint:'依變項用什麼數值呈現。',ph:'Borg CR-10 分數',type:'text',min:2},
   {id:'rel',label:'關係',hint:'選一種你要檢驗的關係。',type:'select',opts:['是否有關聯','是否有顯著差異','能否有效預測'],min:2}],
-  compose:v=>`本研究的研究問題為：${v.pop}的${v.x}與${v.y}（以${v.idx}為指標）${v.rel}？`},
- checks:['對象具體','兩個變項都能被測量','答案不是只有「是」或「否」的常識']},
+  compose:v=>`本研究的研究問題為：${rqSentence(v)}`},
+ checks:['對象具體','兩個變項都能被測量','答案不是一看就知道的常識']},
 {id:'1.3',title:'研究目的',desc:'用動詞開頭的目的句',
  focus:'目的句以動詞開頭，並與研究問題一一對應。',
  lead:'研究目的是研究問題的陳述版。每一條目的都用動詞開頭，例如探討、比較、驗證、建立，並且能用結果回答。',
@@ -246,8 +246,8 @@ const MODS=[
   {text:'讓大家更重視運動。',good:false,why:'這是願景，不是能用資料回答的目的。'},
   {text:'了解、研究、看看相關情形。',good:false,why:'動詞太模糊，沒有對象與變項。'},
   {text:'比較有無血流限制訓練的兩組選手在下肢肌力的差異。',good:true,why:'清楚指出比較的組別與指標。'}]},
- order:{prompt:'把四個片段拼成一句目的。',parts:['探討','大專排球選手','八週肌力訓練','對垂直跳高度的影響'],
-  why:'動詞 → 對象 → 介入 → 結果，是目的句最常用的骨架。'},
+ order:{prompt:'把四個片段拼成一句目的。',parts:['探討','八週肌力訓練','對大專排球選手','垂直跳高度的影響'],
+  why:'動詞 → 介入 → 對象 → 結果，是介入研究目的句最常用的骨架。'},
  tpl:{fields:[
   {id:'p1',label:'目的一',hint:'以動詞開頭。',ph:'探討八週肌力訓練對大專排球選手垂直跳高度的影響。',type:'area',min:8},
   {id:'p2',label:'目的二',hint:'可以是比較、驗證或建立。',ph:'比較不同訓練頻率對下肢爆發力的差異。',type:'area',min:8}],
@@ -273,7 +273,7 @@ const MODS=[
  checks:['概念性與操作性定義都有','操作性定義裡有工具名稱','研究假設有方向，不是「沒有差異」']},
 {id:'1.5',title:'範圍、限制與重要性',desc:'誠實交代邊界，說清價值',
  focus:'範圍交代誰、何時、何地；限制說明推論邊界；重要性分理論與實務。',
- lead:'範圍（delimitation）是你刻意設定的邊界：對象、時間、地點、內容。限制（limitation）是威脅研究品質、你控制不了的部分。講義提醒：研究範圍和研究方法都不能列為限制；真正的限制要做完研究才知道，所以這裡先寫「預期的限制」，第五章再寫實際遇到的。重要性不要誇大，說清楚誰可以用這個結果做什麼。',
+ lead:'範圍（delimitation）是你刻意設定的邊界：對象、時間、地點、內容。限制（limitation）是威脅研究品質、你控制不了的部分。講義提醒：研究範圍和研究方法本身都不能列為限制，要寫的是它們帶來、你控制不了的影響（例如方便取樣使推論受限）；真正的限制要做完研究才知道，所以這裡先寫「預期的限制」，第五章再寫實際遇到的。重要性不要誇大，說清楚誰可以用這個結果做什麼。',
  tip:'重要性可以分成理論貢獻與實務應用兩句。',
  judge:{prompt:'哪些句子寫得恰當？',items:[
   {text:'本研究對象限於 2026 年就讀北部大專院校之男女划船校隊選手，推論至其他族群時須謹慎。',good:true,why:'範圍明確，也交代推論邊界。'},
@@ -289,7 +289,7 @@ const MODS=[
  tpl:{fields:[
   {id:'scope',label:'研究範圍',hint:'對象、時間、地點。',ph:'本研究對象為 2026 年就讀北部大專院校之划船校隊選手。',type:'area',min:8},
   {id:'limit',label:'預期的研究限制',hint:'取樣或測量上可預見的限制；不要把範圍或方法寫成限制。',ph:'因採方便取樣，結果推論至其他族群時須謹慎。',type:'area',min:8},
-  {id:'sig',label:'研究重要性',hint:'理論一句、實務一句。',ph:'本研究可補充女性選手疲勞監測的證據，並提供教練調整訓練量的參考。',type:'area',min:8}],
+  {id:'sig',label:'研究重要性',hint:'理論一句、實務一句。',ph:'本研究可補充大專划船選手疲勞監測的證據，並提供教練調整訓練量的參考。',type:'area',min:8}],
   compose:v=>`研究範圍\n${P(v.scope)}\n\n預期之研究限制\n${P(v.limit)}\n\n研究重要性\n${P(v.sig)}`},
  checks:['範圍沒有被寫成限制','限制是真的限制，不是優點','重要性沒有誇大']}
 ];
@@ -451,7 +451,7 @@ const MODS3=[
   why:'從問題出發，看可行性，定設計，再畫圖。'},
  tpl:{fields:[
   {id:'design',label:'設計類型',hint:'選一個。',type:'select',opts:['實驗研究（隨機分派）','準實驗研究（不等組前後測）','相關研究','調查研究','發展研究（橫斷或縱貫）','質性研究','混合方法研究'],min:2},
-  {id:'why',label:'採取此設計的理由',hint:'依講義示例：目的屬於什麼問題→適合什麼方法→做不到什麼→所以採什麼。',ph:'本研究目的在推論介入與成績的因果關係，適合實驗研究；但無法隨機分派個別選手，僅能以隊為單位分派，故採準實驗研究',type:'area',min:15},
+  {id:'why',label:'採取此設計的理由',hint:'依講義示例：目的屬於什麼問題→適合什麼方法→做不到什麼→所以採什麼。',ph:'本研究目的在探討睡眠時數與賽季疲勞的關聯，不操弄自變項，適合相關研究；為掌握賽季中的變化，採每週重複測量',type:'area',min:15},
   {id:'who',label:'研究對象',hint:'族群與人數。',ph:'北部三所大專院校划船校隊選手約 60 名',type:'text',min:6},
   {id:'when',label:'資料蒐集時間與次數',hint:'什麼時候、測幾次。',ph:'2026 年賽季期間，每週測量一次，共 12 週',type:'text',min:6},
   {id:'vars',label:'研究架構：自變項 → 依變項',hint:'寫成「自變項→依變項」，有調節或控制變項也列出。',ph:'睡眠時數 → 賽季疲勞分數；控制變項：每週訓練量',type:'text',min:6}],
@@ -539,7 +539,7 @@ const MODS3=[
   '判斷變項的尺度：名目、序位、等距或等比。',
   '分清自變項與依變項，數組別與測量次數。',
   '依尺度與設計選方法：相關、t 檢定、ANOVA 或迴歸。',
-  '檢查假設：常態性、變異數同質性、獨立性；不符則改無母數方法。'],
+  '檢查前提假設（assumptions）：常態性、變異數同質性、獨立性；不符則改無母數方法。'],
   why:'尺度 → 自依變項 → 方法 → 假設檢查。'},
  tpl:{fields:[
   {id:'clean',label:'資料清理',hint:'遺漏值與極端值怎麼處理。',ph:'遺漏值以配對刪除處理；以 Shapiro-Wilk 檢定常態性',type:'area',min:8},
@@ -601,12 +601,12 @@ const MODS4=[
 {id:'4.2',title:'圖表設計',desc:'一張表只講一件事',
  focus:'表格要有編號、標題、單位、註解；圖要有軸標籤、誤差線、圖例；文字不重複表格內容。',
  lead:'表格和圖是結果章的主角。表要有編號和標題（放在表上方）、欄位單位、顯著性註解（放在表下方）；圖要有軸標籤和單位、誤差線代表什麼、圖例。一張表或圖只回答一個問題，文字只點出重點，不要把表格的數字再唸一遍。',
- tip:'APA 格式：表標題在表上方、圖標題在圖下方；註解用 * p < .05、** p < .01。',
+ tip:'APA 第 7 版：表與圖的編號、標題都在上方，註解在下方，用 * p < .05、** p < .01（若系所格式要求圖題在下，依系所規定）。',
  judge:{prompt:'哪些圖表做法合格？',items:[
   {text:'表 4-2 標題「兩組前後測 2000 公尺成績（秒）之平均數與標準差」，表下註 * p < .05。',good:true,why:'編號、標題、單位、註解齊全。'},
   {text:'圖的 Y 軸只寫「分數」，沒有單位，誤差線也沒說明。',good:false,why:'讀者不知道量什麼、誤差線代表什麼。'},
   {text:'一張表同時放描述統計、相關矩陣和迴歸結果。',good:false,why:'一張表塞太多，讀者抓不到重點。'},
-  {text:'圖 4-1 的文字說明：「訓練組後測成績顯著優於控制組（圖 4-1）」，不再逐一唸出每組數字。',good:true,why:'文字點出重點，細節留給圖。'}]},
+  {text:'圖 4-1 的文字說明：「兩組後測成績差異未達顯著（圖 4-1）」，不再逐一唸出每組數字。',good:true,why:'文字點出重點，細節留給圖。'}]},
  order:{prompt:'製作一張結果表的四個步驟排序。',parts:[
   '決定這張表要回答哪一個問題。',
   '安排欄與列：組別為列、變項或時間點為欄。',
@@ -624,11 +624,11 @@ const MODS4=[
  focus:'每條假設一段：方法、統計量、自由度、p 值、效果量、方向，最後一句說假設是否獲得支持。',
  lead:'推論統計要照第一章假設的順序報告，一條假設一段。每段寫：用什麼方法、統計量與自由度（t(56) = 2.31）、p 值、效果量、差異或關聯的方向，最後明確說「假設獲得支持」或「未獲支持」。不要在結果章解釋原因，那是第五章的事。',
  tip:'APA 格式範例：t(56) = 2.31, p = .025, d = 0.61；r(56) = −.42, p = .001。',
- judge:{prompt:'下面哪些是講義與 Streiner 提醒的常見錯誤？選「可以用」代表寫法正確。',items:[
+ judge:{prompt:'下面四種報告寫法，哪些可以用？要修改的，正是講義與 Streiner 提醒的常見錯誤。',items:[
   {text:'睡眠時數與疲勞分數呈顯著負相關，r(56) = −.42, p = .001，睡眠越少疲勞越高，H1 獲得支持。',good:true,why:'統計量、p 值、方向、假設結論都有。'},
   {text:'兩組差異達顯著，p = .000。',good:false,why:'p 值永遠不會是 0，SPSS 顯示 .000 要寫成 p < .001。'},
   {text:'兩組後測成績差異未達顯著，t(56) = 1.12, p = .27, d = 0.29，H2 未獲支持。',good:true,why:'不顯著也要完整報告，並說明假設結論。'},
-  {text:'t = −2.31，負號代表訓練有負面效果。',good:false,why:'t 的正負只反映哪一組先減，本身沒有意義；方向要看平均數。'}]},
+  {text:'t = −2.31，負號代表訓練有負面效果。',good:false,why:'t 的正負只反映哪一組減哪一組，本身沒有意義；方向要看平均數。'}]},
  order:{prompt:'一段推論統計的四個部分排序。',parts:[
   '說明檢驗的假設與使用的方法。',
   '報告統計量、自由度與 p 值。',
@@ -645,7 +645,7 @@ const MODS4=[
  checks:['有統計量與自由度','有效果量','有明確說假設是否支持']},
 {id:'4.4',title:'效果量與信賴區間',desc:'顯著不等於重要',
  focus:'p 值說有沒有差異，效果量說差異多大，信賴區間說估計多準。三個一起報。',
- lead:'p < .05 只代表差異不太可能是隨機造成的，不代表差異大到有實務意義；統計顯著不等於臨床或教練上的重要。效果量（d、r、η²）說明差異或關聯的大小，95% 信賴區間說明估計的精確度。Streiner 還提醒「型三錯誤」：檢定相關係數是否大於零沒有意義，應該檢定它是否大於一個可接受的最小值，或看信賴區間下限有沒有超過那個值。',
+ lead:'p < .05 只代表差異不太可能是隨機造成的，不代表差異大到有實務意義；統計顯著不等於臨床或教練上的重要。效果量（d、r、η²）說明差異或關聯的大小，95% 信賴區間說明估計的精確度。Streiner 還提醒不要「檢驗不相關的假設」：檢定信度或效度係數是否大於零沒有意義，應該檢定它是否大於一個可接受的最小值，或看信賴區間下限有沒有超過那個值。',
  tip:'常用參考：Cohen d 0.2 小、0.5 中、0.8 大；r 0.1 小、0.3 中、0.5 大。但要看領域慣例。',
  judge:{prompt:'哪些解讀正確？',items:[
   {text:'量表的信度係數顯著大於零，p < .001，所以信度良好。',good:false,why:'信度係數大於零是廢話；要看它有沒有達到可接受的值（例如 .70），這是 Streiner 說的檢驗不相關假設。'},
@@ -669,8 +669,8 @@ const MODS4=[
  focus:'結果章只描述發現：客觀、過去式、照假設順序、文字與圖表互補不重複。',
  lead:'結果章最常見的毛病有三個：把討論提前寫進來、文字重複表格數字、順序和假設對不上。寫的時候記住：只說「發現了什麼」，不說「為什麼」；每段對應一條假設；文字點重點，數字看表。語氣用過去式、客觀陳述。',
  tip:'避免「證明」「顯示出驚人的效果」這類用語，改用「結果顯示」「達顯著差異」。',
- judge:{prompt:'哪些推論合理？講義列了八種錯誤推理：同語反覆、模糊歸因、生態謬誤、過度推論、相關誤為因果、選擇性報導、過度簡化、訴諸錯誤權威。',items:[
-  {text:'訓練組後測成績顯著優於控制組，F(1, 55) = 6.84, p = .011, partial η² = .11。',good:true,why:'客觀報告，有統計量。'},
+ judge:{prompt:'哪些推論合理？講義列舉的錯誤推理包括：同語反覆、模糊歸因、生態謬誤、過度推論、相關誤為因果、選擇性報導、過度簡化、訴諸錯誤權威。',items:[
+  {text:'控制前測後，兩組後測 2000 公尺成績差異未達顯著，F(1, 55) = 1.21, p = .28, partial η² = .02，H2 未獲支持。',good:true,why:'客觀報告，有統計量與效果量，不因未顯著而迴避。'},
   {text:'睡眠時數與疲勞分數有負相關，因此睡眠不足導致疲勞。',good:false,why:'相關誤為因果。橫斷相關無法確定方向，也可能是疲勞導致睡不好。'},
   {text:'本校划船隊 60 人中有 52 人睡眠不足，顯示台灣大專運動員普遍睡眠不足。',good:false,why:'過度推論。一校方便樣本不能推到全台灣大專運動員。'},
   {text:'睡眠時數與疲勞分數呈負相關，但與 2000 公尺成績之相關未達顯著，r(56) = −.15, p = .26。',good:true,why:'顯著與不顯著都如實報告。'}]},
@@ -681,8 +681,8 @@ const MODS4=[
   '結果摘要：各假設支持情形的總表。'],
   why:'先描述，再逐條假設，最後總結。'},
  tpl:{fields:[
-  {id:'h1',label:'假設一結果（一句）',hint:'含統計量與結論。',ph:'睡眠時數與疲勞分數呈顯著負相關（r = −.42, p = .001），H1 獲得支持',type:'area',min:12},
-  {id:'h2',label:'假設二結果（一句）',hint:'含統計量與結論。',ph:'兩組後測成績差異未達顯著（t = 1.12, p = .27），H2 未獲支持',type:'area',min:12},
+  {id:'h1',label:'假設一結果（一句）',hint:'含統計量與結論。',ph:'睡眠時數與疲勞分數呈顯著負相關（r(56) = −.42, p = .001），H1 獲得支持',type:'area',min:12},
+  {id:'h2',label:'假設二結果（一句）',hint:'含統計量與結論。',ph:'兩組後測成績差異未達顯著（t(56) = 1.12, p = .27），H2 未獲支持',type:'area',min:12},
   {id:'sum',label:'結果摘要',hint:'整體一句話。',ph:'本研究兩項假設中，一項獲得支持，一項未獲支持',type:'area',min:8}],
   compose:v=>`綜合而言，${P(v.h1)}${P(v.h2)}${P(v.sum)}`},
  checks:['沒有解釋原因','語氣客觀','順序與假設一致']}
@@ -730,10 +730,10 @@ const MODS5=[
   {id:'find',label:'本研究的發現',hint:'一項。',ph:'八週肌力訓練未顯著改善 2000 公尺成績',type:'area',min:8},
   {id:'lit',label:'過去研究的發現',hint:'作者年份與結果。',ph:'Lee（2021）發現十六週肌力訓練可改善成績',type:'area',min:8},
   {id:'rel',label:'一致或不一致',hint:'選一個。',type:'select',opts:['一致','部分一致','不一致'],min:2},
-  {id:'why',label:'可能原因或意義',hint:'有依據的解釋。',ph:'介入期間不同，八週可能不足以產生神經肌肉適應',type:'area',min:10}],
+  {id:'why',label:'可能原因或意義',hint:'有依據的解釋。',ph:'八週增加的肌力可能尚未轉移到以耐力為主的 2000 公尺成績',type:'area',min:10}],
   compose:v=>`${P(v.find)}此結果與${v.lit}${v.rel==='一致'?'一致':v.rel==='部分一致'?'部分一致':'不同'}，可能原因為${P(v.why)}`},
  checks:['有引用具體文獻','不一致有解釋','解釋有依據']},
-{id:'5.3',title:'理論意涵與實務應用',desc:'為什麼會這樣、可以用在哪',
+{id:'5.3',title:'機制解釋與應用範圍',desc:'為什麼會這樣、可以用在哪',
  focus:'用理論或生理、心理機制解釋發現，區分「資料支持的解釋」和「推測」。',
  lead:'讀者不只想知道「有關聯」，還想知道「為什麼」。從生理、心理或訓練學的理論提出機制，例如睡眠不足影響恢復與自律神經調節，進而提高疲勞感。但要區分哪些是你的資料直接支持的，哪些是合理推測，推測要用「可能」「推測」等字眼。',
  tip:'句型：「此關聯可能透過……機制產生（理論或文獻），惟本研究未直接測量……，有待後續驗證。」',
@@ -741,7 +741,7 @@ const MODS5=[
   {text:'睡眠不足可能透過降低恢復效率與自律神經調節能力，提高主觀疲勞（Fullagar et al., 2015）；惟本研究未測量心率變異，此機制有待驗證。',good:true,why:'有理論依據，也坦白資料的限制。'},
   {text:'睡眠不足就是會累，這是常識。',good:false,why:'沒有機制，也沒有依據。'},
   {text:'本研究證實了睡眠透過自律神經影響疲勞的機制。',good:false,why:'研究沒有測量該機制，不能說「證實」。'},
-  {text:'肌力訓練未改善成績，推測八週不足以產生神經肌肉適應，相關研究指出此類適應多需十二週以上（Suchomel et al., 2018）。',good:true,why:'推測有文獻支撐，且用詞謹慎。'}]},
+  {text:'肌力訓練未改善 2000 公尺成績，推測八週增加的肌力尚未轉移到這類以耐力為主的專項表現，此推測仍待後續研究檢驗。',good:true,why:'提出合理機制，用詞謹慎，並說明需要驗證。'}]},
  order:{prompt:'寫一段機制解釋的四個步驟排序。',parts:[
   '點出要解釋的發現。',
   '提出理論或生理心理機制，引用文獻。',
@@ -763,7 +763,7 @@ const MODS5=[
   {text:'本研究採方便取樣，樣本來自北部三校，結果推論至其他地區或層級選手時須謹慎；未來研究可採分層取樣納入不同地區校隊。',good:true,why:'限制具體、說明影響、未來方向對應。'},
   {text:'本研究的限制是樣本太少，未來研究應增加樣本。',good:false,why:'太籠統，沒說少到什麼程度、影響什麼。'},
   {text:'睡眠以活動量計估計，無法區分睡眠階段；未來可結合多頻道睡眠儀於實驗室情境驗證。',good:true,why:'測量限制與對應的改進方向。'},
-  {text:'本研究的限制是只研究大專划船選手，且採量化方法。',good:false,why:'這是研究範圍與研究方法，是你自己設定的，講義明確說不能列為限制。'}]},
+  {text:'本研究的限制是只研究大專划船選手，且採量化方法。',good:false,why:'只寫範圍或方法本身不是限制；限制要寫這個選擇帶來、你控制不了的影響，例如「方便取樣使結果難以推論到其他層級選手」。'}]},
  order:{prompt:'寫一個限制的四個部分排序。',parts:[
   '限制是什麼。',
   '對結果解讀的影響。',
@@ -815,12 +815,12 @@ const MODS5=[
   why:'目的 → 方法 → 結果 → 結論。'},
  tpl:{fields:[
   {id:'aim',label:'目的',hint:'一到兩句。',ph:'本研究旨在探討大專划船選手睡眠時數與賽季疲勞之關聯',type:'area',min:10},
-  {id:'met',label:'方法與參與者',hint:'對象、設計、工具、期間。',ph:'以北部三校 58 名划船校隊選手為對象，採橫斷式觀察設計，連續 12 週以活動量計記錄睡眠並填寫 Borg CR-10',type:'area',min:15},
+  {id:'met',label:'方法與參與者',hint:'對象、設計、工具、期間。',ph:'以北部三校 58 名划船校隊選手為對象，採縱貫式觀察設計，連續 12 週以活動量計記錄睡眠並填寫 Borg CR-10',type:'area',min:15},
   {id:'res',label:'結果',hint:'主要發現與數字。',ph:'睡眠時數與疲勞分數呈中度負相關（r = −.42, p = .001），與 2000 公尺成績無顯著關聯',type:'area',min:12},
   {id:'con',label:'結論',hint:'意涵或應用。',ph:'睡眠監測可作為大專划船選手疲勞管理的參考指標',type:'area',min:10},
   {id:'kw',label:'關鍵字',hint:'3–5 個，以頓號分隔。',ph:'睡眠、疲勞監測、划船、大專運動員',type:'text',min:6}],
   compose:v=>`摘要\n${P(v.aim)}${P(v.met)}${P(v.res)}${P(v.con)}\n關鍵字：${v.kw}`},
- checks:['五個部分都有','結果有數字','沒有樣板句','關鍵字 3–5 個']}
+ checks:['目的、方法與參與者、結果、結論都有','結果有數字','沒有樣板句','關鍵字 3–5 個']}
 ];
 const PLAN=[
  {n:2,name:'文獻探討',mods:[['2.1','如何搜尋文獻'],['2.2','閱讀與摘要'],['2.3','文獻整理矩陣'],['2.4','撰寫文獻評析'],['2.5','由文獻導出假設']]},
@@ -861,7 +861,7 @@ const OUT={
 '4.5':'進第四章結尾的「結果摘要」：各假設支持情形的總結。',
 '5.1':'進第五章第一節「主要發現」：重述目的、白話總結支持與不支持的發現。',
 '5.2':'進第五章「與文獻比較」：本研究發現與過去研究一致或不一致，以及可能原因。',
-'5.3':'進第五章「理論意涵與實務應用」：用機制解釋發現，並說明可應用的範圍。',
+'5.3':'進第五章「機制解釋與應用範圍」：用機制解釋發現，並說明可應用的範圍。',
 '5.4':'進第五章「研究限制與未來研究建議」：每個限制配一個未來方向。',
 '5.5':'進第五章「結論與建議」：結論一到兩句，學術與實務建議各一句。',
 '5.6':'進論文最前面的「摘要」頁與關鍵字。'
@@ -877,7 +877,7 @@ const status=m=>{const s=steps(m);return s===0?['未開始','']:s===3?['已完�
 const chPct=c=>c.open?Math.round(c.mods.reduce((a,m)=>a+steps(m),0)/(c.mods.length*3)*100):0;
 const chDone=c=>c.open?c.mods.filter(m=>steps(m)===3).length:0;
 const snippet=m=>m.tpl.compose(vals(m));
-const chapterText=c=>`第${NUM[c.n]}章　${c.name}\n\n`+c.mods.map(m=>`${m.id} ${m.title}\n${tplDone(m)?snippet(m):'（尚未完成）'}`).join('\n\n');
+const chapterText=c=>`第${NUM[c.n]}章　${c.name}\n\n`+c.mods.map(m=>`${m.id} ${SEC[m.id]||m.title}\n${tplDone(m)?snippet(m):'（尚未完成）'}`).join('\n\n');
 const fieldVal=(id,f)=>((S.tpl[id]||{})[f]||'').trim();
 const thesisText=()=>{
   const m10=modById('1.0'),m56=modById('5.6'),m26=modById('2.6');
@@ -895,6 +895,10 @@ const progText=m=>m.tpl?[['判斷',judgeDone(m)],['排序',orderDone(m)],['草�
 
 /* ---------- 路由與畫面 ---------- */
 let view={n:'home'};let ord={};let sampleNS=null,dlNS=null;
+async function getSample(){if(sampleNS)return sampleNS;if(!(window.claude&&claude.use))return null;
+  try{sampleNS=await Promise.race([claude.use('sample'),new Promise(r=>setTimeout(()=>r(null),12000))])}catch(e){sampleNS=null}return sampleNS}
+const NOAI='目前無法使用 Claude 回饋。在課程的 Claude 頁面上，第一次使用時會跳出授權視窗，請按允許後再按一次；GitHub 公開版沒有這個功能。';
+const aiErr=err=>err&&err.code==='rate_limited'?'請求太頻繁，請稍等一分鐘再按一次。':err&&err.code==='not_granted'?'Claude 回饋沒有被允許。請在頁面的權限設定中允許後再試。':'取得回饋失敗，請再按一次。';
 const app=document.getElementById('app');
 const enc=v=>v.n==='mod'?`#mod/${v.id}`:v.n==='thesis'?'#thesis':v.n==='home'?'#home':`#${v.n}/${v.c}`;
 const dec=h=>{const [n,a]=String(h||'').replace(/^#/,'').split('/');
@@ -962,8 +966,8 @@ function modHTML(m){
   <section class="step" id="s-check"><header><span class="mono">5</span><h3>自我檢核</h3></header>
     <div class="checks">${m.checks.map((t,k)=>`<label><input type="checkbox" data-act="chk" data-id="${m.id}" data-k="${k}" ${ck[k]?'checked':''}><span>${esc(t)}</span></label>`).join('')}</div></section>
   <section class="step" id="s-ai"><header><span class="mono">6</span><h3>請 Claude 給回饋</h3></header>
-    <p class="note">寫完片段後可以請 Claude 指出需要修改的地方。你的片段文字會送給 Claude 處理。</p><p class="note aioff">這個網址沒有連上 Claude，AI 回饋只在 Claude 網站版提供；可以先用第 5 步的自我檢核。</p>
-    <div class="btnrow"><button class="btn pri" id="aibtn" data-act="ai" data-id="${m.id}" ${tplDone(m)?'':'disabled'}>取得回饋</button><span class="note" id="aihint" ${tplDone(m)?'hidden':''}>把第 4 步的每一欄都寫完，按鈕才會亮起。</span></div>
+    <p class="note aion">寫完片段後可以請 Claude 指出需要修改的地方。你的片段文字會送給 Claude 處理。</p><p class="note aioff">這個網址沒有連上 Claude，AI 回饋只在 Claude 網站版提供；可以先用第 5 步的自我檢核。</p>
+    <div class="btnrow"><button class="btn pri" id="aibtn" data-act="ai" data-id="${m.id}">取得回饋</button><span class="note" id="aihint" ${tplDone(m)?'hidden':''}>把第 4 步的每一欄都寫完，再按「取得回饋」。</span></div>
     <div class="ai" id="aiout" ${S.ai[m.id]?'':'hidden'}>${esc(S.ai[m.id]||'')}</div></section>
   <div class="nav">${prev?`<button class="btn" data-act="mod" data-id="${prev.id}">← ${prev.id} ${esc(prev.title)}</button>`:'<span></span>'}
   ${next?`<button class="btn pri" data-act="mod" data-id="${next.id}">${next.id} ${esc(next.title)} →</button>`:`<button class="btn pri" data-act="sum" data-c="${c.n}">查看第${NUM[c.n]}章草稿</button>`}</div>`;
@@ -1058,10 +1062,11 @@ function thesisParts(){
   const title=fieldVal('1.0','title')||'（論文題目尚未填寫）';
   const abs=m56&&tplDone(m56)?{text:[fieldVal('5.6','aim'),fieldVal('5.6','met'),fieldVal('5.6','res'),fieldVal('5.6','con')].map(P).join(''),kw:fieldVal('5.6','kw')}:null;
   const SKIP={'1.0':1,'2.6':1,'5.6':1};
-  const chapters=CH.filter(c=>c.open).map(c=>({n:c.n,name:c.name,secs:c.mods.filter(m=>!SKIP[m.id]).map((m,i)=>({no:i+1,title:m.title,text:tplDone(m)?snippet(m):'（尚未完成）'}))}));
+  const chapters=CH.filter(c=>c.open).map(c=>({n:c.n,name:c.name,secs:c.mods.filter(m=>!SKIP[m.id]).map((m,i)=>({no:i+1,title:SEC[m.id]||m.title,text:tplDone(m)?snippet(m):'（尚未完成）'}))}));
   const refs=allRefs();
   return {title,abs,chapters,refs};
 }
+const SEC={'2.2':'相關研究回顧','2.3':'文獻綜合整理','2.4':'文獻評析','2.5':'研究假設的導出','3.4':'研究程序','3.5':'資料處理與分析','3.6':'研究倫理','4.2':'統計圖表','4.3':'假設檢驗結果','4.4':'效果量與實務意義','4.5':'結果摘要'};
 const CNUM=['','一','二','三','四','五','六','七','八','九','十'];
 function buildThesisDocx(D){
   const {Document,Packer,Paragraph,TextRun,HeadingLevel,AlignmentType,PageBreak,TableOfContents,Footer,PageNumber,NumberFormat,SectionType}=D;
@@ -1120,21 +1125,24 @@ async function downloadThesisDocx(){
 
 /* ========== 前後單元帶入 ========== */
 const g=(id,f)=>fieldVal(id,f);
-const relWord=r=>({'是否有關聯':'之關聯','是否有顯著差異':'之差異','能否有效預測':'的預測效果'})[r]||'之關聯';
-const hypWord=r=>({'是否有關聯':'呈顯著關聯','是否有顯著差異':'有顯著差異','能否有效預測':'能顯著預測'})[r]||'呈顯著關聯';
+const relPhrase=q=>q.rel==='是否有顯著差異'?`不同${q.x}之${q.pop}在${q.y}上的差異`:q.rel==='能否有效預測'?`${q.pop}的${q.x}對${q.y}的預測效果`:`${q.pop}的${q.x}與${q.y}之關聯`;
+const hypSentence=q=>q.rel==='是否有顯著差異'?`H1：不同${q.x}之${q.pop}在${q.y}上有顯著差異，【請寫哪一組較高】。`:q.rel==='能否有效預測'?`H1：${q.pop}的${q.x}能顯著【正向／負向】預測${q.y}。`:`H1：${q.pop}的${q.x}與${q.y}呈顯著【正／負】相關。`;
+const h0Sentence=q=>q.rel==='是否有顯著差異'?`H0：不同${q.x}之${q.pop}在${q.y}上沒有差異。`:q.rel==='能否有效預測'?`H0：${q.pop}的${q.x}無法預測${q.y}。`:`H0：${q.pop}的${q.x}與${q.y}沒有關聯。`;
 const Q=()=>({pop:g('1.2','pop'),x:g('1.2','x'),y:g('1.2','y'),rel:g('1.2','rel')});
 const has=(...a)=>a.every(Boolean);
 const NEED='【請選擇統計方法】';
+function rqSentence(v){const ix=v.idx?`（以${v.idx}為指標）`:'';
+  return v.rel==='是否有顯著差異'?`不同${v.x}的${v.pop}在${v.y}${ix}上是否有顯著差異？`:v.rel==='能否有效預測'?`${v.pop}的${v.x}能否有效預測${v.y}${ix}？`:`${v.pop}的${v.x}與${v.y}${ix}是否有關聯？`}
 const noDot=s=>String(s||'').replace(/[。.]$/,'');
 const methodFrom35=()=>{const t=g('3.5','h1');const i=t.lastIndexOf('採');return i>=0?t.slice(i+1).replace(/[。；;，,].*$/,'').trim():''};
 const CARRY={
- '1.1':{d:()=>{const q=Q();if(has(q.pop,q.x,q.y))return `欲探討${q.pop}的${q.x}與${q.y}${relWord(q.rel)}`;const t=g('1.0','title');return t?`欲探討${t}`:''}},
- '1.3':{p1:()=>{const q=Q();return has(q.pop,q.x,q.y)?`探討${q.pop}的${q.x}與${q.y}${relWord(q.rel)}。`:''}},
- '1.4':{term:()=>Q().y,hyp:()=>{const q=Q();return has(q.pop,q.x,q.y)?`H1：${q.pop}的${q.x}與${q.y}${hypWord(q.rel)}。`:''}},
+ '1.1':{d:()=>{const q=Q();if(has(q.pop,q.x,q.y))return `欲探討${relPhrase(q)}`;const t=g('1.0','title');return t?`欲探討${t}`:''}},
+ '1.3':{p1:()=>{const q=Q();return has(q.pop,q.x,q.y)?`探討${relPhrase(q)}。`:''}},
+ '1.4':{term:()=>Q().y,hyp:()=>{const q=Q();return has(q.pop,q.x,q.y)?hypSentence(q):''}},
  '1.5':{scope:()=>{const q=Q();return q.pop?`本研究對象為${q.pop}${g('3.1','when')?'，資料蒐集期間為'+g('3.1','when'):''}。`:''}},
  '2.1':{c1:()=>Q().pop,c2:()=>Q().x,c3:()=>Q().y},
  '2.4':{link:()=>g('1.1','c')},
- '2.5':{gap:()=>g('1.1','c'),h:()=>g('1.4','hyp'),h0:()=>{const q=Q();return has(q.pop,q.x,q.y)?`H0：${q.pop}的${q.x}與${q.y}無${q.rel==='是否有顯著差異'?'差異':'關聯'}。`:''}},
+ '2.5':{gap:()=>g('1.1','c'),h:()=>g('1.4','hyp'),h0:()=>{const q=Q();return has(q.pop,q.x,q.y)?h0Sentence(q):''}},
  '3.1':{who:()=>Q().pop,vars:()=>{const q=Q();return has(q.x,q.y)?`${q.x} → ${q.y}`:''}},
  '3.2':{irb:()=>g('3.6','irb')},
  '3.3':{var:()=>g('1.4','term')||Q().y,proc:()=>g('1.4','def')},
@@ -1202,15 +1210,16 @@ function consHTML(){
    <div class="ai" id="consout" ${S.ai.cons?'':'hidden'}>${esc(S.ai.cons||'')}</div></section>`;
 }
 async function runConsAI(){
-  if(!sampleNS)return toast('目前無法連線 Claude，稍後再試');
   const out=document.getElementById('consout'),b=document.getElementById('consbtn');
+  out.hidden=false;out.textContent='正在連線 Claude…';b.disabled=true;
+  const sm=await getSample();if(!sm){out.textContent=NOAI;b.disabled=false;return}
   const chain=CHAIN.map(([lab,,fn])=>`${lab}：${fn()||'（尚未填寫）'}`).join('\n');
   out.hidden=false;out.textContent='Claude 正在比對各章…';b.disabled=true;
   const prompt=`你是研究法課程的助教。下面是一位體育運動科學研究生論文初稿中，從研究問題到結論的關鍵句。請檢查它們是否前後一致：變項、對象、關係類型（關聯／差異／因果）、統計方法與結論的強度是否相符。
 ${chain}
 請用繁體中文，250 字內，條列最多三個不一致之處，每點指出是哪兩環、哪裡不一致、怎麼改。若都一致，說明一致在哪裡即可。尚未填寫的環節略過。`;
-  try{const r=await sampleNS(prompt,{cache:false,onText:({text})=>{out.textContent=text}});S.ai.cons=r.text;save();out.textContent=r.text}
-  catch(err){out.textContent=S.ai.cons||'';out.hidden=!S.ai.cons;toast(err&&err.code==='rate_limited'?'請求太頻繁，稍等一下再試':'檢查失敗，請再試一次')}
+  try{const r=await sm(prompt,{cache:false,onText:({text})=>{out.textContent=text}});S.ai.cons=r.text;save();out.textContent=r.text}
+  catch(err){out.textContent=aiErr(err)}
   finally{b.disabled=false}
 }
 
@@ -1377,7 +1386,7 @@ function toolHTML(m){const f=TOOLS[m.id];return f?`<section class="step" id="too
 function refreshTool(){const s=document.getElementById('toolsec');const m=curMod();if(s&&m&&TOOLS[m.id])s.innerHTML=`<header><span class="mono">工具</span><h3>先用工具，再寫片段</h3></header>${TOOLS[m.id]()}`}
 function setTplField(id,f,v){const o=S.tpl[id]=S.tpl[id]||{};o[f]=v;save();const el=document.querySelector(`[data-m="${id}"][data-f="${f}"]`);if(el){el.value=v;flash(el.closest('.field')||el)}
   const m=modById(id);const pv=document.getElementById('sec-prev');if(pv&&view.id===id){pv.innerHTML=prevHTML(m);refreshProg(m);
-  const b=document.getElementById('aibtn');if(b)b.disabled=!tplDone(m);const h=document.getElementById('aihint');if(h)h.hidden=tplDone(m)}}
+  const h=document.getElementById('aihint');if(h)h.hidden=tplDone(m)}}
 
 /* ========== 講義精華（依林彥光教授研究法講義整理） ========== */
 const LEC={
@@ -1466,7 +1475,7 @@ const LEC={
 '3.1':{src:'第十三章 量化研究設計與撰寫；量化研究類型；研究方法與緒論',pts:[
  '選擇什麼方法，由研究目的與研究問題決定。',
  '寫法：說明採取的方法與理由 → 這個方法的優點如何符合目的 → 可能遭遇的問題與克服方式 → 研究架構（自變項、依變項）。',
- '實驗研究三要件：組別比較、操弄自變項、隨機取樣與隨機分派；準實驗研究有操弄，但無法隨機分派個人。',
+ '實驗研究三要件：組別比較、操弄自變項、隨機分派（隨機取樣影響的是能推論到多大範圍）；準實驗研究有操弄，但無法隨機分派個人。',
  '相關研究探討變項間的關聯或預測，無法回答因果問題。',
  '調查研究適合描述性、常模性與差異性問題，無法回答因果；要說明調查方式、時間、問卷發放與回收方式。',
  '研究層次：第一層探索與敘述，第二層比較與相關，第三層實驗設計驗證因果。'],
@@ -1515,7 +1524,7 @@ const LEC={
 '4.3':{src:'第十五章 研究結果與討論敘寫；Streiner（2007）導讀',pts:[
  '逐一針對每條假設報告，檢視是否接受對立假設；不顯著的結果也不能忽略。',
  'p 值不會是 0，SPSS 顯示 .000 要寫成 p < .001。',
- 't 值的正負只代表哪一組先減，本身沒有意義；方向要看平均數。',
+ 't 值的正負只代表哪一組減哪一組，本身沒有意義；方向要看平均數。',
  'ANOVA 顯著只代表平均數不全相等，要做事後比較才知道哪幾組不同。',
  '以資料為基礎做合理推論，不呈現資料不允許的部分。'],
  ex:{t:'一段推論統計報告（數字為示意）',segs:[['假設','H1 睡眠時數與疲勞分數之關聯'],['方法','以 Pearson 積差相關檢驗，'],['統計量','r(56) = −.42, p = .001，'],['方向與大小','呈中度負相關，睡眠越少疲勞越高，'],['結論','H1 獲得支持。']]}},
@@ -1568,11 +1577,11 @@ const LEC={
 function lecHTML(m){const L=LEC[m.id];if(!L)return '';
   return `<details class="lec"><summary>講義重點　<span class="mono">出處：${esc(L.src)}</span></summary>
   <ul>${L.pts.map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
-  ${L.ex?`<div class="ex"><div class="mono">範例：${esc(L.ex.t)}</div><p>${L.ex.segs.map(([l,t])=>`<span class="seg"><b>${esc(l)}</b>${esc(t)}</span>`).join('')}</p></div>`:''}</details>`}
+  ${L.ex?`<div class="ex"><div class="mono">範例：${esc(L.ex.t)}</div><div class="paper" style="margin-top:8px">${esc(L.ex.segs.map(x=>x[1]).join(''))}</div><div class="mono" style="margin-top:10px">拆開來看</div><p>${L.ex.segs.map(([l,t])=>`<span class="seg"><b>${esc(l)}</b>${esc(t)}</span>`).join('')}</p></div>`:''}</details>`}
 
 /* ========== 本所論文怎麼寫（GIACS 論文逐章對照） ========== */
 const GIACS=[
- {cite:'本所 2025 碩士論文',
+ {cite:'本所 2025 碩士論文〈學生規律運動與體育學習認知在區域性差異探討〉',
   kind:'碩士論文・次級資料分析',
   sum:'國立體育大學競技與教練科學研究所 2025 年的碩士論文。作者分析中研院釋出的 111 學年各級學校學生運動參與調查（有效樣本 37,965 人），用卡方檢定、t 檢定與二元羅吉斯迴歸，比較不同學制與都市化程度學生的規律運動，以及規律運動和體育學習認知的關係。結果：大專生、參加運動社團、自覺運動足夠與多數體育學習認知題目，都和較高的規律運動比例有關。',
   ch:{1:{part:'第壹章 緒論（研究背景與動機、研究目的、研究範圍與限制、名詞解釋）',pts:[
@@ -1620,7 +1629,7 @@ const GIACS=[
  ['fix','5.5','結論「越核心的區域不代表較多人規律運動，都市化不高的區域有較大空間與時間」，根據只是第一層對第六層一個 p ≈ .04、OR = 0.88 的比較，其他層都不顯著。結論的強度要和證據相稱。'],
  ['ok','5.6','中英文摘要依「目的、背景、方法、結果、結論」分段，方法交代了資料來源與四種統計方法。'],
  ['fix','5.6','摘要寫「運動天數」是影響規律運動的重要因子；但規律運動本身就是用「每週運動 3 天以上」定義的，運動天數不能拿來解釋規律運動，表 26 也沒有這個變項。關鍵詞「體育素養」和題目的「體育學習認知」也要統一。']]}}},
- {cite:'本所 2024 博士論文',
+ {cite:'本所 2024 博士論文〈基於可解釋性人工智慧模型探討棒球比賽勝負關鍵〉',
   kind:'博士論文・機器學習',
   sum:'國立體育大學競技與教練科學研究所 2024 年的博士論文。作者整理 2021–2023 年中華職棒 869 場例行賽的攻守數據，分成傳統數據與加入進階數據兩個資料集，比較九種機器學習模型的分類表現，再用 XGBoost 的特徵重要度、SHAP 值與決策樹找出和勝負最有關的指標，結果以投手防禦率、wRC+、wOBA 最重要。',
   ch:{1:{part:'第壹章 緒論（研究背景與動機、研究目的、研究重要性、名詞解釋）',pts:[
@@ -1678,7 +1687,7 @@ function giacsCardHTML(c){const L=GIACS.filter(g=>g.ch[c.n]);if(!L.length)return
   ${L.map(g=>`<details class="lec"><summary>${esc(g.cite)}　<span class="mono">${esc(g.kind)}・${g.ch[c.n].pts.length} 點</span></summary>
    <p style="margin-top:8px;font-size:14px">${esc(g.sum)}</p>
    <p class="mono" style="margin-top:8px">對應：${esc(g.ch[c.n].part)}</p>${gPts(g.ch[c.n].pts)}</details>`).join('')}
-  <p class="note">為保護作者，網站不列出作者與題目，只放老師的評註。</p></section>`}
+  <p class="note">為保護作者，網站只列論文題目，不列作者；全文請向圖書館查詢。</p></section>`}
 function giacsModHTML(m){const n=chOf(m).n;
   const L=GIACS.map(g=>[g,(g.ch[n]?g.ch[n].pts:[]).filter(p=>p[1]===m.id)]).filter(x=>x[1].length);if(!L.length)return '';
   return `<details class="lec"><summary>本所論文怎麼寫　<span class="mono">${L.reduce((a,x)=>a+x[1].length,0)} 點評註</span></summary>
@@ -1733,12 +1742,14 @@ function readHTML(n){const r=READ[n],a=(S.crit||{})[n]||{},c=CH[n-1];
     <p class="note">每題至少寫一兩句具體的觀察，最好指出頁碼或段落。</p></section>
   <section class="step"><header><span class="mono">3</span><h3>匯出與回饋</h3></header>
     <div class="btnrow"><button class="btn pri" data-act="critdl" data-c="${n}">下載評析（Markdown）</button><button class="btn" data-act="critcopy" data-c="${n}">複製全文</button><button class="btn" id="critai" data-act="critai" data-c="${n}">請 Claude 給回饋</button></div>
-    <p class="note">Claude 沒有讀過這篇論文的全文，回饋只看你的評析寫得是否具體、是否用上這一章的標準。</p>
+    <p class="note aioff">AI 回饋只在 Claude 網站版提供。</p><p class="note aion">Claude 沒有讀過這篇論文的全文，回饋只看你的評析寫得是否具體、是否用上這一章的標準。</p>
     <div class="ai" id="critout" ${(S.ai['crit'+n])?'':'hidden'}>${esc(S.ai['crit'+n]||'')}</div>
     <div class="paper" id="crittext">${esc(critText(n))}</div></section>`}
 async function runCritAI(n){
-  if(!sampleNS)return toast('目前無法連線 Claude，稍後再試');
   const out=document.getElementById('critout'),b=document.getElementById('critai');
+  if(critDone(n)===0){toast('先回答至少一題評析，再請 Claude 給回饋');return}
+  out.hidden=false;out.textContent='正在連線 Claude…';b.disabled=true;
+  const sm=await getSample();if(!sm){out.textContent=NOAI;b.disabled=false;return}
   out.hidden=false;out.textContent='Claude 正在閱讀你的評析…';b.disabled=true;
   const prompt=`你是研究法課程的助教。研究生讀了下面這篇論文，用論文第${NUM[n]}章（${CH[n-1].name}）的標準寫了評析。你沒有讀過原文，請只依評析本身判斷。
 ${critText(n)}
@@ -1747,8 +1758,8 @@ ${critText(n)}
 【太籠統或漏掉的地方】最多兩點，指出題號
 【下一步】一個可以讓評析更深入的問題
 不要編造論文內容，不要過度稱讚。`;
-  try{const r=await sampleNS(prompt,{cache:false,onText:({text})=>{out.textContent=text}});S.ai['crit'+n]=r.text;save();out.textContent=r.text}
-  catch(err){out.textContent=S.ai['crit'+n]||'';out.hidden=!S.ai['crit'+n];toast(err&&err.code==='rate_limited'?'請求太頻繁，稍等一下再試':'取得回饋失敗，請再試一次')}
+  try{const r=await sm(prompt,{cache:false,onText:({text})=>{out.textContent=text}});S.ai['crit'+n]=r.text;save();out.textContent=r.text}
+  catch(err){out.textContent=aiErr(err)}
   finally{b.disabled=false}
 }
 
@@ -1836,14 +1847,16 @@ document.addEventListener('input',e=>{
   if(!t.dataset.f)return;
   const m=modById(t.dataset.m);const o=S.tpl[m.id]=S.tpl[m.id]||{};o[t.dataset.f]=t.value;save();
   document.getElementById('sec-prev').innerHTML=prevHTML(m);refreshProg(m);
-  const b=document.getElementById('aibtn');if(b)b.disabled=!tplDone(m);const h=document.getElementById('aihint');if(h)h.hidden=tplDone(m);
+  const h=document.getElementById('aihint');if(h)h.hidden=tplDone(m);
 });
 
 async function runAI(m){
-  if(!tplDone(m))return toast('先把片段寫完整');
-  if(!sampleNS)return toast('目前無法連線 Claude，稍後再試');
+  if(!tplDone(m)){const t=S.tpl[m.id]||{};const miss=m.tpl.fields.find(f=>((t[f.id]||'').trim().length<(f.min||4)));
+    toast(`先把第 4 步寫完：「${miss?miss.label:''}」還不夠完整`);const el=miss&&document.querySelector(`[data-m="${m.id}"][data-f="${miss.id}"]`);if(el)flash(el.closest('.field')||el);return}
   const out=document.getElementById('aiout'),b=document.getElementById('aibtn');
-  out.hidden=false;out.textContent='Claude 正在閱讀你的片段…';b.disabled=true;
+  out.hidden=false;out.textContent='正在連線 Claude…';b.disabled=true;
+  const sm=await getSample();if(!sm){out.textContent=NOAI;b.disabled=false;return}
+  out.textContent='Claude 正在閱讀你的片段…';
   const prompt=`你是研究法課程的助教，協助體育與運動科學領域的研究生修改論文草稿。
 章節：第${NUM[chOf(m).n]}章 ${chOf(m).name}／${m.id} ${m.title}
 這一節的寫作重點：${m.focus}
@@ -1857,12 +1870,11 @@ ${snippet(m)}
 【改寫示範】只改寫最需要修正的那一句
 不要重寫整段，不要過度稱讚。`;
   try{
-    const r=await sampleNS(prompt,{cache:false,onText:({text})=>{out.textContent=text}});
+    const r=await sm(prompt,{cache:false,onText:({text})=>{out.textContent=text}});
     S.ai[m.id]=r.text;save();out.textContent=r.text;
   }catch(err){
-    out.textContent=S.ai[m.id]||'';out.hidden=!S.ai[m.id];
-    toast(err&&err.code==='rate_limited'?'請求太頻繁，稍等一下再試':err&&err.code==='not_granted'?'需要允許 Claude 回饋才能使用':'取得回饋失敗，請再試一次');
-  }finally{b.disabled=!tplDone(m)}
+    out.textContent=aiErr(err);
+  }finally{b.disabled=false}
 }
 
 try{view=dec(location.hash)}catch(e){}
