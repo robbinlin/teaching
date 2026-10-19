@@ -418,7 +418,7 @@ function layout(){
   const r=cv.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(2,window.devicePixelRatio||1);
   cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
   let x0,x1,y0,y1;
-  if(W>900){x0=W*0.53;x1=W-Math.max(28,W*0.04);y0=Math.max(96,H*0.13);y1=H-Math.max(56,H*0.08);}
+  if(W>900){x0=W*0.53;x1=W-Math.max(28,W*0.04);y0=Math.max(128,H*0.17);y1=H-Math.max(56,H*0.08);}
   else{const bh=Math.min(H*0.48,440);const tx=document.querySelector('.intro-text');const tb=tx?tx.getBoundingClientRect().bottom-r.top:0;x0=14;x1=W-14;y0=Math.max(H-bh,tb+36);y1=H-22;}
   const bw=x1-x0,bh=y1-y0;
   const pegH=bh*0.56,binH=bh*0.40;
