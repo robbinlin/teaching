@@ -185,6 +185,8 @@ textarea{min-height:84px;resize:vertical}
 .toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));max-width:calc(100% - 32px);
   background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;z-index:20}
 .note{font-size:13px;color:var(--muted)}
+.filebtn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+#progbox{margin-top:20px}
 .pblist{display:flex;flex-direction:column;gap:8px}
 details.pbi{border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:4px 12px}
 details.pbi>summary{cursor:pointer;padding:8px 0;min-height:44px;display:flex;flex-direction:column;justify-content:center;gap:2px;list-style-position:inside}
@@ -1250,7 +1252,7 @@ function homeHTML(){
     <span>手繪動畫，每支 2–4 分鐘，從「研究是什麼」講到摘要怎麼寫。</span>
     <span class="vgo">打開播放清單 →</span></a>
   </div>
-  <p class="note">作答只存在這台裝置的瀏覽器。換裝置或清除瀏覽資料後會消失，記得在「論文初稿」下載 Word 檔帶走。</p>`;
+  ${progHTML()}`;
 }
 function chHTML(c){
   const rows=c.mods.map(m=>{
@@ -1369,11 +1371,34 @@ function thesisHTML(){
     <p class="note">填好封面資料，下載的 Word 檔會有封面、摘要、目錄、五章與參考文獻。目錄在 Word 開啟時會提示更新；若沒有，在目錄上按右鍵選「更新功能變數」。</p>
     ${[['school','學校'],['dept','系所'],['degree','學位論文'],['student','研究生'],['advisor','指導教授'],['date','年月（例：中華民國 115 年 6 月）']].map(([k,l])=>`<div class="field"><label for="meta-${k}">${l}</label><input type="text" id="meta-${k}" data-meta="${k}" value="${esc(META[k])}"></div>`).join('')}
     <div class="btnrow"><button class="btn pri" data-act="docx">下載 Word 論文檔（.docx）</button><button class="btn" data-act="copyt">複製全文</button><button class="btn" data-act="dlt">下載 Markdown</button></div></section>
+  ${progHTML()}
   ${consHTML()}
   ${pbThesisHTML()}
   <h3>純文字預覽</h3>
   <div class="paper" id="sumtext">${esc(thesisText())}</div>`;
 }
+
+/* ---------- 進度檔：下載與載入 ---------- */
+let progPending=null;
+const draftsIn=st=>ALLMODS.filter(m=>m.tpl&&m.tpl.fields.every(f=>(((st.tpl||{})[m.id]||{})[f.id]||'').trim().length>=(f.min||4))).length;
+const fmtTime=t=>{try{const d=new Date(t);return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}catch(e){return ''}};
+function progHTML(){const le=S.lastExport;
+  const body=progPending?`<div class="tip"><b>要載入的進度檔：</b>${esc(progPending.META&&progPending.META.student||'未填姓名')}，已寫 ${draftsIn(progPending.S)} / ${ALLMODS.length} 段草稿，存於 ${esc(fmtTime(progPending.savedAt))}。<br>載入後會<b>取代</b>這台裝置目前的進度（目前已寫 ${allDrafts()} 段）。</div>
+    <div class="btnrow"><button class="btn pri" data-act="progok">確定載入</button><button class="btn" data-act="progno">取消</button></div>`
+   :`<div class="btnrow"><button class="btn pri" data-act="progdl">下載進度檔</button><label class="btn filebtn">載入進度檔<input type="file" accept=".json,application/json" id="progfile" hidden></label></div>
+    <p class="note">${le?`上次下載：${esc(fmtTime(le))}。`:'還沒有下載過進度檔。'}作答只存在這台裝置的瀏覽器；換電腦、用無痕視窗或清除瀏覽資料就會消失。每次寫完下載一份（檔名開頭是 research-methods-progress），存到 Dropbox 或寄給自己，換電腦時載入就能接著寫。進度檔也可以交給老師看。</p>`;
+  return `<section class="step" id="progbox"><header><span class="mono">進度檔</span><h3>換電腦也能接著寫</h3></header>${body}</section>`}
+function refreshProgBox(){const b=document.getElementById('progbox');if(!b)return;const t=document.createElement('div');t.innerHTML=progHTML();b.replaceWith(t.firstElementChild)}
+async function progDownload(){const d=new Date(),p=n=>String(n).padStart(2,'0');
+  const name=`research-methods-progress_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.json`;
+  const data=JSON.stringify({app:'rm-course',v:1,savedAt:d.toISOString(),S,META},null,1);
+  if(await saveFile(name,data,'application/json')){S.lastExport=d.toISOString();save();refreshProgBox();toast('已下載進度檔')}}
+document.addEventListener('change',async e=>{const t=e.target;if(t.id!=='progfile'||!t.files||!t.files[0])return;
+  const f=t.files[0];t.value='';
+  try{const o=JSON.parse(await f.text());
+    if(!o||o.app!=='rm-course'||!o.S||typeof o.S!=='object')throw 0;
+    progPending=o;refreshProgBox();const b=document.getElementById('progbox');if(b)flash(b)}
+  catch(err){toast('這不是本課程的進度檔，請選擇檔名開頭為 research-methods-progress 的 .json 檔')}});
 /* ---------- 存檔：先用 Claude 下載，不行就用瀏覽器下載 ---------- */
 async function saveFile(name,data,type){
   if(dlNS){try{await dlNS.save({filename:name,data});return true}catch(err){if(err&&err.code==='declined')return false}}
@@ -2142,6 +2167,12 @@ document.addEventListener('click',async e=>{
   if(act==='thesis')return go({n:'thesis'});
   if(act==='read')return go({n:'read',c:+t.dataset.c});
   if(act==='prompts')return go({n:'prompts'});
+  if(act==='progdl')return progDownload();
+  if(act==='progno'){progPending=null;return refreshProgBox()}
+  if(act==='progok'){const o=progPending;progPending=null;if(!o)return;
+    S=Object.assign({judge:{},order:{},tpl:{},checks:{},ai:{},refs:[],mx:[],crit:{},pw:{},cho:{},ap:{}},o.S);save();
+    if(o.META&&typeof o.META==='object'){META=Object.assign(META,o.META);saveMeta()}
+    ord={};render();toast(`已載入進度：已寫 ${allDrafts()} / ${ALLMODS.length} 段草稿`);return}
   if(act==='pbcopy'){const s=pbStore[t.dataset.k];if(s==null)return;toast(await copyText(s)?'已複製，貼到 AI 工具後記得補上黃色標記的地方':'無法複製，請手動選取上面的文字');return}
   if(act==='pbf'){pbF=t.dataset.k;document.querySelectorAll('.fchip').forEach(b=>{const on=b.dataset.k===pbF;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});document.getElementById('pblist').innerHTML=pbLibList();return}
   if(act==='pbstrict')return;
