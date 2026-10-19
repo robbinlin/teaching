@@ -91,8 +91,11 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-vis
 
 
 /* home */
-.hero{display:grid;gap:20px;grid-template-columns:minmax(0,1fr);align-items:center;padding-block:8px 4px}
-@media (min-width:660px){.hero{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}}
+.hero{display:flex;flex-direction:column;gap:18px;padding-block:4px}
+.herocv{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+#heroCanvas{display:block;width:100%;aspect-ratio:4/3;max-width:100%}
+@media (min-width:660px){#heroCanvas{aspect-ratio:2/1}}
+.herotag{display:block;border-top:1px solid var(--line);padding:8px 14px;font-variant-numeric:tabular-nums}
 .herotext{display:flex;flex-direction:column;gap:12px;min-width:0}
 .heroart{display:flex;justify-content:center}
 .tracksvg{width:100%;max-width:300px;height:auto}
@@ -1006,6 +1009,7 @@ function render(){
   else if(view.n==='thesis')app.innerHTML=thesisHTML();
   else if(view.n==='read')app.innerHTML=readHTML(view.c);
   animateView();
+  if(view.n==='home')startHero();
 }
 function trackSVG(){
   const lanes=CH.map((c,i)=>{const r=74+i*17,p=chPct(c),d=`M ${160-r} 172 A ${r} ${r} 0 0 1 ${160+r} 172`;
@@ -1014,9 +1018,79 @@ function trackSVG(){
   return `<svg class="tracksvg" viewBox="0 0 320 196" role="img" aria-label="五章進度跑道：每一圈是一章，紅色是已完成的比例">
    ${lanes}<text x="160" y="152" class="arcbig" text-anchor="middle">${allDrafts()}<tspan class="arcsm"> / ${ALLMODS.length}</tspan></text>
    <text x="160" y="168" class="arcsm" text-anchor="middle">段草稿</text></svg>`}
+/* ---------- 首頁動畫：五章跑道＋內場散佈圖 ---------- */
+let heroRAF=0;
+function startHero(){
+  cancelAnimationFrame(heroRAF);
+  const cv=document.getElementById('heroCanvas');if(!cv)return;
+  const ctx=cv.getContext('2d');if(!ctx)return;
+  const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pct=CH.map(c=>chPct(c)/100);
+  let W=0,H=0,dpr=1,col={};
+  const tok=()=>{const cs=getComputedStyle(document.documentElement);['--accent','--navy','--ink','--muted','--line','--surface','--ok'].forEach(k=>col[k]=cs.getPropertyValue(k).trim())};
+  const size=()=>{const r=cv.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)};
+  tok();size();
+  let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const pts=Array.from({length:28},(_,i)=>{const x=.04+.92*rnd();return {x,y:Math.min(.96,Math.max(.04,.75-.5*x+(rnd()-.5)*.95)),t:.9+i*.055}});
+  const fit=(()=>{const n=pts.length,mx=pts.reduce((a,p)=>a+p.x,0)/n,my=pts.reduce((a,p)=>a+p.y,0)/n;let sxy=0,sxx=0,syy=0;pts.forEach(p=>{sxy+=(p.x-mx)*(p.y-my);sxx+=(p.x-mx)**2;syy+=(p.y-my)**2});
+    const b=sxy/sxx;return {a:my-b*mx,b,r:sxy/Math.sqrt(sxx*syy)}})();
+  const runners=[0,1,2,3,4].map(i=>({t:.04*i,v:.055+.012*((i*37)%5)/4,trail:[]}));
+  const geo=()=>{const s=W<500?.74:.52,L=W*(W<500?.26:.34),outer=Math.min((W*.94-L)/2,(H*.86)/(2*s)),lw=outer*.11,rIn=outer-5*lw;return {s,L,lw,rIn,cx:W/2,cy:H*.5}};
+  const at=(g,r,t)=>{const P=2*g.L+2*Math.PI*r;let d=((t%1)+1)%1*P;let x,y;
+    if(d<g.L){x=g.cx-g.L/2+d;y=g.cy+r}
+    else if((d-=g.L)<Math.PI*r){const a=Math.PI/2-d/r;x=g.cx+g.L/2+r*Math.cos(a);y=g.cy+r*Math.sin(a)}
+    else if((d-=Math.PI*r)<g.L){x=g.cx+g.L/2-d;y=g.cy-r}
+    else{d-=g.L;const a=-Math.PI/2-d/r;x=g.cx-g.L/2+r*Math.cos(a);y=g.cy+r*Math.sin(a)}
+    return [x,g.cy+(y-g.cy)*g.s]};
+  const lanePath=(g,r,from,to)=>{ctx.beginPath();const n=Math.max(2,Math.ceil((to-from)*160));for(let k=0;k<=n;k++){const [x,y]=at(g,r,from+(to-from)*k/n);k?ctx.lineTo(x,y):ctx.moveTo(x,y)}};
+  const alpha=(c,a)=>{ctx.globalAlpha=a;return c};
+  let t0=null,last=0;
+  function frame(now){
+    if(!document.body.contains(cv))return;
+    if(t0===null)t0=now;const T=reduce?9:(now-t0)/1000,dt=Math.min(.05,(now-last)/1000||0);last=now;
+    const g=geo(),ease=x=>1-Math.pow(1-Math.min(1,Math.max(0,x)),3);
+    ctx.clearRect(0,0,W,H);ctx.globalAlpha=1;ctx.lineCap='round';
+    const draw=ease(T/1.4);
+    // track surface
+    for(let i=0;i<5;i++){const r=g.rIn+(i+.5)*g.lw;ctx.strokeStyle=alpha(col['--accent'],.13);ctx.lineWidth=g.lw*.94;ctx.lineCap='butt';lanePath(g,r,0,draw);ctx.stroke()}
+    // lane lines
+    for(let i=0;i<=5;i++){const r=g.rIn+i*g.lw;ctx.strokeStyle=alpha(col['--surface'],.95);ctx.lineWidth=1.2;lanePath(g,r,0,draw);ctx.stroke()}
+    // chapter progress
+    for(let i=0;i<5;i++){if(!pct[i])continue;const r=g.rIn+(i+.5)*g.lw;ctx.strokeStyle=alpha(col['--accent'],.75);ctx.lineWidth=g.lw*.42;ctx.lineCap='round';
+      lanePath(g,r,0,pct[i]*ease((T-1)/1.2));ctx.stroke()}
+    // start line + lane numbers
+    ctx.globalAlpha=ease((T-.6)/.6);const [sx]=at(g,g.rIn,0);ctx.strokeStyle=col['--ink'];ctx.lineWidth=2;ctx.lineCap='butt';ctx.beginPath();
+    const [,y0]=at(g,g.rIn,0),[,y1]=at(g,g.rIn+5*g.lw,0);ctx.moveTo(sx,y0);ctx.lineTo(sx,y1);ctx.stroke();
+    ctx.fillStyle=col['--ink'];ctx.font=`500 ${Math.max(8,g.lw*.5)}px "IBM Plex Mono",monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
+    for(let i=0;i<5;i++){const [x,y]=at(g,g.rIn+(i+.5)*g.lw,.03);ctx.fillText(String(i+1),x,y)}
+    // infield scatter
+    const ix=g.cx-g.L/2+g.lw*.6,iw=g.L-g.lw*1.2,ih=g.rIn*g.s*1.25,iy=g.cy-ih/2;
+    ctx.globalAlpha=ease((T-.8)/.6)*.6;ctx.strokeStyle=col['--muted'];ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ix,iy);ctx.lineTo(ix,iy+ih);ctx.lineTo(ix+iw,iy+ih);ctx.stroke();
+    pts.forEach(p=>{const k=ease((T-p.t)/.35);if(k<=0)return;ctx.globalAlpha=k*.85;ctx.fillStyle=col['--navy'];ctx.beginPath();ctx.arc(ix+p.x*iw,iy+(1-p.y)*ih,Math.max(1.6,g.lw*.16)*(0.6+.4*k),0,7);ctx.fill()});
+    const lk=ease((T-2.7)/1.1);if(lk>0){ctx.globalAlpha=1;ctx.strokeStyle=col['--accent'];ctx.lineWidth=2.2;ctx.lineCap='round';ctx.beginPath();
+      const ya=iy+(1-fit.a)*ih,yb=iy+(1-(fit.a+fit.b))*ih;ctx.moveTo(ix,ya);ctx.lineTo(ix+iw*lk,ya+(yb-ya)*lk);ctx.stroke();
+      ctx.globalAlpha=lk;ctx.fillStyle=col['--ink'];ctx.textAlign='right';ctx.textBaseline='top';ctx.font=`500 ${Math.max(10,g.lw*.62)}px "IBM Plex Mono",monospace`;ctx.fillText('r = '+fit.r.toFixed(2).replace('-','−').replace('0.','.'),ix+iw,iy-2)}
+    // runners
+    const go=ease((T-1.2)/.8);
+    runners.forEach((rn,i)=>{const r=g.rIn+(i+.5)*g.lw;if(!reduce)rn.t+=rn.v*dt*go*(1+.08*Math.sin(T*1.7+i));else rn.t=.18+.07*i;
+      const p=at(g,r,rn.t);rn.trail.push(p);if(rn.trail.length>16)rn.trail.shift();
+      ctx.lineCap='round';for(let k=1;k<rn.trail.length;k++){ctx.globalAlpha=go*k/rn.trail.length*.55;ctx.strokeStyle=col['--accent'];ctx.lineWidth=g.lw*.34*k/rn.trail.length;
+        ctx.beginPath();ctx.moveTo(...rn.trail[k-1]);ctx.lineTo(...rn.trail[k]);ctx.stroke()}
+      ctx.globalAlpha=go;ctx.fillStyle=col['--ink'];ctx.beginPath();ctx.arc(p[0],p[1],Math.max(2.4,g.lw*.27),0,7);ctx.fill();
+      ctx.fillStyle=col['--surface'];ctx.beginPath();ctx.arc(p[0],p[1],Math.max(1,g.lw*.11),0,7);ctx.fill()});
+    ctx.globalAlpha=1;
+    if(!reduce&&!document.hidden)heroRAF=requestAnimationFrame(frame);
+    else if(!reduce)document.addEventListener('visibilitychange',()=>{if(!document.hidden){last=performance.now();heroRAF=requestAnimationFrame(frame)}},{once:true});
+  }
+  if(window.ResizeObserver){const ro=new ResizeObserver(()=>{if(!document.body.contains(cv)){ro.disconnect();return}size();if(reduce)frame(performance.now())});ro.observe(cv)}
+  if(window.matchMedia){const mq=matchMedia('(prefers-color-scheme: dark)');mq.addEventListener&&mq.addEventListener('change',tok)}
+  heroRAF=requestAnimationFrame(frame);
+}
 function homeHTML(){
   const last=S.last&&modById(S.last),nx=last||ALLMODS.find(m=>m.tpl&&steps(m)<3)||ALLMODS[0];
   return `<section class="hero">
+   <div class="herocv"><canvas id="heroCanvas" role="img" aria-label="五章跑道動畫：五位跑者在五條跑道上前進，紅色是各章已完成的比例；內場是一張散佈圖與迴歸線"></canvas>
+    <span class="herotag mono">五章跑道 · 已寫 ${allDrafts()} / ${ALLMODS.length} 段草稿</span></div>
    <div class="herotext">
     <span class="mono">高等體育研究法 · 競技與教練科學研究所</span>
     <h1 class="home-h1">玩完五章，手上就有論文初稿</h1>
@@ -1028,7 +1102,6 @@ function homeHTML(){
      <div class="stat"><b>${allDone()}<small> / ${ALLMODS.length}</small></b><span>完成單元</span></div>
      <div class="stat"><b>27</b><span>教學影片</span></div></div>
    </div>
-   <div class="heroart">${trackSVG()}</div>
   </section>
   <div class="sechead"><h2>五章跑道</h2><span class="note">判斷、排序、草稿三項做完，單元才算完成</span></div>
   <div class="lanes">${CH.map(c=>`<button class="lane ${c.open?'':'planned'}" data-act="ch" data-c="${c.n}">
