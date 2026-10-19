@@ -96,9 +96,8 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-vis
 #heroCanvas{display:block;width:100%;aspect-ratio:4/3;max-width:100%}
 @media (min-width:660px){#heroCanvas{aspect-ratio:2/1}}
 .herobar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;border-top:1px solid var(--line);padding:8px 14px;font-variant-numeric:tabular-nums}
-.herohint{font-size:13px;color:var(--muted);flex:1 1 220px;min-width:0}
 .btn.sm{min-height:34px;padding:4px 12px;font-size:13px}
-#heroCanvas{touch-action:none}
+
 .herotext{display:flex;flex-direction:column;gap:12px;min-width:0}
 .heroart{display:flex;justify-content:center}
 .tracksvg{width:100%;max-width:300px;height:auto}
@@ -1033,13 +1032,6 @@ function startHero(){
   const tok=()=>{const cs=getComputedStyle(document.documentElement);['--accent','--navy','--ink','--muted','--line','--surface','--ok'].forEach(k=>col[k]=cs.getPropertyValue(k).trim())};
   const size=()=>{const r=cv.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)};
   tok();size();
-  let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
-  const seedPts=()=>{seed=7;return Array.from({length:28},(_,i)=>{const x=.04+.92*rnd();return {x,y:Math.min(.96,Math.max(.04,.75-.5*x+(rnd()-.5)*.95)),t:.9+i*.055}})};
-  let pts=seedPts(),drag=null;
-  const calcFit=()=>{const n=pts.length;if(n<3)return null;const mx=pts.reduce((a,p)=>a+p.x,0)/n,my=pts.reduce((a,p)=>a+p.y,0)/n;let sxy=0,sxx=0,syy=0;pts.forEach(p=>{sxy+=(p.x-mx)*(p.y-my);sxx+=(p.x-mx)**2;syy+=(p.y-my)**2});
-    if(!sxx||!syy)return null;const b=sxy/sxx;return {a:my-b*mx,b,r:sxy/Math.sqrt(sxx*syy)}};
-  let fit=calcFit();
-  const inf=g=>{const iw=g.L-g.lw*1.2,ih=g.rIn*g.s*1.25;return {ix:g.cx-g.L/2+g.lw*.6,iw,ih,iy:g.cy-ih/2}};
   const runners=[0,1,2,3,4].map(i=>({t:.04*i,v:.055+.012*((i*37)%5)/4,trail:[]}));
   const geo=()=>{const s=W<500?.74:.52,L=W*(W<500?.26:.34),outer=Math.min((W*.94-L)/2,(H*.86)/(2*s)),lw=outer*.11,rIn=outer-5*lw;return {s,L,lw,rIn,cx:W/2,cy:H*.5}};
   const at=(g,r,t)=>{const P=2*g.L+2*Math.PI*r;let d=((t%1)+1)%1*P;let x,y;
@@ -1069,14 +1061,10 @@ function startHero(){
     const [,y0]=at(g,g.rIn,0),[,y1]=at(g,g.rIn+5*g.lw,0);ctx.moveTo(sx,y0);ctx.lineTo(sx,y1);ctx.stroke();
     ctx.fillStyle=col['--ink'];ctx.font=`500 ${Math.max(8,g.lw*.5)}px "IBM Plex Mono",monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
     for(let i=0;i<5;i++){const [x,y]=at(g,g.rIn+(i+.5)*g.lw,.03);ctx.fillText(String(i+1),x,y)}
-    // infield scatter
-    const {ix,iw,ih,iy}=inf(g);
-    ctx.globalAlpha=ease((T-.8)/.6)*.6;ctx.strokeStyle=col['--muted'];ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ix,iy);ctx.lineTo(ix,iy+ih);ctx.lineTo(ix+iw,iy+ih);ctx.stroke();
-    pts.forEach(p=>{const k=ease((T-p.t)/.35);if(k<=0)return;ctx.globalAlpha=k*.85;ctx.fillStyle=p===drag?col['--accent']:col['--navy'];ctx.beginPath();ctx.arc(ix+p.x*iw,iy+(1-p.y)*ih,Math.max(1.6,g.lw*.16)*(0.6+.4*k),0,7);ctx.fill()});
-    const lk=ease((T-2.7)/1.1);if(lk>0&&fit){ctx.save();ctx.beginPath();ctx.rect(ix,iy,iw,ih);ctx.clip();ctx.globalAlpha=1;ctx.strokeStyle=col['--accent'];ctx.lineWidth=2.2;ctx.lineCap='round';ctx.beginPath();
-      const ya=iy+(1-fit.a)*ih,yb=iy+(1-(fit.a+fit.b))*ih;ctx.moveTo(ix,ya);ctx.lineTo(ix+iw*lk,ya+(yb-ya)*lk);ctx.stroke();ctx.restore();
-      ctx.globalAlpha=lk;ctx.fillStyle=col['--ink'];ctx.textAlign='right';ctx.textBaseline='bottom';ctx.font=`500 ${Math.max(10,g.lw*.62)}px "IBM Plex Mono",monospace`;ctx.fillText('r = '+fit.r.toFixed(2).replace('-','−').replace('0.','.')+'  n = '+pts.length,ix+iw,iy-3)}
-    if(lk>0&&!fit){ctx.globalAlpha=lk;ctx.fillStyle=col['--muted'];ctx.textAlign='right';ctx.textBaseline='bottom';ctx.font=`500 ${Math.max(10,g.lw*.62)}px "IBM Plex Mono",monospace`;ctx.fillText('至少 3 點才算得出 r',ix+iw,iy-3)}
+    // infield: draft count
+    {const k=ease((T-.8)/.8);ctx.globalAlpha=k;ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillStyle=col['--ink'];
+     const big=Math.max(20,g.rIn*g.s*.62);ctx.font=`500 ${big}px "IBM Plex Mono",monospace`;ctx.fillText(String(allDrafts()),g.cx,g.cy+big*.25);
+     ctx.fillStyle=col['--muted'];ctx.font=`400 ${Math.max(11,big*.3)}px "Noto Sans TC",system-ui,sans-serif`;ctx.fillText(`/ ${ALLMODS.length} 段草稿`,g.cx,g.cy+big*.25+Math.max(14,big*.42))}
     // runners
     const go=ease((T-1.2)/.8);
     runners.forEach((rn,i)=>{const r=g.rIn+(i+.5)*g.lw;if(!reduce)rn.t+=rn.v*dt*go*(1+.08*Math.sin(T*1.7+i));else rn.t=.18+.07*i;
@@ -1096,33 +1084,14 @@ function startHero(){
   // 先畫出完成狀態，分頁在背景或動畫被延後時也不會是空白
   forceT=9;frame(performance.now());
   if(!reduce&&!document.hidden){forceT=null;t0=null;animating=true;heroRAF=requestAnimationFrame(frame)}
-  // 內場散佈圖互動：點空白處新增、拖曳移動、點兩下刪除
-  const repaint=()=>{fit=calcFit();if(!animating){const f=forceT;forceT=9;frame(performance.now());forceT=f}};
-  const toData=e=>{const r=cv.getBoundingClientRect(),g=geo(),b=inf(g),px=e.clientX-r.left,py=e.clientY-r.top;
-    return {px,py,b,x:(px-b.ix)/b.iw,y:1-(py-b.iy)/b.ih}};
-  const hit=d=>{let best=null,bd=1e9;pts.forEach(p=>{const dx=d.b.ix+p.x*d.b.iw-d.px,dy=d.b.iy+(1-p.y)*d.b.ih-d.py,dd=dx*dx+dy*dy;if(dd<bd){bd=dd;best=p}});return bd<16*16?best:null};
-  const inside=d=>d.x>=-.03&&d.x<=1.03&&d.y>=-.05&&d.y<=1.05;
-  const clamp=v=>Math.min(.98,Math.max(.02,v));let lastTap={p:null,t:0};
-  cv.addEventListener('pointerdown',e=>{const d=toData(e);const p=hit(d);
-    if(p){const now=performance.now();if(lastTap.p===p&&now-lastTap.t<400){pts.splice(pts.indexOf(p),1);lastTap={p:null,t:0};e.preventDefault();repaint();return}
-      lastTap={p,t:now};drag=p;cv.setPointerCapture(e.pointerId);e.preventDefault();repaint();return}
-    if(inside(d)&&pts.length<60){const q={x:clamp(d.x),y:clamp(d.y),t:-1};pts.push(q);drag=q;cv.setPointerCapture(e.pointerId);e.preventDefault();repaint()}});
-  cv.addEventListener('pointermove',e=>{const d=toData(e);
-    if(drag){drag.x=clamp(d.x);drag.y=clamp(d.y);repaint();return}
-    cv.style.cursor=hit(d)?'grab':inside(d)?'crosshair':'default'});
-  const end=()=>{if(drag){drag=null;repaint()}};
-  cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
-  heroReset=()=>{pts=seedPts();pts.forEach(p=>p.t=-1);repaint()};
-  heroClear=()=>{pts=[];repaint()};
 }
-let heroReset=()=>{},heroClear=()=>{};
+
 function homeHTML(){
   const last=S.last&&modById(S.last),nx=last||ALLMODS.find(m=>m.tpl&&steps(m)<3)||ALLMODS[0];
   return `<section class="hero">
-   <div class="herocv"><canvas id="heroCanvas" role="img" aria-label="五章跑道動畫：五位跑者在五條跑道上前進，紅色是各章已完成的比例；內場是一張散佈圖與迴歸線"></canvas>
-    <div class="herobar"><span class="mono">五章跑道 · 已寫 ${allDrafts()} / ${ALLMODS.length} 段草稿</span>
-     <span class="herohint">內場散佈圖可以玩：點空白處加點、拖曳移動、點兩下刪除，看 r 怎麼變。</span>
-     <span class="btnrow"><button class="btn sm" data-act="heroreset">還原資料</button><button class="btn sm" data-act="heroclear">清空重畫</button></span></div></div>
+   <div class="herocv"><canvas id="heroCanvas" role="img" aria-label="五章跑道動畫：五位跑者在五條跑道上前進，紅色是各章已完成的比例"></canvas>
+    <div class="herobar"><span class="mono">五章跑道 · 每條跑道是一章，紅線是完成的比例</span>
+</div></div>
    <div class="herotext">
     <span class="mono">高等體育研究法 · 競技與教練科學研究所</span>
     <h1 class="home-h1">玩完五章，手上就有論文初稿</h1>
@@ -2005,8 +1974,6 @@ document.addEventListener('click',async e=>{
   if(act==='sum')return go({n:'sum',c:+t.dataset.c});
   if(act==='thesis')return go({n:'thesis'});
   if(act==='read')return go({n:'read',c:+t.dataset.c});
-  if(act==='heroreset'){heroReset();return}
-  if(act==='heroclear'){heroClear();return}
   if(act==='jump'){const el=document.getElementById(t.dataset.to);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(act==='consai')return runConsAI();
   if(act==='critai')return runCritAI(+t.dataset.c);
