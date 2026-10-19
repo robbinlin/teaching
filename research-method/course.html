@@ -9,6 +9,7 @@
   --bg:#F1F4F7; --surface:#FFFFFF; --ink:#12202E; --muted:#5A6B7B; --line:#D8DFE6;
   --accent:#D4401C; --accent-ink:#FFFFFF; --navy:#1C3557;
   --ok:#1E7A4F; --okbg:#E2F2E9; --bad:#B3261E; --badbg:#FBE7E4; --paper:#FAFBFC;
+  --grid:rgba(28,53,87,.055); --lane:rgba(212,64,28,.14); --wash:rgba(28,53,87,.07); --shadow:0 6px 18px -8px rgba(18,32,46,.22);
   --serif:'Noto Serif TC','Songti TC','PMingLiU',serif;
   --sans:'Noto Sans TC','PingFang TC','Microsoft JhengHei',system-ui,sans-serif;
   --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
@@ -16,12 +17,48 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0D1620; --surface:#15222F; --ink:#E7EDF3; --muted:#9BACBC; --line:#28394A;
   --accent:#F27350; --accent-ink:#1A0B06; --navy:#8DB2E3;
-  --ok:#62C792; --okbg:#143324; --bad:#F0877F; --badbg:#3A1C1A; --paper:#101C28; color-scheme:dark}}
+  --ok:#62C792; --okbg:#143324; --bad:#F0877F; --badbg:#3A1C1A; --paper:#101C28;
+  --grid:rgba(141,178,227,.06); --lane:rgba(242,115,80,.12); --wash:rgba(141,178,227,.07); --shadow:0 8px 22px -10px rgba(0,0,0,.6); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0D1620; --surface:#15222F; --ink:#E7EDF3; --muted:#9BACBC; --line:#28394A;
   --accent:#F27350; --accent-ink:#1A0B06; --navy:#8DB2E3;
-  --ok:#62C792; --okbg:#143324; --bad:#F0877F; --badbg:#3A1C1A; --paper:#101C28; color-scheme:dark}
+  --ok:#62C792; --okbg:#143324; --bad:#F0877F; --badbg:#3A1C1A; --paper:#101C28;
+  --grid:rgba(141,178,227,.06); --lane:rgba(242,115,80,.12); --wash:rgba(141,178,227,.07); --shadow:0 8px 22px -10px rgba(0,0,0,.6); color-scheme:dark}
 *{box-sizing:border-box}
+/* Background: a data-sheet grid with the curved lane lines of a running-track bend, fixed behind the content. */
+.bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(120% 70% at 100% 0%,var(--wash),transparent 60%),
+  linear-gradient(var(--bg),var(--bg))}
+.bgfx::before{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.55) 45%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.55) 45%,transparent 100%)}
+.bgfx::after{content:"";position:absolute;width:min(900px,140vw);aspect-ratio:1;right:max(-320px,-40vw);top:-36%;border-radius:50%;
+  background:repeating-radial-gradient(circle at center,transparent 0 46px,var(--lane) 46px 48px);
+  -webkit-mask-image:radial-gradient(circle at center,transparent 34%,#000 36%,#000 62%,transparent 71%);mask-image:radial-gradient(circle at center,transparent 34%,#000 36%,#000 62%,transparent 71%)}
+@keyframes enterF{from{opacity:.25;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes enterB{from{opacity:.25;transform:translateX(-18px)}to{opacity:1;transform:none}}
+@keyframes enterU{from{opacity:.25;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+#app.go>*{animation:enterU .42s cubic-bezier(.2,.7,.2,1) both}
+#app.go.fwd>*{animation-name:enterF}
+#app.go.back>*{animation-name:enterB}
+#app.go>*:nth-child(2){animation-delay:.03s}#app.go>*:nth-child(3){animation-delay:.06s}#app.go>*:nth-child(4){animation-delay:.09s}
+#app.go>*:nth-child(5){animation-delay:.12s}#app.go>*:nth-child(6){animation-delay:.15s}#app.go>*:nth-child(n+7){animation-delay:.18s}
+#app.go .lane,#app.go .row{animation:enterU .4s cubic-bezier(.2,.7,.2,1) both}
+#app.go .lane:nth-child(2),#app.go .row:nth-child(2){animation-delay:.04s}#app.go .lane:nth-child(3),#app.go .row:nth-child(3){animation-delay:.08s}
+#app.go .lane:nth-child(4),#app.go .row:nth-child(4){animation-delay:.12s}#app.go .lane:nth-child(5),#app.go .row:nth-child(5){animation-delay:.16s}#app.go .row:nth-child(n+6){animation-delay:.2s}
+#app.go .track i{transform-origin:left;animation:fill .9s .25s cubic-bezier(.2,.7,.2,1) both}
+.lane,.row,.btn,.stepbar button,.video{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease}
+@media (hover:hover){
+  .lane:hover,button.row:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--navy)}
+  .btn:not(:disabled):hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+  .stepbar button:hover{border-color:var(--navy)}
+  .video:hover{transform:translateY(-1px);box-shadow:var(--shadow)}}
+.lane:active,button.row:active,.btn:not(:disabled):active{transform:scale(.985)}
+details>summary{transition:color .15s ease}
+details[open]>*:not(summary){animation:enterU .3s ease both}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 body{background:var(--bg);color:var(--ink);font:15px/1.75 var(--sans);padding-block:20px 56px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
@@ -65,13 +102,15 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-vis
 .chip.done{background:var(--okbg);border-color:transparent;color:var(--ok)}
 
 /* module */
-.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 1px 0 var(--line);padding:18px 16px;display:flex;flex-direction:column;gap:12px}
 .step>header{display:flex;gap:10px;align-items:baseline}
 .step>header .mono{color:var(--accent)}
 .tip{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px}
 .q{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--paper)}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
 .btn{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 16px;min-height:40px}
+.home-h1{font-size:clamp(28px,5vw,38px)}
+a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;color:var(--ink)}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .verdict{font-size:14px;border-radius:8px;padding:8px 10px}
@@ -156,6 +195,7 @@ ol.refs{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:8px;f
 .play::after{content:"";position:absolute;left:17px;top:13px;border-left:14px solid var(--accent-ink);border-top:9px solid transparent;border-bottom:9px solid transparent}
 </style>
 
+<div class="bgfx" aria-hidden="true"></div>
 <div class="wrap" id="app"></div>
 <div class="toast" id="toast" hidden></div>
 
@@ -915,6 +955,12 @@ window.addEventListener('hashchange',()=>{let h='';try{h=location.hash}catch(e){
 const modById=id=>ALLMODS.find(m=>m.id===id);
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{e.hidden=true},2600)}
 
+const DEPTH={home:0,ch:1,thesis:1,sum:2,read:2,mod:2};let lastDepth=null,lastKey='';
+function animateView(){const k=JSON.stringify(view),d=DEPTH[view.n]??1;
+  if(k===lastKey)return;let dir=lastDepth===null?'up':d>lastDepth?'fwd':d<lastDepth?'back':'up';
+  if(view.n==='mod'&&animateView.id)dir=view.id>animateView.id?'fwd':'back';
+  app.classList.remove('go','fwd','back','up');void app.offsetWidth;app.classList.add('go',dir);
+  lastDepth=d;lastKey=k;animateView.id=view.n==='mod'?view.id:null}
 function render(){
   if(view.n==='home')app.innerHTML=homeHTML();
   else if(view.n==='ch')app.innerHTML=chHTML(CH[view.c-1]);
@@ -922,9 +968,10 @@ function render(){
   else if(view.n==='sum')app.innerHTML=sumHTML(CH[view.c-1]);
   else if(view.n==='thesis')app.innerHTML=thesisHTML();
   else if(view.n==='read')app.innerHTML=readHTML(view.c);
+  animateView();
 }
 function homeHTML(){
-  return `<div class="top"><span class="mono">研究法 · 五章工作坊</span><h1>玩完五章，手上就有論文初稿</h1>
+  return `<div class="top"><span class="mono">研究法 · 五章工作坊</span><h1 class="home-h1">玩完五章，手上就有論文初稿</h1>
   <p class="lede">五章都已開放。每一章拆成幾個小單元。每個單元有重點、判斷題、排序和寫作練習，完成後得到一段可以直接用的草稿。</p></div>
   ${resumeHTML()}
   <div class="lanes">${CH.map(c=>`<button class="lane ${c.open?'':'planned'}" data-act="ch" data-c="${c.n}">
