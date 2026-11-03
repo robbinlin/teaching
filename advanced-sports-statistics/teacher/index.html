@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>教師頁面｜高等體育統計</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+:root{--bg:#F5F4EE;--surface:#FFFFFF;--ink:#152826;--muted:#566865;--line:#D8DCD4;--accent:#0B7A80;--accent-ink:#FFFFFF;--amber:#B4530A;--soft:#E7EEEB;--ok:#1E7B45;--bad:#B42318;--band:#163533;--band-ink:#E8F1EE;--band-muted:#9FBDB7;
+ --display:"Noto Serif TC","Songti TC","PMingLiU",serif;--body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--r:10px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0E1716;--surface:#152220;--ink:#E4ECE9;--muted:#9AAEA9;--line:#2B3B38;--accent:#45C1C6;--accent-ink:#04201F;--amber:#F0A24A;--soft:#1B2C2A;--ok:#5BC98A;--bad:#F2877D;--band:#0A2321;--band-ink:#DDEBE7;--band-muted:#86A8A2;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1716;--surface:#152220;--ink:#E4ECE9;--muted:#9AAEA9;--line:#2B3B38;--accent:#45C1C6;--accent-ink:#04201F;--amber:#F0A24A;--soft:#1B2C2A;--ok:#5BC98A;--bad:#F2877D;--band:#0A2321;--band-ink:#DDEBE7;--band-muted:#86A8A2;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6}
+a{color:var(--accent)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px))}
+.band{background:var(--band);color:var(--band-ink)}
+.top{display:flex;align-items:center;gap:16px;padding-block:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{font-family:var(--mono);font-size:12px;border:1px solid var(--band-muted);padding:4px 6px;letter-spacing:.06em;white-space:nowrap}
+.brand small{display:block;font-size:12px;color:var(--band-muted)}
+.brand a{color:inherit;text-decoration:none}
+.hero{padding-block:18px 26px}
+.hero h1{font-family:var(--display);font-size:clamp(24px,3.4vw,34px);margin:0 0 4px}
+.hero p{margin:0;color:var(--band-muted)}
+main{padding-block:24px 48px}
+.msg{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px;text-align:center;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:14px}
+.bar .stat{font-size:14px;color:var(--muted)} .bar .stat b{font-family:var(--mono);color:var(--ink);font-size:18px;font-weight:500;margin-left:4px}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:8px 14px;font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.bar input{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:200px}
+.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:500;position:sticky;top:0;background:var(--surface);cursor:pointer;user-select:none}
+th.sorted::after{content:" ▾"} th.sorted.asc::after{content:" ▴"}
+td.n{font-family:var(--mono);text-align:right}
+td.cell{cursor:pointer;min-width:84px}
+td.cell:hover{background:var(--soft)}
+.pc{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:13px}
+.pc i{display:block;width:40px;height:6px;border-radius:3px;background:var(--soft);overflow:hidden}
+.pc i span{display:block;height:100%;background:var(--accent)}
+.pc.full i span{background:var(--ok)}
+.pc.none{color:var(--line)}
+.who{display:flex;align-items:center;gap:8px}.who img{width:24px;height:24px;border-radius:50%}
+.who small{display:block;color:var(--muted);font-size:12px}
+dialog{border:1px solid var(--line);border-radius:12px;padding:0;max-width:760px;width:calc(100% - 32px);background:var(--surface);color:var(--ink)}
+dialog::backdrop{background:rgba(10,20,20,.5)}
+.dlg-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dlg-head h2{font-size:18px;margin:0;flex:1}
+.dlg-body{padding:16px 20px 22px;max-height:70vh;overflow:auto}
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kv div{background:var(--soft);border-radius:8px;padding:8px 10px}.kv span{display:block;font-size:12px;color:var(--muted)}.kv b{font-family:var(--mono);font-weight:500}
+.ans{border-top:1px solid var(--line);padding:10px 0}
+.ans p{margin:0 0 4px;font-size:13px;color:var(--muted)}
+.ans pre{margin:0;white-space:pre-wrap;font-family:var(--body);font-size:14px;background:var(--bg);border-radius:6px;padding:8px 10px}
+.empty{color:var(--muted);font-size:14px}
+.note{font-size:13px;color:var(--muted);margin-top:12px}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head><body>
+<header class="band">
+ <div class="wrap top"><div class="brand"><a href="../"><span class="brand-mark">Advanced Statistics</span></a><span><strong>高等體育統計</strong><small>國立體育大學 競技與教練科學研究所・林彥光 老師</small></span></div></div>
+ <div class="wrap hero"><h1>教師頁面：學生學習進度</h1><p>每位登入過的學生、各章完成度、自我檢測與作業作答。點任一章的格子看詳細作答。</p></div>
+</header>
+<main class="wrap" id="app"><div class="msg">載入中…</div></main>
+<dialog id="dlg"><div class="dlg-head"><h2 id="dlgTitle"></h2><button class="btn" type="button" id="dlgClose">關閉</button></div><div class="dlg-body" id="dlgBody"></div></dialog>
+<script>
+</script><style>/* ===== account widget ===== */
+.acct{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--band-muted)}
+.wrap.top .acct{margin-left:auto}
+.wrap.top .meter{margin-left:0}
+.intro-top .acct{margin-left:16px}
+.acct-in{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:13px;font-weight:500;padding:7px 12px;border-radius:8px;border:1px solid rgba(232,241,238,.35);background:rgba(255,255,255,.06);color:var(--band-ink);cursor:pointer;transition:background .2s,border-color .2s}
+.acct-in:hover{background:rgba(255,255,255,.12);border-color:var(--band-ink)}
+.acct-in svg{width:16px;height:16px;flex:0 0 auto;background:#fff;border-radius:50%;padding:1px}
+.acct-user{display:inline-flex;align-items:center;gap:7px;color:var(--band-ink)}
+.acct-user img{width:24px;height:24px;border-radius:50%;object-fit:cover}
+.acct-name{max-width:14ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct-sync{font-family:var(--mono);font-size:12px}
+.acct-out{font:inherit;font-size:12px;background:none;border:0;color:var(--band-muted);text-decoration:underline;cursor:pointer;padding:2px}
+.acct-out:hover{color:var(--band-ink)}
+.acct-teacher{font-size:12px;color:#04201F;background:#F0A24A;border-radius:20px;padding:2px 10px;text-decoration:none!important;font-weight:600}
+.acct-wait{opacity:.5}
+.my-prog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:10px 0 0}
+.my-prog .mp-bar{width:120px;height:6px;border-radius:3px;background:var(--soft);overflow:hidden;display:inline-block}
+.my-prog .mp-bar span{display:block;height:100%;background:var(--accent)}
+.my-prog b{font-family:var(--mono);font-weight:500;color:var(--accent)}
+@media (max-width:900px){.intro-top .acct{margin-left:auto}.acct-name{display:none}.acct-sync{display:none}}
+</style><script>/* ===== AdvStat：Google 登入與進度同步（Firebase） ===== */
+(function(){
+'use strict';
+var CFG={apiKey:'AIzaSyBoRC-HE1njeOKFg2Nq3FMv4m2ua2MikKg',authDomain:'advstat-ntsu.firebaseapp.com',projectId:'advstat-ntsu',storageBucket:'advstat-ntsu.firebasestorage.app',messagingSenderId:'736539818685',appId:'1:736539818685:web:1e5faa3dcbbde0279f55d4'};
+var TEACHER='robbinlin@ntsu.edu.tw';
+var CH_KEYS=[1,2,3,4,5,6,7,8].map(function(i){return 'ass-ch'+i+'-v2';});
+var OWNER='advstat-owner';
+if(!window.firebase||!firebase.initializeApp){console.warn('Firebase SDK 未載入');return;}
+var app=firebase.apps.length?firebase.app():firebase.initializeApp(CFG);
+var auth=firebase.auth(),db=firebase.firestore();
+var ADV=window.__ADV||null; // chapter bridge (only on chapter pages)
+var chId=ADV?(ADV.key.match(/ch(\d)/)||[])[1]:null;
+
+/* ---------- account widget ---------- */
+var host=document.querySelector('.intro-top')||document.querySelector('.wrap.top');
+var box=document.createElement('div');box.className='acct';box.innerHTML='<span class="acct-wait">…</span>';
+if(host)host.appendChild(box);
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+var syncState='';
+function renderBox(u){
+  if(!u){box.innerHTML='<button type="button" class="acct-in" id="acctIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.5 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9c-.3 1.4-1 2.5-2.2 3.3v2.7h3.5c2.1-1.9 3.3-4.7 3.3-8z"/><path fill="#34A853" d="M12 23c3 0 5.4-1 7.2-2.7l-3.5-2.7c-1 .7-2.2 1-3.7 1-2.9 0-5.3-1.9-6.2-4.5H2.2v2.8C4 20.5 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.8 14.1c-.2-.7-.4-1.4-.4-2.1s.1-1.4.4-2.1V7.1H2.2C1.4 8.6 1 10.3 1 12s.4 3.4 1.2 4.9l3.6-2.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.1-3.1C17.4 2.2 15 1 12 1 7.7 1 4 3.5 2.2 7.1l3.6 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>登入，進度跟著帳號</button>';
+    return;}
+  var nm=u.displayName||u.email;
+  box.innerHTML=(u.email===TEACHER&&!/\/teacher\//.test(location.pathname)?'<a class="acct-teacher" href="'+(chId?'../':'')+'teacher/">教師頁面</a>':'')+
+    '<span class="acct-user" title="'+esc(u.email)+'">'+(u.photoURL?'<img src="'+esc(u.photoURL)+'" alt="" referrerpolicy="no-referrer">':'')+'<span class="acct-name">'+esc(nm)+'</span></span>'+
+    (chId?'<span class="acct-sync" id="acctSync">'+esc(syncState)+'</span>':'')+
+    '<button type="button" class="acct-out" id="acctOut">登出</button>';
+}
+function setSync(t){syncState=t;var e=document.getElementById('acctSync');if(e)e.textContent=t;}
+box.addEventListener('click',function(e){
+  if(e.target.closest('#acctIn')){var p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
+    auth.signInWithPopup(p).catch(function(err){
+      if(err&&(err.code==='auth/popup-blocked'||err.code==='auth/operation-not-supported-in-this-environment'))return auth.signInWithRedirect(p);
+      if(err&&err.code!=='auth/popup-closed-by-user'&&err.code!=='auth/cancelled-popup-request')alert('登入失敗：'+(err.message||err.code));});}
+  if(e.target.closest('#acctOut')){var uid=auth.currentUser&&auth.currentUser.uid;flush().then(function(){
+      // 共用電腦：登出時清掉這個帳號存在本機的進度（雲端仍保留）
+      try{if(uid&&localStorage.getItem(OWNER)===uid){CH_KEYS.forEach(function(k){localStorage.removeItem(k);});localStorage.removeItem(OWNER);}}catch(_){}
+      return auth.signOut();}).then(function(){location.reload();});}
+});
+
+/* ---------- merge local + cloud ---------- */
+function isObj(x){return x&&typeof x==='object'&&!Array.isArray(x);}
+function filled(v){return !(v===undefined||v===null||v===''||(Array.isArray(v)&&!v.length));}
+function merge(cloud,local){
+  var o=JSON.parse(JSON.stringify(local||{}));cloud=cloud||{};
+  Object.keys(cloud).forEach(function(k){if(!(k in o))o[k]=cloud[k];});
+  ['videos','spss','hwChecked'].forEach(function(k){if(isObj(cloud[k])||isObj(o[k])){var r={},a=cloud[k]||{},b=o[k]||{};Object.keys(a).concat(Object.keys(b)).forEach(function(x){r[x]=!!(a[x]||b[x]);});o[k]=r;}});
+  o.slidesDone=!!(cloud.slidesDone||o.slidesDone);o.slideMax=Math.max(+cloud.slideMax||1,+o.slideMax||1);
+  if(isObj(cloud.quiz)||isObj(o.quiz)){var q={},qa=cloud.quiz||{},qb=o.quiz||{};Object.keys(qa).concat(Object.keys(qb)).forEach(function(x){var A=qa[x],B=qb[x];q[x]=(B&&B.ok)?B:(A&&A.ok)?A:(B||A);});o.quiz=q;}
+  if(isObj(cloud.hw)||isObj(o.hw)){var h={},ha=cloud.hw||{},hb=o.hw||{};Object.keys(ha).concat(Object.keys(hb)).forEach(function(x){h[x]=filled(hb[x])?hb[x]:ha[x];});o.hw=h;}
+  if(!filled(o.think)&&filled(cloud.think))o.think=cloud.think;
+  return o;
+}
+function canon(x){var s=function(v){if(Array.isArray(v))return v.map(s);if(isObj(v)){var r={};Object.keys(v).sort().forEach(function(k){r[k]=s(v[k]);});return r;}return v;};return JSON.stringify(s(x));}
+
+/* ---------- summary for the teacher page ---------- */
+function summary(){
+  var t=function(id){var e=document.getElementById(id);return e?e.textContent.trim():'';};
+  var pct=parseInt(t('meterPct'),10)||0;
+  var steps=[].slice.call(document.querySelectorAll('.stage-tab.done')).map(function(x){return x.dataset.tab;});
+  var hw=(t('hwStatus').match(/(\d+)\s*\/\s*(\d+)/)||[]);
+  return {pct:pct,steps:steps,quizCorrect:parseInt(t('quizScore'),10)||0,hwAnswered:+hw[1]||0,hwTotal:+hw[2]||0};
+}
+
+/* ---------- chapter sync ---------- */
+var timer=null,pending=false,ready=false;
+function ref(u){return db.collection('users').doc(u.uid).collection('progress').doc('ch'+chId);}
+function push(){
+  var u=auth.currentUser;if(!u||!ADV||!ready)return Promise.resolve();
+  pending=false;setSync('同步中…');
+  var s=summary();
+  return ref(u).set({chapter:+chId,state:JSON.stringify(ADV.state),pct:s.pct,steps:s.steps,quizCorrect:s.quizCorrect,hwAnswered:s.hwAnswered,hwTotal:s.hwTotal,updatedAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(function(){setSync('✓ 已同步');}).catch(function(e){console.error(e);setSync('⚠ 未同步');});
+}
+function queue(){if(!auth.currentUser||!ready)return;pending=true;setSync('…');clearTimeout(timer);timer=setTimeout(push,1200);}
+function flush(){clearTimeout(timer);return pending?push():Promise.resolve();}
+if(ADV){ADV._cb=queue;
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush();});
+  window.addEventListener('pagehide',function(){flush();});}
+
+function onSignedIn(u){
+  db.collection('users').doc(u.uid).set({email:u.email||'',name:u.displayName||'',photo:u.photoURL||'',lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(function(e){console.error(e);});
+  var owner=null;try{owner=localStorage.getItem(OWNER);}catch(_){}
+  if(!ADV){try{localStorage.setItem(OWNER,u.uid);}catch(_){}homeProgress(u);return;}
+  setSync('讀取中…');
+  ref(u).get().then(function(snap){
+    var cloud=null;if(snap.exists){try{cloud=JSON.parse(snap.data().state||'{}');}catch(_){cloud={};}}
+    var local=ADV.state;
+    // 本機進度若屬於另一個帳號，就不合併，直接以雲端為準
+    var foreign=owner&&owner!==u.uid;
+    var merged=foreign?(cloud||{}):merge(cloud,local);
+    try{localStorage.setItem(OWNER,u.uid);}catch(_){}
+    if(foreign){try{CH_KEYS.forEach(function(k){if(k!==ADV.key)localStorage.removeItem(k);});}catch(_){}}
+    if(canon(merged)!==canon(local)){
+      var flag='advstat-merged-'+chId;
+      if(!sessionStorage.getItem(flag)){sessionStorage.setItem(flag,'1');
+        try{localStorage.setItem(ADV.key,JSON.stringify(merged));}catch(_){}
+        // 先把合併結果寫回雲端，再重新載入頁面套用
+        ready=true;return ref(u).set({chapter:+chId,state:JSON.stringify(merged),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).then(function(){location.reload();});}
+    }
+    sessionStorage.removeItem('advstat-merged-'+chId);
+    ready=true;setSync('✓ 已同步');
+    push();
+  }).catch(function(e){console.error(e);ready=true;setSync('⚠ 無法讀取雲端進度');});
+}
+
+/* ---------- home: show per-chapter progress ---------- */
+function homeProgress(u){
+  var rows=[].slice.call(document.querySelectorAll('.chrow'));if(!rows.length)return;
+  db.collection('users').doc(u.uid).collection('progress').get().then(function(qs){
+    var m={};qs.forEach(function(d){m[d.id]=d.data();});
+    rows.forEach(function(r,i){var d=m['ch'+(i+1)];var tag=r.querySelector('.my-prog');if(!tag){tag=document.createElement('p');tag.className='my-prog';(r.querySelector('.cmain')||r).appendChild(tag);}
+      var p=d&&typeof d.pct==='number'?d.pct:0;tag.innerHTML='<span>你的進度</span><span class="mp-bar"><span style="width:'+p+'%"></span></span><b>'+p+'%</b>';tag.title='你的第 '+(i+1)+' 章進度';});
+  }).catch(function(e){console.error(e);});
+}
+
+auth.getRedirectResult().catch(function(e){console.error(e);});
+auth.onAuthStateChanged(function(u){renderBox(u);if(u)onSignedIn(u);else{ready=false;[].forEach.call(document.querySelectorAll('.my-prog'),function(x){x.remove();});}});
+})();
+
+</script>
+<script>
+(function(){
+'use strict';
+var TEACHER='robbinlin@ntsu.edu.tw';
+var STEPS={learn:'影片與概念',slides:'投影片',spss:'SPSS／計算核對',quiz:'自我檢測',homework:'章節作業'};
+var app=document.getElementById('app');
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function waitFb(cb){if(window.firebase&&firebase.apps&&firebase.apps.length)cb();else setTimeout(function(){waitFb(cb);},100);}
+waitFb(function(){
+var auth=firebase.auth(),db=firebase.firestore();
+var students=[],sortKey='name',sortAsc=true,filter='',qcache={};
+auth.onAuthStateChanged(function(u){
+  if(!u){app.innerHTML='<div class="msg">請先用右上角的「登入」按鈕，以授課教師帳號登入。</div>';return;}
+  if(u.email!==TEACHER){app.innerHTML='<div class="msg">這個頁面僅限授課教師使用。你目前登入的是 '+esc(u.email)+'。</div>';return;}
+  load();
+});
+function load(){
+  app.innerHTML='<div class="msg">讀取學生資料中…</div>';
+  Promise.all([db.collection('users').get(),db.collectionGroup('progress').get()]).then(function(r){
+    var map={};
+    r[0].forEach(function(d){var x=d.data();map[d.id]={uid:d.id,email:x.email||'',name:x.name||'',photo:x.photo||'',lastSeen:x.lastSeen&&x.lastSeen.toDate?x.lastSeen.toDate():null,ch:{}};});
+    r[1].forEach(function(d){var uid=d.ref.parent.parent.id;if(!map[uid])map[uid]={uid:uid,email:'',name:'(未知)',photo:'',lastSeen:null,ch:{}};var x=d.data();var st={};try{st=JSON.parse(x.state||'{}');}catch(_){}
+      map[uid].ch[d.id]={pct:+x.pct||0,steps:x.steps||[],quizCorrect:+x.quizCorrect||0,hwAnswered:+x.hwAnswered||0,hwTotal:+x.hwTotal||0,updatedAt:x.updatedAt&&x.updatedAt.toDate?x.updatedAt.toDate():null,state:st};});
+    students=Object.keys(map).map(function(k){var s=map[k];s.email!==TEACHER||(s.isTeacher=true);var t=0;for(var i=1;i<=8;i++)t+=(s.ch['ch'+i]||{}).pct||0;s.avg=Math.round(t/8);return s;});
+    render();
+  }).catch(function(e){console.error(e);app.innerHTML='<div class="msg">讀取失敗：'+esc(e.message||e)+'</div>';});
+}
+function fmtDate(d){if(!d)return '—';var p=function(n){return String(n).padStart(2,'0');};return d.getFullYear()+'/'+p(d.getMonth()+1)+'/'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());}
+function val(s,k){if(k==='name')return (s.name||s.email).toLowerCase();if(k==='email')return s.email.toLowerCase();if(k==='last')return s.lastSeen?+s.lastSeen:0;if(k==='avg')return s.avg;return (s.ch[k]||{}).pct||0;}
+function render(){
+  var list=students.filter(function(s){return !filter||(s.name+' '+s.email).toLowerCase().indexOf(filter)>=0;});
+  list.sort(function(a,b){var x=val(a,sortKey),y=val(b,sortKey);return (x<y?-1:x>y?1:0)*(sortAsc?1:-1);});
+  var active=students.filter(function(s){return Object.keys(s.ch).length;}).length;
+  var h='<div class="bar"><span class="stat">登入過的學生<b>'+students.length+'</b></span><span class="stat">有學習紀錄<b>'+active+'</b></span><input type="search" id="q" placeholder="搜尋姓名或信箱" value="'+esc(filter)+'"><span style="flex:1"></span><button class="btn" id="reload" type="button">重新整理</button><button class="btn primary" id="csv" type="button">匯出 CSV</button></div>';
+  h+='<div class="tbl-wrap"><table><thead><tr>'+[['name','學生'],['last','最後登入']].concat([1,2,3,4,5,6,7,8].map(function(i){return ['ch'+i,'第 '+i+' 章'];})).concat([['avg','平均']]).map(function(c){return '<th data-k="'+c[0]+'" class="'+(sortKey===c[0]?'sorted'+(sortAsc?' asc':''):'')+'">'+c[1]+'</th>';}).join('')+'</tr></thead><tbody>';
+  if(!list.length)h+='<tr><td colspan="11" class="empty">還沒有學生登入。學生在任一章按「登入」後就會出現在這裡。</td></tr>';
+  list.forEach(function(s){
+    h+='<tr><td><div class="who">'+(s.photo?'<img src="'+esc(s.photo)+'" alt="" referrerpolicy="no-referrer">':'')+'<span>'+esc(s.name||'(未設定姓名)')+'<small>'+esc(s.email)+'</small></span></div></td><td>'+fmtDate(s.lastSeen)+'</td>';
+    for(var i=1;i<=8;i++){var c=s.ch['ch'+i];h+=c?'<td class="cell" data-u="'+s.uid+'" data-c="'+i+'" title="檢測答對 '+c.quizCorrect+' 題，作業 '+c.hwAnswered+'/'+c.hwTotal+'"><span class="pc'+(c.pct>=100?' full':'')+'"><i><span style="width:'+c.pct+'%"></span></i>'+c.pct+'%</span></td>':'<td><span class="pc none">—</span></td>';}
+    h+='<td class="n">'+s.avg+'%</td></tr>';});
+  h+='</tbody></table></div><p class="note">完成度＝五個步驟（影片、投影片、SPSS、檢測全對、作業全部作答）各占 20%。學生每次操作後約 1 秒同步一次。</p>';
+  app.innerHTML=h;
+}
+app.addEventListener('click',function(e){
+  var th=e.target.closest('th[data-k]');if(th){var k=th.dataset.k;if(sortKey===k)sortAsc=!sortAsc;else{sortKey=k;sortAsc=(k==='name'||k==='email');}render();return;}
+  if(e.target.closest('#reload')){load();return;}
+  if(e.target.closest('#csv')){csv();return;}
+  var td=e.target.closest('td.cell');if(td)detail(td.dataset.u,+td.dataset.c);
+});
+app.addEventListener('input',function(e){if(e.target.id==='q'){filter=e.target.value.trim().toLowerCase();var pos=e.target.selectionStart;render();var q=document.getElementById('q');q.focus();try{q.setSelectionRange(pos,pos);}catch(_){}}});
+function questions(ch){
+  if(qcache[ch])return qcache[ch];
+  qcache[ch]=fetch('../ch'+ch+'/').then(function(r){return r.text();}).then(function(t){var m=t.match(/<script type="application\/json" id="chData">([\s\S]*?)<\/script>/);if(!m)return null;var d=JSON.parse(m[1]);return {hw:(d.hw&&d.hw.questions)||[],quiz:d.quiz||[]};}).catch(function(){return null;});
+  return qcache[ch];
+}
+function show(v,q){
+  if(v===undefined||v===null||v==='')return '（未作答）';
+  if(q&&q.o){if(Array.isArray(v))return v.map(function(i){return q.o[i];}).join('、');if(typeof v==='number'&&q.o[v]!==undefined)return q.o[v];}
+  if(typeof v==='object')return JSON.stringify(v);
+  return String(v);
+}
+function detail(uid,ch){
+  var s=students.filter(function(x){return x.uid===uid;})[0];var c=s&&s.ch['ch'+ch];if(!c)return;
+  var st=c.state||{};
+  document.getElementById('dlgTitle').textContent=(s.name||s.email)+'・第 '+ch+' 章';
+  var body=document.getElementById('dlgBody');
+  var done=(c.steps||[]).map(function(k){return STEPS[k]||k;});
+  var nVid=Object.keys(st.videos||{}).filter(function(k){return st.videos[k];}).length;
+  body.innerHTML='<div class="kv"><div><span>完成度</span><b>'+c.pct+'%</b></div><div><span>影片已點開</span><b>'+nVid+' / 3</b></div><div><span>投影片</span><b>'+(st.slidesDone?'看完':'第 '+(st.slideMax||1)+' 張')+'</b></div><div><span>檢測答對</span><b>'+c.quizCorrect+'</b></div><div><span>作業已作答</span><b>'+c.hwAnswered+' / '+c.hwTotal+'</b></div><div><span>最後同步</span><b style="font-size:13px">'+fmtDate(c.updatedAt)+'</b></div></div>'+
+    '<p style="margin:0 0 6px"><b>已完成的步驟：</b>'+(done.length?esc(done.join('、')):'尚無')+'</p><h3 style="font-size:15px;margin:18px 0 4px">作業作答</h3><div id="hwList" class="empty">讀取題目中…</div>'+
+    (st.think?'<h3 style="font-size:15px;margin:18px 0 4px">思考題（不計分）</h3><div class="ans"><pre>'+esc(st.think)+'</pre></div>':'');
+  document.getElementById('dlg').showModal();
+  questions(ch).then(function(Q){
+    var box=document.getElementById('hwList');var hw=st.hw||{};var qs=(Q&&Q.hw)||[];
+    if(!qs.length){var ks=Object.keys(hw);box.innerHTML=ks.length?ks.map(function(k){return '<div class="ans"><p>'+esc(k)+'</p><pre>'+esc(show(hw[k]))+'</pre></div>';}).join(''):'<p class="empty">還沒有作答。</p>';box.className='';return;}
+    box.className='';box.innerHTML=qs.map(function(q,i){return '<div class="ans"><p>第 '+(i+1)+' 題　'+esc((q.p||'').replace(/<[^>]+>/g,'').slice(0,160))+'</p><pre>'+esc(show(hw[q.id],q))+'</pre></div>';}).join('');
+  });
+}
+document.getElementById('dlgClose').addEventListener('click',function(){document.getElementById('dlg').close();});
+function csv(){
+  var head=['姓名','信箱','最後登入'];for(var i=1;i<=8;i++)head.push('第'+i+'章完成度%','第'+i+'章檢測答對','第'+i+'章作業作答數');head.push('平均完成度%');
+  var rows=[head];students.forEach(function(s){var r=[s.name,s.email,fmtDate(s.lastSeen)];for(var i=1;i<=8;i++){var c=s.ch['ch'+i];r.push(c?c.pct:'',c?c.quizCorrect:'',c?c.hwAnswered:'');}r.push(s.avg);rows.push(r);});
+  var text='﻿'+rows.map(function(r){return r.map(function(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',');}).join('\r\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download='高等體育統計_學生進度_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();
+}
+});
+})();
+</script>
+</body></html>
