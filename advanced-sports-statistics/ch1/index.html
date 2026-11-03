@@ -263,6 +263,29 @@ footer{border-top:1px solid var(--line);padding-block:20px 32px;font-size:13px;c
 .chapnav a:hover{color:var(--band-ink);border-color:var(--band-muted)}
 .chapnav .cur{color:var(--band);background:var(--band-ink);border-color:var(--band-ink)}
 .chapnav .home{font-family:var(--body);font-size:13px}
+/* ===== episode flow: watch one, play one ===== */
+.epflow{display:grid;gap:40px;margin-top:4px}
+.ep{position:relative;padding-left:60px}
+.ep::before{content:"";position:absolute;left:19px;top:48px;bottom:-40px;width:2px;background:var(--line)}
+.ep:last-child::before{bottom:0}
+.ep-badge{position:absolute;left:0;top:0;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:15px;font-weight:600;background:var(--surface);color:var(--accent);border:2px solid var(--accent);transition:background .3s,color .3s,border-color .3s}
+.ep.watched .ep-badge{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+.ep-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:40px;margin-bottom:12px}
+.ep-head .label{color:var(--accent)}
+.ep-head h3{font-family:var(--display);font-size:20px;margin:0}
+.ep-state{font-size:12px;border-radius:20px;padding:2px 10px;border:1px solid var(--line);color:var(--muted)}
+.ep.watched .ep-state{border-color:var(--ok);color:var(--ok)}
+.ep .video{flex-direction:row}
+.ep .video .thumb{flex:0 0 min(42%,400px);align-self:flex-start}
+.ep-go{display:flex;align-items:center;gap:10px;margin:22px 0 16px;font-size:14px;color:var(--muted)}
+.ep-go::before{content:"";width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:var(--soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230B7A80' stroke-width='2.4'%3E%3Cpath d='M12 5v14M6 13l6 6 6-6'/%3E%3C/svg%3E") center/14px no-repeat}
+.ep-go b{color:var(--ink);font-weight:600}
+.ep-concepts{display:grid;gap:28px}
+@media (max-width:860px){
+ .ep{padding-left:0}.ep::before{display:none}
+ .ep-badge{position:static;flex:0 0 auto;width:34px;height:34px;font-size:14px}
+ .ep .video{flex-direction:column}.ep .video .thumb{flex:none;width:100%}
+}
 </style>
 
 <div class="band">
@@ -792,6 +815,33 @@ document.addEventListener('click',e=>{
 
 /* ---------- boot ---------- */
 renderVideos();renderW0();renderW1();renderW2();renderSlides();renderFiles();renderGuide();renderQuiz();renderHW();
+/* ===== episode flow: watch one, play one ===== */
+(()=>{
+const stage=document.querySelector('[data-stage="learn"]');const vbox=document.getElementById('videos');if(!stage||!vbox)return;
+const MAP=window.EP_MAP;const cons=[...stage.querySelectorAll('.concept')];
+const nV=vbox.children.length||3;const map=MAP||Array.from({length:nV},(_,i)=>cons.length===nV?[i]:[]);
+const flow=document.createElement('div');flow.className='epflow';flow.id='epflow';
+const titles=[...vbox.querySelectorAll('.video h3')].map(h=>h.textContent);
+for(let i=0;i<nV;i++){
+  const ep=document.createElement('section');ep.className='ep';ep.dataset.ep=i;
+  const t=(titles[i]||'').replace(/^EP\d+\s*/,'');
+  const cs=map[i]||[];
+  ep.innerHTML=`<div class="ep-head"><span class="ep-badge">${i+1}</span><span class="label">第 ${i+1} 段 · EP${i+1}</span><h3>${esc(t)}</h3><span class="ep-state">尚未觀看</span></div><div class="ep-video"></div>`+
+    (cs.length?`<p class="ep-go"><span>${cs.some(c=>cons[c]&&cons[c].querySelector('.widget'))?`看完影片，<b>接著動手：概念 ${cs.map(c=>c+1).join('、')}</b>，用工具驗證影片裡的說法。`:`看完影片，<b>接著讀：概念 ${cs.map(c=>c+1).join('、')}</b>，把這一集的重點整理一次。`}</span></p><div class="ep-concepts"></div>`:'');
+  const box=ep.querySelector('.ep-concepts');cs.forEach(c=>{if(cons[c])box.appendChild(cons[c]);});
+  flow.appendChild(ep);
+}
+// leftover concepts (not mapped) go to the last segment
+const used=new Set(map.flat());const left=cons.filter((_,i)=>!used.has(i));
+if(left.length){const last=flow.lastElementChild;let box=last.querySelector('.ep-concepts');if(!box){box=document.createElement('div');box.className='ep-concepts';last.appendChild(box);}left.forEach(c=>box.appendChild(c));}
+vbox.before(flow);vbox.hidden=true;const cb=document.getElementById('concepts');if(cb&&!cb.children.length)cb.hidden=true;
+const p=stage.querySelector('.stage-head p');if(p)p.textContent='分成三段，每段先看一集動畫（約兩分鐘，會在 YouTube 開啟，點時間碼可直接跳到那一段），看完回來用下面的工具動手驗證，再進下一段。';
+function place(){const cards=[...vbox.children];flow.querySelectorAll('.ep').forEach((ep,i)=>{const slot=ep.querySelector('.ep-video');slot.innerHTML='';if(cards[i])slot.appendChild(cards[i]);
+  const seen=!!(cards[i]&&cards[i].querySelector('.seen'));ep.classList.toggle('watched',seen);ep.querySelector('.ep-state').textContent=seen?'✓ 已觀看':'尚未觀看';ep.querySelector('.ep-badge').textContent=seen?'✓':(i+1);});}
+place();
+const orig=renderVideos;renderVideos=function(){orig();place();};
+})();
+
 $('#thinkText').value=S.think||'';
 route();progress();
 })();
