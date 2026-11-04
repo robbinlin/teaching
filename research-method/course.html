@@ -94,7 +94,7 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-vis
 .hero{display:flex;flex-direction:column;gap:18px;padding-block:4px}
 .herocv{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
 #heroCanvas{display:block;width:100%;aspect-ratio:4/3;max-width:100%}
-@media (min-width:660px){#heroCanvas{aspect-ratio:2/1}}
+@media (min-width:660px){#heroCanvas{aspect-ratio:3/1}}
 .herobar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;border-top:1px solid var(--line);padding:8px 14px;font-variant-numeric:tabular-nums}
 .btn.sm{min-height:34px;padding:4px 12px;font-size:13px}
 
@@ -185,6 +185,10 @@ textarea{min-height:84px;resize:vertical}
 .toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));max-width:calc(100% - 32px);
   background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;z-index:20}
 .note{font-size:13px;color:var(--muted)}
+.starthint{font-size:14px;color:var(--muted);margin:-2px 0 0}.starthint b{color:var(--accent)}
+.progstrip{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;border:1px dashed var(--line);border-radius:8px;padding:8px 12px;margin-top:18px;font-size:13px;color:var(--muted)}
+.progstrip p{margin:0;flex:1 1 260px}.progstrip p b{color:var(--ink);font-weight:600}.progstrip .note{margin-left:6px}
+.progstrip .pbtns{display:flex;gap:6px;flex:none}
 .guide{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:6px 16px 14px;margin:18px 0 6px;box-shadow:var(--shadow)}
 .guide>summary{cursor:pointer;min-height:48px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:10px 0;list-style:none}
 .guide>summary::-webkit-details-marker{display:none}
@@ -204,7 +208,6 @@ h3.gh{font-size:15px;margin:16px 0 8px}
 .howlist.dots li::before{content:'';width:8px;height:8px;margin:7px 0 0 9px;background:var(--accent)}
 .howlist .link{padding:0;font-size:inherit}
 .filebtn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
-#progbox{margin-top:20px}
 .pblist{display:flex;flex-direction:column;gap:8px}
 details.pbi{border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:4px 12px}
 details.pbi>summary{cursor:pointer;padding:8px 0;min-height:44px;display:flex;flex-direction:column;justify-content:center;gap:2px;list-style-position:inside}
@@ -1246,20 +1249,21 @@ function guideHTML(){const fresh=allDrafts()===0;
 function homeHTML(){
   const last=S.last&&modById(S.last),nx=last||ALLMODS.find(m=>m.tpl&&steps(m)<3)||ALLMODS[0];
   return `<section class="hero">
-   <div class="herocv"><canvas id="heroCanvas" role="img" aria-label="五章跑道動畫：五位跑者在五條跑道上前進，紅色是各章已完成的比例"></canvas>
-    <div class="herobar"><span class="mono">五章跑道 · 每條跑道是一章，紅線是完成的比例</span>
-</div></div>
    <div class="herotext">
     <span class="mono">高等體育研究法 · 競技與教練科學研究所</span>
     <h1 class="home-h1">玩完五章，手上就有論文初稿</h1>
     <p class="lede">從選題到摘要，五章拆成 29 個小單元。每個單元先看重點與影片，再做判斷題與排序，最後寫出一段可以直接放進論文的草稿。五章做完，你會有每一節都有內容的初稿骨架，再照同樣格式擴寫成完整論文。</p>
     <div class="btnrow"><button class="btn pri" data-act="mod" data-id="${nx.id}">${last?'繼續：':'開始：'}${nx.id} ${esc(nx.title)} →</button>
      <button class="btn" data-act="thesis">論文初稿</button><button class="btn" data-act="prompts">Prompt 手冊</button></div>
+    <p class="starthint">${last?`上次停在 ${last.id} ${esc(last.title)}，按紅色按鈕接著寫。`:allDrafts()?`按紅色按鈕，從還沒完成的 ${nx.id} 接著做。`:'<b>第一次來：</b>按紅色按鈕，從 1.0 開始，一個單元約 20–40 分鐘。不確定怎麼走，看下面的使用說明。'}</p>
     <div class="stats">
      <div class="stat"><b>${allDrafts()}<small> / ${ALLMODS.length}</small></b><span>已寫草稿</span></div>
      <div class="stat"><b>${allDone()}<small> / ${ALLMODS.length}</small></b><span>完成單元</span></div>
      <div class="stat"><b>27</b><span>教學影片</span></div></div>
    </div>
+   <div class="herocv"><canvas id="heroCanvas" role="img" aria-label="五章跑道動畫：五位跑者在五條跑道上前進，紅色是各章已完成的比例"></canvas>
+    <div class="herobar"><span class="mono">五章跑道 · 每條跑道是一章，紅線是完成的比例</span>
+</div></div>
   </section>
   ${guideHTML()}
   <div class="sechead"><h2>五章跑道</h2><span class="note">判斷、排序、草稿三項做完，單元才算完成</span></div>
@@ -1270,7 +1274,7 @@ function homeHTML(){
   <div class="how">
    <section class="step"><header><h3>隨時可以做的事</h3></header>
     <ul class="howlist dots">
-     <li><b>換電腦接著寫</b><span>寫完一段就按最下方的「下載進度檔」，換電腦時「載入進度檔」。</span></li>
+     <li><b>換電腦接著寫</b><span>寫完一段就按最下方的「下載進度檔」，換電腦時按旁邊的「載入」。</span></li>
      <li><b>查 Prompt</b><span><button class="link" data-act="prompts">Prompt 手冊</button>有 54 個依章節整理的 prompt，原則是先自己寫、再請 AI 檢查。</span></li>
      <li><b>看合成結果</b><span>任何時候都能到<button class="link" data-act="thesis">論文初稿</button>看目前合成的全文與檢查結果。</span></li></ul></section>
    <a class="vcard" href="https://www.youtube.com/playlist?list=PLToQ9czxCyH8" target="_blank" rel="noopener">
@@ -1411,11 +1415,10 @@ let progPending=null;
 const draftsIn=st=>ALLMODS.filter(m=>m.tpl&&m.tpl.fields.every(f=>(((st.tpl||{})[m.id]||{})[f.id]||'').trim().length>=(f.min||4))).length;
 const fmtTime=t=>{try{const d=new Date(t);return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}catch(e){return ''}};
 function progHTML(){const le=S.lastExport;
-  const body=progPending?`<div class="tip"><b>要載入的進度檔：</b>${esc(progPending.META&&progPending.META.student||'未填姓名')}，已寫 ${draftsIn(progPending.S)} / ${ALLMODS.length} 段草稿，存於 ${esc(fmtTime(progPending.savedAt))}。<br>載入後會<b>取代</b>這台裝置目前的進度（目前已寫 ${allDrafts()} 段）。</div>
-    <div class="btnrow"><button class="btn pri" data-act="progok">確定載入</button><button class="btn" data-act="progno">取消</button></div>`
-   :`<div class="btnrow"><button class="btn pri" data-act="progdl">下載進度檔</button><label class="btn filebtn">載入進度檔<input type="file" accept=".json,application/json" id="progfile" hidden></label></div>
-    <p class="note">${le?`上次下載：${esc(fmtTime(le))}。`:'還沒有下載過進度檔。'}作答只存在這台裝置的瀏覽器；換電腦、用無痕視窗或清除瀏覽資料就會消失。每次寫完下載一份（檔名開頭是 research-methods-progress），存到 Dropbox 或寄給自己，換電腦時載入就能接著寫。進度檔也可以交給老師看。</p>`;
-  return `<section class="step" id="progbox"><header><span class="mono">進度檔</span><h3>換電腦也能接著寫</h3></header>${body}</section>`}
+  if(progPending)return `<section class="step" id="progbox"><div class="tip"><b>要載入的進度檔：</b>${esc(progPending.META&&progPending.META.student||'未填姓名')}，已寫 ${draftsIn(progPending.S)} / ${ALLMODS.length} 段草稿，存於 ${esc(fmtTime(progPending.savedAt))}。<br>載入後會<b>取代</b>這台裝置目前的進度（目前已寫 ${allDrafts()} 段）。</div>
+    <div class="btnrow"><button class="btn pri" data-act="progok">確定載入</button><button class="btn" data-act="progno">取消</button></div></section>`;
+  return `<div class="progstrip" id="progbox"><p><b>換電腦接著寫</b>　作答只存在這台瀏覽器，換電腦前先下載進度檔。${le?`<span class="note">上次下載 ${esc(fmtTime(le))}</span>`:''}</p>
+   <div class="pbtns"><button class="btn sm" data-act="progdl">下載進度檔</button><label class="btn sm filebtn">載入<input type="file" accept=".json,application/json" id="progfile" hidden></label></div></div>`}
 function refreshProgBox(){const b=document.getElementById('progbox');if(!b)return;const t=document.createElement('div');t.innerHTML=progHTML();b.replaceWith(t.firstElementChild)}
 async function progDownload(){const d=new Date(),p=n=>String(n).padStart(2,'0');
   const name=`research-methods-progress_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.json`;
