@@ -928,8 +928,8 @@ function goSlide(n,silent){
 function renderFiles(){
   if(!CH.files.length){$('#filesPanel').hidden=true;return;}
   $('#zipBtn').innerHTML=CH.zip?`<button class="btn primary" data-dl="${esc(CH.zip)}" data-name="高等體育統計_CH${pad2(CH.id)}_資料.zip">${DLI}下載全部（ZIP，${CH.files.length} 個檔）</button>`:'';
-  $('#filesNote').textContent=CH.zip?'CSV 可單獨下載；其他格式（SAV、SPS、XLS、XLSX）包含在 ZIP 內。SPS 語法裡的路徑要改成自己的下載位置。':'下載後在 SPSS 開啟。';
-  $('#files').innerHTML=CH.files.map(f=>`<div class="file"><span class="ext">${esc(f.ext)}</span><div><strong>${esc(f.label)}</strong><small>${esc(f.file)}</small>${f.path?`<button data-dl="${esc(f.path)}" data-name="${esc(f.file)}">下載 CSV</button>`:'<span class="inzip">在 ZIP 內</span>'}</div></div>`).join('');
+  $('#filesNote').textContent=CH.files.every(f=>f.path)?'每個檔案都可以單獨下載，也可以一次下載全部（ZIP）。下載後在 SPSS 選「檔案 → 開啟 → 資料」開啟 .sav，不需要匯入或執行語法。':CH.zip?'CSV 可單獨下載；其他格式（SAV、SPS、XLS、XLSX）包含在 ZIP 內。SPS 語法裡的路徑要改成自己的下載位置。':'下載後在 SPSS 開啟。';
+  $('#files').innerHTML=CH.files.map(f=>`<div class="file"><span class="ext">${esc(f.ext)}</span><div><strong>${esc(f.label)}</strong><small>${esc(f.file)}</small>${f.path?`<button data-dl="${esc(f.path)}" data-name="${esc(f.file)}">下載 ${esc(f.ext)}</button>`:'<span class="inzip">在 ZIP 內</span>'}</div></div>`).join('');
 }
 
 /* ---------- guide ---------- */
