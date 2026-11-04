@@ -185,6 +185,24 @@ textarea{min-height:84px;resize:vertical}
 .toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));max-width:calc(100% - 32px);
   background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;z-index:20}
 .note{font-size:13px;color:var(--muted)}
+.guide{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:6px 16px 14px;margin:18px 0 6px;box-shadow:var(--shadow)}
+.guide>summary{cursor:pointer;min-height:48px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:10px 0;list-style:none}
+.guide>summary::-webkit-details-marker{display:none}
+.guide>summary::after{content:'＋';margin-left:auto;color:var(--muted);font-size:18px}
+.guide[open]>summary::after{content:'－'}
+.guide>summary b{font-size:18px}
+.flow{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.flow li{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px 10px 46px;display:flex;flex-direction:column;gap:2px}
+.flow .fno{position:absolute;left:12px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:600 13px/24px var(--mono);text-align:center}
+.flow li>span:last-child,.seven span{font-size:13px;color:var(--muted)}
+@media (min-width:860px){.flow{grid-template-columns:repeat(5,minmax(0,1fr))}.flow li{padding:42px 12px 12px}.flow li:not(:last-child)::after{content:'→';position:absolute;right:-9px;top:12px;color:var(--muted);font-size:14px;z-index:1}}
+h3.gh{font-size:15px;margin:16px 0 8px}
+.seven{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;grid-template-columns:minmax(0,1fr);gap:6px 18px}
+.seven li{counter-increment:s;display:grid;align-content:start;grid-template-columns:24px minmax(0,1fr);gap:0 8px}
+.seven li::before{content:counter(s);grid-row:1/3;width:22px;height:22px;border-radius:50%;border:1px solid var(--navy);color:var(--navy);font:500 12px/20px var(--mono);text-align:center}
+@media (min-width:660px){.seven{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.howlist.dots li::before{content:'';width:8px;height:8px;margin:7px 0 0 9px;background:var(--accent)}
+.howlist .link{padding:0;font-size:inherit}
 .filebtn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 #progbox{margin-top:20px}
 .pblist{display:flex;flex-direction:column;gap:8px}
@@ -1216,6 +1234,15 @@ function startHero(){
   if(!reduce&&!document.hidden){forceT=null;t0=null;animating=true;heroRAF=requestAnimationFrame(frame)}
 }
 
+
+function guideHTML(){const fresh=allDrafts()===0;
+  const flow=[['首頁','按「開始」進第一個單元；之後再來，同一個按鈕會帶你回到上次的單元。'],['章節','照順序做每個單元，後面的單元會帶入前面寫過的內容。'],['單元','七個步驟，從看重點到寫出一段論文草稿，約 20–40 分鐘。'],['章草稿','一章做完，看合成的全文；再讀一篇真實論文、看本所論文評註。'],['論文初稿','五章寫完，看一致性與口試前檢查，填封面，下載 Word 論文檔。']];
+  const seven=[['看重點','說明、講義重點、本所論文原文與評註、教學影片'],['判斷題','四個句子判斷能不能用，答完馬上看原因'],['排序','把打亂的段落排回正確順序'],['寫草稿','照提示填自己的研究，下方即時組成論文段落；可帶入前面內容、再加一筆'],['自我檢核','勾選這段有沒有做到該做的事'],['Claude 回饋','<span class="aion">請 Claude 指出需要修改的地方</span><span class="aioff">Claude 版網站才有；公開版請用第 5、7 步</span>'],['Prompt','複製已帶入你內容的 prompt 到其他 AI 工具，請它檢查而不是代寫']];
+  return `<details class="guide" id="guide" ${fresh?'open':''}><summary><span class="mono">使用說明</span><b>${fresh?'第一次來？照這個順序走':'怎麼用這個網站'}</b><span class="note">一學期走完一遍，每週約一章</span></summary>
+   <ol class="flow">${flow.map(([t,d],i)=>`<li><span class="fno">${i+1}</span><b>${t}</b><span>${d}</span></li>`).join('')}</ol>
+   <h3 class="gh">每個單元的七步</h3>
+   <ol class="seven">${seven.map(([t,d])=>`<li><b>${t}</b><span>${d}</span></li>`).join('')}</ol>
+   <p class="note" style="margin-top:12px">判斷題、排序、寫草稿三項都做完，單元才算「已完成」。草稿一寫完就會自動放進章草稿與論文初稿。</p></details>`}
 function homeHTML(){
   const last=S.last&&modById(S.last),nx=last||ALLMODS.find(m=>m.tpl&&steps(m)<3)||ALLMODS[0];
   return `<section class="hero">
@@ -1234,17 +1261,18 @@ function homeHTML(){
      <div class="stat"><b>27</b><span>教學影片</span></div></div>
    </div>
   </section>
+  ${guideHTML()}
   <div class="sechead"><h2>五章跑道</h2><span class="note">判斷、排序、草稿三項做完，單元才算完成</span></div>
   <div class="lanes">${CH.map(c=>`<button class="lane ${c.open?'':'planned'}" data-act="ch" data-c="${c.n}">
     <span class="no">${c.n}</span>
     <span class="nm"><b>${esc(c.name)}</b><span>${c.open?`${chDone(c)} / ${c.mods.length} 單元完成`:'規劃中'}</span></span>
     <span class="track"><i style="width:${chPct(c)}%"></i></span></button>`).join('')}</div>
   <div class="how">
-   <section class="step"><header><h3>每個單元怎麼走</h3></header>
-    <ol class="howlist">
-     <li><b>看重點</b><span>講義重點、教學影片，還有本所論文的原文與老師評註。</span></li>
-     <li><b>判斷與排序</b><span>判斷句子能不能用，把段落排出正確順序，答錯會告訴你為什麼。</span></li>
-     <li><b>寫草稿</b><span>填入你自己的研究，前面寫過的內容可以一鍵帶入；寫完自動合成章草稿與 Word 論文檔。</span></li></ol></section>
+   <section class="step"><header><h3>隨時可以做的事</h3></header>
+    <ul class="howlist dots">
+     <li><b>換電腦接著寫</b><span>寫完一段就按最下方的「下載進度檔」，換電腦時「載入進度檔」。</span></li>
+     <li><b>查 Prompt</b><span><button class="link" data-act="prompts">Prompt 手冊</button>有 54 個依章節整理的 prompt，原則是先自己寫、再請 AI 檢查。</span></li>
+     <li><b>看合成結果</b><span>任何時候都能到<button class="link" data-act="thesis">論文初稿</button>看目前合成的全文與檢查結果。</span></li></ul></section>
    <a class="vcard" href="https://www.youtube.com/playlist?list=PLToQ9czxCyH8" target="_blank" rel="noopener">
     <span class="play" aria-hidden="true"></span>
     <span class="mono">YouTube 播放清單</span>
