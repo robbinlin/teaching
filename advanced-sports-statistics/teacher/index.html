@@ -233,7 +233,7 @@ function load(){
     r[0].forEach(function(d){var x=d.data();map[d.id]={uid:d.id,email:x.email||'',name:x.name||'',photo:x.photo||'',lastSeen:x.lastSeen&&x.lastSeen.toDate?x.lastSeen.toDate():null,ch:{}};});
     r[1].forEach(function(d){var uid=d.ref.parent.parent.id;if(!map[uid])map[uid]={uid:uid,email:'',name:'(未知)',photo:'',lastSeen:null,ch:{}};var x=d.data();var st={};try{st=JSON.parse(x.state||'{}');}catch(_){}
       map[uid].ch[d.id]={pct:+x.pct||0,steps:x.steps||[],quizCorrect:+x.quizCorrect||0,hwAnswered:+x.hwAnswered||0,hwTotal:+x.hwTotal||0,updatedAt:x.updatedAt&&x.updatedAt.toDate?x.updatedAt.toDate():null,state:st};});
-    students=Object.keys(map).map(function(k){var s=map[k];s.email!==TEACHER||(s.isTeacher=true);var t=0;for(var i=1;i<=8;i++)t+=(s.ch['ch'+i]||{}).pct||0;s.avg=Math.round(t/8);return s;});
+    students=Object.keys(map).map(function(k){var s=map[k];if(!s.lastSeen){Object.keys(s.ch).forEach(function(c){var t=s.ch[c].updatedAt;if(t&&(!s.lastSeen||t>s.lastSeen))s.lastSeen=t;});}s.email!==TEACHER||(s.isTeacher=true);var t=0;for(var i=1;i<=8;i++)t+=(s.ch['ch'+i]||{}).pct||0;s.avg=Math.round(t/8);return s;});
     render();
   }).catch(function(e){console.error(e);app.innerHTML='<div class="msg">讀取失敗：'+esc(e.message||e)+'</div>';});
 }
