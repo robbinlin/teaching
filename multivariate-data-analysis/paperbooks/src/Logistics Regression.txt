@@ -1,0 +1,185 @@
+=== Slide 1 ===
+Generalized Linear Regression: Logistics Regression
+Lin, Yen-Kuang
+
+=== Slide 2 ===
+The Link Function
+A linear predictor – that is a linear function of regressors
+where  X could be both quantitative variables, qualitative variables or interactions
+The above equation depicts the relationship between a set of explanatory variables and the dependent variable.
+2
+
+=== Slide 3 ===
+http://jedismedicine.blogspot.tw/2014/01/regression-and-fallacy-of-analytic.html
+3
+
+=== Slide 4 ===
+The Link Function
+Since μ is in its original form, we called it a identity link.
+Recall that in the Regression class, we use log transform to fix the normality assumption.
+That is, we are modeling
+Now, the correlation between the explanatory variables and the dependent variable is linked through a log function
+4
+
+=== Slide 5 ===
+The Link Function
+In general, a smooth link function g(.) transforms the mean of the response variable to the predictors.
+Other available links
+Link | 
+Inverse | 
+Inverse Square | 
+Square Root | 
+Logit | 
+Probit | 
+Log-Log | 
+Complementary log-log | 
+g(μ)=x
+5
+
+=== Slide 6 ===
+The Random Component
+Identify the response variable and select proper distribution.
+In regression, we assume y to be normally distributed.
+When y is binary, such as success or failure, we assume a binomial distribution
+When y is a count, we assume a Poisson or negative  binomial distribution.
+6
+
+=== Slide 7 ===
+Example: The Binomial Distribution
+The Binomial distribution is the probability distribution of the number of success in n trial.
+Example: Suppose a biased coin comes up heads with probability 0.3 when tossed, what’s the probability of achieving 2 heads after 5 tosses.
+HHTTT, HTHTT, HTTHT, HTTTH, THHTT,
+THTHT, THTTH, TTHHT, TTHTH, TTTHH
+The prob. of HHTTT is (0.3)*(0.3)*(0.7)*(0.7)*(0.7)=0.03087. In fact, the prob. for any of the 10 combination above is 0.0387. Therefore, the prob. of observing 2 heads is
+In general, success of x times in n trial with the success probability
+of p, the distribution would be 
+7
+
+=== Slide 8 ===
+The systematic component
+The systematic component specifies the explanatory variables.
+Typically refers as x’s and appears at ride-hand side of the model equation.
+Some x can be based on others in the model. For example, x3=x1*x2, to allow interaction between x1 and x2.
+Some x can be the polynomial of the others. For example x4=x1*x1.
+X could be both continuous and categorical.
+8
+
+=== Slide 9 ===
+The Generalized Linear Model
+Random Component | Link | Systematic Component | Model
+Normal | Identity | Continuous | Regression
+Normal | Identity | Categorical | Analysis of Variance
+Normal | Identity | Mixed(both Cont. and Cate.) | Analysis of Covariance
+Binomial | Logit | Mixed(both Cont. and Cate.) | Logistic regression
+Poisson | Log | Mixed(both Cont. and Cate.) | Loglinear
+9
+
+=== Slide 10 ===
+Example: The logistic regression
+In logistic regression, the link component is the logit link.
+When the response variable is binary, we are interested in modeling the “success” probability. i.e.,
+The logistic regression:
+10
+
+=== Slide 11 ===
+Example: The logistic regression-odds ratio
+For a probability of success π, the odds of success are defined to be
+ | Myocardial Infarction=Yes | Myocardial Infarction=No | Total
+Placebo | 75 | 25 | 100
+Aspirin | 50 | 50 | 100
+For Placebo: 
+For Aspirin: 
+Odds Ratio=
+11
+
+=== Slide 12 ===
+Properties of Odds Ratio
+•
+When the row variable and column variable are independent,
+π1 = π2, so odds1=odds2 and 
+When θ > 1, the odds of success are higher in row 1 than in row 2.
+When θ < 1, the odds of success are lower in row 1 than in row 2.
+The strengths of θ and 
+ are equivalent.
+θ does not change when the table orientation reverses.
+12
+
+=== Slide 13 ===
+Interpretation of Logistic Regression
+Logit Interpretation
+◦
+For every 1-unit increase in x, the Logit(π) increase β unit
+Odds Ratio Interpretation
+◦
+The odds at level x+1 equal the odds at x multiplied by eβ
+Probability Interpretation
+◦
+13
+
+=== Slide 14 ===
+Example: Logistic Regression
+Analysis of Maximum Likelihood Estimates
+Parameter | DF | Estimate | Standard
+Error | Wald
+Chi-Square | Pr > ChiSq | Exp(Est)
+Intercept | 1 | -12.3508 | 2.6287 | 22.07 | <0.0001 | 4.326E-8
+X | 1 | 0.4972 | 0.1017 | 23.89 | <0.0001 | 1.6441
+Logit(π)=-12.35+0.497*x: For every 1-unit increase in x, the Logit(π) increase 0.497 unit
+◦
+:The odds at level x+1 equal the odds at x multiplied by e0.497=1.64
+•
+when x=26.3, the estimated probability is 0.674,
+so the odds = 0.674/0.326=2.07. When x=27.3=26.3+1, the estimated probability is 0.773 and   odds=0.773/0.227=3.4; that is 3.40=2.07*1.64
+14
+
+=== Slide 15 ===
+ROC curve
+A tool to summarized diagnostic efficiency.
+Example: Ultrasound can be used to detect thickening in the lining of the uterus, which may be an early sign of cancer.
+Cutoff for abnormal wall thickness | Percent of cancer patients detected (Sensitivity) | Percent of healthy subject detected (Specificity) | 1-Specificity
+4 mm | 99 | 50 | 50
+5 mm | 97 | 61 | 39
+10 mm | 83 | 80 | 20
+15 mm | 60 | 90 | 10
+20 mm | 40 | 95 | 5
+25 mm | 20 | 98 | 2
+15
+
+=== Slide 16 ===
+If we plot sensitivity v.s. 1-specificity, we get
+Retrieved from http://ebp.uga.edu/courses/Chapter%204%20-%20Diagnosis%20I/8%20-%20ROC%20curves.html
+16
+
+=== Slide 17 ===
+Example
+Consider a study on cancer remission (Lee, 1974). The data consist of patient characteristics and whether or not cancer remission occurred. The following DATA step creates the data set Remission containing seven variables. The variable remiss is the cancer remission indicator variable with a value of 1 for remission and a value of 0 for nonremission. The other six variables are the risk factors thought to be related to cancer remission
+17
+
+=== Slide 18 ===
+Output:
+Logit(π)=-1.82+1.52*blast: For every 1-unit increase in blast, the Logit(π) increase 1.52 unit
+:The odds at level x+1 equal the odds at x multiplied by e1.52=4.57
+when blast=0, the estimated probability is 0.139,
+so the odds = 0.139/0.860=0.162. When x=1=0+1, the estimated probability is 0.425 and   odds=0.425/0.574=0.74; that is 0.74=0.16*4.57
+18
+
+=== Slide 19 ===
+So now for every value of blast, we get an estimate of probability of remission
+19
+
+=== Slide 20 ===
+Then we can make a decision depending on whether the probability is large enough to claims he/she will remiss.
+If we assume that if the prob is larger than 0.228, he/she will likely to remiss.
+Sensitivity=4/6
+Specificity=10/10
+20
+
+=== Slide 21 ===
+Depending on different values of blast, we can calculate its associate sensitivity and  specificity. Then plot the ROC curve!
+21
+
+=== Slide 22 ===
+Assigned Reading
+Aiken, L. H., Clarke, S. P., Sloane, D. M., Sochalski, J., & Silber, J. H. (2002). Hospital nurse staffing and patient mortality, nurse burnout, and job dissatisfaction. Jama, 288(16), 1987-1993.
+Mitchell, S. L., Kiely, D. K., Hamel, M. B., Park, P. S., Morris, J. N., & Fries, B. E. (2004). Estimating prognosis for nursing home residents with advanced dementia. Jama, 291(22), 2734-2740.
+22

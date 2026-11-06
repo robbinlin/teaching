@@ -1,0 +1,546 @@
+=== Slide 1 ===
+重複測量設計元素
+林彥光
+
+=== Slide 2 ===
+When Can We Study Change Over Time
+When study design is :
+Experimental
+Observational
+When time is measured in:
+Month
+Years
+Minute, second, sessions, semester, and so on
+When subjects’ record is taken in
+Fixed schedule
+Flexible schedule
+2
+
+=== Slide 3 ===
+Feature in study of change
+Change
+Within individual change – How does each person change over time?
+Interindividual change –What predicts differences among people in their changes
+Feature in study of change
+Multiple waves of data
+Meaningful metric for time
+Outcome that changes systematically
+3
+
+=== Slide 4 ===
+Multiple waves of data
+Why do we need multiple waves of data?
+Describe how each person changes over time
+Distinguish between cross-sectional study and longitudinal study
+Many developmental psychologists, for example, analyze cross-sectional data sets composed of children of differing ages, concluding that outcome differences between age groups-in measures such as antisocial behavior— reflect real change over time.
+How many waves do we need
+Two?
+Shape of individual’s trajectory
+Likely confounding with measurement error
+Three?
+6 Or more?
+4
+
+=== Slide 5 ===
+Metric of Time
+Age: reading scores
+Grade: antisocial behavior
+Month: survival
+Longevity of vehicles: years
+Tire trend: miles
+Starters: trips
+How to choose the “best” metric of time?
+Reflect the cadence that is expected to be most useful for the outcome
+The time variable can only change monotonically
+Ex. Height but not weight
+Spacing
+5
+
+=== Slide 6 ===
+The measured outcome
+Continuous outcome:
++ - x  /
+Instrument:
+Reliability
+Validity
+Outcome measure must be equatable over time
+Outcome measure must be valid over time: maturation, history
+“Lord (1963) argued that, just because a measurement was valid on one occasion, it would not necessarily remain so on all subsequent occasions even when administered to the same individuals under the same conditions. He argued that a multiplication test may be a valid measure of mathematical skill among young children, but becomes a measure of memory among teenagers.”
+6
+
+=== Slide 7 ===
+Exploring Longitudinal Data
+Create a longitudinal data set
+Recall that the standard data set is each individual has his/her own record.
+Person-level data set (wide format): each person has one record and multiple variables contain the data from each measurement occasion
+Person-period data set (long format): each person has multiple records—one for each measurement occasion
+ID | Wave 1 | Wave 2 | Wave 3
+1 | 32 | 35 | 39
+2 | 27 | 59 | 89
+3 | 13 | 12 | 11
+ID | Wave | Order
+1 | 32 | 1
+1 | 35 | 2
+1 | 39 | 3
+2 | 27 | 1
+2 | 59 | 2
+2 | 89 | 3
+3 | 13 | 1
+3 | 12 | 2
+3 | 11 | 3
+7
+
+=== Slide 8 ===
+Person-Level data (wide format)
+Advantages
+Person-level data most resembles the cross-sectional dataset
+Quickly assess the change over time
+Disadvantages
+Omits the “time” variable
+Useless when the spacing of waves varies
+Difficult to handle time varying covariates
+ID | Wave 1 | Wave 2 | Wave 3
+1 | 32 | 35 | 39
+2 | 27 | 59 | 89
+3 | 13 | 12 | 11
+8
+
+=== Slide 9 ===
+Person-period data(long format)
+Person-period data contains at least:
+A subject identifier
+A time indicator
+Outcome variables
+Advantages
+Allows the number of measurement differs across people
+Can include both time-vary and time-invariant variables
+ID | Wave | Order
+1 | 32 | 1
+1 | 35 | 2
+1 | 39 | 3
+2 | 27 | 1
+2 | 59 | 2
+2 | 89 | 3
+3 | 13 | 1
+3 | 12 | 2
+3 | 11 | 3
+9
+
+=== Slide 10 ===
+Descriptive Analysis of Change over Time
+Empirical Growth Plots:
+The data set:
+the National Youth Survey (NYS; Raudenbush & Chan, 1992). Each year, when participants were ages II, 12, 13, 14, and 15, they filled out a nine-item instrument designed to assess their tolerance of deviant behavior. Using a four-point scale (1 = very wrong, 2 = wrong, 3 = a little bit wrong, 4 = not wrong at all), they indicated whether it was wrong for someone their age to: (a) cheat on tests, (b) purposely destroy property of others, (c) use marijuana, (d) steal something worth less than five dollars, (e) hit or threaten someone without reason, (f) use alcohol, (g) break into a building or vehicle to steal, (h) sell hard drugs, or (i) steal something worth more than fifty dollars. At each occasion, the outcome, TOL, is computed as the respondent’s average across the nine responses.
+10
+
+=== Slide 11 ===
+Person-Level data
+11
+
+=== Slide 12 ===
+Person-Period data set
+12
+
+=== Slide 13 ===
+data tolerance_pp;
+    set tolerance;
+    age=11;tol=tol11;time=age-11;output;
+    age=12;tol=tol12;time=age-11;output;
+    age=13;tol=tol13;time=age-11;output;
+    age=14;tol=tol14;time=age-11;output;
+    age=15;tol=tol15;time=age-11;output;
+    drop tol11-tol15;
+    keep id age time tol male exposure;
+run;
+13
+
+=== Slide 14 ===
+14
+
+=== Slide 15 ===
+15
+
+=== Slide 16 ===
+Descriptive Analysis of Change over Time
+Trajectory to summarize individual’s Empirical Growth Plot
+Parametric
+Straight line, quadratic form
+Nonparametirc
+Loess, Spline, kernel smoothers, and moving averages
+16
+
+=== Slide 17 ===
+17
+
+=== Slide 18 ===
+Smoothing the Trajectory Using OLS Regression
+Individual parametric model?
+How do we choose the functional form for each individual?
+Change might appear linear for some but curvilinear for others
+Adopting a common functional form can distinguish individual with the same set of fitted trajectories.
+Is the empirical growth record reflect true change or random fluctuation?
+18
+
+=== Slide 19 ===
+Smoothing the Trajectory Using OLS Regression
+Step1: Select an appropriate parametric form
+Step2:Estimate a within-person regression model for each person
+Step3:Collect summary statistics from all the within-person regression
+Step4:Superimpose each person’s fitted line on their own plot.
+19
+
+=== Slide 20 ===
+ID | intercept | se_intercept | time | se_time | res_var | r2 | MALE | EXPOSURE
+9 | 1.90 | 0.25 | 0.12 | 0.10 | 0.11 | 0.31 | 0.00 | 1.54
+45 | 1.14 | 0.13 | 0.17 | 0.05 | 0.03 | 0.77 | 1.00 | 1.16
+268 | 1.54 | 0.26 | 0.02 | 0.11 | 0.11 | 0.02 | 1.00 | 0.90
+314 | 1.31 | 0.15 | -.03 | 0.06 | 0.04 | 0.07 | 0.00 | 0.81
+442 | 1.58 | 0.21 | 0.06 | 0.08 | 0.07 | 0.13 | 0.00 | 1.13
+514 | 1.43 | 0.14 | 0.26 | 0.06 | 0.03 | 0.88 | 1.00 | 0.90
+569 | 1.82 | 0.03 | 0.05 | 0.01 | 0.00 | 0.88 | 0.00 | 1.99
+624 | 1.12 | 0.04 | 0.02 | 0.02 | 0.00 | 0.33 | 1.00 | 0.98
+723 | 1.27 | 0.08 | -.05 | 0.03 | 0.01 | 0.45 | 0.00 | 0.81
+918 | 1.00 | 0.30 | 0.14 | 0.12 | 0.15 | 0.31 | 0.00 | 1.21
+949 | 1.73 | 0.24 | -.10 | 0.10 | 0.10 | 0.25 | 1.00 | 0.93
+978 | 1.03 | 0.32 | 0.63 | 0.13 | 0.17 | 0.89 | 1.00 | 1.59
+1105 | 1.54 | 0.15 | 0.16 | 0.06 | 0.04 | 0.68 | 1.00 | 1.38
+1542 | 1.19 | 0.18 | 0.24 | 0.07 | 0.05 | 0.78 | 0.00 | 1.44
+1552 | 1.18 | 0.37 | 0.15 | 0.15 | 0.23 | 0.25 | 0.00 | 1.04
+1653 | 0.95 | 0.14 | 0.25 | 0.06 | 0.03 | 0.86 | 0.00 | 1.25
+20
+
+=== Slide 21 ===
+21
+
+=== Slide 22 ===
+Exploring the difference in change across People
+Steps to plot the difference:
+Step 1:Sort the person-period data set by time (here, AGE), and separately estimate the mean outcome (here, TOLERANCE) for each occasion of measurement.
+Step 2: Plot these time-specific means and apply the same smoothing algorithm, nonparametric or parametric, used to obtain the individual trajectories
+22
+
+=== Slide 23 ===
+23
+
+=== Slide 24 ===
+Descriptive statistics for the individual growth parameter by fitting individual OLS model
+ | Initial status (Intercept) | Rate of change (slope)
+Mean | 1.36 | 0.13
+Standard deviation | 0.30 | 0.17
+Bivariate Correlation | -0.45 | 
+24
+
+=== Slide 25 ===
+Explore the Relationship between change and Time-Invariant predictors
+Evaluating the impact o predictors helps you uncover systematic patterns in the individual change trajectories corresponding to interindividual variation in person characteristics.
+25
+
+=== Slide 26 ===
+Continuous predictors
+26
+
+=== Slide 27 ===
+Categorized continuous predictor
+27
+
+=== Slide 28 ===
+Longitudinal studies
+Longitudinal studies v.s Multivariate model
+Longitudinal studies v.s. time series
+Advantages:
+　　1. Account for subject-specific variability, thus powerful
+　　2.Each subject can be viewed as his/her own control
+　　3.Within-subject variability or time are separated out from overall variability
+Disadvantages:
+　　1. Missing values
+　　2. Massier Analysis
+28
+
+=== Slide 29 ===
+Analyzing longitudinal data
+William Sealy Gosset published the earliest idea of the longitudinal data analysis.
+Attempt to determine if a different effect existed for optical isomer of hyoscyamine hydrobromide in producing sleep.
+10 patients sleep gains were measure before and after treatment
+So-called derived variable
+29
+
+=== Slide 30 ===
+Possible Candidate for Longitudinal Data
+Dependent T-Test and Nonparametric test for two timings
+ANCOVA
+Summary Statistics Approach
+Repeated Measure ANOVA
+Mixed-effect Model
+MANOVA
+GEE model
+30
+
+=== Slide 31 ===
+Summary Statistics Approach
+The most elementary method to reduce a vector of repeated measurements to a single summary statistics.
+Recall that Student(1908) reduce the vector with two dimensions into one single score.
+The model can be represented as di=B0+ei, where di is the difference between pre-test and post test for subject I
+Wishart(1938) elaborated with a study of three different levels of protein content effects on three groups of bacon pigs over 16 weeks where growth rate was determined based on the weight gain
+31
+
+=== Slide 32 ===
+Special case of SS approach: Paired T-Test
+Paired T-Test is a special case of summary statistics. Paired T-Test also called the dependent sample t-test, matched-paired t test.
+Compare the means of two related groups to see if there are any statistically differences between these means.
+What does it mean by “related”?
+Natural pairs: twins
+Matched pairs: matched control group method
+Repeated measures: pre-post design
+32
+
+=== Slide 33 ===
+Explore paired T-Test
+Recall that in independent sample T-Test,
+H0: μ1 = μ2  v.s.  H1: μ1 ≠ μ2
+However, the natural dependency of these two groups violates the assumption of the independent sample T-Test.
+In paired T-Test, we examine H0: μ1 − μ2 = 0
+Paired T-Test examines the differences between means when subjects are measured with the same dv but two different conditions.
+Paired T-Test also examines the change between means when subjects are measured with the same dv but two different timings.
+33
+
+=== Slide 34 ===
+Paired T-Test for continuous variables
+Example: TMU decides to pulls out an intervention to improve learning satisfaction among nursing students. Program “NTBH” (No Test… Be Happy…) is conducted with our convenience sample of 30 participants where learning satisfaction is measured by an index score at pretest and posttest phases. The satisfaction index is operationally defined as a continuous and ratio measure ranging from 0 to 100 with lower scores indicating lower satisfaction and higher scores indicating higher life satisfaction
+34
+
+=== Slide 35 ===
+ID | Posttest | Pretest | diff
+1 | 49 | 48 | 1
+2 | 26 | 27 | -1
+3 | 26 | 22 | 4
+4 | 51 | 49 | 2
+5 | 21 | 25 | -4
+6 | 39 | 37 | 2
+7 | 62 | 60 | 2
+8 | 33 | 30 | 3
+9 | 50 | 55 | -5
+10 | 30 | 27 | 3
+35
+
+=== Slide 36 ===
+PROC TTEST DATA=temp;
+   PAIRED pretest*posttest;
+RUN;
+Procedure for comparing two means
+2 Paired measurements connected by a *
+Invokes the paired t-test
+36
+
+=== Slide 37 ===
+37
+
+=== Slide 38 ===
+38
+
+=== Slide 39 ===
+39
+
+=== Slide 40 ===
+40
+
+=== Slide 41 ===
+Paired T-Test version of ordinal data: Sign test
+Paired T-Test is conducted for continuous variable
+Sign test should be used when the data is measured on a ordinal scale
+Steps:
+Calculate the difference between each pair
+Each pair of (X, Y) is classified as “+” if Y>X, as “-” if Y<X or “tie” if Y=X
+Test Statistics:
+T=total number of +
+In SAS,
+41
+
+=== Slide 42 ===
+Example: TMU decides to pulls out an intervention to improve learning satisfaction among nursing students. Program“NTBH” (No Test… Be Happy…) is conducted with our convenience sample of 30 participants where learning satisfaction is measured by an index score at pretest and posttest phases. The satisfaction index is operationally defined as a ordinal measure ranging from 0 to 5 with lower scores indicating lower satisfaction and higher scores indicating higher life satisfaction.
+42
+
+=== Slide 43 ===
+The data
+pre_r | post_r | diff1 | sign
+2 | 2 | 0 | .
+1 | 1 | 0 | .
+1 | 1 | 0 | .
+2 | 3 | 1 | +
+1 | 1 | 0 | .
+2 | 2 | 0 | .
+3 | 3 | 0 | .
+2 | 2 | 0 | .
+3 | 3 | 0 | .
+1 | 2 | 1 | +
+43
+
+=== Slide 44 ===
+SAS code for Sign Test
+data temp1;
+    set temp;
+    post_r=round(posttest/20); *rank the original posttest score;
+    pre_r=round(pretest/20); *rank the original pretest score;
+    diff1=post_r-pre_r; *calculate the difference;
+*Assign a "+" if post>pre, a "-" if post<pre, and "." if post=pre;
+    if post_r>pre_r then sign="+";
+    else if post_r<pre_r then sign="-";
+    else if post_r=pre_r then sign=".";
+run;
+proc univariate data=temp1;
+    var diff1;
+run;quit;
+Procedure for Sign Test;
+44
+
+=== Slide 45 ===
+45
+
+=== Slide 46 ===
+Paired T-Test version of categorical data: McNemar’s Test
+Recall that in Chi-Square test, we examine the association between two categorical variables.
+Example :某醫院欲檢定不同醫事人員對新式刷卡系統是否有不同反應:
+觀察值 | 喜歡新制 | 喜歡舊制 | 列總合
+醫生 | 55 | 45 | 100
+護理師 | 70 | 30 | 100
+欄總合 | 125 | 75 | 200
+期望值 | 喜歡新制 | 喜歡舊制 | 列總合
+醫生 | 62.5 | 37.5 | 100
+護理師 | 62.5 | 37.5 | 100
+欄總合 | 125 | 75 | 200
+46
+
+=== Slide 47 ===
+McNemar’s test
+ | Time 1 condition | Time 2 condition
+Time 1 condition | n11 | n12
+Time 2 condition | n21 | n22
+H0: π12 = π21
+47
+
+=== Slide 48 ===
+Example: TMU decides to pulls out an intervention to improve learning satisfaction among nursing students. Program“NTBH” (No Test… Be Happy…) is conducted with our convenience sample of 30 participants where learning satisfaction is measured by an index score at pretest and posttest phases. The satisfaction index is operationally defined as a nominal measure score as either satisfied or unsatisfied .
+48
+
+=== Slide 49 ===
+data temp2;
+    set temp;
+    if posttest<=50 then status_post="Unsatisfied";
+    else if posttest>50 then status_post="Satisfied";
+    if pretest<=50 then status_pre="Unsatisfied";
+    else if pretest>50 then status_pre="Satisfied";
+run;
+proc freq data=temp3;
+    tables status_post *status_pre/norow nocol;
+    exact mcnem;
+run;
+49
+
+=== Slide 50 ===
+Analyze with SAS
+proc reg data = tolerance_pp
+    outest = expl (drop = _MODEL_ _in_ _p_ _edf_) ;
+    by   male exposure id;
+    model tol = time;
+run;
+proc glm data=expl;
+    class male;
+    model intercept=male;
+run;quit;
+Calculate individual’s intercept and slope
+Output the result to a dataset
+Procedure GLM examines if the intercepts/slopes different across  gender
+50
+
+=== Slide 51 ===
+51
+
+=== Slide 52 ===
+ANCOVA
+In the analysis of variance, there are times when continuous variables that are not of interest in the study, but that contain information about the variability of the data can be used to increase the power and decrease the bias associated with a test of our factor effects. Such a variable is called a covariate.
+52
+
+=== Slide 53 ===
+Example: Weight loss
+53
+
+=== Slide 54 ===
+If we examine for the treatment
+PROC GLM DATA=health;
+    CLASS treatment;
+    MODEL weightloss=treatment;
+RUN;QUIT;
+54
+
+=== Slide 55 ===
+55
+
+=== Slide 56 ===
+If we add the exercise scores as a covariate
+PROC GLM DATA=health;
+    CLASS treatment;
+    MODEL weightloss=treatment exercise treatment*exercise;
+RUN;QUIT;
+56
+
+=== Slide 57 ===
+57
+
+=== Slide 58 ===
+Why
+58
+
+=== Slide 59 ===
+59
+
+=== Slide 60 ===
+ANCOVA Model
+yij = μ + αi + β(xij) + αiβ(xij) + εij
+yij is the jth response measured at treatment level I
+μ + αi we can consider this  as treatment i mean
+β is the slope of the two lines
+xij is the jth value of the covariate at treatment level i
+60
+
+=== Slide 61 ===
+Steps for analyzing ANCOVA
+yij = μ + αi + β(xij) + αiβ(xij) + εij
+1. Analyze the full model, including the covariate and the interaction between the covariate and the treatment effect.
+2. Test the interaction first. If it is significant, stop. It indicates you have multiple lines with multiple slopes. If it is not significant, it indicates you have multiple lines with the same slope. Continue to the next step.
+3. Test the covariate. If it is significant, stop. It indicates you are looking at multiple lines with parallel significant slopes. If it is not significant, it indicates you have multiple means, not multiple lines. Continue to the next step.
+4. Conduct a basic ANOVA analysis.
+61
+
+=== Slide 62 ===
+ANCOVA for repeated measures
+yij = μ + αi + β(xij) + αiβ(xij) + εij
+yij is the jth posttest score measured at treatment level i
+μ + αi we can consider this  as treatment i mean
+β is the slope of the two lines
+xij is the jth value of the pretest score at treatment level i
+62
+
+=== Slide 63 ===
+Example: Rogosa(1980)
+63
+
+=== Slide 64 ===
+Step 1: Examine The Interaction Between the Pretest and the Grouping Factor
+來源 | DF | 類型III SS | 均方 | F 值 | Pr > F
+group | 1 | 1.90931701 | 1.90931701 | 0.97 | 0.3405
+pre | 1 | 46.44406884 | 46.44406884 | 23.47 | 0.0002
+pre*group | 1 | 8.66607275 | 8.66607275 | 4.38 | 0.0527
+64
+
+=== Slide 65 ===
+Step 2: Examine the pretest
+來源 | DF | 類型III SS | 均方 | F 值 | Pr > F
+group | 1 | 10.12628292 | 10.12628292 | 4.27 | 0.0544
+pre | 1 | 45.91790408 | 45.91790408 | 19.36 | 0.0004
+65
+
+=== Slide 66 ===
+When to Use ANCOVA or Paired-T Test on Gain Score
+ANCOVA is generally more powerful than the paired-t test.
+The choice depends on the correlation between the correlation between the pretest and the posttest
+Methodological issue
+66

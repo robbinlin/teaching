@@ -1,0 +1,369 @@
+=== Slide 1 ===
+統計資料分析-以SPSS為例
+林彥光
+競技與教練科學所
+
+=== Slide 2 ===
+學經歷介紹
+學歷背景 | 
+ | 美國北科羅拉多大學應用統計與研究法博士
+ | 美國北科羅拉多大學應用統計與研究法碩士
+ | 元智大學化學工程與材料科學學系
+專業經驗 | 
+2021/8~ | 國立體育大學競技與教練科學研究所助理教授
+2020/8~2021/8 | 台北醫學大學大數據科技及管理研究所兼任助理教授
+2019/8~2020/8 | 台北醫學大學管理學院正研究員
+2017/2~2019/8 | 台北醫學大學管理學院副研究員
+2011/8~2017/2 | 台北醫學大學生物統計暨研究諮詢中心助理研究員
+2013/2~2020/8 | 台北醫學大學護理學院兼任助理教授
+2006/5～2011/5 | COLORADOSTAT 統計顧問公司
+2010/7~2010/12 | Nebula 商業統計顧問公司
+專長領域
+健康大數據分析
+長期追蹤資料分析
+統計諮商
+多變量統計
+擅長軟體
+SAS (Statistical Analysis System)
+SPSS (Statistical Package for the Social Sciences )
+Python
+2
+
+=== Slide 3 ===
+課程群組: 加了方便聯繫，沒事不傳早安圖
+3
+
+=== Slide 4 ===
+課程大綱
+1
+敘述統計
+2
+平均值檢定
+3
+迴歸分析
+4
+
+=== Slide 5 ===
+資料建構與敘述統計
+資料的型態
+名目 (nominal scale):
+數字僅代表不同類別，排序沒有意義，差距沒有意義，0沒有意義
+序位 (ordinal scale):受傷程度(輕、中、重)
+排序有意義，差距沒有意義，0沒有意義
+等距尺度(interval scale):時間(幾點鐘)
+排序有意義，差距有意義，0沒有意義
+等比尺度(ratio scale):身高、體重、薪水
+排序有意義，差距有意義，0有意義
+5
+
+=== Slide 6 ===
+6
+
+=== Slide 7 ===
+資料建構與敘述統計
+資料的型態
+名目 (nominal scale):如性別、種族
+數字僅代表不同類別，排序沒有意義，差距沒有意義，0沒有意義
+序位 (ordinal scale):
+排序有意義，差距沒有意義，0沒有意義
+等距尺度(interval scale):時間(幾點鐘)
+排序有意義，差距有意義，0沒有意義
+等比尺度(ratio scale):身高、體重、薪水
+排序有意義，差距有意義，0有意義
+7
+
+=== Slide 8 ===
+金牌
+銀牌
+銅牌
+8
+
+=== Slide 9 ===
+資料建構與敘述統計
+資料的型態
+名目 (nominal scale):如性別、種族
+數字僅代表不同類別，排序沒有意義，差距沒有意義，0沒有意義
+序位 (ordinal scale):受傷程度(輕、中、重)
+排序有意義，差距沒有意義，0沒有意義
+等距尺度(interval scale):
+排序有意義，差距有意義，0沒有意義
+等比尺度(ratio scale):身高、體重、薪水
+排序有意義，差距有意義，0有意義
+9
+
+=== Slide 10 ===
+IQ
+10
+
+=== Slide 11 ===
+資料建構與敘述統計
+資料的型態
+名目 (nominal scale):如性別、種族
+數字僅代表不同類別，排序沒有意義，差距沒有意義，0沒有意義
+序位 (ordinal scale):受傷程度(輕、中、重)
+排序有意義，差距沒有意義，0沒有意義
+等距尺度(interval scale):時間(幾點鐘)
+排序有意義，差距有意義，0沒有意義
+等比尺度(ratio scale):
+排序有意義，差距有意義，0有意義
+11
+
+=== Slide 12 ===
+$250,000
+$500,000
+$750,000
+12
+
+=== Slide 13 ===
+資料建構與敘述統計
+資料的型態
+名目 (nominal scale):如性別、種族
+數字僅代表不同類別，排序沒有意義，差距沒有意義，0沒有意義
+序位 (ordinal scale):受傷程度(輕、中、重)
+排序有意義，差距沒有意義，0沒有意義
+等距尺度(interval scale):時間(幾點鐘)
+排序有意義，差距有意義，0沒有意義
+等比尺度(ratio scale):身高、體重、薪水
+排序有意義，差距有意義，0有意義
+分類型變數
+連續型變數
+13
+
+=== Slide 14 ===
+資料建構與敘述統計
+如何整理資料?
+Summary measure
+例:平均數，眾數，中位數
+Distribution
+ex 受傷天數:1 1 1 2 2 3 3 2 1 3 2 2 2 1 3 2 3 1 2 3
+天數 | 頻率
+1 | 6
+2 | 8
+3 | 6
+14
+[講者備註] 如收支平衡表，以加總整理
+如欲知年度平均電費，以平均數整理
+
+=== Slide 15 ===
+15
+
+=== Slide 16 ===
+資料建構與敘述統計
+直方圖
+16
+[講者備註] 可看出分部的形狀，如女性看來較男性advanced
+可看出每個類別的強度
+
+=== Slide 17 ===
+資料建構與敘述統計
+長條圖
+17
+[講者備註] X軸無法排序，長度代表強度
+
+=== Slide 18 ===
+資料建構與敘述統計
+圓餅圖
+18
+[講者備註] 缺點: 不易分辨強度 (通常只看最大塊)
+
+=== Slide 19 ===
+資料建構與敘述統計
+折線圖
+19
+[講者備註] 兩個連續型加一個分類型變數
+
+=== Slide 20 ===
+資料建構與敘述統計
+散佈圖
+20
+[講者備註] 兩個連續型變數
+
+=== Slide 21 ===
+資料建構與敘述統計
+Three different lies:
+Lies，
+Damned   lies，
+Statistics.....
+21
+
+=== Slide 22 ===
+資料建構與敘述統計
+22
+
+=== Slide 23 ===
+資料建構與敘述統計
+23
+
+=== Slide 24 ===
+資料建構與敘述統計
+24
+
+=== Slide 25 ===
+資料建構與敘述統計
+http://www.physics.csbsju.edu/stats/display.html
+25
+
+=== Slide 26 ===
+資料建構與敘述統計
+http://www.physics.csbsju.edu/stats/display.html
+26
+
+=== Slide 27 ===
+資料建構與敘述統計
+http://www.physics.csbsju.edu/stats/display.html
+27
+
+=== Slide 28 ===
+資料建構與敘述統計
+http://www.physics.csbsju.edu/stats/display.html
+28
+
+=== Slide 29 ===
+資料建構與敘述統計
+http://turf.unl.edu/extpresentationspdf/BairdStats.pdf
+29
+
+=== Slide 30 ===
+立體橫條圖
+Bessler. L. (sugi 28) Easy, Elegant, and Effective SAS® Graphs: Inform and Influence with Your Data
+30
+
+=== Slide 31 ===
+2D橫條圖
+Bessler. L. (sugi 28) Easy, Elegant, and Effective SAS® Graphs: Inform and Influence with Your Data
+31
+
+=== Slide 32 ===
+Stacked Bar Chart
+Bessler. L. (sugi 28) Easy, Elegant, and Effective SAS® Graphs: Inform and Influence with Your Data
+32
+
+=== Slide 33 ===
+Group bar chart
+Bessler. L. (sugi 28) Easy, Elegant, and Effective SAS® Graphs: Inform and Influence with Your Data
+33
+
+=== Slide 34 ===
+資料建構與敘述統計
+如何描述資料分佈?
+Center(集中程度)
+Spread(分散程度)
+Shape(形狀)
+34
+
+=== Slide 35 ===
+資料建構與敘述統計
+Measure of Centrality
+Mean (平均數)
+例: 2,3,4,1,5      The mean would be
+Median (中位數)
+例:1,2,5,8,9       The Median would be 5
+例:2,4,5,7,8,9    The Median would be (5+7)/2=6
+Mode (眾數)
+例:1,2,3,3,9       The mode would be 3
+例:1,2,3,3,9,9    The mode would be 3 AND 9
+35
+[講者備註] 平均數應該是最為常用以衡量中心的統計量，但易受outlier影響
+如有資料1,2,3,4,500, the mean would be 102 but the median is 3 
+Mode可適用於可類型資料，尤其是nominal
+
+=== Slide 36 ===
+資料建構與敘述統計
+Measure of spread
+Range: Xmax-Xmin
+例: (3,5,6,8,9), the range is 9-3=6
+Variance
+Variance of population:
+Standard Deviation:
+Interquartile Range: Q3-Q1
+36
+
+=== Slide 37 ===
+PASW 簡介(原SPSS)
+PASW, aka Predictive Analytics Software
+基本介面:
+資料視窗
+語法視窗
+輸出視窗
+37
+
+=== Slide 38 ===
+PASW 簡介(原SPSS)
+本課程使用 SPSS 完成。請參考網址:
+https://www.ibm.com/tw-zh/products/spss-statistics/base。
+學生需要使用spss軟體，請使用myapp系統，路徑：資訊中心首頁-最下方/教學服務/myapp/，依說明作業即可
+國體首頁->在校學生->APP雲端軟體->SPSS 20
+38
+
+=== Slide 39 ===
+39
+
+=== Slide 40 ===
+keyword "SPSS" searched from PUBMED
+40
+
+=== Slide 41 ===
+資料視窗
+可從SPSS中手動輸入
+可讀取excel，SAS，txt，STATA之資料檔
+資料視窗內有兩個工作表 (自version 10.0):
+資料檢視:輸入、編輯、檢視
+變數檢視:新增變數、變數標籤、變數格式，定義遺漏值
+41
+
+=== Slide 42 ===
+42
+
+=== Slide 43 ===
+43
+
+=== Slide 44 ===
+輸出視窗
+44
+
+=== Slide 45 ===
+語法視窗
+45
+
+=== Slide 46 ===
+SPSS實作:cars.sav (次數分配表+直方圖)
+46
+
+=== Slide 47 ===
+47
+
+=== Slide 48 ===
+48
+
+=== Slide 49 ===
+49
+
+=== Slide 50 ===
+50
+
+=== Slide 51 ===
+51
+
+=== Slide 52 ===
+盒鬚圖
+52
+
+=== Slide 53 ===
+53
+
+=== Slide 54 ===
+54
+
+=== Slide 55 ===
+實例演練
+基礎題:
+1. 計算mpg，engine，horse，weight 之mean，mode，median
+2. 試繪origin之頻率分配表 (frequency table)
+3. 試繪origin之圓餅圖 (pie chart)
+進階題:
+4. 試繪mpg對weight之散佈圖
+*統計圖->圖表建立器
+5.計算不同origin之平均馬力
+*分析->比較平均數->平均數
+Cars: https://bit.ly/3tOmVSC
+55

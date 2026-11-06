@@ -1,0 +1,335 @@
+=== Slide 1 ===
+Multivariate Analysis of Variance
+
+=== Slide 2 ===
+ | Number of DV | 
+Number of Groups in IV | 1 | 2 or more
+2(as a special case) | T-test | Hotelling’s T
+2 or more | Analysis of Variance (ANOVA) | Multivariate analysis of variance
+When assess one IV on one DV
+Simple Linear Regression
+When assess multiple IV on one DV
+Multiple Linear Regression
+When comparing two groups on one DV
+T-Test
+When comparing three or more groups on one DV
+ANOVA
+When comparing two groups on multiple DV’s
+Hotelling’s T²
+When comparing three or more groups on multiple DV’s
+MANOVA
+2
+
+=== Slide 3 ===
+Recall in ANOVA:
+ANOVA is used to investigate if there is a difference  in the single dependent variable that is due to membership in a group. That is, we explore if there is a difference in the single DV among groups.
+or the overall sample mean.
+and can be denoted eij.
+3
+
+=== Slide 4 ===
+Example:
+When students’ motivation increases, they will be more likely to pursue learning opportunities. Students can learn better when they have higher motivation; therefore, this study will focus on learners’ motivation. Many researchers suggest that motivation can be enhanced when English songs are used for learning English, but few experimental studies have considered the use of popular songs in a multimedia format. Therefore, the purpose of this study is to investigate whether learners’ motivation improves when authentic popular songs are introduced in the process of learning English as a foreign language.
+So, what statistical model should be used?
+4
+
+=== Slide 5 ===
+How the motivation is measured?
+ARCS Model
+Keller’s ARCS model (1987) was developed due to the need for designing and stimulating an approach for integrating motivation in instructional and learning environments.
+The ARCS model consists of four components:
+Attention
+Relevance
+Confidence
+Satisfaction.
+5
+
+=== Slide 6 ===
+6
+
+=== Slide 7 ===
+Results
+ | Teaching Method 1 |  | Teaching Method 2 |  | Teaching Method 3 |  | P value
+Item | Mean | Std Dev | Mean | Std Dev | Mean | Std Dev | 
+Attention | 3.80 | 0.64 | 4.00 | 0.75 | 3.80 | 0.64 | 0.13
+Relevance | 3.49 | 0.75 | 3.77 | 0.77 | 3.49 | 0.75 | 0.01
+Confidence | 3.43 | 0.80 | 3.57 | 0.84 | 3.43 | 0.80 | 0.02
+Satisfaction | 3.90 | 0.73 | 3.97 | 0.82 | 3.90 | 0.73 | 0.23
+This study used 4 ANOVA to investigate the effect of teaching methods on the motivation
+7
+
+=== Slide 8 ===
+In ANOVA
+The model: Y=X1+X2+X3+X3+..+Xn
+F statistic = MSM / MSR
+F statistic = the ratio of total amount of variation that needs to be explained by:
+MSM = systematic variation :variance given that all observations come from single distribution
+MSR = residual variation : variance of each condition separately
+If F < 1,  MSR > MSM
+If F > 1,  MSR < MSM
+8
+
+=== Slide 9 ===
+MANOVA
+First introduced by Wilks in 1932, but became a practical tool after the development of appropriate test statistics with tables distributions and  availability of computer programs.
+Y1
+Y2
+…
+Yp
+=Y=X1+X2+X3+X3+..Xn
+H0:
+μ11
+μ21
+…
+μp1
+=
+μ12
+μ22
+…
+μp2
+=…
+μ1k
+μ2k
+…
+μpk
+, all the group mean vectors are equal
+Doesn’t mean all the averages have to be the same (μ11 = μ12 = μ13, μ21 = μ22 = μ23, μ31 = μ32 = μ33)
+9
+
+=== Slide 10 ===
+The Two-Group case: Hotelling’s T²
+In the previous example, lets assume the researcher was interested in only two teaching method. If only univariate analyses were used,
+what statistical model would be used?
+And how many of them would have to be performed?
+Since the four dimensions of motivation were interrelated, what is more desired is a test of the difference between the teaching methods on these variables collectively. Here is where Hotelling’s T², a specialized form  of MANOVA and a extension of the univariate t test can be used
+A
+R
+C
+S
+10
+
+=== Slide 11 ===
+Consider the following equation for a variate of the dependent variables
+C = W1X1 + W2X2 + ⋯ + WnXn
+Where C=composite score for a respondent
+Wi=weight for dependent variable I
+Xi=dependent variable I
+How many combination for the set of weights is possible?
+The computational formula for Hotelling’s T² represents the solution for a maximum t statistics
+The test statistics
+11
+
+=== Slide 12 ===
+Why to use MANOVA
+You do a MANOVA instead of a series of one-at-a-time ANOVAs for two main reasons
+to reduce the experiment-wise level of Type I error.
+None of the individual ANOVAs may produce a significant main effect on the response, but in combination they might, which suggests that the variables are more meaningful taken together than considered separately
+If the number of DV is relatively low(5 or fewer), the statistical power of the MANOVA  equals or exceed that obtained with a single ANOVA
+–MANOVA takes into account the inter-correlations among the response Variables
+12
+
+=== Slide 13 ===
+Sample Size Requirement
+The sample size requirements for MANOVA relate to individual group sizes and not the total sample.
+As a bare minimum, the sample in each group must be greater than the number of DV’s
+As a practical guide, a recommended minimum cell size is 20
+As the number of DV increases, the sample size required increases. For example, required sample sizes increase by 50 percent as the number of DV goes from two to six
+13
+
+=== Slide 14 ===
+In MANOVA
+Each subject now has multiple scores: there is a matrix of responses in each cell
+Additional calculations are needed for the difference scores between the DV’s
+Matrices of difference scores are calculated and the matrix squared
+When the squared differences are summed you get a sum-of-squares-and-cross-products-matrix
+This is actually the matrix counterpart to the sums of squares
+Now we can test hypotheses about the effects of the Ivs on linear combination(s) of the DVs
+14
+
+=== Slide 15 ===
+MANOVA: Test Statistics
+SAS reports four tests
+–Wilk’s Lmbda: consider all the discriminant functions
+–Pillai’s trace: good for smaller sample size
+–Hotelling- Lawley Trace
+–Roy’s greatest root :most appropriate when the DV’s are strongly interrelated on a single dimension, but it is the measure most likely to be severely affected by violations of the assumptions.
+All of these are function of either E or H matrices in combination
+We will use results from Wilk’s
+15
+
+=== Slide 16 ===
+MANOVA: Test Statistics
+Wilk’s Lambda (Λ) was the first MANOVA test statistic developed and is very important for several multivariate procedures in addition to MANOVA.
+Wilk’s Lambda (Λ) is the error sum of squares (E) divided by the sum of the effect sum of squares (H) and the error sum of squares. i.e., random variation/systematic variation.
+The quantity (1 - Λ) is often interpreted as the proportion of variance in the dependent variables explained by the model effect. However, this quantity is not unbiased and can be quite misleading in small samples.
+Λ is approximately chi-square distributed
+Even though there are tables of critical values for Λ, but they are virtually never used
+16
+
+=== Slide 17 ===
+MANOVA: assumptions
+Independence: Observations must be independent
+The set of dependent variables must follow a multivariate normal distribution (any linear combination of the DV follow a normal distribution).
+i.e.,If all DV’s are multivariate normal collectively, then Each DV has a univariate normal dist. However, converse is not necessarily true.
+Equality of Variance-Covariance matrix: Variance-covariance matrices must be equal for all the treatment groups
+17
+
+=== Slide 18 ===
+The equality of variance-covariance
+Σ1 = Σ2 = ⋯ = Σk = Σ
+e.g. 3 DV’s
+Σ =
+σ12
+σ12
+σ13
+σ21
+σ22
+σ23
+σ31
+σ32
+σ32
+, where σ12 is variance of y1, σ22 is variance of y2, and σ32 is variance of y3
+It DOES NOT say σ12 = σ22 = σ32
+18
+
+=== Slide 19 ===
+Interpretation of the MANOVA results
+Once the statistical significance of treatments has been assessed, we turn our attention to how each treatment affects the dependent measures.
+Identify whether the group differ on a single DV or the entire DVs
+Assess which dependent variable exhibited differences across the groups
+19
+
+=== Slide 20 ===
+Assess Effect on the Dependent variable
+Main effect of the treatment
+Descriptive statistics
+E.g., Do test scores differ between male and female?
+Male Math
+Male Science
+Male History
+Male English
+=
+Female Math
+Female Science
+Female History
+Female English
+=>
+75
+68
+59
+81
+=
+72
+58
+71
+92
+If the analysis includes more than one treatment, the interaction term must be examined.
+If a treatment involves more than two levels, a series of post-hoc test should be performed.
+20
+
+=== Slide 21 ===
+Example:
+A researcher randomly assigns 33 subjects to one of three groups.
+Group 1 receives technical dietary information interactively from an on-line website.
+Group 2 receives the same information from a nurse practitioner
+Group 3 receives the information from a video tape made by the same nurse practitioner.
+Each subject then made three ratings for the information presented:
+difficulty
+usefulness
+importance
+Research interest: The researcher looks at three different ratings of the presentation (difficulty, usefulness and importance) to determine if there is a difference in the modes of presentation.
+21
+
+=== Slide 22 ===
+Multi-group comparisons
+Post hoc tests:
+Bonferroni
+Scheffee
+Tukey
+Priori comparison: make specific comparisons between groups
+Contrast: C = W1G1 + W2G2 + ⋯ + WnGn
+Where C=contrast value, W=weights, G=group means
+Example1: test between G1 and G2
+C = (1)G1 + (−1)G2 + (0)G3
+Example2: test whether the average of G1 and G2 differs from G3
+C = (0.5)G1 + (0.5)G2 + (−1)G3
+22
+
+=== Slide 23 ===
+Assessing significance for each DV
+Univariate Significance Test:
+apply ANOVA to each of the DV and adjust for the multiple tests
+Stepwise Discriminate Analysis:
+Following with a significant MANOVA, we then interchange the DV’s and the IV’s and do a discriminant analysis.
+23
+
+=== Slide 24 ===
+Example:
+id | group | dv1 | dv2 | dv3 | dv4
+1 | A | 31 | 29 | 15 | 26
+2 | B | 24 | 28 | 20 | 32
+3 | B | 14 | 20 | 28 | 30
+4 | A | 38 | 34 | 30 | 34
+5 | B | 25 | 29 | 25 | 29
+6 | A | 30 | 28 | 16 | 34
+Step 1: Examine the correlation among different dvs
+Step 2: Adopt appropriate statistical model
+24
+
+=== Slide 25 ===
+What do you see?
+- Subjects are different at baseline
+- Each subject has their own profile plot
+-Variability higher at time 1 and low at time 4
+25
+
+=== Slide 26 ===
+What do you see?
+Groups are different at baseline
+Nonlinear trend for both groups
+26
+
+=== Slide 27 ===
+Correlation matrix by group
+27
+
+=== Slide 28 ===
+Correlation matrix
+Negatively correlated between time2 and time3, and time1 and time3
+Strong positive correlation between time1 and time2
+Weak positive correlation in the pairs of (time1, time4), (time2, time4), and (time3, time4)
+Compound Symmetry?
+28
+
+=== Slide 29 ===
+MANOVA SAS Code:
+proc glm data=aa;
+   class group;
+   model dv1-dv4= group;
+   manova h=_all_/printe;
+run; quit;
+29
+
+=== Slide 30 ===
+Between-Subjects Tests
+Following the MANOVA for multivariate tests of significance for within-subjects effects, SAS prints tests of the between-subjects effects. There is only one approach to testing these effects.
+30
+
+=== Slide 31 ===
+Post hoc for groups
+31
+
+=== Slide 32 ===
+Pros and cons
+In contrast to the Compound Symmetry(CS) var-cov structure assumed in ANOVA, MANOVA does not assume any specific var-cov structure.
+In MANOVA,
+So, if the number of subject is close to the number of measurements, t, then a small value of F would be calculated
+A t × t covariance matrix is need to be estimated. So a large number of degrees of freedom are consumed in estimating
+parameters in the var-cov matrix.
+32
+
+=== Slide 33 ===
+Assigned Reading:
+Parasuraman, S., Drake, B. H., & Zammuto, R. F. (1982). The effect of nursing care modalities and shift assignments on nurses' work experiences and job attitudes. Nursing Research, 31(6), 364-367.
+Tseng, J., Yuan, R. Y., & Jeng, C. (2015). Treadmill training improves forward and backward gait in early Parkinson disease. American Journal of Physical Medicine & Rehabilitation, 94(10), 811-819.
+33

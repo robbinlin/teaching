@@ -1,0 +1,628 @@
+=== Slide 1 ===
+Application of Confirmatory Factor Analysis: 驗證式因素分析(CFA)
+林彥光
+
+=== Slide 2 ===
+因素分析 (Factor Analysis)
+Exploratory Factor Analysis (EFA): explore the possible underlying factor structure of a set of observed variables without imposing a preconceived structure on the outcome (Child, 1990)
+Confirmatory factor analysis (CFA): verify the factor structure of a set of observed variables.
+2
+
+=== Slide 3 ===
+Exploratory Factor Analysis (EFA):
+is a variable reduction technique which identifies the number of latent constructs and the underlying factor structure of a set of variables
+allows you to describe and identify the number of latent constructs (factors)
+traditionally has been used to explore the possible underlying factor structure of a set of measured variables without imposing any preconceived structure on the outcome (Child, 1990).
+3
+
+=== Slide 4 ===
+Exploratory Factor Analysis (EFA):
+determine number of factors
+1. scree test, look for elbow
+2. proportion of variance
+3. eigenvalues>1
+4. interpretability
+4
+
+=== Slide 5 ===
+Exploratory Factor Analysis (EFA):
+5
+
+=== Slide 6 ===
+Confirmatory Factor Analysis
+Test the hypothesis that a relationship between the observed variables and their underlying latent construct(s) exists
+The use of CFA depends on
+Sample size (5-20 per parameter estimate)
+Instrument
+Multivariate Normality
+Missing data
+Model fit
+6
+
+=== Slide 7 ===
+Confirmatory Factor Analysis
+7
+
+=== Slide 8 ===
+Sample Size for EFA
+Pearson (2008)
+8
+
+=== Slide 9 ===
+探索性因素分析(EFA)v.s.驗證性因素分析(CFA)
+EFA | CFA
+探索性 | 驗證性
+依據題項命名因素 | 理論決定因素名稱
+問卷設計的前端 | 問卷設計的後端
+不對loading作顯著性檢定 | 有loading顯著性檢定
+探索因素結構 | 驗證因素模型(包含因素個數)
+N>50, 100, or 5:1, 10:1 | N>100 or 15:1
+常態分配假定 | 常態分配假定
+So EFA or CFA?
+9
+[講者備註] **Although EFA and CFA are often referred to as though they represent a dichotomy, the distinction between the two is really more a matter of degree.  Certainly, it is possible to use EFA in a confirmatory manner or to use CFA in an exploratory manner. However, because the CFA model is much more restrictive than that of EFA,, most experts recommend that EFA be used for situations which minimal research has been conducted regarding the structure of the construct or measure of instruct. Use of CFA in such situations often results in gross misfit of the model to the data. In situations such as these, there are innumerable ways in which the model can be respecified to improve fit, and a research can easily be overwhelmed.
+**Alternative EFA models typically represent a more finite set of models that differ on criteria such as the number of factors, method of extraction, and type of rotation. 
+Researchers will often claim a priori knowledge of the underlying structure based on the fact that the items have been written to measure specific aspects of the construct. However, items are rarely aware of the scale for which they have been written and often fail to behave as they should. So unless there is empirical evidence to support such a claim, it is probably best to begin by conducting an EFA in such situations. If a clear structure emerges, CFA can be employed.  
+*** EFA should be used when the variables to be analyzed are either newly developed or have not been analyzed together or then the theoretical basis(i.e., number of factors, level of correlation among factors)  for the factor analysis model is weak.
+
+=== Slide 10 ===
+terminology:
+參數(parameter):描述母群體特質的數值
+觀察變數(observed variables):可直接觀察並進行測量的變數，如身高、體重
+潛在變數(latent variables):
+無法直接觀測，如滿意度，學習動機。
+外生變數(exogenous):
+用以預測內生變數，不具有測量誤差
+內生變數(endogenous):
+被外生變數預測，具有測量誤差
+10
+
+=== Slide 11 ===
+CFA分析基本需求
+Minimum sample size: 100, 150, 300, 500 (Hair et al.(2009),Loehlin,(1992))
+Numbers per variable: 15:1
+量表最好為七點尺度
+潛在構面至少以三題衡量
+每一指標不得double loading (Bollen, 1989)
+11
+
+=== Slide 12 ===
+Steps of Conducting a CFA
+1. review the relevant theory and research
+2. specify a model (e.g., diagram, equations)
+3. determine model identification (e.g., if unique values can be found for parameter estimation; the number of degrees of freedom, df for model testing is positive)
+4. collect data
+5. conduct preliminary descriptive statistical analysis (e.g., scaling, missing data, collinearity issues, outlier detection)
+6. estimate parameters in the model
+7. assess model fit
+8. present and interpret the results.
+12
+
+=== Slide 13 ===
+Fit Statistics
+Chi-Square Test: the amount of difference between the expected and observed covariance matrices.
+H0:  理論模型之共變異=飽和模型之共變異
+A X2 close to zero indicates little difference between the expected and observed covariance matrices.
+X2 ≒ 0
+P-value>0.05
+理論模型=飽和模型
+13
+[講者備註] Traditional statistical methods normally utilize one statistical test to determine the significance of the analysis. However, Structural Equation Modeling (SEM), 
+CFA specifically, relies on several statistical tests to determine the adequacy of model fit to the data
+The chi square tests the hypothesis that the model is consistent with the pattern of covariation among the observed variables.
+Another way to describe the chi square goodness of fit statistic is to say that it tests the null hypothesis that there is no statistically significant difference in the observed and theoretical covariance structure matrices.
+
+=== Slide 14 ===
+Fit Statistics
+Comparative Fit Index (CFI): discrepancy function adjusted for sample size. CFI ranges from 0 to 1 with a larger value indicating better model fit. Acceptable model fit is indicated by a CFI value of 0.90 or greater (Hu & Bentler, 1999). 
+14
+
+=== Slide 15 ===
+Fit Statistics
+Root Mean Square Error of Approximation (RMSEA):  refer to residual in the model. RMSEA values range from 0 to 1 with a smaller RMSEA value indicating better model fit. Acceptable model fit is indicated by an RMSEA value of 0.06 or less (Hu & Bentler, 1999).
+15
+
+=== Slide 16 ===
+絕對配適指標: 理論模型與飽和模型比較
+X² | P>0.05
+NC=X²/df | 1<NC<3
+GFI(配適度) | >0.9
+AGFI(調整後配適度) | >0.9
+SRMR(標準化殘差均方和平方根) | <0.05
+RMSEA( 漸進殘差均方和平方根) | <0.08尚可, <0.05良好
+HOELTER(CN) | >200
+GFI隨著樣本數及估計參數增加而增加
+AGFI樣本數小時易被低估
+SRMR隨著樣本數及估計參數增加而變少
+16
+[講者備註] The good of fit index "is a measure of the relative amount of variances and covariances jointly accounted for by the model" (Joreskog & Sorbom, 1986, p. I. 41). This index can be thought of as being roughly analogous to the multiple R squared in multiple regression. A model is considered to have a better fit when "it has a lower ratio computed as the noncentrality parameter divided by degrees of freedom" (Thomas & Thompson, 1994, p. 10). The closer the GFI is to 1.00, the better is the fit of the model to the data.
+The adjusted goodness of fit statistic is based on a correction for the number of degrees of freedom in a less restricted model obtained by freeing more parameters. Both the GFI and the AGFI are less sensitive to sample size than the chi square statistic.
+
+=== Slide 17 ===
+增值配適指標:理論模型與獨立模型比較
+NFI(規範配適指標) | >0.9
+RFI(相對規範配適指標) | >0.9
+IFI(增值規範配適指標) | >0.9
+TLI(非規範配適指標) | >0.9
+CFI(比較規範配適指標) | >0.9
+NFI隨著估計參數增加而增加
+17
+
+=== Slide 18 ===
+精簡配適指標:懲罰估計參數多的模型
+PGFI(簡約配適度指標) | >0.5
+PNFI(簡約後規範配適指標) | >0.5
+PCFI(簡約後適配指標) | >0.5
+競爭配適指標:比較競爭模型
+NCP | The smaller the better
+SNCP | The smaller the better
+ECVI | The smaller the better
+AIC | The smaller the better
+CAIC | The smaller the better
+BCC | The smaller the better
+BIC | The smaller the better
+18
+[講者備註] 絕對配適指標:可解釋為樣本共變異數矩陣備模型共變異矩陣解釋的比例，類似於R2
+增值配適指標:研究模型的配適度與統計基本模型比較改善的程度，基本模型指的是獨立(虛無模型)
+精簡配適指標:決定研究模型是否太過複雜，同一筆漾本資料但相似的模型以精簡指標越大者越好
+競爭配適指標:非巢狀模型比較有用的配適指標，越小越好
+SEM沒有萬用的指標，每一個配適度指標，僅表示資料某一方面的訊息，因此某一指標良好，不表示模性配適量好
+配適度指標不用用來解釋成理論是具有意義的，afterall, 我們用CFA驗證理論，而非創造理論
+
+=== Slide 19 ===
+配適指標
+模式越複雜，自由度越少，配適度越好
+樣本越大，power越大
+GFI隨著樣本數及估計參數增加而增加
+AGFI樣本數小時易被低估
+SRMR隨著樣本數及估計參數增加而變少
+NCP隨著樣本數增加而增加
+CFI較不受樣本數影響
+NFI隨著估計參數增加而增加
+19
+
+=== Slide 20 ===
+Example 1 – Theory Validation (Suhr, 2004)
+hypothesizes two latent constructs related to wellness, physical (fitness, exercise, illness) and mental (stress, hardiness). CFA analyzes data from a study where researchers investigated the effects of hardiness, stress, fitness, and exercise on health problems (Roth, et al., 1989). College students (n=373) reported physical illness, stressful life events, exercise participation levels, perceived fitness levels, and hardiness components. 
+20
+
+=== Slide 21 ===
+Example 1-Diagram
+CFA Diagram
+fitness
+exercise
+illness
+hardines
+stress
+physical
+wellness
+mental
+wellness
+(error terms not
+ shown on diagram)
+21
+
+=== Slide 22 ===
+Example 1-SAS Code
+Data Step
+Statistics Procedure
+22
+
+=== Slide 23 ===
+Example 1: Results
+23
+[講者備註] 11=(sigma1^2, sigma2^2, sigma3^2, sigma4^2, sigma5^2, P1, P2,P3,P4, P5, covF1F2)
+15=5*(5+1)/2
+Informations>Parameters: overidentified
+Informations=Parameters: justidentified
+Informations<Parameters: underdentified
+
+=== Slide 24 ===
+Example 1: Fit statistics
+Close to 0.05
+Close to 0.06
+Above 0.9
+24
+[講者備註] The CFA analysis has confirmed the factor structure. If the analysis indicates unacceptable model fit,
+the factor structure cannot be confirmed, an exploratory factor analysis is the next step.
+
+=== Slide 25 ===
+Example 1 : parameter estimates
+25
+[講者備註] A t value is calculated by dividing the parameter estimate by the standard error, 0.3213 / 0.1123 = 2.8587.
+Parameter estimates are significant at the 0.05 level if the t value exceeds 1.96 and at the 0.01 level if the t value
+exceeds 2.56.
+Parameter estimates for the confirmatory factor model are significant at the 0.01 level.
+
+=== Slide 26 ===
+Example 1 : parameter estimates
+<1.96
+26
+
+=== Slide 27 ===
+Example 2: Achievement Data and Participants
+Data is from the National Longitudinal Survey of Youth , a longitudinal study of achievement, behavior, and home environment. The original NLSY79 sample design enabled researchers to study longitudinal experiences of different  age groups as well as analyze experiences of women, Hispanics, Blacks, and economically disadvantaged. The NLSY79 is a nationally representative sample of 12,686 young men and women who were 14- to 22-years old when first surveyed in 1979 (Baker, Keck, Mott, & Quinlan, 1993).
+27
+
+=== Slide 28 ===
+Example 2 : CFA-Diagram
+math88
+math90
+math92
+math94
+readr88
+readr90
+readr92
+readr94
+readc88
+readc90
+readc92
+readc94
+math
+achievement
+reading
+recognition
+achievement
+reading
+comprehension
+achievement
+28
+
+=== Slide 29 ===
+Example 2 : SAS-Code
+29
+
+=== Slide 30 ===
+Example 2 : Results
+30
+
+=== Slide 31 ===
+Example 2 : Fit Statistics
+Too large
+>0.06
+<0.9
+31
+[講者備註] Fit Statistics indicate unacceptable model fit.
+• Chi-square is large. The model does not produce a small difference between observed and expected matrices.
+• Chi-square probability (< 0.0001) is unacceptable. Criteria for acceptable model is pr > 0.05.
+• Unexplained variance, residual, is un acceptable. Model RMSEA (0.2188) is greater than the 0.06 or less criteria.
+• CFI ((0.8069), NNI (0.7595), and NFI (0.8038) are less than the acceptable criteria, 0.90.
+
+=== Slide 32 ===
+Now what?
+32
+
+=== Slide 33 ===
+Example 3: Fix with EFA 
+SAS-Code: 3-factor EFA
+proc factor data=rawfl method=ml  reorder scree   priors=smc;
+          var
+          math88 math90 math92 math94 readr88 readr90
+          readr92 readr94   readc88 readc90 readc92 readc94;
+33
+
+=== Slide 34 ===
+Example 3: EFA-Factor Pattern
+34
+
+=== Slide 35 ===
+Example 3: EFA-Scree Plot
+35
+
+=== Slide 36 ===
+Example 3: EFA with rotation
+36
+
+=== Slide 37 ===
+Example 3: SAS Code-2 factor EFA
+proc factor data=rawfl method=ml priors=smc n=2 rotate=v reorder;
+          var math88 math90 math92 math94
+                 readr88 readr90 readr92 readr94
+                 readc88 readc90 readc92 readc94;
+37
+
+=== Slide 38 ===
+Example 3: EFA-Factor Pattern
+38
+
+=== Slide 39 ===
+Example 3: EFA Rotated Factor Pattern
+39
+
+=== Slide 40 ===
+2 or 3 factors?
+Reliability could be a hint
+3 factor
+Basic Skills factor:0.943
+Math factor: 0.867
+Reading factor: 0.945
+2 factor
+Basic Skills factor: 0.943
+Math/Reading factor: 0.949
+Interpretability
+40
+[講者備註] Select CFA to verify the factor structure and EFA to determine the factor structure
+
+=== Slide 41 ===
+Example 4
+Table 1. Scale of Athletic Priorities* Factor Structure and Reliability
+Factor | Items | Alpha
+Entertainment | 10, 15, 17, 32 | 0.778
+National Sport Development | 9, 23, 25, 35 | 0.781
+Financial | 4, 19, 24, 34 | 0.837
+Transmission of Culture | 2, 5, 14, 18 | 0.704
+Career Opportunities | 6, 8, 11, 36 | 0.904
+Public Relations | 3, 12, 28, 29 | 0.827
+Athlete’s Personal Growth | 1, 22, 31, 33 | 0.833
+Prestige | 7, 13, 20, 21 | 0.784
+Achieved Excellence | 16, 26, 27, 30 | 0.821
+Total Scale | Items 1-36 | 0.925
+(Chelladurai, et al., 1984)
+41
+
+=== Slide 42 ===
+Example 4: 9 factors CFA
+chi-square = 427.051, df = 27, p < 0.0001,
+RMSEA = 0.266, 
+CFI = 0.6018, 
+NNFI = 0.469
+42
+
+=== Slide 43 ===
+Example 4: Examine the structure for each of the 9 factors
+43
+
+=== Slide 44 ===
+Example 4: efa as a remedy
+44
+
+=== Slide 45 ===
+chi-square = 000.000, df = 0, p < 0.0001,
+RMSEA = 0.000, 
+CFI = 1.000, 
+NNFI = 1.000
+45
+
+=== Slide 46 ===
+Reliability and Validity Analysis
+Reliability: 
+is the degree to which an instrument is able to measure a given quantity consistently.
+Stability
+Validity:
+ is the degree to which an instrument actually measures what it is intended to measure.
+46
+[講者備註] To raise the power, substitute a highly reliable scale for a
+substantially poorer one. For example, when n = 50, two scales
+with reliabilities of 0.38 have a correlation of 0.24, p < 0.10, and
+would be significant at p < 0.01 if their reliabilities were increased
+to 0.90 or if the sample was more than twice as large (n > 100).
+
+=== Slide 47 ===
+Reliability
+Cronbach’s alpha
+Indicator Reliability: Square Multiple Correlations in SAS, The reliability of an indicator or manifest variable is defined as the square of the correlation between the latent factor and that variable.
+47
+[講者備註] This is directly analogous to R2 in linear regression. The reliability, then, indicates the percent of the variation 
+in the variable explained by the construct that it is supposed to measure
+
+=== Slide 48 ===
+Example 3: x1–x3 for verbal skills 
+                  y1–y3 for math skills 
+48
+
+=== Slide 49 ===
+Example 3: SAS Code
+proc calis data=scores; 
+        factor 
+                verbal ---> x1-x3, 
+                math ---> y1-y3; 
+        pvar 
+                verbal = 1., 
+                math = 1.; 
+    run; 
+49
+
+=== Slide 50 ===
+Example 3: Fit statistics
+50
+
+=== Slide 51 ===
+Example 3: SMC
+74.75% of the variation in X1 is explained by Verbal
+97.26% of the variation in X1 is explained by Math
+51
+[講者備註] The R-squares in this table shows the percentages of variance of the variables that are overlapped with the factors. While all these percentages (0.74 – 0.97) are quite high for all variables, the percentage is especially high for y1. It shares 97% of the variance with the math factor. So, it appears that the observed variable y1 is almost a perfect indicator of the math factor.
+
+=== Slide 52 ===
+Reliability: Composite Reliability
+Composite Reliability (CR): This index reflects the internal consistency of the indicators measuring a construct. Hair (1997) 認為0.7為可接受; Fornell and Larcker (1981)建議為0.6
+52
+
+=== Slide 53 ===
+Example 3: Standardized Factor Loading
+53
+
+=== Slide 54 ===
+Example 3: Standardized Error Variances
+54
+
+=== Slide 55 ===
+Construct and Indicator | Standardized Loadings | Error Variances | CR
+Verbal |  |  | 
+X1 | 0.8646 | 0.2521 | 0.924
+X2 | 0.8873 | 0.2127 | 
+X3 | 0.8746 | 0.1012 | 
+Math |  |  | 
+Y1 | 0.9862 | 0.0456 | 0.975
+Y2 | 0.9272 | 0.0613 | 
+Y3 | 0.8560 | 0.0891 | 
+55
+
+=== Slide 56 ===
+Reliability: Average Variance Extracted
+Average Variance Extracted (AVE): the amount of the variance that is captured by an underlying factor in relation to the amount of variance due to measurement error. AVE越高，收斂效度越高，信度越高 Fornell and Larcker(1981)建議需大於0.5
+56
+
+=== Slide 57 ===
+Construct and Indicator | Standardized Loadings | Error 
+Variances | AVE
+Verbal |  |  | 
+X1 | 0.8646 | 0.2521 | 0.8025
+X2 | 0.8873 | 0.2127 | 
+X3 | 0.8746 | 0.1012 | 
+Math |  |  | 
+Y1 | 0.9862 | 0.0456 | 0.929
+Y2 | 0.9272 | 0.0613 | 
+Y3 | 0.8560 | 0.0891 | 
+80.25% of the variance is captured by the verbal construct
+92.9% of the variance is captured by the verbal construct
+57
+
+=== Slide 58 ===
+Factors Influencing Reliability
+測驗內容因素: 
+一致性低，題數過少
+當信度很高，需要更多的題目以增加信度
+評分因素: 
+評分者的主觀性
+評分間隔時間
+受試者因素: 
+受試者的身心狀態，注意力
+受試者的代表性、多變性
+受試環境因素: 受試空間舒適度，溫度，溼度，聲音
+58
+
+=== Slide 59 ===
+Validity
+該測驗所測得欲測之特性的程度
+59
+
+=== Slide 60 ===
+數學能力測驗?
+小學三年級數學題目:
+一天，有個年輕人來到店裡買了一雙鞋子。這雙鞋子成本是15元，標價是21元。結果是這個年輕人掏出50元要買這雙鞋子。鞋店當時沒有零錢，用那50元向街坊換了50元的零錢，找給年輕人29元。但是街坊後來發現那50元是假鈔，鞋店無奈之下，還了街坊50元。
+現在問題是：鞋店在這次交易中到底損失了多少錢?
+15? 
+15+29=44? 
+15+29+50=94?
+60
+
+=== Slide 61 ===
+Validity: Convergent Validity
+Convergent Validity: 每個構念的測量題目之間應有理論上的依據及中度以上的相關
+ | Item1 | Item2 | Item3
+Item1 | 1 |  | 
+Item2 | 0.76 | 1 | 
+Item3 | 0.91 | 0.82 | 1
+61
+
+=== Slide 62 ===
+Convergent Validity
+Construct
+Item1
+Item2
+Item3
+0.76
+0.82
+0.91
+62
+
+=== Slide 63 ===
+Convergent Validity
+1. SMC>=0.5
+2. Factor loading>=0.7
+3. CR>0.7
+4. AVE>0.5
+5. Cronbach’s alpha>0.6
+63
+
+=== Slide 64 ===
+Validity
+Discriminate Validity:不同概念之間的相關程度要低於同一概念之測量題目的相關
+ | Factor 1-item 1 | Factor 1-
+Item 2 | Factor 2-
+Item 3 | Factor 2-
+Item 4
+Factor 1-
+Item 1 | 1 |  | 0.21 | 0.17
+Factor 1-
+Item 2 |  | 1 | 0.34 | 0.39
+Factor 2-
+Item 3 |  |  | 1 | 
+Factor 2-
+Item 4 |  |  |  | 1
+64
+
+=== Slide 65 ===
+Discriminate Validity
+Construct 1
+Construct 2
+Item 1
+Item 2
+Item 3
+Item 4
+65
+
+=== Slide 66 ===
+Validity: Discriminate Validity
+1. Correlation between factors>0.85
+2. AVE>(correlations between factors)2
+66
+
+=== Slide 67 ===
+Validity: Construct Validity
+Construct Validity: 
+Convergent Validity + Discriminant Validity
+ | Factor 1-item 1 | Factor 1-
+Item 2 | Factor 2-
+Item 3 | Factor 2-
+Item 4
+Factor 1-
+Item 1 | 1 | 0.77 | 0.21 | 0.17
+Factor 1-
+Item 2 | 0.77 | 1 | 0.34 | 0.39
+Factor 2-
+Item 3 | 0.21 | 0.34 | 1 | 0.86
+Factor 2-
+Item 4 | 0.17 | 0.39 | 0.86 | 1
+67
+
+=== Slide 68 ===
+影響內在效度的因子
+歷史(history): 時間效應，研究期間的環境因素，出現於長時間的研究
+成熟(maturation):受試者發生身心變化的效應，出現於長時間的研究
+測試(testing): 多次測驗後，前測影響後測的結果
+儀器使用(instrumentation): 使用不可靠的儀器與工具測量
+統計回歸(statistical regression): 選入極端受試者後，在後測發生往平均靠近的現象。
+取樣偏差(selection bias):抽樣誤差，實驗組與控制組不對稱。
+實驗流失(experimental mortality): 實驗對象的損耗，影響完整資訊的取得
+研究者對受試者的預期(expectancy)
+68
+
+=== Slide 69 ===
+Modification
+Two forms of post hoc model modification
+Removal of nosignificant paths (trimming)
+Addition of paths to increase model fit
+Caution!
+Replicable?
+Data driven?
+69
+[講者備註] Using the same sample to respecify and test a modified model capitalizeds on sampling error and thus decrease the chance of obtaining replicable results. 
+The model no longer aligns with theory but instead is empirically based or data driven
+
+=== Slide 70 ===
+Selected output
+70
+
+=== Slide 71 ===
+Selected output
+71
+
+=== Slide 72 ===
+Selected output
+72
+
+=== Slide 73 ===
+Questions?
+73

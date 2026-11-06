@@ -1,0 +1,123 @@
+=== Slide 1 ===
+Moderator and Mediator
+Moderator: a variable that alters the direction of the relation between a IV and a DV.
+Mediator: a variable that explains the relation between a IV and a DV
+
+=== Slide 2 ===
+Frazier & Tix, (2004)
+2
+
+=== Slide 3 ===
+Examine a Moderator
+1
+Step1: Representing categorical variables with coded variables
+2
+Step2:Centering or standardizing continuous variables
+3
+Step3:Creating products terms
+4
+Step4:Interpret the results
+3
+
+=== Slide 4 ===
+Examine a Mediator
+1
+Step1: Determine if there is a relationship between the IV and the DV (path c)
+2
+Step2: Determine if there is a relationship between the IV and the mediator (path a)
+3
+Step3: Determine if there is a relationship between the mediator and the DV (path b)
+4
+Step4: Determine if the strength of the relation between the predictor and the outcome is significantly reduced when the mediator is added to the model
+4
+
+=== Slide 5 ===
+5
+
+=== Slide 6 ===
+Example:
+/*******************************************************************************/
+/*The General Social Surveys (GSS) have been conducted by the National Opinion Research */
+/*Center annually since 1972, except for the years 1979, 1981, and 1992 (a supplement was added in 1992), */
+/*and biennially beginning in 1994. The GSS are designed as part of a program of social indicator research, */
+/*replicating questionnaire items and wording in order to facilitate time-trend studies. Items on religion*/
+/*include religious preference, church attendance, beliefs about the Bible, attitudes toward organized */
+/*religion and its opponents, and more. In addition, it contains a special module examining respondents' */
+/*images of God. The survey also contains a topical module on work organizations*/
+/*******************************************************************************/
+6
+
+=== Slide 7 ===
+Mediation effect was determined by procedures described by Baron and Kenny (1986). 
+Regression 1:if the initial variable significantly predicts the outcome variable. 
+Regression 2: if the initial variable significantly predicts the mediator.
+Regression 3:both the initial variable and the mediator are entered simultaneously and are used to predict the criterion variable 
+7
+
+=== Slide 8 ===
+In the GSS survey, a researcher is interested in if work hard can improve his/her income. However, obeying to authority may served as a mediator.
+Work hard
+obey
+tax
+8
+
+=== Slide 9 ===
+Step 1
+Work hard
+tax
+B=-0.14, p<0.001
+9
+
+=== Slide 10 ===
+Step 2
+Work hard
+obey
+b=0.69, p<0.001
+10
+
+=== Slide 11 ===
+Step 3:
+Work hard
+obey
+tax
+b=-0.13, p<0.001
+b=-0.05, p=0.15
+11
+
+=== Slide 12 ===
+The result indicated that the previously significant relationship between predictor (work hard) and the outcome (tax) becomes non significant (β =-0.05(p=0.15)).
+Therefore, there is almost complete mediator effect for Obey in the relationship between work hard and tax.
+The Sobel Test indicates that 65.4% of the total effect is mediated by Obey (p<0.001)  
+12
+
+=== Slide 13 ===
+Moderator example
+In the GSS survey, a researcher is interested in if Obey can improve his/her income. However, Happiness may served as a moderator.
+Obey
+Happiness
+tax
+13
+
+=== Slide 14 ===
+Output:
+Parameter Estimates
+Variable | Label | DF | Parameter
+Estimate | Standard
+Error | t Value | Pr > |t| | Standardized
+Estimate | Squared
+Semi-partial
+Corr Type II | Squared
+Partial
+Corr Type II
+Intercept | Intercept | 1 | 1.14419 | 0.13798 | 8.29 | <.0001 | 0 | . | .
+obey | obey | 1 | -0.08637 | 0.03655 | -2.36 | 0.0183 | -0.11230 | 0.00356 | 0.00368
+happy | happy | 1 | 0.19976 | 0.06631 | 3.01 | 0.0026 | 0.10992 | 0.00578 | 0.00596
+obeyhappy |  | 1 | -0.02525 | 0.01583 | -1.60 | 0.1109 | -0.08778 | 0.00162 | 0.00168
+P>0.05, failed to reject H0. So Obey is not a moderator
+14
+
+=== Slide 15 ===
+Assigned Reading:
+Bennett, J. A. (2000). Mediator and moderator variables in nursing research: Conceptual and statistical differences. Research in nursing & health, 23(5), 415-420.
+Hall, L. A., Kotch, J. B., Browne, D., & Rayens, M. K. (1996). Self-esteem as a mediator of the effects of stressors and social resources on depressive symptoms in postpartum mothers. Nursing research, 45(4), 231-238.
+15

@@ -1,0 +1,278 @@
+=== Slide 1 ===
+投稿常見的統記計謬誤
+國立體育大學
+林彥光
+2022/12/23
+X
+
+=== Slide 2 ===
+Error #1:Misuse of descriptive statistics
+ | Data 1 | Data 2 | Data3
+value | 1,2,3,4,5 | 1,2,3,4,500 | -97, -47, 15, 47, 97
+Mean | 3 | 102 | 3
+Median | 3 | 3 | 15
+Variance | 2.5 | 49502.5 | 5854
+SD | 1.58 | 222.49 | 76.51
+Range | 4 | 499 | 194
+Interquartile Range | 2 | 2 | 94
+2
+[講者備註] Two of the most common descriptive statistics for continuous data are the mean and standard deviation. However, these statistics correctly describe only
+a “normal” or “Gaussian” distribution of values. By definition, about 68% of the values of a normal distribution are within plus or minus 1 standard deviation
+of the mean, about 95% are within plus or minus 2 standard deviations, and about 99% are within plus or minus 3 standard deviations. In markedly non-normal
+distributions, these relationships are no longer true, so the mean and standard deviation do not communiate the shape of the distribution well. Instead, other
+measures, such as the median (the 50th percentile: the value dividing the data into an upper and a lower half) and range (usually reported by giving the
+ minimum and maximum values) or interquartile range (usually reported by giving the 25th and the 75th percentiles) are recommended (14).
+Although the mean and standard deviation can be calculated from as few as two data points, these statistics may not describe small samples well. 
+In addition, most biological data are not normally distributed (15). For these reasons, the median and range or interquartile range should probably be far more
+ common in the medical literature than the mean and standard deviation.
+
+=== Slide 3 ===
+Error #2: Misuse of p-value
+p=0.02 is more significant than p=0.03?
+p=0.02, so we proof that Ha is true?
+Absence of proof is not proof of absence (無效 或 無法證明有效?)
+3
+
+=== Slide 4 ===
+Rejection Region
+Critical Value
+Test Statistics
+Area=p-value
+4
+
+=== Slide 5 ===
+A is significantly larger than C and (A>C)B is insignificantly different from C (B=C), then A is significantly larger than B(A>B)?
+Average change of blood pressure for 3 drugs
+Type | Average Change | n | p | CI
+A | -20 | 18 | 0.02 | (-30, -1)
+B | -0.2 | 18 | 0.03 | (-3, -1)
+C | -20 | 18 | 0.07 | (-50,10)
+5
+[講者備註] A is different from 0, C is indifferent from 0, but A is NOT different from C
+
+=== Slide 6 ===
+Error #3: Fail to include the CI along with the estimate
+Is there a significant change on patients’ compliance?
+Mean | 95% CL Mean |  | Std Dev | t Value | Pr > |t|
+3.0000 | 0.0111 | 4.0999 | 5.0332 | 4.37 | 0.0222
+Although the p-value is <0.05, the average difference could be as low as 0.011
+6
+
+=== Slide 7 ===
+Error #4: Statistical significance against clinical importance
+Statistical significance v.s. practical significance
+Statistical insignificance v.s. practical insignificance
+Power and sample size
+7
+[講者備註] In statistics, small differences between large groups can be statistically significant but clinically
+meaningless (12,33). In a study of the time-to-failure for two types of pacemaker leads, a mean difference
+of 0.25 months over 5 years among thousands of leads is not apt to be clinically important, even if such
+a difference would have occurred by chance less than 1 time 1,000 (p<0.001).
+
+It is also true that large differences between small groups can be clinically important but not statistically
+significant. In a small study of patients with a terminal condition, if even one patient in the treatment group
+survives, the survival is clinically important, whether or not the survival rate is statistically different from
+that of the control group.
+
+Before you conclude that the null hypothesis is true, determine the power of the test. The absence of statistical significance does not necessarily mean that the effect did not occur. Perhaps the sample sizes were too small, or the background variation too large, to detect any but the largest differences be tween treatments. Determination of the power of the test (Sokal and Rohlf 1981: 161-168, Snedecor and Cochran 1989: 68-70, Steel and Torrie 1980:113-119) will give you an idea of how small a difference you could have detected as significant. Don't forget to check your data for trends. A nonsignificant but obvious trend suggests that the null hypothesis should not be accepted. Of course, in this case the null hypothesis cannot be rejected, either.
+
+=== Slide 8 ===
+Error #5:Unnecesarily precise report
+The budget increased from 19,942 to 64,347
+The budget increased from 19,900 to 64,300 
+The budget increased from about 20,000 to 64,000
+Group A is significantly lower than Group B (p=0.024578321)
+Group A is significantly different from 0(p=0.000000000)
+8
+[講者備註] Most of us understand numbers with one or two significant digits more quickly and easily than numbers with three or more digits. Thus, rounding numbers to two significant digits improves communication (13). For instance, in the sentences below, the final population size is about three times the initial population size for both the women and the men, but this fact is only apparent after rounding: 
+Many numbers do not need to be reported with full precision. If a patient weighs 60 kg, reporting the weight as 60.18 kg adds only confusion, even if the measurement was that precise. For the same reason, the smallest P value that need be reported is P<0.001.
+
+=== Slide 9 ===
+Error #6: Graphics that does not support the message of the data
+9
+
+=== Slide 10 ===
+Axis changes
+http://turf.unl.edu/extpresentationspdf/BairdStats.pdf
+10
+
+=== Slide 11 ===
+Misleading 3D charts
+11
+
+=== Slide 12 ===
+Bessler. L. (sugi 28) Easy, Elegant, and Effective SAS® Graphs: Inform and Influence with Your Data
+12
+
+=== Slide 13 ===
+Error #7: Fail to interpret interaction correctly
+In two-way ANOVA, Factor A and Factor B may affect the outcome individually and collectively.
+Reading Speed Data:
+Gender | Method | Words
+1 | 1 | 461
+1 | 1 | 653
+1 | 2 | 900
+1 | 2 | 815
+1 | 3 | 696
+1 | 3 | 799
+2 | 1 | 1000
+2 | 1 | 693
+2 | 2 | 1000
+2 | 2 | 1000
+2 | 3 | 560
+2 | 3 | 576
+13
+[講者備註] Interpret interaction effects in multi-way ANOVAs correctly. In some cases, authors discussed nonsignificant interaction effects as if they were significant. 
+A hypothetical ex ample of this error is the reporting of a non significant water*fertilizer effect, followed by "fertilizer increased yield in the watered plots 
+but not in the unwatered plots."
+
+=== Slide 14 ===
+Three hypothesis tests are:
+Is there a Gender effect?
+Is there a Method effect?
+If there a Gender*Method effect?
+14
+
+=== Slide 15 ===
+Is there a Gender effect?
+P=0.03
+15
+
+=== Slide 16 ===
+Is there a Method effect?
+P=0.02
+16
+
+=== Slide 17 ===
+If there a  Gender*Method effect?
+17
+
+=== Slide 18 ===
+Is there a  Gender*Method effect?
+P=0.03
+18
+
+=== Slide 19 ===
+Error #8:Fail to incorporate the correlation between repeated measures
+Weight before/after diet data: 
+Patient | before | After | difference
+1 | 60 | 78 | 18
+2 | 56 | 66 | 10
+3 | 90 | 96 | 6
+4 | 78 | 88 | 10
+ | 71 | 82 | 
+19
+[講者備註] An inappropriate procedure could be detected by examineing assumption
+Repeated measures of the same individual are not independent, and cannot be analyzed as if they were. This situation requires special analyses (e.g., Gurevitch and Chester 1986).
+
+=== Slide 20 ===
+Independent Sample T-Test
+time | Method | Mean | 95% CL Mean |  | Method | Pr > |t|
+after |  | 82.00 | 61.37 | 102.6 |  | 
+before |  | 71.00 | 45.74 | 96.25 |  | 
+Diff (1-2) | Pooled | 11.00 | -14.07 | 36.07 | Pooled | 0.3243
+20
+
+=== Slide 21 ===
+Pair T-Test
+Mean | 95% CL Mean |  | Std Dev | DF | t Value | Pr > |t|
+11.00 | 2.99 | 19.00 | 5.02 | 3 | 4.37 | 0.0222
+21
+
+=== Slide 22 ===
+Error #9: unlimited multiple hypothesis  tests?
+How many p’s are you going to report in one study?
+Ex. For seven groups, 21 sets pairwise comparisons are possible for testing.
+Type I error=0.05
+Type I error ≡ 0.55
+22
+[講者備註] Most studies report several P values, which increases the risk of making a type I error: such as saying that a treatment is effective when chance is a more likely explanation for the results (22). The multiple testing problem may be encountered when (12):
+
+=== Slide 23 ===
+Multiple testing occurs when
+testing each of several baseline characteristics for differences between groups 
+multiple pair-wise comparisons
+testing multiple endpoints
+performing secondary analyses of relationships observed during the study;
+23
+[講者備註] – establishing group equivalence by testing each of several baseline characteristics for differences between groups (hoping to find none);
+– performing multiple pair-wise comparisons, which occurs when three or more groups of data are compared two at a time in separate analyses;
+– testing multiple endpoints that are influenced by the same set of explanatory variables;
+– performing secondary analyses of relationships observed during the study but not identified in the original study design;
+– performing subgroup analyses not planned in the original study;
+– performing interim analyses of accumulating data (one endpoint measured at several different times).
+– comparing groups at multiple time points with a series of individual group comparisons. Multiple testing is often desirable, and exploratory analyses should be reported as exploratory.
+“Data dredging,” however – undisclosed analyses involving computing many P values to find something that is statistically significant (and therefore worth reporting) – is considered to be poor research.
+
+=== Slide 24 ===
+例
+ | 運動前 | 運動後 | 運動後20分鐘 | 運動後120分鐘
+AR |  |  |  | 
+RR |  |  |  | 
+依變項:淋巴細胞數目、T淋巴細胞亞群、B細胞及NK細胞比例
+24
+
+=== Slide 25 ===
+Error #10 Correlation v.s. Causation
+Shoe size  v.s. scores on a reading exam
+Ice cream sales v.s. drowned visitors
+Sleep with light on v.s. myopia
+lurking variable
+How can you claim causality?
+25
+
+=== Slide 26 ===
+Error #12 Representativeness
+The 1936 Literary Digest Poll
+A sample size of 2.4 million
+Over ten million voters being asked, including telephone directories, club membership lists, magazine subscribers.
+Predicted Alfred Landon(Republican) : Franklin Roosevelt(Democratic)=57:43
+Results: Alfred Landon: Franklin Roosevelt=38:62
+Selection bias & nonresponse bias
+26
+
+=== Slide 27 ===
+Error #13 Analyzing your data with inappropriate procedure.
+How do I know if it’s a inappropriate procedure? 
+Fail to validate the test assumptions
+Assumption of “LINEAR” Regression
+Assumption of ANOVA
+Consequence for violation of assumptions
+27
+
+=== Slide 28 ===
+Ten Ways to Cheat on Statistical Tests
+BMJ 1997 315:422-5
+Throw all data into a computer and report as significant any relation where P<0.05
+If baseline differences between the groups favor the intervention group, remember not to adjust for them
+Do not test for normal distribution. If you do, you might get stuck with non-itemmetric tests.
+Ignore all drop outs and non-responders, so the analysis only concerns subjects who fully complied with  treatment
+28
+
+=== Slide 29 ===
+Assume that you can calculate "r value" on set of data against another and that a "significant" r value proves causation
+If outliers are messing up calculations, just rub them out. But if outliers are helping the case, even if they seem to be spurious results, leave them in
+If the confidence intervals overlap zero difference between the groups, leave them out of report. Better still, mention them briefly in the text but don't draw them in on the graph—and ignore them when drawing your conclusions
+29
+
+=== Slide 30 ===
+If the difference between two groups becomes significant 4.5 months into a 6 month trial, stop the trial and start writing up. Alternatively, if at 6 months the results are "nearly significant,“ extend the trial for another 3 weeks
+If results prove uninteresting, see if any particular subgroups behaved differently
+If analyzing data the way you plan to does not give the result you wanted, run the figures through a selection of other tests
+30
+
+=== Slide 31 ===
+Biochemia medica
+Table 1. The frequency of statistical errors in manuscripts submitted to Biochemia Medica during 2006-2009. Errors are sorted according to their frequency
+31
+
+=== Slide 32 ===
+Selected Reference
+Twenty Statistical Errors Even YOU  Can Find in Biomedical Research Articles
+Common Statistical Errors Even YOU Can Find
+Reviewer's quick guide to common statistical errors in scientific papers
+http://en.wikipedia.org/wiki/Misleading_graph
+32
+
+=== Slide 33 ===
+Thanks for listening

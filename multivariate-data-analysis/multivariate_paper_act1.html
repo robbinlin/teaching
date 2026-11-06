@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MULTIVARIATE｜紙本書版・第一幕原型</title>
+<style>
+:root{--paper:#f3ecdc;--ink:#2a2419;--font:"Noto Serif TC","Source Han Serif TC","PMingLiU","Microsoft JhengHei",serif;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#3b2a1c;font-family:var(--font);color:var(--ink)}
+#three{position:fixed;inset:0}
+#three canvas{display:block}
+#ui{position:fixed;inset:0;pointer-events:none}
+#ui>*{pointer-events:auto}
+.pill{position:absolute;top:18px;background:rgba(243,236,220,.92);border:1px solid rgba(60,40,20,.25);border-radius:999px;padding:7px 14px;font-size:13px;letter-spacing:.08em;box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;align-items:center;gap:8px}
+#chap{left:18px}
+#chap b{font-size:11px;letter-spacing:.25em;color:#8a7a5a;font-weight:400}
+#tools{right:18px;padding:5px 8px;gap:4px}
+#tools button{border:none;background:none;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+#tools button:hover{background:rgba(60,40,20,.1)}
+#tools svg{width:18px;height:18px;fill:none;stroke:#5a4a30;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#tools button.off svg{stroke:#b8a98a}
+#hint{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);font-size:12px;letter-spacing:.2em;color:rgba(243,236,220,.7);transition:opacity 1s}
+#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#3b2a1c;color:#d9c9a8;letter-spacing:.3em;font-size:13px;transition:opacity .6s}
+</style>
+</head>
+<body>
+<div id="three"></div>
+<div id="ui">
+  <div id="loading">翻開書本中…</div>
+  <div id="chap" class="pill"><b>CASE 01</b><span id="chapTxt">扉頁</span></div>
+  <div id="tools" class="pill"><button id="btnMute" title="音樂開關"><svg id="ico" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8a5 5 0 0 1 0 8M19 5a9 9 0 0 1 0 14"/></svg></button></div>
+  <div id="hint">點擊書頁或按空白鍵翻閱 ・ 點擊角色可讀到他們的心聲</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+gsap.ticker.lagSmoothing(0);
+/* ===================== Web Audio ===================== */
+const AUDIO=(function(){let ctx,master,music,noise,muted=false,ready=false;const PENTA=[261.63,293.66,329.63,392,440,523.25,587.33,659.25,783.99];
+  function init(){if(ctx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=new AC();master=ctx.createGain();master.gain.value=0.8;master.connect(ctx.destination);music=ctx.createGain();music.gain.value=0.35;const dl=ctx.createDelay(1);dl.delayTime.value=0.4;const fb=ctx.createGain();fb.gain.value=0.3;dl.connect(fb);fb.connect(dl);const wet=ctx.createGain();wet.gain.value=0.3;dl.connect(wet);wet.connect(master);music.connect(master);music.connect(dl);
+    const n=ctx.sampleRate;noise=ctx.createBuffer(1,n,ctx.sampleRate);const d=noise.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+    let next=ctx.currentTime+0.6,last=3;(function tick(){while(next<ctx.currentTime+1.2){let i=Math.max(0,Math.min(8,last+Math.floor(Math.random()*5)-2));last=i;const o=ctx.createOscillator();o.type='triangle';o.frequency.value=PENTA[i];const f=ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=1600;const g=ctx.createGain();const t=next,dur=1.4+Math.random();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.14,t+0.06);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(f);f.connect(g);g.connect(music);o.start(t);o.stop(t+dur+0.1);next+=0.9+Math.random()*1.2;}setTimeout(tick,400);})();ready=true;}
+  const sg=v=>{const g=ctx.createGain();g.gain.value=v;g.connect(master);return g;};
+  function flip(){if(!ctx||muted)return;const t=ctx.currentTime,s=ctx.createBufferSource();s.buffer=noise;const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.Q.value=0.8;bp.frequency.setValueAtTime(600,t);bp.frequency.exponentialRampToValueAtTime(3000,t+0.3);const g=sg(0.001);g.gain.exponentialRampToValueAtTime(0.45,t+0.08);g.gain.exponentialRampToValueAtTime(0.001,t+0.45);s.connect(bp);bp.connect(g);s.start(t);s.stop(t+0.5);}
+  function pop(p){if(!ctx||muted)return;const t=ctx.currentTime,o=ctx.createOscillator();o.type='sine';const b=260+(p||0)*40;o.frequency.setValueAtTime(b,t);o.frequency.exponentialRampToValueAtTime(b*2.5,t+0.1);const g=sg(0.001);g.gain.exponentialRampToValueAtTime(0.3,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);o.connect(g);o.start(t);o.stop(t+0.2);}
+  function click(){if(!ctx||muted)return;const t=ctx.currentTime,o=ctx.createOscillator();o.type='square';o.frequency.value=1100;const g=sg(0.06);g.gain.exponentialRampToValueAtTime(0.0001,t+0.04);o.connect(g);o.start(t);o.stop(t+0.05);}
+  function chime(good){if(!ctx||muted)return;const t=ctx.currentTime;(good?[523.25,659.25,783.99]:[392,349.23]).forEach((f,i)=>{const o=ctx.createOscillator();o.type='sine';o.frequency.value=f;const g=sg(0.001);g.gain.setValueAtTime(0.0001,t+i*0.12);g.gain.exponentialRampToValueAtTime(0.2,t+i*0.12+0.03);g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.12+0.6);o.connect(g);o.start(t+i*0.12);o.stop(t+i*0.12+0.7);});}
+  function toggle(){muted=!muted;if(master)master.gain.setTargetAtTime(muted?0:0.8,ctx.currentTime,0.05);return muted;}
+  return {init,flip,pop,click,chime,toggle,get ready(){return ready;}};})();
+
+/* ===================== Three.js world ===================== */
+const FONT='"Microsoft JhengHei","PingFang TC","Noto Sans TC","Heiti TC",sans-serif';
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;document.getElementById('three').appendChild(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x2b1d12);scene.fog=new THREE.Fog(0x2b1d12,14,30);
+const camera=new THREE.PerspectiveCamera(36,innerWidth/innerHeight,0.1,60);const camHome={pos:new THREE.Vector3(0,5.3,3.5),target:new THREE.Vector3(0,0.25,-0.4)};function fitCamera(){const half=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));const d=Math.max(2.5/(half*camera.aspect),1.75/half);const dir=new THREE.Vector3(0,Math.cos(0.42),Math.sin(0.42));camHome.target.set(0,0.2,-0.05);camHome.pos.copy(camHome.target).addScaledVector(dir,d);}
+fitCamera();camera.position.copy(camHome.pos);const camTarget=camHome.target.clone();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();fitCamera();if(typeof gsap!=='undefined'){camera.position.copy(camHome.pos);camTarget.copy(camHome.target);}renderer.setSize(innerWidth,innerHeight);});
+scene.add(new THREE.AmbientLight(0xffe6c4,0.35));scene.add(new THREE.HemisphereLight(0xfff1dc,0x4a3220,0.45));
+const key=new THREE.DirectionalLight(0xffe2b8,1.15);key.position.set(-3,7,3);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-4;key.shadow.camera.right=4;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.bias=-0.0006;scene.add(key);
+const lamp=new THREE.PointLight(0xffc98a,0.35,10,1.5);lamp.position.set(3,2.8,-1.5);scene.add(lamp);
+const mat=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.85,flatShading:true},o||{}));
+function M(geo,c,o){const m=new THREE.Mesh(geo,c&&c.isMaterial?c:mat(c,o));m.castShadow=true;m.receiveShadow=true;return m;}
+const box=(w,h,d,c,o)=>M(new THREE.BoxGeometry(w,h,d),c,o),cyl=(a,b,h,c,s)=>M(new THREE.CylinderGeometry(a,b,h,s||12),c),sph=(r,c,s)=>M(new THREE.SphereGeometry(r,s||12,(s||12)-2),c),cone=(r,h,c,s)=>M(new THREE.ConeGeometry(r,h,s||8),c);
+const at=(o,x,y,z,ry)=>{o.position.set(x,y,z);if(ry!==undefined)o.rotation.y=ry;return o;};
+const MAXANI=renderer.capabilities.getMaxAnisotropy();
+function pageMat(tex){return new THREE.MeshStandardMaterial({map:tex,roughness:.95,toneMapped:false,emissive:0xffffff,emissiveMap:tex,emissiveIntensity:0.1});}
+function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=MAXANI;return t;}
+// desk (procedural wood)
+const woodTex=canvasTex(1024,1024,(g,w,h)=>{g.fillStyle='#6b4a2e';g.fillRect(0,0,w,h);for(let i=0;i<260;i++){g.strokeStyle=`rgba(${40+Math.random()*30},${22+Math.random()*18},${10+Math.random()*10},${0.25+Math.random()*0.35})`;g.lineWidth=1+Math.random()*3;g.beginPath();let y=Math.random()*h;g.moveTo(0,y);for(let x=0;x<=w;x+=64){y+=(Math.random()-.5)*6;g.lineTo(x,y);}g.stroke();}g.fillStyle='rgba(0,0,0,.08)';for(let i=0;i<3000;i++)g.fillRect(Math.random()*w,Math.random()*h,2,1);});
+woodTex.wrapS=woodTex.wrapT=THREE.RepeatWrapping;woodTex.repeat.set(3,3);
+const desk=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.MeshStandardMaterial({map:woodTex,roughness:.75}));desk.rotation.x=-Math.PI/2;desk.position.y=-0.3;desk.receiveShadow=true;scene.add(desk);
+
+/* ---------- paper ---------- */
+const PW=1024,PH=1400,RES=2;const paperBase=document.createElement('canvas');paperBase.width=PW*RES;paperBase.height=PH*RES;(function(g){g.setTransform(RES,0,0,RES,0,0);g.fillStyle='#f4eddc';g.fillRect(0,0,PW,PH);for(let i=0;i<9000;i++){g.fillStyle=`rgba(${120+Math.random()*60},${100+Math.random()*50},${60+Math.random()*40},${Math.random()*0.08})`;g.fillRect(Math.random()*PW,Math.random()*PH,1+Math.random()*2,1);}const gr=g.createLinearGradient(0,0,PW,0);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,0)');})(paperBase.getContext('2d'));
+function paperCanvas(){const c=document.createElement('canvas');c.width=PW*RES;c.height=PH*RES;const g=c.getContext('2d');g.setTransform(RES,0,0,RES,0,0);g.drawImage(paperBase,0,0,PW,PH);return c;}
+function spineShade(g,side){const gr=side==='L'?g.createLinearGradient(PW-70,0,PW,0):g.createLinearGradient(0,0,70,0);gr.addColorStop(side==='L'?0:1,'rgba(40,35,30,0)');gr.addColorStop(side==='L'?1:0,'rgba(40,35,30,.16)');g.fillStyle=gr;g.fillRect(side==='L'?PW-70:0,0,70,PH);}
+// rich text layout: runs [{t,c,b,sz}]
+function parseEm(s){const runs=[];const re=/<em>([\s\S]*?)<\/em>/g;let i=0,m;while((m=re.exec(s))){if(m.index>i)runs.push({t:s.slice(i,m.index)});runs.push({t:m[1],em:true});i=m.index+m[0].length;}if(i<s.length)runs.push({t:s.slice(i)});return runs.map(r=>({...r,t:r.t.replace(/<[^>]+>/g,'')}));}
+const NOSTART='。，、」』）！？；：…·';
+function drawRuns(g,runs,x,y,maxW,size,lh,color,emColor,bold){g.textBaseline='alphabetic';let cx=x,cy=y;const chars=[];runs.forEach(r=>{for(const ch of r.t)chars.push({ch,em:!!r.em});});
+  for(let i=0;i<chars.length;i++){const {ch,em}=chars[i];g.font=`${bold||em?'bold ':''}${size}px ${FONT}`;const w=g.measureText(ch).width;if(ch==='\n'){cx=x;cy+=lh;continue;}
+    if(cx+w>x+maxW&&!NOSTART.includes(ch)){cx=x;cy+=lh;}
+    g.fillStyle=em?emColor:color;g.fillText(ch,cx,cy);if(!(bold||em)){g.strokeStyle=g.fillStyle;g.lineWidth=size*0.045;g.lineJoin='round';g.strokeText(ch,cx,cy);}cx+=w+(/[a-zA-Z0-9]/.test(ch)?0:0.5);}
+  return cy+lh;}
+
+/* ---------- book geometry ---------- */
+const BW=2.2,BH=3.0,THICK=0.22;
+const book=new THREE.Group();scene.add(book);
+const coverMat=mat(0x3a2f2a,{roughness:.9});
+book.add(at(box(BW*2+0.32,0.06,BH+0.24,coverMat),0,-0.03,0));// hard cover
+[-1,1].forEach(s=>{const stack=box(BW-0.02,THICK,BH-0.02,0xe9e1cc);stack.position.set(s*(BW/2+0.08),THICK/2,0);book.add(stack);const edge=box(BW-0.02,THICK,0.012,0xd9cfb6);edge.position.set(s*(BW/2+0.08),THICK/2,BH/2-0.005);book.add(edge);});
+book.add(at(box(0.16,THICK+0.02,BH,0x2e2622),0,THICK/2,0));// spine groove
+const leftCanvas=paperCanvas(),rightCanvas=paperCanvas();
+const leftTex=new THREE.CanvasTexture(leftCanvas),rightTex=new THREE.CanvasTexture(rightCanvas);[leftTex,rightTex].forEach(t=>{t.encoding=THREE.sRGBEncoding;t.anisotropy=MAXANI;});
+function pageMesh(tex){const m=new THREE.Mesh(new THREE.PlaneGeometry(BW,BH),pageMat(tex));m.rotation.x=-Math.PI/2;m.receiveShadow=true;return m;}
+const leftPage=pageMesh(leftTex);leftPage.position.set(-(BW/2+0.08),THICK+0.002,0);book.add(leftPage);
+const rightPage=pageMesh(rightTex);rightPage.position.set(BW/2+0.08,THICK+0.002,0);book.add(rightPage);
+const anchor=new THREE.Group();anchor.position.set(BW/2+0.08,THICK+0.004,0.05);anchor.scale.setScalar(0.82);book.add(anchor);
+// flip sheet (pivot at spine, extends +x)
+const flipPivot=new THREE.Group();flipPivot.position.set(0.0,THICK+0.004,0);flipPivot.visible=false;book.add(flipPivot);
+const flipFrontCanvas=paperCanvas(),flipBackCanvas=paperCanvas();const flipFrontTex=new THREE.CanvasTexture(flipFrontCanvas),flipBackTex=new THREE.CanvasTexture(flipBackCanvas);[flipFrontTex,flipBackTex].forEach(t=>{t.encoding=THREE.sRGBEncoding;t.anisotropy=MAXANI;});
+const flipFront=new THREE.Mesh(new THREE.PlaneGeometry(BW,BH),pageMat(flipFrontTex));flipFront.rotation.x=-Math.PI/2;flipFront.position.x=BW/2+0.08;flipFront.castShadow=true;flipPivot.add(flipFront);
+const flipBack=new THREE.Mesh(new THREE.PlaneGeometry(BW,BH),pageMat(flipBackTex));flipBack.rotation.x=Math.PI/2;flipBack.rotateZ(Math.PI);flipBack.position.set(BW/2+0.08,-0.002,0);flipPivot.add(flipBack);
+// canvas <-> world mapping on the left page
+const L_X=-(BW/2+0.08);
+const cvToWorld=(cx,cy)=>new THREE.Vector3(L_X+(cx/PW-0.5)*BW,THICK+0.004,(cy/PH-0.5)*BH);
+const cvW=px=>px/PW*BW,cvH=px=>px/PH*BH;
+
+/* ---------- characters & props (paper-friendly palette) ---------- */
+function makeChar(o){o=Object.assign({skin:0xf0cdaa,shirt:0x4f7cc1,pants:0x3a3a4a,hair:0x3a2a22,hairStyle:'short',glasses:false,coat:false,acc:null,scale:1},o);const g=new THREE.Group();
+  [-0.09,0.09].forEach(x=>{g.add(at(cyl(0.07,0.08,0.26,o.pants,8),x,0.13,0));g.add(at(box(0.16,0.07,0.22,0x2a2a2a),x,0.035,0.04));});
+  const bodyC=o.coat?0xf5f1e6:o.shirt;g.add(at(cyl(0.2,0.24,0.42,bodyC,10),0,0.47,0));if(o.coat)g.add(at(box(0.13,0.36,0.05,o.shirt),0,0.48,0.22));if(o.acc==='tie')g.add(at(box(0.05,0.22,0.02,0xb34a4a),0,0.5,0.24));
+  [-1,1].forEach(s=>{const a=cyl(0.055,0.06,0.36,bodyC,8);a.position.set(s*0.27,0.48,0);a.rotation.z=s*0.18;g.add(a);g.add(at(sph(0.065,o.skin,8),s*0.31,0.28,0));});
+  const head=new THREE.Group();head.position.y=0.95;g.add(head);head.add(sph(0.27,o.skin,16));[-0.1,0.1].forEach(x=>{head.add(at(sph(0.035,0x1a1a1a,8),x,0.03,0.245));});[-0.15,0.15].forEach(x=>head.add(at(sph(0.04,0xf0a0a0,8),x,-0.05,0.225)));head.add(at(box(0.08,0.02,0.02,0xa05050),0,-0.11,0.262));
+  if(o.hairStyle!=='bald'){const hair=M(new THREE.SphereGeometry(0.29,16,12,0,Math.PI*2,0,Math.PI*0.52),o.hair);hair.position.y=0.03;head.add(hair);if(o.hairStyle==='bun')head.add(at(sph(0.1,o.hair,10),0,0.24,-0.1));}
+  if(o.glasses){[-0.1,0.1].forEach(x=>{const r=M(new THREE.TorusGeometry(0.065,0.012,8,16),0x222222);r.position.set(x,0.03,0.262);head.add(r);});head.add(at(box(0.08,0.012,0.012,0x222222),0,0.03,0.268));}
+  if(o.acc==='notebook')g.add(at(box(0.16,0.2,0.03,0xe8e2d0),-0.33,0.4,0.1));
+  g.userData={type:'char',head,baseY:0,phase:Math.random()*6};g.scale.setScalar(o.scale);return g;}
+const CHARS={
+  prof:{name:'周啟宏教授',o:{shirt:0x2b3a6b,hair:0x9a9a9a,acc:'tie'},quips:['我們解釋了 56% 的變異！','審查委員當初都說很好。','轉軸只是數學技巧吧？']},
+  hero:{name:'沈以安',o:{shirt:0x2e8b84,coat:true,glasses:true,hair:0x2a1e18,hairStyle:'bun',acc:'notebook'},quips:['資料不會說謊，但會被誤讀。','先問問題，再選方法。','我想再看一次相關矩陣。']},
+  ra:{name:'柏哲',o:{shirt:0x5c9c6a,hair:0x1a1a1a},quips:['學姊，要不要先吃宵夜？','原來 Kaiser 準則會騙人……']},
+  extra:{name:'與會者',o:{shirt:0xcf7f5a,hair:0x3a2a22,scale:0.9},quips:['（鼓掌）','（低頭做筆記）']},
+  extra2:{name:'與會者',o:{shirt:0x8a6bbf,hair:0x5a4a3a,scale:0.9},quips:['（點頭）','56%，很厲害啊。']}};
+function spawn(id,x,z,ry,sc){const d=CHARS[id];const g=makeChar(Object.assign({},d.o,{scale:(d.o.scale||1)*(sc||0.62)}));g.position.set(x,0,z);g.rotation.y=ry||0;g.userData.id=id;g.userData.name=d.name;g.userData.quips=d.quips;return g;}
+function makePodium(){const g=new THREE.Group();g.add(at(box(0.5,0.62,0.36,0x6e4a2e),0,0.31,0));g.add(at(box(0.6,0.05,0.42,0x8c6240),0,0.64,0));g.add(at(cyl(0.012,0.012,0.3,0x333333,6),0.1,0.78,0.05));g.add(at(sph(0.035,0x222222,8),0.1,0.93,0.08));return g;}
+function makeChair(){const g=new THREE.Group();g.add(at(box(0.3,0.04,0.3,0x5a4a3a),0,0.22,0));g.add(at(box(0.3,0.3,0.04,0x5a4a3a),0,0.37,-0.13));[[-0.12,-0.12],[0.12,-0.12],[-0.12,0.12],[0.12,0.12]].forEach(([x,z])=>g.add(at(cyl(0.015,0.015,0.22,0x2b2f3f,6),x,0.11,z)));return g;}
+function makeScreen(){const t=canvasTex(560,360,(g,w,h)=>{g.fillStyle='#f6f1e4';g.fillRect(0,0,w,h);g.strokeStyle='#2a2419';g.lineWidth=3;g.strokeRect(8,8,w-16,h-16);g.fillStyle='#2a2419';g.font='bold 30px '+FONT;g.textAlign='center';g.fillText('24 項指標 → 3 個核心因素',w/2,54);g.font='bold 22px '+FONT;g.fillStyle='#7a6a4a';g.fillText('主成分分析（未轉軸）・解釋變異 56%',w/2,86);const names=['綜合運動潛能','心理韌性','有氧能力'],hs=[6.88,3.78,2.86];hs.forEach((v,i)=>{const x=110+i*150,bh=v*28;g.fillStyle=['#2e8b84','#d69a3a','#8a6bbf'][i];g.fillRect(x-40,300-bh,80,bh);g.strokeStyle='#2a2419';g.lineWidth=2;g.strokeRect(x-40,300-bh,80,bh);g.fillStyle='#2a2419';g.font='bold 20px '+FONT;g.fillText(names[i],x,330);g.font='16px '+FONT;g.fillText('λ = '+v.toFixed(2),x,288-bh);});g.beginPath();g.moveTo(40,300);g.lineTo(w-40,300);g.stroke();});
+  const g=new THREE.Group();g.add(at(box(1.58,1.03,0.06,0x3a2f2a),0,0.98,0));const s=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.95),new THREE.MeshStandardMaterial({map:t,roughness:.9}));s.position.set(0,0.98,0.035);g.add(s);g.add(at(box(0.06,0.5,0.06,0x3a2f2a),0,0.25,0));g.add(at(box(0.5,0.04,0.3,0x3a2f2a),0,0.02,0));return g;}
+function makeTree(h){const g=new THREE.Group();g.add(at(cyl(0.05,0.07,h*0.4,0x6b4a33,7),0,h*0.2,0));g.add(at(cone(h*0.32,h*0.55,0x4f8a52,7),0,h*0.55,0));g.add(at(cone(h*0.24,h*0.45,0x5f9a5e,7),0,h*0.8,0));return g;}
+function makeMatrix(){const g=new THREE.Group();const n=9;for(let i=0;i<n;i++)for(let j=0;j<n;j++){const same=Math.floor(i/3)===Math.floor(j/3);const r=i===j?1:(same?0.5+Math.abs(Math.sin(i*7+j*3))*0.25:0.1+Math.abs(Math.sin(i*5+j*11))*0.15);const h=0.04+r*0.45;const b=box(0.09,h,0.09,i===j?0xd69a3a:(r>0.45?0x2e8b84:(r>0.22?0x8fbdb8:0xd8d2c2)));b.position.set((i-4)*0.12,h/2,(j-4)*0.12);g.add(b);}return g;}
+// scenes
+const SCENES={
+  conference(g){g.add(at(box(1.8,0.07,0.8,0x4a3f3a),0,0.035,-0.85));const sc=makeScreen();at(sc,-0.12,0.07,-1.2);g.add(sc);g.add(at(makePodium(),0.55,0.07,-0.68));const ch={};ch.prof=spawn('prof',0.55,-0.9,0.1);ch.prof.position.y=0.07;g.add(ch.prof);
+    for(let r=0;r<2;r++)for(let i=0;i<4;i++)g.add(at(makeChair(),-0.6+i*0.4,0,0.05+r*0.42));g.add(at(spawn('extra',-0.2,0.06,Math.PI,0.5),-0.2,0.12,0.06));g.add(at(spawn('extra2',0.2,0.48,Math.PI,0.5),0.2,0.12,0.48));
+    ch.hero=spawn('hero',0.95,0.55,-0.5);g.add(ch.hero);ch.ra=spawn('ra',0.95,0.05,-0.6);g.add(ch.ra);g.add(at(makeTree(0.55),-0.9,0,-0.95));return ch;},
+  matrix(g){const m=makeMatrix();at(m,-0.1,0,-0.1,0.3);g.add(m);const ch={};ch.hero=spawn('hero',0.85,0.5,-0.6);g.add(ch.hero);ch.ra=spawn('ra',-0.85,0.5,0.5);g.add(ch.ra);return ch;}};
+
+/* ===================== Content ===================== */
+const N='n';
+const BEATS=[
+  {s:N,t:'深夜十一點，研究室只剩一盞燈。桌上的第一份檔案，封面寫著：<em>消失的維度</em>。'},
+  {s:N,t:'三個月前，年度運動科學研討會。周啟宏教授的團隊發表了一項大型研究：312 位菁英運動員、24 項表現指標。'},
+  {s:'prof',t:'經過主成分分析，24 個變數被濃縮成三個核心因素：<em>綜合運動潛能</em>、<em>心理韌性</em>、以及<em>有氧能力</em>。三者合計解釋了 56% 的變異。'},
+  {type:'note',id:'pca'},
+  {s:'prof',t:'其中「心理韌性」與國手選拔結果高度相關。我們建議把它納入明年的選訓標準。'},
+  {s:'hero',t:'（翻著手冊）等等……在「心理韌性」這個成分上，垂直跳和深蹲的負荷量是<em>負的</em>，專注力量表是正的？'},
+  {s:'hero',t:'一個「心理」構念，為什麼會被肌力測驗反向定義？'},
+  {type:'note',id:'load'},
+  {s:'ra',t:'學姊，大家都在鼓掌耶。而且他們解釋了 56% 的變異，這不是很厲害嗎？'},
+  {s:'hero',t:'解釋了很多變異，不代表解釋了<em>對的東西</em>。回去之後，我想把相關矩陣重新跑一次。'},
+  {type:'choice',q:'面對 24 個彼此高度相關的表現指標，你認為這個研究問題真正需要的是什麼？',opts:[
+    {t:'降維：把 24 個變數壓縮成少數綜合分數，方便後續使用。',good:false,fb:'這是 PCA 的思維：用最少的成分保留最多變異。它回答的是「資料怎麼最有效地摘要」，但不保證任何成分對應到理論構念。'},
+    {t:'探索潛在構念：找出是什麼共同原因，讓這些變數彼此相關。',good:true,fb:'這是因素分析的思維：變數之所以相關，是因為背後有共同因素。要宣稱「心理韌性」這種構念存在，需要的是這種測量模型，而不是單純的變異摘要。'},
+    {t:'不需要減少變數，直接用 24 個變數建模。',good:false,fb:'24 個高度相關的預測變數會帶來嚴重的多重共線性，而且研究團隊的目的本來就是想討論「構念」。問題不在於要不要減少變數，而在於減少的方式要回答什麼問題。'}]},
+  {type:'note',id:'fa'},
+  {s:N,t:'研討會結束。以安把 24 × 24 的相關矩陣列印出來，貼滿了研究室的牆。'},
+  {s:'hero',t:'在決定用 PCA 還是因素分析之前，還有一個更基本的問題：<em>到底該保留幾個？</em>'},
+  {type:'note',id:'howmany'},
+  {s:N,t:'凌晨一點，以安把結果寫進筆記本，翻到下一頁。'},
+  {type:'end'}
+];
+const SPEAKER={prof:'周啟宏教授｜研究團隊主持人',hero:'沈以安｜運動科學研究者',ra:'柏哲｜研究生'};
+const INK='#0a0806',INK2='#17120c',ACC='#86200f',TEAL='#0c4a45';
+
+/* ---------- left page document ---------- */
+let doc=[];// blocks
+let optRects=[],fbRect=null;
+function renderLeft(c,blocks,header){const g=c.getContext('2d');g.drawImage(paperBase,0,0,PW,PH);spineShade(g,'L');optRects=[];fbRect=null;
+  let y=110;const x=100,maxW=PW-240;
+  // header
+  g.fillStyle=INK2;g.font='bold 22px '+FONT;g.textAlign='left';g.fillText('CASE 01  ·  消失的維度  ·  PCA × Factor Analysis',x,78);g.fillStyle='rgba(60,40,20,.35)';g.fillRect(x,92,maxW,1);
+  if(header){g.fillStyle=TEAL;g.font='bold 24px '+FONT;g.fillText(header.k,x,y+10);y+=50;g.fillStyle=INK;g.font='bold 54px '+FONT;g.fillText(header.t,x,y+20);y+=90;}
+  blocks.forEach(b=>{
+    if(b.type==='narr'){g.fillStyle='rgba(12,74,69,.8)';g.fillRect(x,y-26,3,36);y=drawRuns(g,parseEm(b.t),x+22,y,maxW-22,38,56,INK2,ACC);y+=24;}
+    else if(b.type==='say'){g.fillStyle=TEAL;g.font='bold 28px '+FONT;g.fillText(SPEAKER[b.s],x,y-4);y+=34;y=drawRuns(g,parseEm('「'+b.t+'」'),x,y,maxW,40,58,INK,ACC);y+=26;}
+    else if(b.type==='question'){g.fillStyle=ACC;g.font='bold 23px '+FONT;g.fillText('研究決策 ・ RESEARCH DECISION',x,y-4);y+=34;y=drawRuns(g,parseEm(b.t),x,y,maxW,40,58,INK,ACC,true);y+=18;}
+    else if(b.type==='option'){const top=y-30;const boxH=measureRuns(g,parseEm(b.t),maxW-120,35,50)+30;const picked=b.state==='picked',dim=b.state==='dim';g.fillStyle=picked?'rgba(31,111,105,.12)':'rgba(255,255,255,.35)';g.strokeStyle=picked?TEAL:'rgba(60,40,20,.45)';g.lineWidth=picked?3:1.5;roundRect(g,x,top,maxW,boxH,10);g.fill();g.stroke();
+      g.strokeStyle=INK;g.lineWidth=2;g.strokeRect(x+22,top+16,30,30);if(picked){g.strokeStyle=TEAL;g.lineWidth=4;g.beginPath();g.moveTo(x+27,top+31);g.lineTo(x+36,top+41);g.lineTo(x+50,top+20);g.stroke();}
+      g.globalAlpha=dim?0.6:1;g.fillStyle=INK;g.font='bold 22px '+FONT;g.fillText(b.k,x+62,top+38);drawRuns(g,parseEm(b.t),x+92,top+42,maxW-120,35,50,INK,ACC);g.globalAlpha=1;
+      optRects.push({x,y:top,w:maxW,h:boxH,idx:b.idx});y=top+boxH+18;}
+    else if(b.type==='feedback'){const top=y-20;const h=measureRuns(g,parseEm(b.t),maxW-60,34,50)+80;fbRect={x,y:top,w:maxW,h};g.fillStyle='rgba(255,250,235,.8)';g.strokeStyle='rgba(60,40,20,.35)';g.lineWidth=1.5;roundRect(g,x,top,maxW,h,8);g.fill();g.stroke();g.fillStyle=b.good?TEAL:ACC;g.font='bold 20px '+FONT;g.fillText(b.good?'✓ 分析上站得住腳':'△ 值得再想想',x+30,top+40);drawRuns(g,parseEm(b.t),x+30,top+92,maxW-60,34,50,INK,ACC);y=top+h+30;}
+    else if(b.type==='hint'){g.fillStyle=INK2;g.font='bold 23px '+FONT;g.fillText(b.t,x,y);y+=40;}
+    else if(b.type==='end'){g.fillStyle='rgba(60,40,20,.35)';g.fillRect(x+maxW/2-60,y-10,120,1);g.fillStyle=INK2;g.font='bold 26px '+FONT;g.textAlign='center';g.fillText('第一幕 ・ 完',PW/2,y+40);g.textAlign='left';y+=80;}
+  });
+  // page number & cue
+  g.fillStyle=INK2;g.font='bold 22px '+FONT;g.textAlign='left';g.fillText(String(pageNo),x,PH-60);g.textAlign='left';
+  leftTex.needsUpdate=true;return y;}
+function measureRuns(g,runs,maxW,size,lh){const c=document.createElement('canvas').getContext('2d');return drawRuns(c,runs,0,0,maxW,size,lh,'#000','#000')-0;}
+function roundRect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
+function drawCue(text){const g=leftCanvas.getContext('2d');g.fillStyle=ACC;g.font='bold 26px '+FONT;g.textAlign='right';g.fillText(text,PW-130,PH-60);g.textAlign='left';leftTex.needsUpdate=true;}
+let pageNo=2;let curHeader=null;
+// right page (figure page)
+let rightNote=null;
+function renderRight(c,fig){const g=c.getContext('2d');g.drawImage(paperBase,0,0,PW,PH);spineShade(g,'R');const x=120,maxW=PW-220;
+  g.fillStyle=INK2;g.font='bold 22px '+FONT;g.textAlign='right';g.fillText('研究案件紀錄',PW-100,78);g.textAlign='left';g.fillStyle='rgba(60,40,20,.35)';g.fillRect(x,92,maxW,1);
+  if(fig.frame){g.strokeStyle='rgba(60,40,20,.25)';g.lineWidth=1.5;g.setLineDash([6,6]);g.strokeRect(x+40,150,maxW-80,760);g.setLineDash([]);}
+  let y=1020;g.fillStyle=INK;g.font='bold 30px '+FONT;g.fillText(fig.cap,x,y);y+=48;y=drawRuns(g,parseEm(fig.sub),x,y,maxW,30,46,INK2,ACC);
+  if(rightNote){y+=30;g.fillStyle='rgba(12,74,69,.8)';g.fillRect(x,y-22,3,30);g.fillStyle=TEAL;g.font='bold 24px '+FONT;g.fillText('心聲 ・ '+rightNote.who,x+20,y);y+=36;drawRuns(g,parseEm(rightNote.t),x+20,y,maxW-20,26,40,INK,ACC);}
+  g.fillStyle=INK2;g.font='bold 22px '+FONT;g.textAlign='right';g.fillText(String(pageNo+1),PW-100,PH-60);g.textAlign='left';rightTex.needsUpdate=true;}
+// title spread
+function renderTitle(){const g=leftCanvas.getContext('2d');g.drawImage(paperBase,0,0,PW,PH);spineShade(g,'L');g.textAlign='center';g.fillStyle=INK2;g.font='bold 26px '+FONT;g.fillText('R E S E A R C H   C A S E   F I L E S',PW/2,360);g.fillStyle=INK;g.font='bold 92px '+FONT;g.fillText('MULTIVARIATE',PW/2,480);g.font='32px '+FONT;g.fillStyle=INK2;g.fillText('The Hidden Structure of Data',PW/2,545);g.fillStyle='rgba(60,40,20,.4)';g.fillRect(PW/2-80,590,160,1);g.fillStyle=INK;g.font='bold 64px '+FONT;g.fillText('消失的維度',PW/2,700);g.font='30px '+FONT;g.fillStyle=TEAL;g.fillText('CASE 01 ・ PCA × Factor Analysis',PW/2,760);g.fillStyle=INK2;g.font='32px '+FONT;g.fillText('當數據不只一個維度，',PW/2,980);g.fillText('真相也不只有一種解釋。',PW/2,1030);g.textAlign='left';leftTex.needsUpdate=true;
+  const r=rightCanvas.getContext('2d');r.drawImage(paperBase,0,0,PW,PH);spineShade(r,'R');const x=130,maxW=PW-250;let y=240;r.fillStyle=TEAL;r.font='bold 30px '+FONT;r.fillText('案件摘要',x,y);y+=56;
+  y=drawRuns(r,parseEm('某研究團隊宣稱，他們從 24 項運動表現指標中找到了三個決定運動員成功的核心因素。但同一批資料使用 PCA 與因素分析，竟然得到不同的結構。更令人懷疑的是，研究團隊將主成分直接解釋成具有因果意義的心理與生理構念。'),x,y,maxW,33,50,INK,ACC);y+=36;
+  r.fillStyle=TEAL;r.font='bold 30px '+FONT;r.fillText('核心衝突',x,y);y+=50;y=drawRuns(r,parseEm('我們發現的究竟是資料的<em>主要變異方向</em>，還是真正存在的<em>潛在構念</em>？'),x,y,maxW,33,50,INK,ACC);y+=36;
+  r.fillStyle=TEAL;r.font='bold 30px '+FONT;r.fillText('目錄',x,y);y+=50;['第一幕　三個核心因素','第二幕　牆上的矩陣','第三幕　結構不等於構念'].forEach((s,i)=>{r.fillStyle=i?INK2:INK;r.font=(i?'':'bold ')+'32px '+FONT;r.fillText(s,x+10,y);y+=52;});
+  r.fillStyle=ACC;r.font='bold 28px '+FONT;r.textAlign='right';r.fillText('點擊翻頁，進入第一幕 ▸',PW-120,PH-60);r.textAlign='left';rightTex.needsUpdate=true;}
+
+/* ===================== Flap (3D paper lift-the-flap) ===================== */
+let flap=null;
+function makeFlap(rect){const w=cvW(rect.w),h=cvH(rect.h);const pivot=new THREE.Group();const p0=cvToWorld(rect.x+rect.w/2,rect.y);pivot.position.set(p0.x,THICK+0.008,p0.z);
+  const tex=canvasTex(2048,Math.round(2048*h/w),(g,cw,ch)=>{g.scale(2,2);cw/=2;ch/=2;g.fillStyle='#efe6d0';g.fillRect(0,0,cw,ch);for(let i=0;i<2500;i++){g.fillStyle=`rgba(120,90,50,${Math.random()*0.08})`;g.fillRect(Math.random()*cw,Math.random()*ch,2,1);}const gr=g.createLinearGradient(0,0,0,70);gr.addColorStop(0,'rgba(60,40,20,.25)');gr.addColorStop(1,'rgba(60,40,20,0)');g.fillStyle=gr;g.fillRect(0,0,cw,70);g.strokeStyle='rgba(60,40,20,.35)';g.lineWidth=2;g.setLineDash([10,8]);g.strokeRect(14,14,cw-28,ch-28);g.setLineDash([]);
+    g.fillStyle=INK;g.textAlign='center';g.font='bold 44px '+FONT;g.fillText('掀開紙片，看回饋',cw/2,ch/2+6);g.font='26px '+FONT;g.fillStyle=INK2;g.fillText('LIFT THE FLAP',cw/2,ch/2+52);
+    g.strokeStyle=ACC;g.lineWidth=4;g.beginPath();g.moveTo(cw/2-60,ch-90);g.quadraticCurveTo(cw/2,ch-150,cw/2+70,ch-110);g.stroke();g.beginPath();g.moveTo(cw/2+70,ch-110);g.lineTo(cw/2+48,ch-112);g.moveTo(cw/2+70,ch-110);g.lineTo(cw/2+62,ch-130);g.stroke();});
+  const front=new THREE.Mesh(new THREE.PlaneGeometry(w,h),pageMat(tex));front.rotation.x=-Math.PI/2;front.position.z=h/2;front.castShadow=true;pivot.add(front);
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({color:0xe6dcc4,roughness:.95}));back.rotation.x=Math.PI/2;back.position.set(0,-0.001,h/2);pivot.add(back);
+  pivot.userData={type:'flap'};pivot.scale.setScalar(0.001);book.add(pivot);gsap.to(pivot.scale,{x:1,y:1,z:1,duration:0.8,ease:'elastic.out(1,0.55)'});AUDIO.pop(2);return pivot;}
+
+/* ===================== State machine ===================== */
+const S={state:'TITLE',busy:false,beat:0,sceneGroup:null,chars:{},choice:null,picked:null,spread:0};
+const chapTxt=document.getElementById('chapTxt');
+async function locked(fn){if(S.busy)return;S.busy=true;try{await fn();}catch(e){console.error(e);}finally{S.busy=false;}}
+function camTo(pos,target,dur){return new Promise(res=>{const tl=gsap.timeline({onComplete:res});tl.to(camera.position,{x:pos.x,y:pos.y,z:pos.z,duration:dur,ease:'power2.inOut'},0);tl.to(camTarget,{x:target.x,y:target.y,z:target.z,duration:dur,ease:'power2.inOut'},0);});}
+function buildScene(name){const g=new THREE.Group();S.chars=SCENES[name](g);anchor.add(g);S.sceneGroup=g;g.traverse(o=>{if(o.userData.type==='char')o.userData.baseY=o.position.y;});g.children.forEach(c=>{c.userData.bs=c.scale.x;c.scale.setScalar(0.001);});return new Promise(res=>{let n=0;g.children.forEach((c,i)=>gsap.to(c.scale,{x:c.userData.bs,y:c.userData.bs,z:c.userData.bs,duration:0.9,ease:'elastic.out(1,0.5)',delay:i*0.06,onStart:()=>{if(i%2===0)AUDIO.pop(i%5);},onComplete:()=>{if(++n===g.children.length)res();}}));});}
+function flatten(){const g=S.sceneGroup;if(!g)return Promise.resolve();return new Promise(res=>{let n=0;g.children.forEach((c,i)=>gsap.to(c.scale,{y:0.001,z:0.001,duration:0.45,ease:'power3.in',delay:i*0.03,onComplete:()=>{if(++n===g.children.length){anchor.remove(g);S.sceneGroup=null;res();}}}));});}
+function snapshotRight(){flipFrontCanvas.getContext('2d').drawImage(rightCanvas,0,0,PW,PH);flipFrontTex.needsUpdate=true;}
+async function turnPage(newLeftDraw,newRightDraw,sceneName){S.state='TURN';snapshotRight();if(flap){book.remove(flap);flap=null;}
+  await flatten();pageNo+=2;
+  // back of the flipping sheet = new left page
+  newLeftDraw(flipBackCanvas);flipBackTex.needsUpdate=true;
+  // right page under the sheet = new right page
+  rightNote=null;newRightDraw(rightCanvas);
+  flipPivot.rotation.z=0;flipPivot.visible=true;AUDIO.flip();
+  await new Promise(r=>gsap.to(flipPivot.rotation,{z:Math.PI,duration:1.1,ease:'power2.inOut',onComplete:r}));
+  newLeftDraw(leftCanvas);flipPivot.visible=false;
+  if(sceneName)await buildScene(sceneName);}
+let currentFig={cap:'',sub:''};
+const FIG1={frame:true,cap:'圖 1.1　年度運動科學研討會',sub:'周教授的團隊在台上發表三個「核心因素」。以安與柏哲站在會場右側。點擊角色，可讀到他們此刻的心聲。'};
+const FIG2={frame:true,cap:'圖 1.2　24 × 24 相關矩陣的區塊結構',sub:'同一類指標之間的相關（高柱）明顯高於跨類別的相關（矮柱）。資料本來就有結構；問題是：研究團隊的三個成分，是怎麼切出這個結構的？'};
+const PAPER_BG='#f4eddc';
+
+/* ===================== 研究筆記（模型說明頁） ===================== */
+const MATHF='"Cambria Math","Cambria","Times New Roman",'+FONT;
+function seeded(s){return ()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+function gauss(r){let u=0,v=0;while(u===0)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function arrow(g,x1,y1,x2,y2,col,lw,head){g.strokeStyle=col;g.fillStyle=col;g.lineWidth=lw||3;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();const a=Math.atan2(y2-y1,x2-x1),hs=head||16;g.beginPath();g.moveTo(x2,y2);g.lineTo(x2-hs*Math.cos(a-0.4),y2-hs*Math.sin(a-0.4));g.lineTo(x2-hs*Math.cos(a+0.4),y2-hs*Math.sin(a+0.4));g.closePath();g.fill();}
+function label(g,t,x,y,size,col,align,bold){g.fillStyle=col||INK;g.font=(bold?'bold ':'')+size+'px '+FONT;g.textAlign=align||'left';g.fillText(t,x,y);g.textAlign='left';}
+
+// 圖 N1：PCA 的幾何意義
+function figPCA(g,x,y,w,h){const cx=x+w/2,cy=y+h/2+10,sc=Math.min(w,h)/7.2;const r=seeded(20241101);
+  g.strokeStyle='rgba(60,40,20,.5)';g.lineWidth=2;arrow(g,x+30,cy,x+w-20,cy,'rgba(60,40,20,.6)',2,12);arrow(g,cx,y+h-20,cx,y+30,'rgba(60,40,20,.6)',2,12);
+  label(g,'Z₁ 垂直跳（標準化）',x+w-20,cy+38,24,INK2,'right',true);label(g,'Z₂ 深蹲負荷',cx+14,y+46,24,INK2,'left',true);
+  const ang=-Math.PI/4;
+  g.save();g.translate(cx,cy);g.rotate(ang);g.strokeStyle='rgba(12,74,69,.45)';g.setLineDash([8,8]);g.lineWidth=2.5;g.beginPath();g.ellipse(0,0,2.5*sc,0.95*sc,0,0,Math.PI*2);g.stroke();g.setLineDash([]);g.restore();
+  for(let i=0;i<140;i++){const a=gauss(r)*1.15,b=gauss(r)*0.42;const px=cx+(a*Math.cos(ang)-b*Math.sin(ang))*sc,py=cy+(a*Math.sin(ang)+b*Math.cos(ang))*sc;g.fillStyle='rgba(23,18,12,.55)';g.beginPath();g.arc(px,py,4.5,0,Math.PI*2);g.fill();}
+  arrow(g,cx,cy,cx+Math.cos(ang)*2.9*sc,cy+Math.sin(ang)*2.9*sc,TEAL,6,22);arrow(g,cx,cy,cx+Math.cos(ang-Math.PI/2)*1.2*sc,cy+Math.sin(ang-Math.PI/2)*1.2*sc,ACC,6,20);
+  label(g,'PC1：變異最大的方向',cx+Math.cos(ang)*2.9*sc-10,cy+Math.sin(ang)*2.9*sc-18,26,TEAL,'right',true);
+  label(g,'PC2：與 PC1 垂直',cx+Math.cos(ang-Math.PI/2)*1.2*sc-14,cy+Math.sin(ang-Math.PI/2)*1.2*sc-8,26,ACC,'right',true);
+  label(g,'λ₁ ＝ 資料沿 PC1 的變異量（特徵值）',x+40,y+h-24,24,INK2,'left',true);}
+
+// 圖 N2：雙極成分的負荷量
+function figLoad(g,x,y,w,h){const rows=[['專注力量表',.62],['自信心量表',.55],['焦慮（反向計分）',.48],['最大攝氧量',.10],['深蹲 1RM',-.51],['垂直跳',-.58]];
+  const lx=x+250,mid=lx+(w-260)/2,half=(w-300)/2,top=y+80,rh=(h-150)/rows.length;
+  label(g,'成分 2（研究團隊命名為「心理韌性」）',x+w/2,y+36,26,INK,'center',true);
+  g.strokeStyle='rgba(60,40,20,.55)';g.lineWidth=2;g.beginPath();g.moveTo(mid,top-10);g.lineTo(mid,top+rh*rows.length);g.stroke();
+  [-.4,.4].forEach(v=>{const px=mid+v/0.7*half;g.strokeStyle='rgba(134,32,15,.5)';g.setLineDash([6,6]);g.beginPath();g.moveTo(px,top-10);g.lineTo(px,top+rh*rows.length);g.stroke();g.setLineDash([]);label(g,(v>0?'+':'−')+'.40',px,top-18,22,ACC,'center',true);});
+  label(g,'0',mid,top-18,22,INK2,'center',true);
+  rows.forEach(([n,v],i)=>{const yy=top+i*rh,bh=rh*0.56,bw=Math.abs(v)/0.7*half;g.fillStyle=v>=0?'rgba(12,74,69,.85)':'rgba(134,32,15,.85)';g.fillRect(v>=0?mid:mid-bw,yy+(rh-bh)/2,bw,bh);
+    label(g,n,lx-16,yy+rh/2+9,25,INK,'right',true);label(g,(v>0?'+':'−')+Math.abs(v).toFixed(2).slice(1),v>=0?mid+bw+10:mid-bw-10,yy+rh/2+9,23,v>=0?TEAL:ACC,v>=0?'left':'right',true);});
+  label(g,'◀ 肌力端',mid-half,y+h-14,24,ACC,'left',true);label(g,'心理量表端 ▶',mid+half,y+h-14,24,TEAL,'right',true);}
+
+// 圖 N3：PCA 與因素分析的路徑圖
+function figPath(g,x,y,w,h){const half=w/2;
+  function boxV(bx,by,t){g.fillStyle='#fffaf0';g.strokeStyle=INK;g.lineWidth=2.5;g.fillRect(bx-36,by-24,72,48);g.strokeRect(bx-36,by-24,72,48);label(g,t,bx,by+9,24,INK,'center',true);}
+  // PCA
+  label(g,'PCA：指標 → 成分',x+half/2,y+34,26,TEAL,'center',true);label(g,'（加權總和，沒有誤差項）',x+half/2,y+66,21,INK2,'center',true);
+  const ys=[0,1,2,3].map(i=>y+120+i*78);const bx1=x+70,px=x+half-80,py=y+120+117;
+  ys.forEach((yy,i)=>{boxV(bx1,yy,'Z'+'₁₂₃₄'[i]);arrow(g,bx1+38,yy,px-62,py+(yy-py)*0.25,TEAL,2.5,13);});
+  g.fillStyle='rgba(12,74,69,.12)';g.strokeStyle=TEAL;g.lineWidth=3;roundRect(g,px-60,py-34,120,68,8);g.fill();g.stroke();label(g,'PC',px,py+10,28,TEAL,'center',true);
+  label(g,'w',x+half/2+10,py-56,24,TEAL,'center',true);
+  g.strokeStyle='rgba(60,40,20,.3)';g.lineWidth=1.5;g.beginPath();g.moveTo(x+half,y+20);g.lineTo(x+half,y+h-20);g.stroke();
+  // FA
+  const fx=x+half+80,fy=py,bx2=x+w-130,ex=x+w-36;
+  label(g,'因素分析：因素 → 指標',x+half+half/2,y+34,26,ACC,'center',true);label(g,'（共同原因＋獨特誤差 ε）',x+half+half/2,y+66,21,INK2,'center',true);
+  g.fillStyle='rgba(134,32,15,.1)';g.strokeStyle=ACC;g.lineWidth=3;g.beginPath();g.arc(fx,fy,44,0,Math.PI*2);g.fill();g.stroke();label(g,'F',fx,fy+11,32,ACC,'center',true);
+  ys.forEach((yy,i)=>{arrow(g,fx+46,fy+(yy-fy)*0.25,bx2-40,yy,ACC,2.5,13);boxV(bx2,yy,'Z'+'₁₂₃₄'[i]);g.strokeStyle=INK2;g.lineWidth=2;g.beginPath();g.arc(ex,yy,16,0,Math.PI*2);g.stroke();label(g,'ε',ex,yy+7,20,INK2,'center',true);arrow(g,ex-17,yy,bx2+38,yy,INK2,2,10);});
+  label(g,'λ',fx+70,fy-60,26,ACC,'center',true);
+  // 對照表
+  const ty=y+h-250,cols=[x+20,x+230,x+w/2+110],rows=[['','PCA','因素分析'],['箭頭方向','指標 → 成分','因素 → 指標'],['分析的變異','全部變異','只有共同變異'],['誤差項','沒有','有（ε）'],['結果的地位','加權總分','潛在構念的估計']];
+  rows.forEach((r,i)=>{const yy=ty+i*48;if(i===0||i===1){g.fillStyle='rgba(60,40,20,.45)';g.fillRect(x+20,yy+(i?-34:14),w-40,1.5);}r.forEach((t,j)=>label(g,t,cols[j],yy,24,i===0?(j===1?TEAL:ACC):(j===0?INK2:INK),'left',true));});
+  g.fillStyle='rgba(60,40,20,.45)';g.fillRect(x+20,ty+4*48+16,w-40,1.5);}
+
+// 圖 N4：陡坡圖與平行分析
+function figScree(g,x,y,w,h){const ev=[7.1,3.6,2.7,1.15,0.95,0.86,0.78,0.71,0.65,0.6],pa=[1.62,1.5,1.41,1.34,1.27,1.21,1.15,1.1,1.05,1.0];
+  const ox=x+90,oy=y+h-70,aw=w-130,ah=h-130,ymax=8;const X=i=>ox+(i+0.5)*aw/ev.length,Y=v=>oy-v/ymax*ah;
+  g.strokeStyle='rgba(60,40,20,.6)';g.lineWidth=2;g.beginPath();g.moveTo(ox,oy-ah);g.lineTo(ox,oy);g.lineTo(ox+aw,oy);g.stroke();
+  [0,2,4,6,8].forEach(v=>label(g,String(v),ox-14,Y(v)+8,22,INK2,'right',true));ev.forEach((_,i)=>label(g,String(i+1),X(i),oy+32,22,INK2,'center',true));
+  label(g,'成分序號',ox+aw,oy+62,22,INK2,'right',true);label(g,'特徵值 λ',ox-70,oy-ah-18,22,INK2,'left',true);
+  g.strokeStyle=TEAL;g.setLineDash([4,6]);g.lineWidth=2.5;g.beginPath();g.moveTo(ox,Y(1));g.lineTo(ox+aw,Y(1));g.stroke();label(g,'Kaiser：λ ＞ 1',X(0)-20,Y(1)+34,23,TEAL,'left',true);
+  g.strokeStyle=ACC;g.setLineDash([12,8]);g.lineWidth=3;g.beginPath();pa.forEach((v,i)=>i?g.lineTo(X(i),Y(v)):g.moveTo(X(i),Y(v)));g.stroke();g.setLineDash([]);g.strokeStyle='rgba(134,32,15,.6)';g.lineWidth=1.5;g.beginPath();g.moveTo(X(6.5),Y(2.55));g.lineTo(X(6.5),Y(1.2)-4);g.stroke();label(g,'平行分析：隨機資料的 λ',X(5),Y(2.7),23,ACC,'left',true);
+  g.strokeStyle=INK;g.lineWidth=3;g.beginPath();ev.forEach((v,i)=>i?g.lineTo(X(i),Y(v)):g.moveTo(X(i),Y(v)));g.stroke();
+  ev.forEach((v,i)=>{g.fillStyle=i<3?TEAL:(i===3?ACC:INK2);g.beginPath();g.arc(X(i),Y(v),i<4?9:6,0,Math.PI*2);g.fill();});
+  label(g,'λ₁～λ₃ 都高於隨機線 → 保留 3 個',X(1)+24,Y(5.3),24,TEAL,'left',true);
+  g.strokeStyle='rgba(134,32,15,.6)';g.lineWidth=1.5;g.beginPath();g.moveTo(X(3)+6,Y(1.15)-10);g.lineTo(X(4),Y(3.9)+8);g.stroke();label(g,'λ₄ ＝ 1.15：過了 Kaiser，',X(4),Y(3.9),23,ACC,'left',true);label(g,'卻低於隨機線',X(4),Y(3.9)+30,23,ACC,'left',true);
+  label(g,'（示意圖：數值為教學用）',ox+aw,y+22,20,INK2,'right',true);}
+
+const NOTES={
+ pca:{no:1,t:'主成分分析在做什麼？',blocks:[
+  {type:'h',t:'核心想法'},
+  {type:'p',t:'PCA 把 p 個彼此相關的變數，重新組合成 p 個<em>互不相關</em>的新變數，稱為主成分。第 1 個主成分盡可能抓住最多變異；第 2 個在與第 1 個垂直的前提下，抓住剩下最多的變異，依此類推。'},
+  {type:'formula',t:'PC₁ ＝ w₁Z₁ ＋ w₂Z₂ ＋ … ＋ w₂₄Z₂₄'},
+  {type:'p',t:'權重 w 來自相關矩陣 R 的<em>特徵向量</em>；每個主成分的變異量，就是對應的<em>特徵值</em> λ。'},
+  {type:'h',t:'「解釋 56% 變異」是什麼意思？'},
+  {type:'p',t:'24 個標準化變數，每個變異數都是 1，總變異就是 24。前三個特徵值相加約 13.4，而 13.4 ÷ 24 ≈ 56%。換句話說，還有 <em>44% 的資訊被捨棄</em>了。'},
+  {type:'formula',t:'解釋比例 ＝ (λ₁＋λ₂＋λ₃) ÷ 24'}],
+  fig:{draw:figPCA,cap:'圖 N1　PC1 沿著資料「拉得最長」的方向',sub:'三個高度相關的指標，點雲呈斜長的橢球。PCA 先找最長的軸（綠），再依序找與它垂直的軸（紅、黃）。',points:['PCA 是<em>數學轉換</em>，不是統計模型：沒有誤差項，也不假設有潛在原因。','它分析的是<em>全部變異</em>，包含每個指標特有的變異與測量誤差。','主成分只是變數的加權總和；名稱是研究者事後給的詮釋。']}},
+ load:{no:2,t:'負荷量怎麼讀？',blocks:[
+  {type:'h',t:'負荷量＝指標與成分的相關'},
+  {type:'p',t:'在 PCA 中，負荷量 a ＝ w × √λ，可以讀成「這個指標與這個成分的相關係數」，介於 −1 與 1 之間。絕對值越大，這個指標越能代表該成分。'},
+  {type:'h',t:'正負號本身沒有意義'},
+  {type:'p',t:'特徵向量可以整體反轉：把一個成分的所有負荷量同時乘以 −1，模型完全不變。真正重要的是<em>同一個成分內</em>，哪些指標同號、哪些反號。'},
+  {type:'h',t:'這是一個雙極成分'},
+  {type:'p',t:'專注力為正、垂直跳與深蹲為負，代表這個成分對比的是「心理量表高、肌力低」與「肌力高、心理量表低」的選手。把它命名為「心理韌性」，等於忽略了另一半的內容。'},
+  {type:'p',t:'為什麼會這樣？第 1 個成分常吸走所有指標共有的變異；之後的成分被迫與它垂直，常常就成了<em>對比型</em>成分。這是數學限制，不一定是真實構念。'}],
+  fig:{draw:figLoad,cap:'圖 N2　一端是心理量表，另一端是肌力',sub:'半透明平面為常用的 |a| ≥ .40 門檻。綠柱向上、紅柱向下：兩端都有高負荷量的指標。',points:['先看絕對值：哪些指標的 |a| 夠大？','再看分組：同號的是一群，反號的是另一群。','最後才命名：名稱要同時說明兩端。旋轉（如 varimax）可讓結構更清楚，但旋轉後的 PCA 仍然是成分，不是因素。']}},
+ fa:{no:3,t:'PCA 與因素分析',blocks:[
+  {type:'h',t:'因素分析的測量模型'},
+  {type:'p',t:'因素分析假設每個觀察指標，都由<em>共同因素</em> F 與<em>獨特因素</em> ε 組成。以第 7 個指標為例：'},
+  {type:'formula',t:'Z₇ ＝ λ₇₁F₁ ＋ λ₇₂F₂ ＋ λ₇₃F₃ ＋ ε₇'},
+  {type:'p',t:'λ 是因素負荷量，ε 是這個指標獨有的部分（含測量誤差）。所以每個指標的變異可以拆成兩塊：'},
+  {type:'formula',t:'1 ＝ h²（共同性）＋ u²（獨特性）'},
+  {type:'h',t:'關鍵差別'},
+  {type:'p',t:'PCA 分析相關矩陣的<em>全部變異</em>；因素分析把對角線的 1 換成共同性，只分析<em>共同變異</em>（例如主軸因子法 PAF）。因此只有因素分析能回答：「這些指標會相關，是因為背後有共同原因嗎？」'},
+  {type:'p',t:'要宣稱「心理韌性」是一個構念，需要的是因素分析，最好再用新樣本做<em>驗證性因素分析（CFA）</em>。'}],
+  fig:{draw:figPath,figH:720,table:true,cap:'圖 N3　箭頭方向決定了模型在回答什麼',sub:'方塊是觀察指標，球體 F 是潛在因素，灰色小球 ε 是獨特誤差。',points:['想摘要資料、降維 → PCA。','想找潛在構念、發展量表 → 因素分析。']}},
+ howmany:{no:4,t:'要保留幾個？',blocks:[
+  {type:'h',t:'三種常見準則'},
+  {type:'p',t:'<em>Kaiser 準則</em>：保留特徵值大於 1 的成分。理由是一個成分至少要比一個原始變數解釋更多變異。它簡單，但在變數多時常常<em>保留太多</em>。'},
+  {type:'p',t:'<em>陡坡圖</em>：把特徵值由大到小畫出來，找曲線「轉折變平」的位置。好用，但判斷帶有主觀成分。'},
+  {type:'p',t:'<em>平行分析</em>：用同樣樣本數與變數數，產生大量隨機資料，計算它們的特徵值。只保留<em>比隨機資料還大</em>的成分。這是目前最推薦的方法。'},
+  {type:'h',t:'這份資料的情況'},
+  {type:'p',t:'以安重跑後發現：Kaiser 準則建議 4 個，平行分析建議 3 個。第 4 個特徵值 1.15 雖然大於 1，卻不比隨機資料大。不同準則給出不同答案時，研究者必須說明選擇的理由。'}],
+  fig:{draw:figScree,cap:'圖 N4　陡坡圖與平行分析',sub:'圓柱為實際特徵值，黃線為隨機資料的特徵值，綠色平面為 λ ＝ 1（數值為教學示意）。',points:['報告時應同時列出準則與結果，不要只寫「依 Kaiser 準則」。','保留的數量會改變每個成分的內容；這正是第二幕要追查的問題。']}}
+};
+
+
+/* ===================== 3D 浮空模型（研究筆記用） ===================== */
+function tag(text,h,col,bg){const fs=64,pad=20;const c=document.createElement('canvas');const g=c.getContext('2d');g.font='bold '+fs+'px '+FONT;const w=Math.ceil(g.measureText(text).width)+pad*2;c.width=w;c.height=fs+pad*2;g.font='bold '+fs+'px '+FONT;
+  if(bg!==false){g.fillStyle=bg||'rgba(255,250,238,.9)';roundRect(g,2,2,w-4,c.height-4,24);g.fill();g.strokeStyle='rgba(60,40,20,.35)';g.lineWidth=3;g.stroke();}
+  g.fillStyle=col||INK;g.textBaseline='middle';g.fillText(text,pad,c.height/2+4);
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=MAXANI;
+  h*=1.4;const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true,toneMapped:false}));sp.scale.set(h*w/c.height,h,1);sp.renderOrder=10;sp.raycast=()=>{};return sp;}
+function arrow3(a,b,col,r){const g=new THREE.Group();const dir=b.clone().sub(a);const len=dir.length();const hl=Math.min(r*6,len*0.4);
+  const shaft=cyl(r,r,len-hl,col,10);shaft.position.y=(len-hl)/2;const head=cone(r*2.6,hl,col,12);head.position.y=len-hl/2;g.add(shaft,head);
+  g.position.copy(a);g.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());return g;}
+function seg(a,b,col,r){const d=b.clone().sub(a);const c=cyl(r,r,d.length(),col,8);c.position.copy(a.clone().add(b).multiplyScalar(0.5));c.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());return c;}
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+const blobTex=canvasTex(256,256,(g,w,h)=>{const gr=g.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);gr.addColorStop(0,'rgba(40,28,15,.35)');gr.addColorStop(1,'rgba(40,28,15,0)');g.fillStyle=gr;g.fillRect(0,0,w,h);});
+function blob(x,z,sx,sz){const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:blobTex,transparent:true,depthWrite:false,opacity:.4}));m.rotation.x=-Math.PI/2;m.scale.set(sx,sz,1);m.position.set(x,0.004,z);return m;}
+function mount(g,f,tilt){const w=new THREE.Group();w.position.set(f.position.x,0,f.position.z);f.position.x=0;f.position.z=0;w.rotation.x=tilt===undefined?-0.85:tilt;w.add(f);g.add(w);}
+function floater(x,y,z,opt){const f=new THREE.Group();f.position.set(x,y,z);f.userData.float=Object.assign({baseY:y,amp:0.025,sway:0.18,spin:0,phase:Math.random()*6},opt||{});f.userData.rotBase=0;return f;}
+const C_TEAL=0x0f5c55,C_RED=0x9a2e18,C_GOLD=0xc07d18,C_INK=0x2a2419,C_GRAY=0x9a9080,C_PAPER=0xf3ead6;
+
+const MODEL3D={
+  // 研究筆記 1：三維點雲＋橢球＋主成分軸
+  n_pca(g){const f=floater(0,0.62,-0.15,{spin:0.25,sway:0});g.add(blob(0,-0.5,1.6,1.1));
+    const L=0.62;[[V(1,0,0),'Z₁ 垂直跳'],[V(0,0,1),'Z₂ 深蹲'],[V(0,1,0),'Z₃ 專注力']].forEach(([d,n])=>{f.add(arrow3(d.clone().multiplyScalar(-L),d.clone().multiplyScalar(L),0x6b5a45,0.007));const t=tag(n,0.075,INK2);t.position.copy(d.clone().multiplyScalar(L+0.1));f.add(t);});
+    const d1=V(1,0.75,0.6).normalize(),d2=new THREE.Vector3().crossVectors(d1,V(0,0,1)).normalize(),d3=new THREE.Vector3().crossVectors(d1,d2).normalize();
+    const r=seeded(20241101),N=150,pts=new THREE.InstancedMesh(new THREE.SphereGeometry(0.02,8,6),mat(0x3a3226,{flatShading:false}),N);pts.castShadow=true;const m4=new THREE.Matrix4();
+    for(let i=0;i<N;i++){const a=gauss(r)*0.3,b=gauss(r)*0.13,c=gauss(r)*0.06;const p=d1.clone().multiplyScalar(a).add(d2.clone().multiplyScalar(b)).add(d3.clone().multiplyScalar(c));m4.makeTranslation(p.x,p.y,p.z);pts.setMatrixAt(i,m4);}f.add(pts);
+    const ell=new THREE.Mesh(new THREE.SphereGeometry(1,32,20),new THREE.MeshStandardMaterial({color:C_TEAL,transparent:true,opacity:0.26,roughness:.6,depthWrite:false}));const rm=new THREE.Matrix4().makeBasis(d1,d2,d3);ell.quaternion.setFromRotationMatrix(rm);ell.scale.set(0.62,0.28,0.13);f.add(ell);
+    f.add(arrow3(V(0,0,0),d1.clone().multiplyScalar(0.72),C_TEAL,0.018));f.add(arrow3(V(0,0,0),d2.clone().multiplyScalar(0.34),C_RED,0.016));f.add(arrow3(V(0,0,0),d3.clone().multiplyScalar(0.2),C_GOLD,0.014));
+    const t1=tag('PC1：變異最大（λ₁）',0.085,TEAL);t1.position.copy(d1.clone().multiplyScalar(0.86));f.add(t1);
+    const t2=tag('PC2 ⟂ PC1',0.075,ACC);t2.position.copy(d2.clone().multiplyScalar(0.46));f.add(t2);
+    const t3=tag('PC3',0.07,'#8a5a12');t3.position.copy(d3.clone().multiplyScalar(0.3));f.add(t3);
+    mount(g,f,-0.6);return {};},
+  // 研究筆記 2：浮空負荷量長條圖（正值向上、負值向下）
+  n_load(g){const f=floater(0,0.5,-0.11,{sway:0.2});g.add(blob(0,-0.56,2.0,0.8));
+    const rows=[['專注力',.62],['自信心',.55],['焦慮',.48],['攝氧量',.10],['深蹲',-.51],['垂直跳',-.58]];const H=0.62,sp=0.3;
+    const zero=new THREE.Mesh(new THREE.BoxGeometry(1.95,0.01,0.34),new THREE.MeshStandardMaterial({color:C_PAPER,transparent:true,opacity:.7,roughness:.9}));f.add(zero);
+    [.4,-.4].forEach(v=>{const p=new THREE.Mesh(new THREE.PlaneGeometry(1.95,0.012),new THREE.MeshBasicMaterial({color:v>0?C_TEAL:C_RED,transparent:true,opacity:.7,depthWrite:false}));p.position.set(0,v*H,0.12);f.add(p);const t=tag((v>0?'+':'−')+'.40',0.055,v>0?TEAL:ACC);t.position.set(1.08,v*H,0.12);f.add(t);});
+    rows.forEach(([n,v],i)=>{const x=(i-2.5)*sp,h=Math.abs(v)*H;const b=box(0.18,h,0.18,v>=0?C_TEAL:C_RED);b.position.set(x,v>=0?h/2+0.005:-h/2-0.005,0);f.add(b);
+      const vt=tag((v>0?'+':'−')+Math.abs(v).toFixed(2).slice(1),0.055,v>=0?TEAL:ACC);vt.position.set(x,v>=0?h+0.07:-h-0.07,0.1);f.add(vt);
+      const nt=tag(n,0.058,INK);nt.position.set(x,v>=0?-0.07:0.07,0.12);f.add(nt);});
+    const tt=tag('成分 2：被命名為「心理韌性」',0.072,INK);tt.position.set(0,0.62*0.62+0.25,0);f.add(tt);
+    const a=tag('心理量表端',0.055,TEAL);a.position.set(-1.1,0.22,0);f.add(a);const bb=tag('肌力端',0.055,ACC);bb.position.set(1.08,-0.2,0);f.add(bb);
+    mount(g,f);return {};},
+  // 研究筆記 3：PCA（指標→成分）與因素分析（因素→指標）兩座浮空路徑模型
+  n_fa(g){g.add(blob(-0.62,-0.78,1.0,0.7));g.add(blob(0.62,-0.78,1.0,0.7));
+    const xs=[-0.3,-0.1,0.1,0.3],sub='₁₂₃₄';
+    // PCA
+    const p=floater(-0.62,0.14,-0.3,{sway:0.2});xs.forEach((x,i)=>{p.add(at(box(0.14,0.14,0.14,C_PAPER),x,0.2,0));const t=tag('Z'+sub[i],0.06,INK,false);t.position.set(x,0.2,0.09);p.add(t);p.add(arrow3(V(x,0.28,0),V(x*0.25,0.6,0),C_TEAL,0.01));});
+    const pc=M(new THREE.CylinderGeometry(0.13,0.13,0.1,6),C_TEAL);pc.position.set(0,0.68,0);p.add(pc);const pt=tag('PC',0.07,'#fff','rgba(31,122,114,.95)');pt.position.set(0,0.68,0.16);p.add(pt);
+    const ptt=tag('PCA：指標 → 成分（無誤差項）',0.068,TEAL);ptt.position.set(0,0.95,0);p.add(ptt);mount(g,p);
+    // FA
+    const q=floater(0.62,0.14,-0.3,{sway:0.2,phase:1.7});const F=sph(0.12,C_RED,16);F.position.set(0,0.7,0);q.add(F);const ft=tag('F',0.07,'#fff','rgba(154,46,24,.95)');ft.position.set(0,0.7,0.14);q.add(ft);
+    xs.forEach((x,i)=>{q.add(at(box(0.14,0.14,0.14,C_PAPER),x,0.32,0));const t=tag('Z'+sub[i],0.06,INK,false);t.position.set(x,0.32,0.09);q.add(t);q.add(arrow3(V(x*0.3,0.6,0),V(x,0.4,0),C_RED,0.01));
+      const e=sph(0.04,C_GRAY,10);e.position.set(x,0.06,0);q.add(e);q.add(arrow3(V(x,0.1,0),V(x,0.24,0),C_GRAY,0.006));const et=tag('ε',0.05,INK);et.position.set(x,-0.03,0.06);q.add(et);});
+    const qtt=tag('因素分析：因素 → 指標（含 ε）',0.068,ACC);qtt.position.set(0,0.95,0);q.add(qtt);mount(g,q);return {};},
+  // 研究筆記 4：立體陡坡圖＋Kaiser 平面＋平行分析線
+  n_howmany(g){const f=floater(0,0.08,-0.26,{sway:0.15,amp:0.015});g.add(blob(0,-0.6,2.4,0.7));
+    const ev=[7.1,3.6,2.7,1.15,0.95,0.86,0.78,0.71,0.65,0.6],pa=[1.62,1.5,1.41,1.34,1.27,1.21,1.15,1.1,1.05,1.0],k=0.13,sp=0.2,X=i=>(i-4.5)*sp;
+    const base=box(2.1,0.03,0.42,0xe8dcc2);base.position.y=-0.015;f.add(base);
+    ev.forEach((v,i)=>{const c=cyl(0.07,0.07,v*k,i<3?C_TEAL:(i===3?C_RED:C_GRAY),14);c.position.set(X(i),v*k/2,0);f.add(c);const nt=tag(String(i+1),0.055,INK2,false);nt.position.set(X(i),-0.02,0.27);f.add(nt);});
+    [0,1,2,3].forEach(i=>{const t=tag(ev[i].toFixed(i===3?2:1),0.06,i<3?TEAL:ACC);t.position.set(X(i),ev[i]*k+0.08,0);f.add(t);});
+    for(let i=0;i<ev.length-1;i++)f.add(seg(V(X(i),ev[i]*k,0),V(X(i+1),ev[i+1]*k,0),C_INK,0.009));
+    const kp=new THREE.Mesh(new THREE.BoxGeometry(2.1,0.004,0.42),new THREE.MeshBasicMaterial({color:C_TEAL,transparent:true,opacity:.22,depthWrite:false}));kp.position.y=1*k;f.add(kp);
+    const kt=tag('Kaiser 平面：λ ＝ 1',0.065,TEAL);kt.position.set(X(7),1*k+0.07,0.3);f.add(kt);
+    pa.forEach((v,i)=>{const s=sph(0.03,C_GOLD,10);s.position.set(X(i),v*k,0.16);f.add(s);if(i)f.add(seg(V(X(i-1),pa[i-1]*k,0.16),V(X(i),v*k,0.16),C_GOLD,0.013));});
+    const pt=tag('平行分析：隨機資料的 λ',0.065,'#8a5a12');pt.position.set(X(7.3),pa[7]*k+0.2,0.2);f.add(pt);
+    const n4=tag('λ₄ 過了 Kaiser，卻低於隨機線',0.062,ACC);n4.position.set(X(4.3),0.42,0.1);f.add(n4);
+    const n3=tag('保留 3 個',0.075,TEAL);n3.position.set(X(1),0.6,0.1);f.add(n3);
+    mount(g,f);return {};}
+};
+Object.assign(SCENES,MODEL3D);
+
+// 註：表格仍印在紙上（研究筆記 3）
+function figTable(g,x,y,w,h){const ty=y+h-230,cols=[x+30,x+250,x+w/2+120],rows=[['','PCA','因素分析'],['箭頭方向','指標 → 成分','因素 → 指標'],['分析的變異','全部變異','只有共同變異'],['誤差項','沒有','有（ε）'],['結果的地位','加權總分','潛在構念的估計']];
+  rows.forEach((r,i)=>{const yy=ty+i*46;r.forEach((t,j)=>label(g,t,cols[j],yy,24,i===0?(j===1?TEAL:ACC):(j===0?INK2:INK),'left',true));});
+  g.fillStyle='rgba(60,40,20,.45)';g.fillRect(x+20,ty+14,w-40,1.5);g.fillRect(x+20,ty+4*46+16,w-40,1.5);}
+
+function noteHeader(g,n,side){const x=side==='L'?100:120,maxW=PW-(side==='L'?240:220);
+  g.fillStyle=INK2;g.font='bold 22px '+FONT;g.textAlign=side==='L'?'left':'right';g.fillText(side==='L'?'CASE 01  ·  研究筆記':'模型說明圖',side==='L'?x:PW-100,78);g.textAlign='left';g.fillStyle='rgba(60,40,20,.35)';g.fillRect(x,92,maxW,1);}
+function renderNoteLeft(c,n){const g=c.getContext('2d');
+  for(const [sz,lh] of [[31,48],[29,45],[27,42],[25,39]]){g.drawImage(paperBase,0,0,PW,PH);spineShade(g,'L');noteHeader(g,n,'L');
+    const x=100,maxW=PW-240;let y=110;
+    g.fillStyle=TEAL;roundRect(g,x,y-16,190,40,20);g.fill();label(g,'研究筆記 '+n.no,x+95,y+12,24,'#fff','center',true);y+=72;
+    label(g,n.t,x,y+10,50,INK,'left',true);y+=70;
+    n.blocks.forEach(b=>{
+      if(b.type==='h'){y+=10;g.fillStyle=ACC;g.fillRect(x,y-24,8,30);label(g,b.t,x+22,y,32,ACC,'left',true);y+=lh+4;}
+      else if(b.type==='p'){y=drawRuns(g,parseEm(b.t),x,y,maxW,sz,lh,INK,ACC)+8;}
+      else if(b.type==='formula'){const bh=72;g.fillStyle='rgba(12,74,69,.07)';g.strokeStyle='rgba(12,74,69,.55)';g.lineWidth=2;roundRect(g,x,y-34,maxW,bh,10);g.fill();g.stroke();g.fillStyle=INK;g.font='bold '+(sz+3)+'px '+MATHF;g.textAlign='center';g.fillText(b.t,x+maxW/2,y+12);g.textAlign='left';y+=bh+18;}});
+    if(y<=PH-110){g.fillStyle=INK2;g.font='bold 22px '+FONT;g.fillText(String(pageNo),x,PH-60);break;}}
+  if(c===leftCanvas)leftTex.needsUpdate=true;}
+function renderNoteRight(c,n){const g=c.getContext('2d'),f=n.fig,x=120,maxW=PW-220,figH=f.figH||620;
+  for(const [sz,lh] of [[28,44],[26,40],[24,37]]){g.drawImage(paperBase,0,0,PW,PH);spineShade(g,'R');noteHeader(g,n,'R');
+    g.strokeStyle='rgba(60,40,20,.28)';g.lineWidth=1.5;g.setLineDash([10,8]);g.strokeRect(x,130,maxW,figH);g.setLineDash([]);
+    if(f.table)figTable(g,x,130,maxW,figH);if(!f.table)label(g,'▲ 立體模型浮在本頁上方　・　拖曳畫面可旋轉',x+maxW/2,130+figH-22,22,INK2,'center',true);
+    let y=130+figH+60;label(g,f.cap,x,y,30,INK,'left',true);y+=46;y=drawRuns(g,parseEm(f.sub),x,y,maxW,sz,lh,INK2,ACC)+14;
+    const top=y-14;let yy=y+40;const startY=yy;
+    f.points.forEach((p,i)=>{yy=drawRuns(g,parseEm(p),x+64,yy,maxW-84,sz,lh,INK,ACC);});
+    g.strokeStyle='rgba(134,32,15,.55)';g.lineWidth=2;roundRect(g,x,top,maxW,yy-top,10);g.stroke();
+    g.fillStyle=PAPER_BG;g.fillRect(x+24,top-16,112,32);label(g,'重　點',x+80,top+10,24,ACC,'center',true);
+    // bullets
+    let by=startY;f.points.forEach(p=>{g.fillStyle=ACC;g.beginPath();g.arc(x+40,by-10,6,0,Math.PI*2);g.fill();by=drawRuns(document.createElement('canvas').getContext('2d'),parseEm(p),0,by,maxW-84,sz,lh,'#000','#000');});
+    if(yy<=PH-90){g.fillStyle=INK2;g.font='bold 22px '+FONT;g.textAlign='right';g.fillText(String(pageNo+1),PW-100,PH-60);g.textAlign='left';break;}}
+  rightTex.needsUpdate=true;}
+function glide(pos,target){gsap.to(camera.position,{x:pos.x,y:pos.y,z:pos.z,duration:1.1,ease:'power2.inOut',overwrite:'auto'});gsap.to(camTarget,{x:target.x,y:target.y,z:target.z,duration:1.1,ease:'power2.inOut',overwrite:'auto'});}
+function focusSpeaker(id){return;const ch=S.chars[id];if(!ch)return;const v=new THREE.Vector3();ch.userData.head.getWorldPosition(v);glide(camHome.pos.clone().lerp(new THREE.Vector3(v.x,v.y+1.6,v.z+2.2),0.14),camHome.target.clone().lerp(v,0.16));}
+function unfocus(){glide(camHome.pos,camHome.target);}
+
+function startAct(){return locked(async()=>{chapTxt.textContent='第一幕 ・ 三個核心因素';currentFig=FIG1;S.scene='conference';S.chap='第一幕 ・ 三個核心因素';S.onNote=false;doc=[];curHeader={k:'第一幕',t:'三個核心因素'};await turnPage(c=>renderLeft(c,doc,curHeader),c=>renderRight(c,FIG1),'conference');S.state='READING';S.beat=0;showBeat();});}
+function nextIsTurn(){const nb=BEATS[S.beat+1];return !nb||nb.type==='choice'||nb.type==='note';}
+function showBeat(){const b=BEATS[S.beat];if(!b)return;
+  if(b.type==='note'){const n=NOTES[b.id];locked(async()=>{unfocus();S.onNote=true;chapTxt.textContent='研究筆記 '+n.no+' ・ '+n.t;await turnPage(c=>renderNoteLeft(c,n),c=>renderNoteRight(c,n),'n_'+b.id);S.chars={};S.state='READING';drawCue('翻頁回到故事 ▸');});return;}
+  if(S.onNote&&b.type!=='choice'){S.onNote=false;const blk0=b.type==='end'?{type:'end'}:(b.s===N?{type:'narr',t:b.t}:{type:'say',s:b.s,t:b.t});locked(async()=>{chapTxt.textContent=S.chap;curHeader={k:curHeader.k,t:curHeader.t.replace('（續）','')+'（續）'};doc=[blk0];await turnPage(c=>renderLeft(c,doc,curHeader),c=>renderRight(c,currentFig),S.scene);if(b.type==='end'){S.state='END';drawCue('翻頁進入第二幕 ▸');}else{S.state='READING';drawCue(nextIsTurn()?'翻頁 ▸':'繼續閱讀 ▸');}});return;}
+  if(b.type==='choice'){S.state='CHOICE';S.choice=b;S.picked=null;S.onNote=false;S.scene='matrix';S.chap='第一幕 ・ 研究決策';locked(async()=>{unfocus();chapTxt.textContent='第一幕 ・ 研究決策';currentFig=FIG2;doc=[{type:'question',t:b.q},...b.opts.map((o,i)=>({type:'option',k:'ABC'[i],t:o.t,idx:i,state:''}))];curHeader={k:'第一幕 ・ 研究決策',t:'這個問題需要什麼？'};await turnPage(c=>renderLeft(c,doc,curHeader),c=>renderRight(c,FIG2),'matrix');S.state='CHOICE';drawCue('點選一個選項 ▸');});return;}
+  if(b.type==='end'){S.state='END';doc.push({type:'end'});renderLeft(leftCanvas,doc,curHeader);drawCue('翻頁進入第二幕 ▸');return;}
+  const blk=b.s===N?{type:'narr',t:b.t}:{type:'say',s:b.s,t:b.t};doc.push(blk);
+  const yEnd=renderLeft(leftCanvas,doc,curHeader);
+  if(yEnd>PH-150&&doc.length>1){doc.pop();renderLeft(leftCanvas,doc,curHeader);locked(async()=>{curHeader={k:curHeader.k,t:curHeader.t.replace('（續）','')+'（續）'};doc=[blk];await turnPage(c=>renderLeft(c,doc,curHeader),c=>renderRight(c,currentFig),S.scene);S.state='READING';const isLast=nextIsTurn();drawCue(isLast?'翻頁 ▸':'繼續閱讀 ▸');if(b.s!==N)focusSpeaker(b.s);});return;}
+  AUDIO.click();
+  const isLast=nextIsTurn();drawCue(isLast?'翻頁 ▸':'繼續閱讀 ▸');
+  if(b.s!==N)focusSpeaker(b.s);else unfocus();}
+function advance(){if(S.busy)return;if(S.state==='TITLE'){AUDIO.init();startAct();return;}if(S.state==='READING'||S.state==='AFTER'){S.beat++;showBeat();return;}
+  if(S.state==='END'){locked(async()=>{chapTxt.textContent='第二幕 ・ 牆上的矩陣';await turnPage(c=>{const g=c.getContext('2d');g.drawImage(paperBase,0,0,PW,PH);spineShade(g,'L');g.textAlign='center';g.fillStyle=TEAL;g.font='bold 24px '+FONT;g.fillText('第二幕',PW/2,560);g.fillStyle=INK;g.font='bold 54px '+FONT;g.fillText('牆上的矩陣',PW/2,640);g.fillStyle=INK2;g.font='bold 26px '+FONT;g.fillText('紙本書版原型到此為止。',PW/2,760);g.fillText('第二幕之後請見原版《MULTIVARIATE》。',PW/2,804);g.textAlign='left';leftTex.needsUpdate=true;},c=>{const g=c.getContext('2d');g.drawImage(paperBase,0,0,PW,PH);spineShade(g,'R');rightTex.needsUpdate=true;},null);S.state='DONE';});}}
+function pickOption(idx){if(S.state!=='CHOICE'||S.picked!==null)return;S.picked=idx;AUDIO.click();const o=S.choice.opts[idx];doc.forEach(b=>{if(b.type==='option')b.state=b.idx===idx?'picked':'dim';});doc.push({type:'feedback',t:o.fb,good:o.good});renderLeft(leftCanvas,doc,curHeader);
+  // cover the feedback with a flap
+  if(fbRect){flap=makeFlap(fbRect);S.state='FLAP';drawCue('掀開紙片 ▸');}}
+function liftFlap(){if(S.state!=='FLAP'||!flap)return;S.state='LIFTING';AUDIO.flip();const o=S.choice.opts[S.picked];const fl=flap;gsap.to(fl.rotation,{x:-1.6,duration:0.7,ease:'power2.out'});gsap.to(fl.scale,{x:0.001,y:0.001,z:0.001,duration:0.45,delay:0.55,ease:'power2.in',onComplete:()=>{book.remove(fl);if(flap===fl)flap=null;}});gsap.delayedCall(1.0,()=>{AUDIO.chime(o.good);S.state='AFTER';renderLeft(leftCanvas,doc,curHeader);drawCue('繼續閱讀 ▸');});}
+// quip on right page
+function charClick(ch){if(ch.userData.busy)return;ch.userData.busy=true;const s=ch.scale.x;AUDIO.pop(Math.floor(Math.random()*4));const tl=gsap.timeline({onComplete:()=>ch.userData.busy=false});tl.to(ch.scale,{x:s*1.25,y:s*0.72,z:s*1.25,duration:0.1}).to(ch.scale,{x:s*0.85,y:s*1.22,z:s*0.85,duration:0.12}).to(ch.scale,{x:s,y:s,z:s,duration:0.7,ease:'elastic.out(1,0.4)'});tl.to(ch.userData.head.rotation,{y:(Math.random()<.5?1:-1)*0.7,duration:0.25},0.1).to(ch.userData.head.rotation,{y:0,duration:0.5,ease:'elastic.out(1,0.5)'},0.45);
+  const q=ch.userData.quips;rightNote={who:ch.userData.name,t:q[Math.floor(Math.random()*q.length)]};renderRight(rightCanvas,currentFig);}
+
+/* ---------- input ---------- */
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();let down=null;
+function hits(ev,objs){mouse.x=(ev.clientX/innerWidth)*2-1;mouse.y=-(ev.clientY/innerHeight)*2+1;ray.setFromCamera(mouse,camera);return ray.intersectObjects(objs,true);}
+let dragRot=null;renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];if(S.onNote&&S.sceneGroup&&!S.busy)dragRot={x:e.clientX};});
+addEventListener('pointermove',e=>{if(!dragRot||!S.sceneGroup)return;const dx=e.clientX-dragRot.x;dragRot.x=e.clientX;S.sceneGroup.traverse(o=>{if(o.userData.float)o.userData.rotBase+=dx*0.01;});});
+addEventListener('pointerup',()=>{dragRot=null;});
+renderer.domElement.addEventListener('pointerup',e=>{if(!down)return;const mv=Math.hypot(e.clientX-down[0],e.clientY-down[1]);down=null;if(mv>6)return;onClick(e);});
+renderer.domElement.addEventListener('pointermove',e=>{let cur='default';if(!S.busy){if(flap&&S.state==='FLAP'&&hits(e,[flap]).length)cur='pointer';else if(S.sceneGroup&&hits(e,[S.sceneGroup]).some(h=>findChar(h.object)))cur='pointer';else if(S.state==='CHOICE'&&S.picked===null){const h=hits(e,[leftPage])[0];if(h&&optAt(h.uv)!==null)cur='pointer';}}renderer.domElement.style.cursor=cur;});
+function findChar(o){while(o&&!(o.userData&&o.userData.type==='char'))o=o.parent;return o;}
+function optAt(uv){const cx=uv.x*PW,cy=(1-uv.y)*PH;for(const r of optRects)if(cx>=r.x&&cx<=r.x+r.w&&cy>=r.y&&cy<=r.y+r.h)return r.idx;return null;}
+function onClick(e){if(S.busy)return;document.getElementById('hint').style.opacity=0;
+  if(flap&&S.state==='FLAP'&&hits(e,[flap]).length){liftFlap();return;}
+  if(S.sceneGroup){const h=hits(e,[S.sceneGroup]);const ch=h.length?findChar(h[0].object):null;if(ch){charClick(ch);return;}}
+  if(S.state==='CHOICE'&&S.picked===null){const h=hits(e,[leftPage])[0];if(h){const i=optAt(h.uv);if(i!==null)pickOption(i);}return;}
+  if(S.state==='FLAP'){liftFlap();return;}
+  advance();}
+addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='Enter'||e.code==='ArrowRight'){e.preventDefault();if(S.state==='FLAP'){liftFlap();return;}if(S.state!=='CHOICE')advance();}});
+document.getElementById('btnMute').addEventListener('click',()=>{if(!AUDIO.ready)AUDIO.init();const m=AUDIO.toggle();document.getElementById('btnMute').classList.toggle('off',m);});
+
+/* ---------- loop ---------- */
+renderTitle();let t=0,last=performance.now(),first=true;
+(function frame(now){const dt=Math.min(0.05,(now-last)/1000);last=now;t+=dt;if(S.sceneGroup)S.sceneGroup.traverse(o=>{const fl=o.userData.float;if(fl){o.position.y=fl.baseY+Math.sin(t*1.3+fl.phase)*fl.amp;if(!dragRot)o.userData.rotBase+=fl.spin*dt;o.rotation.y=o.userData.rotBase+Math.sin(t*0.4+fl.phase)*fl.sway;}if(o.userData.type==='char'&&!o.userData.busy){o.position.y=o.userData.baseY+Math.sin(t*2+o.userData.phase)*0.01;o.userData.head.rotation.y=Math.sin(t*0.6+o.userData.phase)*0.25;}});
+  camera.lookAt(camTarget);renderer.render(scene,camera);if(first){first=false;const L=document.getElementById('loading');L.style.opacity=0;setTimeout(()=>L.style.display='none',700);}requestAnimationFrame(frame);})(performance.now());
+</script>
+</body>
+</html>

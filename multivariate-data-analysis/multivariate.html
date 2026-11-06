@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MULTIVARIATE：The Hidden Structure of Data｜多變量 3D 互動研究檔案</title>
+<style>
+:root{
+  --ink:#0d1222; --paper:#f6f1e6; --paper2:#efe7d6; --cream:#fff9ee; --teal:#2e8b84; --amber:#d69a3a; --crimson:#b34a4a;
+  --accent:#ffd27a; --muted:#8e97b3; --card:rgba(16,20,38,.86); --line:rgba(255,255,255,.12);
+  --font:"Noto Serif TC","Noto Sans TC","PingFang TC","Microsoft JhengHei","微軟正黑體","Heiti TC",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#070a14;color:#eef0f7;font-family:var(--font);-webkit-font-smoothing:antialiased}
+#three{position:fixed;inset:0;z-index:0}
+#three canvas{display:block;outline:none}
+#trail{position:fixed;inset:0;z-index:5;pointer-events:none}
+#ui{position:fixed;inset:0;z-index:10;pointer-events:none}
+#ui > *{pointer-events:auto}
+.hidden{display:none !important}
+button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
+button:disabled{opacity:.4;cursor:not-allowed}
+
+/* ---------- Intro ---------- */
+#intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background:radial-gradient(ellipse at 50% 40%,rgba(30,40,80,.55),rgba(5,7,15,.92) 70%);cursor:pointer;transition:opacity .9s}
+#intro .eyebrow{letter-spacing:.5em;font-size:12px;color:var(--muted);margin-bottom:18px}
+#intro h1{font-size:clamp(44px,8vw,96px);letter-spacing:.18em;font-weight:700;color:#fff;text-shadow:0 0 40px rgba(255,210,122,.25)}
+#intro h2{font-size:clamp(14px,2vw,22px);letter-spacing:.3em;color:var(--accent);font-weight:400;margin-top:10px}
+#intro p{margin-top:26px;font-size:clamp(14px,1.6vw,19px);color:#d7dbea;max-width:640px;line-height:1.8}
+#intro .start{margin-top:46px;padding:14px 34px;border:1px solid rgba(255,210,122,.6);border-radius:999px;color:var(--accent);letter-spacing:.2em;font-size:14px;
+  animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,210,122,.0)}50%{box-shadow:0 0 0 12px rgba(255,210,122,.08)}}
+#intro .foot{position:absolute;bottom:26px;font-size:11px;color:var(--muted);letter-spacing:.15em}
+
+/* ---------- HUD ---------- */
+#hud{position:absolute;inset:0;pointer-events:none}
+#hud > *{pointer-events:auto}
+#badge{position:absolute;top:18px;left:20px;background:var(--card);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:10px 16px;min-width:180px;transition:opacity .4s}
+#badge .k{font-size:10px;letter-spacing:.3em;color:var(--muted)}
+#badge .t{font-size:16px;font-weight:700;margin-top:3px}
+#badge .a{font-size:12px;color:var(--accent);margin-top:2px}
+#topRight{position:absolute;top:18px;right:20px;display:flex;gap:10px}
+.iconBtn{width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--line);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s}
+.iconBtn:hover{transform:translateY(-2px);background:rgba(40,48,80,.9)}
+.iconBtn svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.iconBtn.off svg{stroke:var(--muted)}
+.iconBtn.on{border-color:rgba(255,210,122,.7)}
+#hint{position:absolute;transform:translate(-50%,-120%);background:var(--card);border:1px solid var(--line);padding:8px 14px;border-radius:10px;font-size:13px;white-space:nowrap;pointer-events:none;transition:opacity .15s;opacity:0}
+#hint b{color:var(--accent)}
+#progress{position:absolute;top:76px;left:20px;display:flex;gap:6px}
+#progress i{width:22px;height:4px;border-radius:2px;background:rgba(255,255,255,.18)}
+#progress i.done{background:var(--accent)}
+#progress i.cur{background:#fff}
+#officeTip{position:absolute;left:50%;top:22px;transform:translateX(-50%);font-size:13px;letter-spacing:.2em;color:#d7dbea;background:var(--card);border:1px solid var(--line);padding:8px 18px;border-radius:999px;transition:opacity .4s}
+
+/* ---------- Dialog ---------- */
+#dialog{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);width:min(860px,calc(100% - 40px));background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;padding:18px 24px 16px;box-shadow:0 20px 50px rgba(0,0,0,.45);transition:opacity .3s,transform .3s}
+#dialog.pop{animation:rise .35s ease-out}
+@keyframes rise{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+#dialog .speaker{display:inline-block;font-size:12px;letter-spacing:.2em;color:var(--accent);border:1px solid rgba(255,210,122,.45);padding:3px 10px;border-radius:999px;margin-bottom:10px}
+#dialog .speaker.narr{color:var(--muted);border-color:var(--line)}
+#dialog .text{font-size:17px;line-height:1.85;min-height:60px;color:#f3f4fa}
+#dialog .text em{color:var(--accent);font-style:normal}
+#dialog .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:10px;align-items:center}
+#dialog .tip{margin-right:auto;font-size:11px;color:var(--muted);letter-spacing:.1em}
+.btn{padding:9px 20px;border-radius:999px;font-size:14px;letter-spacing:.08em;background:rgba(255,255,255,.08);border:1px solid var(--line);transition:all .2s}
+.btn:hover{background:rgba(255,255,255,.16);transform:translateY(-1px)}
+.btn.primary{background:var(--accent);color:#1a1405;border-color:transparent;font-weight:700}
+.btn.primary:hover{background:#ffe0a0}
+.btn.lab{background:linear-gradient(135deg,#2e8b84,#3aa8a0);color:#fff;border-color:transparent;font-weight:700}
+.btn.ghost{background:transparent}
+
+/* ---------- Modal ---------- */
+.modal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,7,15,.62);backdrop-filter:blur(6px);animation:fade .3s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.panel{background:var(--paper);color:var(--ink);border-radius:20px;width:min(760px,calc(100% - 36px));max-height:calc(100% - 60px);overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.6);padding:30px 34px;position:relative;animation:rise2 .4s ease-out}
+@keyframes rise2{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:none}}
+.panel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;border-radius:20px 0 0 20px;background:var(--accentBar,#2e8b84)}
+.panel .eyebrow{font-size:11px;letter-spacing:.35em;color:#7b7461;margin-bottom:8px}
+.panel h3{font-size:22px;margin-bottom:14px;line-height:1.4}
+.panel p{line-height:1.8;font-size:15px;color:#2b2f3f}
+.opts{display:flex;flex-direction:column;gap:10px;margin:16px 0 6px}
+.opt{text-align:left;padding:14px 18px;border-radius:14px;background:var(--cream);border:1px solid #e3d9c2;font-size:15px;line-height:1.7;transition:all .18s;display:flex;gap:12px;align-items:flex-start}
+.opt .k{flex:0 0 26px;width:26px;height:26px;border-radius:50%;background:#1b2238;color:#ffd27a;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700;margin-top:2px}
+.opt:hover{transform:translateX(4px);border-color:var(--teal);background:#fff}
+.opt.sel{border-color:var(--teal);background:#e8f4f2}
+.opt.dim{opacity:.45}
+.fb{margin-top:14px;padding:14px 18px;border-radius:14px;background:#fff3d6;border:1px solid #f0d9a2;line-height:1.75;font-size:15px}
+.fb.good{background:#e6f6f1;border-color:#9fd8c6}
+.fb .tag{display:inline-block;font-size:11px;letter-spacing:.2em;padding:2px 8px;border-radius:999px;background:#1b2238;color:#fff;margin-bottom:6px}
+.panel .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.panel .btn{border-color:#d9d0b8;color:#1b2238}
+.panel .btn.primary{background:#1b2238;color:#ffd27a}
+.panel .btn.primary:hover{background:#2a3350}
+.chk{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-radius:12px;background:var(--cream);border:1px solid #e3d9c2;cursor:pointer;line-height:1.6;font-size:15px}
+.chk input{margin-top:5px;transform:scale(1.2)}
+.chk.sel{border-color:var(--teal);background:#e8f4f2}
+.chk.right{border-color:#5cb791;background:#e6f6f1}
+.chk.wrong{border-color:#d98b8b;background:#fbe9e9}
+.revRow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--cream);border:1px solid #e3d9c2;margin-bottom:8px;font-size:14.5px;line-height:1.6}
+.revRow .seg{display:flex;gap:4px}
+.revRow .seg button{padding:6px 12px;border-radius:999px;border:1px solid #d9d0b8;font-size:13px;background:#fff}
+.revRow .seg button.sel{background:#1b2238;color:#ffd27a;border-color:#1b2238}
+.revRow.right{border-color:#5cb791;background:#e6f6f1}
+.revRow.wrong{border-color:#d98b8b;background:#fbe9e9}
+.revRow .note{grid-column:1/-1;font-size:13px;color:#5a5f73}
+
+/* ---------- Report / ending ---------- */
+.report{background:#fff;border:1px solid #e3d9c2;border-radius:12px;padding:20px 22px;margin:12px 0;font-size:14.5px;line-height:1.8;position:relative}
+.report h4{font-size:15px;letter-spacing:.15em;color:#7b7461;margin-bottom:8px}
+.report ul{padding-left:20px}
+.report li{margin-bottom:6px}
+.stamp{position:absolute;right:18px;top:14px;transform:rotate(-8deg);border:3px solid var(--stampColor,#b34a4a);color:var(--stampColor,#b34a4a);padding:4px 10px;font-weight:700;letter-spacing:.2em;font-size:13px;border-radius:6px;opacity:.85}
+.score{display:flex;gap:8px;align-items:center;margin:8px 0}
+.score i{width:18px;height:18px;border-radius:50%;background:#e3d9c2}
+.score i.on{background:var(--teal)}
+
+/* ---------- Lab ---------- */
+#lab .panel{width:min(1180px,calc(100% - 30px));max-height:calc(100% - 30px);padding:22px 26px;--accentBar:#2e8b84}
+#lab header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px}
+#lab header h3{margin:0}
+#lab .labBody{display:grid;grid-template-columns:270px 1fr;gap:18px}
+@media (max-width:860px){#lab .labBody{grid-template-columns:1fr}}
+.ctl{background:#fff;border:1px solid #e3d9c2;border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.ctl h5{font-size:12px;letter-spacing:.25em;color:#7b7461;margin-bottom:8px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{padding:7px 12px;border-radius:999px;border:1px solid #d9d0b8;font-size:13px;background:#fbf8f1;transition:all .15s}
+.seg button:hover{background:#fff}
+.seg button.sel{background:#1b2238;color:#ffd27a;border-color:#1b2238}
+.ctl input[type=range]{width:100%}
+.ctl .val{font-weight:700;color:var(--teal)}
+.viz{background:#fff;border:1px solid #e3d9c2;border-radius:14px;padding:14px 16px;min-height:420px}
+.viz canvas{width:100%;display:block}
+.viz .note{font-size:13.5px;line-height:1.7;color:#3b4052;margin-top:10px;padding:10px 14px;background:#fbf8f1;border-radius:10px;border-left:4px solid var(--teal)}
+.viz .note b{color:#1b2238}
+.big{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.big .card{flex:1 1 150px;background:#fbf8f1;border:1px solid #e3d9c2;border-radius:12px;padding:12px 14px}
+.big .card .k{font-size:11px;letter-spacing:.2em;color:#7b7461}
+.big .card .v{font-size:28px;font-weight:700;color:#1b2238;margin-top:2px}
+.big .card .v.warn{color:var(--crimson)}
+.big .card .v.ok{color:var(--teal)}
+.big .card .s{font-size:12px;color:#5a5f73}
+table.tbl{border-collapse:collapse;width:100%;font-size:13px;margin-top:8px}
+.tbl th,.tbl td{padding:5px 8px;border-bottom:1px solid #eee5d0;text-align:right;white-space:nowrap}
+.tbl th{font-size:11px;letter-spacing:.1em;color:#7b7461;text-align:right}
+.tbl td:first-child,.tbl th:first-child{text-align:left}
+.tbl td.hi{font-weight:700;color:#1b2238}
+.tbl td.cross{background:#fff1d6;color:#9a5b00;font-weight:700}
+.tbl td.low{background:#fbe3e3;color:#a33}
+.tbl tr.sig td{background:#e6f6f1}
+.tbl .cell{display:inline-block;min-width:44px;padding:2px 4px;border-radius:4px}
+.legend{font-size:12px;color:#5a5f73;margin-top:8px;display:flex;gap:14px;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{padding:8px 14px;border-radius:10px 10px 0 0;border:1px solid #e3d9c2;border-bottom:none;background:#efe7d6;font-size:13px}
+.tabs button.sel{background:#fff;font-weight:700;color:#1b2238}
+
+/* ---------- Toast ---------- */
+#toast{position:absolute;left:50%;top:110px;transform:translateX(-50%);background:var(--cream);color:var(--ink);padding:10px 18px;border-radius:999px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,6px)}
+#toast::after{content:"";position:absolute;left:50%;bottom:-7px;width:12px;height:12px;background:var(--cream);transform:translateX(-50%) rotate(45deg)}
+
+/* ---------- Final ---------- */
+#final .panel{--accentBar:#ffd27a;text-align:center}
+#final h3{font-size:28px;letter-spacing:.2em}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0;text-align:left}
+@media (max-width:700px){.grid3{grid-template-columns:1fr}}
+.grid3 .c{background:#fff;border:1px solid #e3d9c2;border-radius:12px;padding:14px;font-size:13.5px;line-height:1.7}
+.grid3 .c b{display:block;font-size:15px;margin-bottom:4px}
+#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#070a14;z-index:50;color:var(--muted);letter-spacing:.3em;font-size:13px;transition:opacity .6s}
+</style>
+</head>
+<body>
+<div id="three"></div>
+<canvas id="trail"></canvas>
+<div id="ui">
+  <div id="loading">載入研究室中…</div>
+  <div id="intro">
+    <div class="eyebrow">RESEARCH CASE FILES</div>
+    <h1>MULTIVARIATE</h1>
+    <h2>The Hidden Structure of Data</h2>
+    <p>當數據不只一個維度，真相也不只有一種解釋。<br>深夜的研究室，桌上放著三份尚未解決的研究檔案。<br>你是一位運動科學研究者。請重新分析資料，找出問題究竟出在哪裡。</p>
+    <div class="start">點擊任意處，進入研究室</div>
+    <div class="foot">多變量統計分析｜互動式研究電影｜PCA · FA · CLUSTER · LDA · MANOVA</div>
+  </div>
+  <div id="hud" class="hidden">
+    <div id="badge"><div class="k">CASE FILE</div><div class="t">研究室</div><div class="a">選擇一份檔案</div></div>
+    <div id="progress"></div>
+    <div id="officeTip">點擊桌上的研究檔案，開啟案件</div>
+    <div id="topRight">
+      <button id="btnOrbit" class="iconBtn off hidden" title="自由視角（拖曳旋轉）"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3 3 3 13 0 16M12 4c-3 3-3 13 0 16"/></svg></button>
+      <button id="btnHome" class="iconBtn hidden" title="回到研究室"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></button>
+      <button id="btnMute" class="iconBtn" title="音樂開關"><svg id="icoSound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8a5 5 0 0 1 0 8M19 5a9 9 0 0 1 0 14"/></svg></button>
+    </div>
+    <div id="hint"></div>
+    <div id="dialog" class="hidden">
+      <div class="speaker">旁白</div>
+      <div class="text"></div>
+      <div class="actions"><span class="tip">點擊畫面或按空白鍵繼續 ・ 點擊角色有驚喜</span><button id="btnLab" class="btn lab hidden">進入統計實驗室</button><button id="btnNext" class="btn primary">繼續 ▸</button></div>
+    </div>
+  </div>
+  <div id="toast"></div>
+  <div id="choice" class="modal hidden"><div class="panel"><div class="eyebrow">RESEARCH DECISION ・ 研究決策</div><h3 class="q"></h3><div class="opts"></div><div class="fb hidden"></div><div class="actions"><button id="btnChoiceNext" class="btn primary hidden">繼續 ▸</button></div></div></div>
+  <div id="lab" class="modal hidden"><div class="panel"><header><div><div class="eyebrow">STATISTICS LAB ・ 統計實驗室</div><h3 id="labTitle"></h3></div><button id="btnLabClose" class="btn primary">完成分析，回到劇情 ▸</button></header><div class="labBody"><div id="labCtl"></div><div id="labViz" class="viz"></div></div></div></div>
+  <div id="ending" class="modal hidden"><div class="panel"><div class="eyebrow">CASE CLOSED ・ 結案報告</div><h3 id="endTitle"></h3><div id="endBody"></div><div class="actions"><button id="btnEndClose" class="btn primary">闔上檔案，回到研究室 ▸</button></div></div></div>
+  <div id="final" class="modal hidden"><div class="panel"><div class="eyebrow">ALL CASES CLOSED</div><h3>MULTIVARIATE</h3><p style="margin-top:8px">三份檔案都已結案。</p><div id="finalBody"></div><p style="margin-top:14px;font-size:14px;color:#5a5f73">統計模型所呈現的結構，未必等同於研究者宣稱的構念；<br>正確率回答的是它被問的問題；整體顯著，也只是一句話的開頭。</p><div class="actions" style="justify-content:center"><button id="btnFinalClose" class="btn primary">回到研究室</button></div></div></div>
+</div>
+<script>
+/* ---------- 程式庫載入器：多重 CDN 備援 + 自我診斷 ---------- */
+(function(){
+  const L=document.getElementById('loading');
+  function msg(html){L.innerHTML=html;L.style.letterSpacing='0';L.style.padding='0 40px';L.style.textAlign='center';L.style.lineHeight='2';L.style.fontSize='15px';L.style.color='#eef0f7';L.style.opacity=1;L.classList.remove('hidden');}
+  window.__diag=msg;
+  window.addEventListener('error',e=>{if(window.__booted)return;msg('載入時發生錯誤：<br><code style="color:#ffd27a">'+(e.message||e.type)+'</code><br><span style="color:#8e97b3;font-size:13px">'+(e.filename?e.filename.split('/').pop()+'：'+e.lineno:'')+'</span><br>請按 F12 開啟主控台查看詳情。');});
+  const SRC=[
+    ['three.js',['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js','https://unpkg.com/three@0.128.0/build/three.min.js'],()=>!!window.THREE,false],
+    ['OrbitControls',['https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js','https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js'],()=>!!(window.THREE&&THREE.OrbitControls),true],
+    ['GSAP',['https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js','https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js','https://unpkg.com/gsap@3.12.5/dist/gsap.min.js'],()=>!!window.gsap,false]
+  ];
+  function load(url){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=url;s.async=false;s.onload=res;s.onerror=()=>rej(new Error(url));document.head.appendChild(s);});}
+  async function loadAny([name,urls,ok,optional]){for(const u of urls){try{await load(u);if(ok())return true;}catch(e){}}if(optional)return false;throw new Error(name);}
+  (async()=>{
+    try{
+      await loadAny(SRC[0]);const hasOrbit=await loadAny(SRC[1]);await loadAny(SRC[2]);
+      if(!hasOrbit){THREE.OrbitControls=function(){this.enabled=false;this.target=new THREE.Vector3();this.update=function(){};};}
+      if(!window.WebGLRenderingContext){msg('你的瀏覽器不支援 WebGL，無法顯示 3D 場景。請改用最新版 Chrome 或 Edge。');return;}
+      msg('載入研究室中…');
+      setTimeout(()=>{if(!window.__booted&&!document.hidden)msg('3D 場景啟動逾時。<br>請確認瀏覽器已開啟「硬體加速」（Chrome／Edge 設定 → 系統），<br>若透過遠端桌面連線，WebGL 可能被停用，請在本機螢幕開啟。<br>按 F12 可查看主控台錯誤訊息。');},15000);
+      __boot();
+    }catch(e){msg('無法載入程式庫 <b>'+e.message+'</b>（已嘗試 cdnjs／jsdelivr／unpkg 三個來源）。<br>這個檔案需要網路連線以取得 three.js 與 GSAP；<br>請確認網路、VPN 或防火牆設定後重新整理（F5）。');}
+  })();
+})();
+</script>
+<script>
+function __boot(){
+// ===== MULTIVARIATE : stat core (shared by node test & browser) =====
+const MV = (function(){
+  // ---------- RNG ----------
+  function RNG(seed){
+    let s = seed >>> 0;
+    const r = {
+      next(){ s += 0x6D2B79F5; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; },
+      norm(){ let u = 0; while(u === 0) u = r.next(); const v = r.next(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); },
+      int(n){ return Math.floor(r.next()*n); },
+      shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=r.int(i+1); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+    };
+    return r;
+  }
+  // ---------- matrix ----------
+  const zeros=(n,m)=>Array.from({length:n},()=>new Array(m).fill(0));
+  const eye=n=>{const I=zeros(n,n);for(let i=0;i<n;i++)I[i][i]=1;return I;};
+  const T=A=>A[0].map((_,j)=>A.map(r=>r[j]));
+  function mul(A,B){const n=A.length,m=B[0].length,k=B.length;const C=zeros(n,m);for(let i=0;i<n;i++)for(let j=0;j<m;j++){let s=0;for(let t=0;t<k;t++)s+=A[i][t]*B[t][j];C[i][j]=s;}return C;}
+  const add=(A,B)=>A.map((r,i)=>r.map((v,j)=>v+B[i][j]));
+  const sub=(A,B)=>A.map((r,i)=>r.map((v,j)=>v-B[i][j]));
+  const scale=(A,s)=>A.map(r=>r.map(v=>v*s));
+  function inv(A){const n=A.length;const M=A.map((r,i)=>r.concat(eye(n)[i]));for(let c=0;c<n;c++){let p=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;[M[c],M[p]]=[M[p],M[c]];const d=M[c][c];if(Math.abs(d)<1e-14)throw new Error('singular');for(let j=0;j<2*n;j++)M[c][j]/=d;for(let r=0;r<n;r++){if(r===c)continue;const f=M[r][c];if(f===0)continue;for(let j=0;j<2*n;j++)M[r][j]-=f*M[c][j];}}return M.map(r=>r.slice(n));}
+  function det(A){const n=A.length;const M=A.map(r=>r.slice());let d=1;for(let c=0;c<n;c++){let p=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;if(Math.abs(M[p][c])<1e-300)return 0;if(p!==c){[M[c],M[p]]=[M[p],M[c]];d=-d;}d*=M[c][c];for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let j=c;j<n;j++)M[r][j]-=f*M[c][j];}}return d;}
+  function trace(A){let s=0;for(let i=0;i<A.length;i++)s+=A[i][i];return s;}
+  function chol(A){const n=A.length;const L=zeros(n,n);for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=A[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];if(i===j){if(s<=0)throw new Error('not PD');L[i][i]=Math.sqrt(s);}else L[i][j]=s/L[j][j];}return L;}
+  // symmetric eigen (Jacobi) -> values desc, vectors as columns
+  function eigSym(A){
+    const n=A.length;const a=A.map(r=>r.slice());const v=eye(n);
+    for(let sweep=0;sweep<100;sweep++){
+      let off=0;for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)off+=a[i][j]*a[i][j];
+      if(off<1e-20)break;
+      for(let p=0;p<n;p++)for(let q=p+1;q<n;q++){
+        if(Math.abs(a[p][q])<1e-300)continue;
+        const theta=(a[q][q]-a[p][p])/(2*a[p][q]);
+        const t=(theta>=0?1:-1)/(Math.abs(theta)+Math.sqrt(theta*theta+1));
+        const c=1/Math.sqrt(t*t+1),s=t*c;
+        for(let k=0;k<n;k++){const akp=a[k][p],akq=a[k][q];a[k][p]=c*akp-s*akq;a[k][q]=s*akp+c*akq;}
+        for(let k=0;k<n;k++){const apk=a[p][k],aqk=a[q][k];a[p][k]=c*apk-s*aqk;a[q][k]=s*apk+c*aqk;}
+        for(let k=0;k<n;k++){const vkp=v[k][p],vkq=v[k][q];v[k][p]=c*vkp-s*vkq;v[k][q]=s*vkp+c*vkq;}
+      }
+    }
+    const idx=a.map((_,i)=>i).sort((i,j)=>a[j][j]-a[i][i]);
+    const values=idx.map(i=>a[i][i]);
+    const vectors=zeros(n,n);
+    idx.forEach((i,j)=>{ // make sign deterministic: largest abs component positive
+      let mi=0;for(let k=0;k<n;k++)if(Math.abs(v[k][i])>Math.abs(v[mi][i]))mi=k;
+      const sg=v[mi][i]<0?-1:1;for(let k=0;k<n;k++)vectors[k][j]=sg*v[k][i];});
+    return {values,vectors};
+  }
+  // ---------- descriptive ----------
+  const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+  const sd=a=>{const m=mean(a);return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/(a.length-1));};
+  function colMeans(X){const p=X[0].length;const m=new Array(p).fill(0);X.forEach(r=>r.forEach((v,j)=>m[j]+=v));return m.map(v=>v/X.length);}
+  function cov(X){const n=X.length,p=X[0].length;const m=colMeans(X);const C=zeros(p,p);X.forEach(r=>{for(let i=0;i<p;i++)for(let j=0;j<p;j++)C[i][j]+=(r[i]-m[i])*(r[j]-m[j]);});return scale(C,1/(n-1));}
+  function corr(X){const C=cov(X);const p=C.length;const R=zeros(p,p);for(let i=0;i<p;i++)for(let j=0;j<p;j++)R[i][j]=C[i][j]/Math.sqrt(C[i][i]*C[j][j]);return R;}
+  function standardize(X,m,s){const p=X[0].length;m=m||colMeans(X);s=s||X[0].map((_,j)=>sd(X.map(r=>r[j])));return {Z:X.map(r=>r.map((v,j)=>(v-m[j])/s[j])),m,s};}
+  // ---------- distributions ----------
+  function gammln(x){const cof=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,tmp=x+5.5;tmp-=(x+0.5)*Math.log(tmp);let ser=1.000000000190015;for(let j=0;j<6;j++)ser+=cof[j]/++y;return -tmp+Math.log(2.5066282746310005*ser/x);}
+  function betacf(a,b,x){const MAXIT=300,EPS=3e-14,FPMIN=1e-300;const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<FPMIN)d=FPMIN;d=1/d;let h=d;for(let m=1;m<=MAXIT;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FPMIN)d=FPMIN;c=1+aa/c;if(Math.abs(c)<FPMIN)c=FPMIN;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FPMIN)d=FPMIN;c=1+aa/c;if(Math.abs(c)<FPMIN)c=FPMIN;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+  function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(gammln(a+b)-gammln(a)-gammln(b)+a*Math.log(x)+b*Math.log(1-x));if(x<(a+1)/(a+b+2))return bt*betacf(a,b,x)/a;return 1-bt*betacf(b,a,1-x)/b;}
+  function pF(F,d1,d2){if(!(F>0))return 1;return betai(d2/2,d1/2,d2/(d2+d1*F));}
+  function gammp(a,x){if(x<=0)return 0;if(x<a+1){let ap=a,sum=1/a,del=sum;for(let n=1;n<=500;n++){ap+=1;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*3e-14)break;}return sum*Math.exp(-x+a*Math.log(x)-gammln(a));}
+    let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<=500;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-14)break;}return 1-Math.exp(-x+a*Math.log(x)-gammln(a))*h;}
+  function pChi(x,k){if(!(x>0))return 1;return 1-gammp(k/2,x/2);}
+  function pNorm(z){return 0.5*(1+erf(z/Math.SQRT2));}
+  function erf(x){const t=1/(1+0.3275911*Math.abs(x));const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return x>=0?y:-y;}
+  function pT(t,df){return betai(df/2,0.5,df/(df+t*t));} // two-sided
+
+  // ---------- Factor analysis ----------
+  function pcaLoad(R,k){const e=eigSym(R);const L=R.map((_,i)=>Array.from({length:k},(_,j)=>e.vectors[i][j]*Math.sqrt(Math.max(e.values[j],0))));return {L,values:e.values};}
+  function smc(R){const Ri=inv(R);return R.map((_,i)=>1-1/Ri[i][i]);}
+  function paf(R,k,iters=60){const n=R.length;let h=smc(R);let L;for(let it=0;it<iters;it++){const Rr=R.map(r=>r.slice());for(let i=0;i<n;i++)Rr[i][i]=h[i];const e=eigSym(Rr);L=Rr.map((_,i)=>Array.from({length:k},(_,j)=>e.vectors[i][j]*Math.sqrt(Math.max(e.values[j],0))));const h2=L.map(r=>r.reduce((s,v)=>s+v*v,0));let diff=0;for(let i=0;i<n;i++)diff=Math.max(diff,Math.abs(h2[i]-h[i]));h=h2.map(v=>Math.min(v,0.995));if(diff<1e-6)break;}return {L,h};}
+  function svdSmall(M){const MtM=mul(T(M),M);const e=eigSym(MtM);const k=M.length;const S=e.values.map(v=>Math.sqrt(Math.max(v,0)));const V=e.vectors;const U=zeros(k,k);const MV_=mul(M,V);for(let i=0;i<k;i++)for(let j=0;j<k;j++)U[i][j]=S[j]>1e-12?MV_[i][j]/S[j]:(i===j?1:0);return {U,S,V};}
+  function varimax(L0,normalize=true){const p=L0.length,k=L0[0].length;if(k<2)return {L:L0.map(r=>r.slice()),R:eye(k)};const h=L0.map(r=>Math.sqrt(r.reduce((s,v)=>s+v*v,0))||1);const L=normalize?L0.map((r,i)=>r.map(v=>v/h[i])):L0.map(r=>r.slice());let R=eye(k),d=0;for(let it=0;it<200;it++){const LR=mul(L,R);const colSq=new Array(k).fill(0);LR.forEach(r=>r.forEach((v,j)=>colSq[j]+=v*v));const B=LR.map(r=>r.map((v,j)=>v*v*v-v*colSq[j]/p));const M=mul(T(L),B);const {U,S,V}=svdSmall(M);R=mul(U,T(V));const dn=S.reduce((s,v)=>s+v,0);if(dn<d*(1+1e-7))break;d=dn;}let Lr=mul(L,R);if(normalize)Lr=Lr.map((r,i)=>r.map(v=>v*h[i]));
+    // order factors by SS loadings, sign so that column sum positive
+    const ss=Array.from({length:k},(_,j)=>Lr.reduce((s,r)=>s+r[j]*r[j],0));const order=ss.map((_,j)=>j).sort((a,b)=>ss[b]-ss[a]);Lr=Lr.map(r=>order.map(j=>r[j]));for(let j=0;j<k;j++){const cs=Lr.reduce((s,r)=>s+r[j],0);if(cs<0)Lr.forEach(r=>r[j]=-r[j]);}return {L:Lr,R};}
+  function parallel(N,p,rng,reps=20){const acc=new Array(p).fill(0);for(let r=0;r<reps;r++){const X=Array.from({length:N},()=>Array.from({length:p},()=>rng.norm()));const e=eigSym(corr(X));e.values.forEach((v,i)=>acc[i]+=v);}return acc.map(v=>v/reps);}
+
+  // ---------- clustering / classification ----------
+  function dist2(a,b){let s=0;for(let i=0;i<a.length;i++){const d=a[i]-b[i];s+=d*d;}return s;}
+  function kmeans(X,k,rng,restarts=8){let best=null;for(let r=0;r<restarts;r++){
+      // k-means++
+      const C=[X[rng.int(X.length)].slice()];while(C.length<k){const d=X.map(x=>Math.min(...C.map(c=>dist2(x,c))));const tot=d.reduce((s,v)=>s+v,0);let u=rng.next()*tot,i=0;while(u>d[i]&&i<X.length-1){u-=d[i];i++;}C.push(X[i].slice());}
+      let lab=new Array(X.length).fill(-1);for(let it=0;it<100;it++){let changed=false;X.forEach((x,i)=>{let bi=0,bd=Infinity;C.forEach((c,j)=>{const d=dist2(x,c);if(d<bd){bd=d;bi=j;}});if(lab[i]!==bi){lab[i]=bi;changed=true;}});const sums=C.map(()=>new Array(X[0].length).fill(0)),cnt=new Array(k).fill(0);X.forEach((x,i)=>{cnt[lab[i]]++;x.forEach((v,j)=>sums[lab[i]][j]+=v);});for(let j=0;j<k;j++)if(cnt[j]>0)C[j]=sums[j].map(v=>v/cnt[j]);if(!changed)break;}
+      const wss=X.reduce((s,x,i)=>s+dist2(x,C[lab[i]]),0);if(!best||wss<best.wss)best={C,lab,wss};}
+    // relabel clusters by centroid order (first dim) for determinism
+    const order=best.C.map((c,j)=>j).sort((a,b)=>best.C[a][0]-best.C[b][0]);const map=new Array(k);order.forEach((j,i)=>map[j]=i);return {C:order.map(j=>best.C[j]),lab:best.lab.map(l=>map[l]),wss:best.wss};}
+  function silhouette(X,lab,k){const n=X.length;if(k<2)return 0;const D=zeros(n,n);for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){D[i][j]=D[j][i]=Math.sqrt(dist2(X[i],X[j]));}let tot=0;for(let i=0;i<n;i++){const sums=new Array(k).fill(0),cnt=new Array(k).fill(0);for(let j=0;j<n;j++){if(j===i)continue;sums[lab[j]]+=D[i][j];cnt[lab[j]]++;}const a=cnt[lab[i]]>0?sums[lab[i]]/cnt[lab[i]]:0;let b=Infinity;for(let c=0;c<k;c++){if(c===lab[i]||cnt[c]===0)continue;b=Math.min(b,sums[c]/cnt[c]);}tot+=cnt[lab[i]]>0?(b-a)/Math.max(a,b):0;}return tot/n;}
+  // Ward hierarchical: returns merge heights (last levels) and labels for k
+  function ward(X,kMax=8){const n=X.length;let clusters=X.map((x,i)=>({pts:[i],cen:x.slice(),n:1}));const heights=[];const labelsAt={};
+    while(clusters.length>1){let bi=0,bj=1,bd=Infinity;for(let i=0;i<clusters.length;i++)for(let j=i+1;j<clusters.length;j++){const a=clusters[i],b=clusters[j];const d=(a.n*b.n)/(a.n+b.n)*dist2(a.cen,b.cen);if(d<bd){bd=d;bi=i;bj=j;}}
+      const a=clusters[bi],b=clusters[bj];const m={pts:a.pts.concat(b.pts),n:a.n+b.n,cen:a.cen.map((v,t)=>(v*a.n+b.cen[t]*b.n)/(a.n+b.n))};clusters.splice(bj,1);clusters.splice(bi,1);clusters.push(m);heights.push(Math.sqrt(bd));
+      if(clusters.length<=kMax){const lab=new Array(n);const order=clusters.map((c,j)=>j).sort((p,q)=>clusters[p].cen[0]-clusters[q].cen[0]);order.forEach((j,ci)=>clusters[j].pts.forEach(p=>lab[p]=ci));labelsAt[clusters.length]=lab;}}
+    return {heights,labelsAt};}
+  function lda(X,y,k){const p=X[0].length;const n=X.length;const means=[],cnt=[];for(let c=0;c<k;c++){const idx=y.map((v,i)=>v===c?i:-1).filter(i=>i>=0);cnt.push(idx.length);const m=new Array(p).fill(0);idx.forEach(i=>X[i].forEach((v,j)=>m[j]+=v));means.push(m.map(v=>v/Math.max(idx.length,1)));}
+    const W=zeros(p,p);X.forEach((x,i)=>{const m=means[y[i]];for(let a=0;a<p;a++)for(let b=0;b<p;b++)W[a][b]+=(x[a]-m[a])*(x[b]-m[b]);});const S=scale(W,1/(n-k));const Si=inv(S);const priors=cnt.map(c=>c/n);
+    const model={means,Si,priors,k,S};model.predict=x=>{let bc=0,bs=-Infinity;for(let c=0;c<k;c++){const m=means[c];let s=0;const w=Si.map(r=>r.reduce((acc,v,j)=>acc+v*m[j],0));for(let j=0;j<p;j++)s+=w[j]*(x[j]-0.5*m[j]);s+=Math.log(priors[c]||1e-9);if(s>bs){bs=s;bc=c;}}return bc;};return model;}
+  const accuracy=(pred,y)=>pred.reduce((s,v,i)=>s+(v===y[i]?1:0),0)/y.length;
+  function confusion(pred,y,k){const M=zeros(k,k);y.forEach((t,i)=>M[t][pred[i]]++);return M;}
+  function cvAccuracy(X,y,k,folds,rng){const idx=rng.shuffle(X.map((_,i)=>i));let correct=0;for(let f=0;f<folds;f++){const test=idx.filter((_,i)=>i%folds===f);const train=idx.filter((_,i)=>i%folds!==f);const m=lda(train.map(i=>X[i]),train.map(i=>y[i]),k);test.forEach(i=>{if(m.predict(X[i])===y[i])correct++;});}return correct/X.length;}
+  function anovaF(x,y,k){const n=x.length;const gm=mean(x);const groups=Array.from({length:k},()=>[]);x.forEach((v,i)=>groups[y[i]].push(v));let ssb=0,ssw=0;groups.forEach(g=>{if(!g.length)return;const m=mean(g);ssb+=g.length*(m-gm)*(m-gm);g.forEach(v=>ssw+=(v-m)*(v-m));});const F=(ssb/(k-1))/(ssw/(n-k));return {F,p:pF(F,k-1,n-k),eta2:ssb/(ssb+ssw)};}
+
+  // ---------- MANOVA ----------
+  function manova(X,y,g){const p=X[0].length,N=X.length;const gm=colMeans(X);const means=[],ns=[],covs=[];for(let c=0;c<g;c++){const G=X.filter((_,i)=>y[i]===c);ns.push(G.length);means.push(colMeans(G));covs.push(cov(G));}
+    const H=zeros(p,p),E=zeros(p,p);for(let c=0;c<g;c++){for(let a=0;a<p;a++)for(let b=0;b<p;b++)H[a][b]+=ns[c]*(means[c][a]-gm[a])*(means[c][b]-gm[b]);}X.forEach((x,i)=>{const m=means[y[i]];for(let a=0;a<p;a++)for(let b=0;b<p;b++)E[a][b]+=(x[a]-m[a])*(x[b]-m[b]);});
+    const q=g-1,v=N-g;const L=chol(E);const Li=inv(L);const Msym=mul(mul(Li,H),T(Li));const eg=eigSym(Msym);const theta=eg.values.map(t=>Math.max(t,0));const s=Math.min(p,q);
+    const wilks=theta.reduce((acc,t)=>acc/(1+t),1);
+    // Rao F for Wilks
+    let t=(p*p+q*q-5>0)?Math.sqrt((p*p*q*q-4)/(p*p+q*q-5)):1;const r=v-(p-q+1)/2,u=(p*q-2)/4;const df1w=p*q,df2w=r*t-2*u;const lt=Math.pow(wilks,1/t);const Fw=((1-lt)/lt)*(df2w/df1w);
+    const pillai=theta.slice(0,s).reduce((acc,t)=>acc+t/(1+t),0);const m=(Math.abs(p-q)-1)/2,nn=(v-p-1)/2;const df1p=s*(2*m+s+1),df2p=s*(2*nn+s+1);const Fp=(pillai/(s-pillai))*(df2p/df1p);
+    const hl=theta.slice(0,s).reduce((acc,t)=>acc+t,0);const df1h=s*(2*m+s+1),df2h=2*(s*nn+1);const Fh=hl*df2h/(s*s*(2*m+s+1));
+    const roy=theta[0];const d=Math.max(p,q);const df1r=d,df2r=v-d+q;const Fr=roy*df2r/df1r;
+    // Box's M
+    const Sp=scale(E,1/v);let M=v*Math.log(det(Sp));covs.forEach((S,c)=>M-=(ns[c]-1)*Math.log(det(S)));const cc=(ns.reduce((acc,n)=>acc+1/(n-1),0)-1/v)*(2*p*p+3*p-1)/(6*(p+1)*(g-1));const chi=M*(1-cc),dfb=p*(p+1)*(g-1)/2;
+    // discriminant function (first) standardized coefficients
+    const a=mul(T(Li),eg.vectors.map(r=>[r[0]]));const sdw=Sp.map((r,i)=>Math.sqrt(r[i]));let coef=a.map((r,i)=>r[0]*sdw[i]);const mx=Math.max(...coef.map(Math.abs));coef=coef.map(c=>c/mx);
+    // univariate
+    const uni=Array.from({length:p},(_,j)=>anovaF(X.map(r=>r[j]),y,g));
+    // Mahalanobis within group
+    const Spi=inv(Sp);const md=X.map((x,i)=>{const dlt=x.map((v,j)=>v-means[y[i]][j]);let sum=0;for(let a2=0;a2<p;a2++)for(let b=0;b<p;b++)sum+=dlt[a2]*Spi[a2][b]*dlt[b];return sum;});
+    return {N,p,g,means,ns,covs,Sp,theta,wilks,Fw,df1w,df2w,pw:pF(Fw,df1w,df2w),pillai,Fp,df1p,df2p,pp:pF(Fp,df1p,df2p),hl,Fh,df1h,df2h,ph:pF(Fh,df1h,df2h),roy,Fr,df1r,df2r,pr:pF(Fr,df1r,df2r),boxM:M,boxChi:chi,boxDf:dfb,boxP:pChi(chi,dfb),coef,uni,md,eta2:1-wilks};}
+
+  return {RNG,zeros,eye,T,mul,add,sub,scale,inv,det,trace,chol,eigSym,mean,sd,colMeans,cov,corr,standardize,pF,pChi,pNorm,pT,pcaLoad,paf,varimax,parallel,smc,kmeans,silhouette,ward,lda,accuracy,confusion,cvAccuracy,anovaF,manova};
+})();
+if(typeof module!=='undefined')module.exports=MV;
+// ===== MULTIVARIATE : simulated research datasets (deterministic, reproducible) =====
+const DATA = (function(MV){
+  // ---- Case 1 : 24 performance indicators, 3 latent constructs + 1 wearable-device method factor ----
+  const VARS1 = [
+    {n:'垂直跳',f:[0.80,0,0,0]},{n:'立定跳遠',f:[0.78,0,0,0]},{n:'30m衝刺(反向)',f:[0.74,0,0,0]},{n:'深蹲1RM',f:[0.82,0,0,0]},
+    {n:'臥推1RM',f:[0.70,0,0,0]},{n:'藥球投擲',f:[0.72,0,0,0]},{n:'反應力量指數',f:[0.28,0,0.12,0.30],u:0.9},{n:'10m加速',f:[0.68,0,0,0]},
+    {n:'VO2max',f:[0,0.82,0,0]},{n:'乳酸閾值',f:[0,0.76,0,0]},{n:'心率恢復',f:[0,0.72,0,0]},{n:'3000m(反向)',f:[0,0.80,0,0]},
+    {n:'Yo-Yo測試',f:[0.22,0.70,0,0]},{n:'睡眠品質',f:[0,0.30,0.18,0.45],u:0.82},{n:'HRV',f:[0,0.62,0,0.40]},{n:'疲勞自評(反向)',f:[0,0.48,0.42,0]},
+    {n:'專注力量表',f:[0,0,0.78,0]},{n:'自信心',f:[0,0,0.74,0]},{n:'競賽焦慮(反向)',f:[0,0,0.70,0]},{n:'內在動機',f:[0,0,0.72,0]},
+    {n:'心理韌性量表',f:[0,0,0.80,0]},{n:'教練評分',f:[0.46,0,0.45,0]},{n:'壓力因應',f:[0,0,0.68,0]},{n:'情緒調節',f:[0,0,0.64,0]}
+  ];
+  function genCase1(){
+    const rng=MV.RNG(20241101);const N=300;const X=[];
+    const fc=[[1,0.35,0.25,0],[0.35,1,0.30,0],[0.25,0.30,1,0],[0,0,0,1]];const L=MV.chol(fc);
+    for(let i=0;i<N;i++){const z=[rng.norm(),rng.norm(),rng.norm(),rng.norm()];const fa=L.map(r=>r.reduce((s,v,j)=>s+v*z[j],0));
+      X.push(VARS1.map(v=>{const com=v.f.reduce((s,l,j)=>s+l*fa[j],0);let h=0;for(let a=0;a<4;a++)for(let b=0;b<4;b++)h+=v.f[a]*v.f[b]*fc[a][b];const u=v.u||Math.sqrt(Math.max(1-h,0.05));return com+u*rng.norm();}));}
+    const R=MV.corr(X);const eig=MV.eigSym(R).values;const pa=MV.parallel(N,24,MV.RNG(77),15);
+    return {N,X,R,vars:VARS1.map(v=>v.n),eig,pa,groups:['爆發力／力量','耐力／恢復','心理／專注']};
+  }
+  // ---- Case 2 : athletes, 2 core features, hidden true training-response type, 120 noise biomarkers ----
+  function genCase2(){
+    const rng=MV.RNG(8086);
+    function sample(n){const X=[],y=[];for(let i=0;i<n;i++){const a=rng.norm();const b=0.3*a+Math.sqrt(1-0.09)*rng.norm();
+        const g=[0.9*a-0.3*b+0.9*rng.norm(), 0.9*b-0.3*a+0.9*rng.norm(), 0.45*(a+b)+0.35+0.9*rng.norm()];
+        let t=0;for(let k=1;k<3;k++)if(g[k]>g[t])t=k;X.push([Math.round((a*12+60)*10)/10,Math.round((b*12+60)*10)/10]);y.push(t);}return {X,y};}
+    const train=sample(180),test=sample(90);
+    const rngN=MV.RNG(7);const P=120;const noiseTrain=Array.from({length:180},()=>Array.from({length:P},()=>rngN.norm()));
+    return {train,test,noiseTrain,P,featNames:['爆發力指數','恢復能力指數'],typeNames:['速度型','耐力型','綜合型']};
+  }
+  // ---- Case 3 : 3 groups × 30, 3 DVs, 3 multivariate outliers in the control group ----
+  function genCase3(){
+    const rng=MV.RNG(39);const g=3,n=30;const dv=['肌力 (kg)','速度進步 (秒)','爆發力 (W)'];
+    const m1=1.1,m2=0.8;const eff=[[1.0*m1,0.35*m1,0.05],[0.5*m2,0.2*m2,0.02],[0,0,0]];
+    const base=[120,0,2900],sds=[18,1,260];
+    const C=[[1,0.5,0.55],[0.5,1,0.45],[0.55,0.45,1]];const L=MV.chol(C);const X=[],y=[];
+    for(let c=0;c<g;c++)for(let i=0;i<n;i++){const z=[rng.norm(),rng.norm(),rng.norm()];const e=L.map(r=>r.reduce((s,v,j)=>s+v*z[j],0));
+      X.push([0,1,2].map(j=>base[j]+sds[j]*(e[j]+eff[c][j])));y.push(c);}
+    X.forEach(r=>r[1]=Math.round((r[1]*0.08)*1000)/1000);
+    const ci=y.indexOf(2);X[ci+3]=[58,-0.42,2000];X[ci+11]=[190,0.05,2915];X[ci+20]=[122,0.31,3850];
+    X.forEach(r=>{r[0]=Math.round(r[0]*10)/10;r[2]=Math.round(r[2]);});
+    return {X,y,g,n,dv,groups:['新訓練法','傳統訓練','對照組'],randomized:false};
+  }
+  return {genCase1,genCase2,genCase3,VARS1};
+})(typeof MV!=='undefined'?MV:require('./stats.js'));
+if(typeof module!=='undefined')module.exports=DATA;
+// ===== MULTIVARIATE : pre-computed analysis results used by narrative templates =====
+const VALS = (function(MV,DATA){
+  const V={};
+  const pct=x=>Math.round(x*1000)/10;
+  const fmtP=p=>p<0.001?'< .001':('= '+p.toFixed(3).replace(/^0/,''));
+  // Case 1
+  const c1=DATA.genCase1();V.c1=c1;
+  V.c1kaiser=c1.eig.filter(v=>v>1).length;V.c1pa=c1.eig.filter((v,i)=>v>c1.pa[i]).length;
+  V.c1eig=c1.eig.slice(0,5).map(v=>v.toFixed(2)).join('、');
+  const pf3=MV.paf(c1.R,3);const v3=MV.varimax(pf3.L);V.c1L=v3.L;V.c1h=pf3.h;
+  V.c1explained=Math.round(c1.eig.slice(0,3).reduce((s,v)=>s+v,0)/24*100);
+  // Case 2
+  const c2=DATA.genCase2();V.c2=c2;
+  const km3=MV.kmeans(c2.train.X,3,MV.RNG(103));V.c2km3=km3;
+  const mdl=MV.lda(c2.train.X,km3.lab,3);
+  V.c2resub=pct(MV.accuracy(c2.train.X.map(x=>mdl.predict(x)),km3.lab));
+  V.c2cv=pct(MV.cvAccuracy(c2.train.X,km3.lab,3,5,MV.RNG(9)));
+  const map=[0,1,2].map(c=>{const cnt=[0,0,0];c2.train.y.forEach((t,i)=>{if(km3.lab[i]===c)cnt[t]++;});return cnt.indexOf(Math.max(...cnt));});
+  V.c2map=map;V.c2sysTrueTest=pct(MV.accuracy(c2.test.X.map(x=>map[mdl.predict(x)]),c2.test.y));
+  const mt=MV.lda(c2.train.X,c2.train.y,3);V.c2trueTest=pct(MV.accuracy(c2.test.X.map(x=>mt.predict(x)),c2.test.y));
+  V.c2trueResub=pct(MV.accuracy(c2.train.X.map(x=>mt.predict(x)),c2.train.y));
+  V.c2sil=[2,3,4,5,6].map(k=>{const km=MV.kmeans(c2.train.X,k,MV.RNG(100+k));return {k,wss:km.wss,sil:MV.silhouette(c2.train.X,km.lab,k),lab:km.lab};});
+  // leakage experiment
+  function leak(selectOnAll){const X=c2.train.X,y=c2.train.y;const idx=MV.RNG(42).shuffle(X.map((_,i)=>i));const trI=idx.slice(0,120),teI=idx.slice(120);
+    const F=X.map((x,i)=>x.concat(c2.noiseTrain[i]));const pool=selectOnAll?idx:trI;
+    const sc=F[0].map((_,j)=>MV.anovaF(pool.map(i=>F[i][j]),pool.map(i=>y[i]),3).F);
+    const sel=F[0].map((_,j)=>j).sort((a,b)=>sc[b]-sc[a]).slice(0,8);
+    const md=MV.lda(trI.map(i=>sel.map(j=>F[i][j])),trI.map(i=>y[i]),3);
+    return {sel,tr:pct(MV.accuracy(trI.map(i=>md.predict(sel.map(j=>F[i][j]))),trI.map(i=>y[i]))),te:pct(MV.accuracy(teI.map(i=>md.predict(sel.map(j=>F[i][j]))),teI.map(i=>y[i])))};}
+  V.c2leakAll=leak(true);V.c2leakTrain=leak(false);
+  // Case 3
+  const c3=DATA.genCase3();V.c3=c3;
+  const r=MV.manova(c3.X,c3.y,3);V.c3r=r;
+  V.c3W=r.wilks.toFixed(2).replace(/^0/,'');V.c3P=fmtP(r.pw);V.c3Pillai=r.pillai.toFixed(2).replace(/^0/,'');V.c3PP=fmtP(r.pp);
+  V.c3BoxP=fmtP(r.boxP);V.c3nOut=r.md.filter(d=>d>16.27).length;V.c3outIdx=r.md.map((d,i)=>d>16.27?i:-1).filter(i=>i>=0);
+  const keep=c3.X.map((_,i)=>i).filter(i=>r.md[i]<=16.27);const r2=MV.manova(keep.map(i=>c3.X[i]),keep.map(i=>c3.y[i]),3);V.c3r2=r2;V.c3keep=keep;
+  V.c3W2=r2.wilks.toFixed(2).replace(/^0/,'');V.c3P2=fmtP(r2.pw);V.c3Pillai2=r2.pillai.toFixed(2).replace(/^0/,'');V.c3PP2=fmtP(r2.pp);V.c3BoxP2=fmtP(r2.boxP);
+  V.c3d0=(r2.means[0][0]-r2.means[2][0]).toFixed(1);V.c3d1=(r2.means[0][1]-r2.means[2][1]).toFixed(2);V.c3d2=Math.round(r2.means[0][2]-r2.means[2][2]);
+  const sdw=r2.Sp.map((row,i)=>Math.sqrt(row[i]));V.c3dz0=((r2.means[0][0]-r2.means[2][0])/sdw[0]).toFixed(2);V.c3dz1=((r2.means[0][1]-r2.means[2][1])/sdw[1]).toFixed(2);V.c3dz2=((r2.means[0][2]-r2.means[2][2])/sdw[2]).toFixed(2);
+  V.c3uniP=r2.uni.map(u=>fmtP(u.p));V.c3uniP1=r.uni.map(u=>fmtP(u.p));
+  V.c3alpha='.0167';
+  V.fmtP=fmtP;V.pct=pct;
+  return V;
+})(typeof MV!=='undefined'?MV:require('./stats.js'),typeof DATA!=='undefined'?DATA:require('./data.js'));
+if(typeof module!=='undefined')module.exports=VALS;
+
+/* =====================================================================
+   PART 3 : Web Audio synth  +  Three.js world (office, case files, characters, props, act scenes)
+   ===================================================================== */
+const AUDIO=(function(){
+  let ctx=null,master=null,musicGain=null,delay=null,started=false,muted=false,noiseBuf=null,timer=null;
+  const PENTA=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25,783.99,880.00];
+  function init(){
+    if(ctx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=new AC();
+    master=ctx.createGain();master.gain.value=0.9;master.connect(ctx.destination);
+    musicGain=ctx.createGain();musicGain.gain.value=0.5;
+    delay=ctx.createDelay(1.0);delay.delayTime.value=0.38;const fb=ctx.createGain();fb.gain.value=0.32;const dl=ctx.createBiquadFilter();dl.type='lowpass';dl.frequency.value=2200;
+    delay.connect(dl);dl.connect(fb);fb.connect(delay);const wet=ctx.createGain();wet.gain.value=0.35;delay.connect(wet);wet.connect(master);
+    musicGain.connect(master);musicGain.connect(delay);
+    const n=ctx.sampleRate*1.2;noiseBuf=ctx.createBuffer(1,n,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+    startMusic();started=true;
+  }
+  function resume(){if(ctx&&ctx.state==='suspended')ctx.resume();}
+  function note(freq,t,dur,vol,type){const o=ctx.createOscillator();o.type=type||'triangle';o.frequency.value=freq;const f=ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=1800;const g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.06);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(f);f.connect(g);g.connect(musicGain);o.start(t);o.stop(t+dur+0.05);}
+  let padOsc=[];
+  function startMusic(){
+    // slow pad
+    [130.81,196.0].forEach((fr,i)=>{const o=ctx.createOscillator();o.type='sine';o.frequency.value=fr;const o2=ctx.createOscillator();o2.type='sine';o2.frequency.value=fr*1.005;const g=ctx.createGain();g.gain.value=0.05;const lfo=ctx.createOscillator();lfo.frequency.value=0.08+i*0.03;const lg=ctx.createGain();lg.gain.value=0.025;lfo.connect(lg);lg.connect(g.gain);o.connect(g);o2.connect(g);g.connect(musicGain);o.start();o2.start();lfo.start();padOsc.push(o,o2,lfo);});
+    // melody scheduler
+    let next=ctx.currentTime+0.5;let last=4;
+    function tick(){if(!ctx)return;while(next<ctx.currentTime+1.2){let idx=last+(Math.floor(Math.random()*5)-2);idx=Math.max(0,Math.min(PENTA.length-1,idx));if(Math.random()<0.15)idx=Math.floor(Math.random()*PENTA.length);last=idx;const dur=1.2+Math.random()*1.4;note(PENTA[idx],next,dur,0.16,'triangle');if(Math.random()<0.35)note(PENTA[idx]/2,next+0.02,dur*1.2,0.07,'sine');next+=0.75+Math.random()*1.1;}timer=setTimeout(tick,400);}
+    tick();
+  }
+  function sfxGain(v){const g=ctx.createGain();g.gain.value=v;g.connect(master);return g;}
+  function flip(){if(!ctx||muted)return;const t=ctx.currentTime;const s=ctx.createBufferSource();s.buffer=noiseBuf;const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.Q.value=0.9;bp.frequency.setValueAtTime(700,t);bp.frequency.exponentialRampToValueAtTime(3200,t+0.28);const g=sfxGain(0.001);g.gain.setValueAtTime(0.001,t);g.gain.exponentialRampToValueAtTime(0.5,t+0.08);g.gain.exponentialRampToValueAtTime(0.001,t+0.42);s.connect(bp);bp.connect(g);s.start(t);s.stop(t+0.5);}
+  function thud(){if(!ctx||muted)return;const t=ctx.currentTime;const s=ctx.createBufferSource();s.buffer=noiseBuf;const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=260;const g=sfxGain(0.001);g.gain.setValueAtTime(0.9,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);s.connect(lp);lp.connect(g);s.start(t);s.stop(t+0.3);}
+  function pop(p){if(!ctx||muted)return;const t=ctx.currentTime;const o=ctx.createOscillator();o.type='sine';const base=280+(p||0)*40;o.frequency.setValueAtTime(base,t);o.frequency.exponentialRampToValueAtTime(base*2.6,t+0.11);const g=sfxGain(0.001);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.35,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);o.connect(g);o.start(t);o.stop(t+0.2);}
+  function click(){if(!ctx||muted)return;const t=ctx.currentTime;const o=ctx.createOscillator();o.type='square';o.frequency.value=1250;const g=sfxGain(0.001);g.gain.setValueAtTime(0.08,t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.04);o.connect(g);o.start(t);o.stop(t+0.05);}
+  function chime(good){if(!ctx||muted)return;const t=ctx.currentTime;const seq=good?[523.25,659.25,783.99,1046.5]:[392,349.23,311.13];seq.forEach((f,i)=>{const o=ctx.createOscillator();o.type='sine';o.frequency.value=f;const g=sfxGain(0.001);g.gain.setValueAtTime(0.0001,t+i*0.11);g.gain.exponentialRampToValueAtTime(0.22,t+i*0.11+0.03);g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.11+0.6);o.connect(g);o.start(t+i*0.11);o.stop(t+i*0.11+0.7);});}
+  function toggle(){muted=!muted;if(master)master.gain.setTargetAtTime(muted?0:0.9,ctx.currentTime,0.05);return muted;}
+  return {init,resume,flip,thud,pop,click,chime,toggle,get muted(){return muted;},get ready(){return started;}};
+})();
+
+/* ---------------- Three.js world ---------------- */
+const W3=(function(){
+  const container=document.getElementById('three');
+  let renderer;try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});}catch(e){window.__diag('你的瀏覽器無法啟用 WebGL，3D 場景無法顯示。<br>請改用最新版 Chrome／Edge，並在設定中開啟「硬體加速」；<br>若透過遠端桌面連線，WebGL 通常會被停用，請在本機螢幕開啟此檔案。');throw e;}
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+  container.appendChild(renderer.domElement);
+  const scene=new THREE.Scene();scene.background=new THREE.Color(0x0a0e1c);scene.fog=new THREE.Fog(0x0a0e1c,16,34);
+  const camera=new THREE.PerspectiveCamera(42,window.innerWidth/window.innerHeight,0.1,100);
+  const camTarget=new THREE.Vector3(0,0.4,0);
+  const VIEW={office:{pos:[0,4.4,9.6],target:[0,0.3,-0.2]},read:{pos:[-0.35,5.4,5.9],target:[-0.45,0.35,-0.3]}};
+  camera.position.set(...VIEW.office.pos);
+  const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enabled=false;controls.enableDamping=true;controls.dampingFactor=0.08;controls.minDistance=2.5;controls.maxDistance=12;controls.maxPolarAngle=Math.PI*0.49;
+  window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+
+  // ---------- helpers ----------
+  const mat=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.85,metalness:0,flatShading:true},o||{}));
+  function M(geo,color,o){const m=new THREE.Mesh(geo,(color&&color.isMaterial)?color:mat(color,o));m.castShadow=true;m.receiveShadow=true;return m;}
+  const box=(w,h,d,c,o)=>M(new THREE.BoxGeometry(w,h,d),c,o);
+  const cyl=(rt,rb,h,c,seg,o)=>M(new THREE.CylinderGeometry(rt,rb,h,seg||12),c,o);
+  const sph=(r,c,seg,o)=>M(new THREE.SphereGeometry(r,seg||12,seg?Math.max(6,seg-2):10),c,o);
+  const cone=(r,h,c,seg)=>M(new THREE.ConeGeometry(r,h,seg||8),c);
+  function at(o,x,y,z,ry){o.position.set(x,y,z);if(ry!==undefined)o.rotation.y=ry;return o;}
+  function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');draw(g,w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;}
+  function texPlane(w,h,tex,opts){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial(Object.assign({map:tex,roughness:.9},opts||{})));m.receiveShadow=true;return m;}
+  function wrapText(g,text,x,y,maxW,lh){const chars=text.split('');let line='';for(const ch of chars){const test=line+ch;if(g.measureText(test).width>maxW&&line){g.fillText(line,x,y);line=ch;y+=lh;}else line=test;}g.fillText(line,x,y);return y+lh;}
+  const FONT='"Noto Serif TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+
+  // ---------- lights ----------
+  scene.add(new THREE.AmbientLight(0x5868a0,0.55));
+  const hemi=new THREE.HemisphereLight(0x8aa0ff,0x1b1a2a,0.35);scene.add(hemi);
+  const moon=new THREE.DirectionalLight(0x9fb4ff,0.45);moon.position.set(6,9,-4);moon.castShadow=true;moon.shadow.mapSize.set(2048,2048);moon.shadow.camera.left=-9;moon.shadow.camera.right=9;moon.shadow.camera.top=9;moon.shadow.camera.bottom=-9;moon.shadow.bias=-0.0008;scene.add(moon);
+  const lamp=new THREE.PointLight(0xffd3a0,1.6,16,1.6);lamp.position.set(-3.4,2.2,-1.1);lamp.castShadow=true;lamp.shadow.mapSize.set(1024,1024);lamp.shadow.bias=-0.002;scene.add(lamp);
+  const readLight=new THREE.SpotLight(0xfff1dc,0,14,0.55,0.6,1.4);readLight.position.set(0.5,6,2.5);readLight.target.position.set(0,0,0);readLight.castShadow=true;readLight.shadow.mapSize.set(2048,2048);readLight.shadow.bias=-0.0006;scene.add(readLight);scene.add(readLight.target);
+
+  // ---------- office ----------
+  const office=new THREE.Group();scene.add(office);
+  (function buildOffice(){
+    const floor=M(new THREE.PlaneGeometry(40,40),0x1d2236,{flatShading:false,roughness:.95});floor.rotation.x=-Math.PI/2;floor.position.y=-2.4;office.add(floor);
+    const wall=M(new THREE.PlaneGeometry(40,14),0x222a45,{flatShading:false});wall.position.set(0,4.6,-4.2);office.add(wall);
+    const sideWall=M(new THREE.PlaneGeometry(30,14),0x1c2238,{flatShading:false});sideWall.rotation.y=Math.PI/2;sideWall.position.set(-9,4.6,0);office.add(sideWall);
+    // window
+    const win=new THREE.Group();win.position.set(3.6,2.6,-4.15);office.add(win);
+    const sky=texPlane(3.4,2.8,canvasTex(256,220,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#0b1540');gr.addColorStop(1,'#1d3366');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='#fff';for(let i=0;i<60;i++){g.globalAlpha=Math.random()*.8+.2;g.fillRect(Math.random()*w,Math.random()*h*.8,1.5,1.5);}g.globalAlpha=1;g.fillStyle='#ffe9b8';g.beginPath();g.arc(w*.72,h*.3,24,0,Math.PI*2);g.fill();g.fillStyle='#1d3366';g.beginPath();g.arc(w*.72+10,h*.3-6,22,0,Math.PI*2);g.fill();g.fillStyle='#0d1a3a';g.fillRect(0,h*.78,w,h*.22);g.fillStyle='#2a3f72';for(let i=0;i<12;i++)g.fillRect(i*22+4,h*.78-Math.random()*40,14,60);}),{emissive:0x334a88,emissiveIntensity:.35});
+    win.add(sky);
+    [[0,1.42,3.6,0.12],[0,-1.42,3.6,0.12],[-1.76,0,0.12,2.9],[1.76,0,0.12,2.9],[0,0,0.08,2.9],[0,0,3.6,0.08]].forEach(([x,y,w,h])=>{const f=box(w,h,0.12,0xd9c6a5);f.position.set(x,y,0.06);win.add(f);});
+    // bookshelf
+    const shelf=new THREE.Group();shelf.position.set(-6.2,-2.4,-3.2);office.add(shelf);
+    const frameC=0x6b4a33;shelf.add(at(box(0.12,6,1.1,frameC),-1.6,3,0));shelf.add(at(box(0.12,6,1.1,frameC),1.6,3,0));shelf.add(at(box(3.3,0.1,1.1,frameC),0,6,0));
+    const bookColors=[0x2e8b84,0xd69a3a,0xb34a4a,0x4f7cc1,0x8a6bbf,0xe0c070,0x5c9c6a,0xcf7f5a,0xe8e2d0];
+    for(let s=0;s<4;s++){shelf.add(at(box(3.2,0.1,1.0,frameC),0,0.4+s*1.4,0));let x=-1.45;let seed=s*13;while(x<1.4){const w=0.14+((seed*7919)%100)/100*0.16;const h=0.7+((seed*104729)%100)/100*0.5;const b=box(w,h,0.75,bookColors[seed%bookColors.length]);b.position.set(x+w/2,0.45+s*1.4+h/2,0.05);b.rotation.z=((seed%5)-2)*0.01;shelf.add(b);x+=w+0.03;seed++;}}
+    // desk
+    const deskTop=box(9.4,0.24,4.6,0x8c6240,{roughness:.6});deskTop.position.y=-0.12;office.add(deskTop);
+    const edge=box(9.6,0.08,4.8,0x6e4a2e);edge.position.y=-0.27;office.add(edge);
+    [[-4.3,-1.9],[4.3,-1.9],[-4.3,1.9],[4.3,1.9]].forEach(([x,z])=>office.add(at(box(0.28,2.2,0.28,0x5a3b22),x,-1.35,z)));
+    office.add(at(box(2.2,1.0,4.0,0x6e4a2e),3.2,-1.0,-0.2)); // drawer block
+    // lamp
+    const lg=new THREE.Group();lg.position.set(-3.4,0,-1.1);office.add(lg);
+    lg.add(at(cyl(0.45,0.5,0.1,0x2b2f3f),0,0.05,0));const arm1=cyl(0.05,0.05,1.5,0x2b2f3f);arm1.position.set(0.25,0.8,0);arm1.rotation.z=-0.35;lg.add(arm1);
+    const arm2=cyl(0.05,0.05,1.2,0x2b2f3f);arm2.position.set(0.3,1.9,0);arm2.rotation.z=0.9;lg.add(arm2);
+    const shade=cone(0.55,0.6,0xd8b56a,16);shade.position.set(0.05,2.3,0);shade.rotation.x=Math.PI;shade.rotation.z=0.25;shade.material.side=THREE.DoubleSide;lg.add(shade);
+    const bulb=sph(0.14,0xfff0c8,10,{emissive:0xffd58a,emissiveIntensity:1.8});bulb.position.set(0.05,2.05,0);lg.add(bulb);
+    // monitor
+    const mon=new THREE.Group();mon.position.set(3.4,0,-1.5);mon.rotation.y=-0.35;office.add(mon);
+    mon.add(at(cyl(0.35,0.45,0.08,0x2b2f3f),0,0.04,0));mon.add(at(box(0.12,0.7,0.1,0x2b2f3f),0,0.4,0));mon.add(at(box(2.3,1.4,0.1,0x1a1d2a),0,1.35,0));
+    const monTex=canvasTex(460,280,(g,w,h)=>{g.fillStyle='#0d1424';g.fillRect(0,0,w,h);g.strokeStyle='#2a3a5c';g.lineWidth=1;for(let i=0;i<10;i++){g.beginPath();g.moveTo(40,20+i*25);g.lineTo(w-20,20+i*25);g.stroke();}g.fillStyle='#4fd1c5';for(let i=0;i<70;i++){const x=60+Math.random()*340,y=40+Math.random()*200;g.beginPath();g.arc(x,y,3,0,7);g.fill();}g.fillStyle='#ffd27a';g.font='bold 20px '+FONT;g.fillText('athletes_2024.csv',44,h-14);});
+    const screen=texPlane(2.1,1.2,monTex,{emissive:0x24406a,emissiveIntensity:.5});screen.position.set(0,1.35,0.06);mon.add(screen);
+    // mug, plant, papers, pencil cup
+    const mug=new THREE.Group();mug.position.set(2.0,0,1.3);office.add(mug);mug.add(at(cyl(0.2,0.17,0.42,0xe8e2d0),0,0.21,0));const handle=M(new THREE.TorusGeometry(0.12,0.035,8,14),0xe8e2d0);handle.position.set(0.24,0.22,0);mug.add(handle);mug.add(at(cyl(0.16,0.16,0.02,0x4a2e1a),0,0.41,0));
+    const plant=new THREE.Group();plant.position.set(-4.0,0,1.2);office.add(plant);plant.add(at(cyl(0.3,0.22,0.5,0xb06a4a),0,0.25,0));[[0,0.8,0,0.32],[0.22,0.65,0.1,0.22],[-0.2,0.7,-0.08,0.24],[0.05,0.6,0.25,0.2]].forEach(([x,y,z,r])=>plant.add(at(sph(r,0x4f9a5e,8),x,y,z)));
+    const cup=new THREE.Group();cup.position.set(1.0,0,-1.7);office.add(cup);cup.add(at(cyl(0.16,0.14,0.42,0x3a4a6a),0,0.21,0));[0xd9534f,0xf0ad4e,0x5bc0de].forEach((c,i)=>{const p=cyl(0.025,0.025,0.7,c,6);p.position.set((i-1)*0.07,0.5,0);p.rotation.z=(i-1)*0.12;cup.add(p);});
+    [[-1.6,1.6,0.3],[-1.2,1.75,-0.2]].forEach(([x,z,r])=>{const p=box(0.9,0.02,1.2,0xf4efe2);p.position.set(x,0.01,z);p.rotation.y=r;office.add(p);});
+    // coat rack
+    const rack=new THREE.Group();rack.position.set(7.2,-2.4,-3.0);office.add(rack);rack.add(at(cyl(0.05,0.05,4.6,0x5a3b22),0,2.3,0));rack.add(at(cyl(0.4,0.45,0.08,0x5a3b22),0,0.04,0));const coat=box(0.7,1.5,0.4,0x8b4f6b);coat.position.set(0.1,3.4,0.2);rack.add(coat);
+    // rug
+    const rug=M(new THREE.PlaneGeometry(10,6),0x3b2f4a,{flatShading:false});rug.rotation.x=-Math.PI/2;rug.position.set(0,-2.39,1.5);office.add(rug);
+  })();
+
+  // ---------- case file (folder) ----------
+  const FILE={W:2.4,D:3.2,H:0.42,COVER:0.06};
+  function coverTexture(c,closed){return canvasTex(512,680,(g,w,h)=>{
+    g.fillStyle='#'+c.hex;g.fillRect(0,0,w,h);g.fillStyle='rgba(0,0,0,.12)';for(let i=0;i<40;i++)g.fillRect(Math.random()*w,Math.random()*h,2,2);
+    g.strokeStyle='rgba(255,255,255,.55)';g.lineWidth=3;g.strokeRect(26,26,w-52,h-52);g.strokeStyle='rgba(255,255,255,.25)';g.lineWidth=1;g.strokeRect(38,38,w-76,h-76);
+    g.fillStyle='rgba(255,255,255,.9)';g.font='bold 22px '+FONT;g.textAlign='center';g.fillText('RESEARCH CASE FILE',w/2,92);
+    g.font='bold 86px '+FONT;g.fillText(c.num,w/2,200);
+    g.font='bold 52px '+FONT;g.fillText(c.title,w/2,300);
+    g.font='26px '+FONT;g.fillStyle='rgba(255,255,255,.8)';g.fillText(c.sub,w/2,352);
+    g.font='20px '+FONT;g.fillText('類型｜'+c.genre,w/2,396);
+    g.fillStyle='rgba(255,255,255,.75)';g.fillRect(w/2-120,440,240,1);
+    g.font='18px '+FONT;g.fillText(c.tag,w/2,480);
+    g.save();g.translate(w/2,590);g.rotate(-0.12);g.strokeStyle=closed?'#ffe9a8':'rgba(255,230,200,.85)';g.lineWidth=5;g.strokeRect(-150,-34,300,68);g.fillStyle=closed?'#ffe9a8':'rgba(255,230,200,.85)';g.font='bold 34px '+FONT;g.fillText(closed?'CASE CLOSED':'UNRESOLVED',0,12);g.restore();
+    g.textAlign='left';});}
+  function insideTexture(c,actTitle,actNo,sub){return canvasTex(512,680,(g,w,h)=>{
+    g.fillStyle='#f6f1e6';g.fillRect(0,0,w,h);g.fillStyle='rgba(0,0,0,.05)';for(let i=0;i<300;i++)g.fillRect(Math.random()*w,Math.random()*h,1.5,1.5);
+    g.strokeStyle='#'+c.hex;g.lineWidth=2;g.strokeRect(30,30,w-60,h-60);
+    g.fillStyle='#'+c.hex;g.font='18px '+FONT;g.textAlign='center';g.fillText(c.num+'  ・  '+c.sub,w/2,80);
+    g.fillStyle='#1b2238';g.font='bold 56px '+FONT;g.fillText(c.title,w/2,170);
+    g.fillStyle='#7b7461';g.fillRect(w/2-60,200,120,2);
+    g.font='bold 30px '+FONT;g.fillStyle='#'+c.hex;g.fillText('第 '+actNo+' 幕',w/2,270);
+    g.font='bold 40px '+FONT;g.fillStyle='#1b2238';g.fillText(actTitle,w/2,330);
+    g.font='22px '+FONT;g.fillStyle='#4a4f63';let y=400;sub.split('\n').forEach(line=>{y=wrapText(g,line,w/2,y,400,34);});
+    g.font='16px '+FONT;g.fillStyle='#9a927f';g.fillText('— 研究案件紀錄 —',w/2,h-50);g.textAlign='left';});}
+  const paperTex=canvasTex(512,680,(g,w,h)=>{g.fillStyle='#fbf7ee';g.fillRect(0,0,w,h);g.strokeStyle='rgba(46,139,132,.12)';g.lineWidth=1;for(let x=0;x<w;x+=32){g.beginPath();g.moveTo(x,0);g.lineTo(x,h);g.stroke();}for(let y=0;y<h;y+=32){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke();}g.fillStyle='rgba(0,0,0,.04)';for(let i=0;i<300;i++)g.fillRect(Math.random()*w,Math.random()*h,1.5,1.5);});
+  function makeFile(c){
+    const g=new THREE.Group();g.userData={type:'file',c,open:false};
+    const base=box(FILE.W,FILE.COVER,FILE.D,c.color);base.position.y=FILE.COVER/2;g.add(base);
+    const stack=box(FILE.W-0.1,FILE.H,FILE.D-0.1,0xf3ecdc);stack.position.y=FILE.COVER+FILE.H/2;g.add(stack);
+    // page lines on side
+    const side=box(FILE.W-0.08,FILE.H-0.02,0.01,0xe4dcc8);side.position.set(0,FILE.COVER+FILE.H/2,FILE.D/2-0.045);g.add(side);
+    const top=texPlane(FILE.W-0.12,FILE.D-0.12,paperTex);top.rotation.x=-Math.PI/2;top.position.y=FILE.COVER+FILE.H+0.001;g.add(top);
+    // tab
+    const tab=box(0.7,FILE.COVER*0.9,0.3,c.color);tab.position.set(FILE.W/2-0.6,FILE.COVER+FILE.H+FILE.COVER/2,-FILE.D/2-0.12);g.add(tab);
+    // cover pivot at left spine
+    const pivot=new THREE.Group();pivot.position.set(-FILE.W/2,FILE.COVER+FILE.H+FILE.COVER/2,0);g.add(pivot);
+    const cover=box(FILE.W,FILE.COVER,FILE.D,c.color);cover.position.x=FILE.W/2;pivot.add(cover);
+    const label=texPlane(FILE.W-0.1,FILE.D-0.1,coverTexture(c,false));label.rotation.x=-Math.PI/2;label.position.set(FILE.W/2,FILE.COVER/2+0.002,0);pivot.add(label);
+    const inside=texPlane(FILE.W-0.16,FILE.D-0.16,insideTexture(c,'',1,''));inside.rotation.x=Math.PI/2;inside.rotateZ(Math.PI);inside.position.set(FILE.W/2,-FILE.COVER/2-0.002,0);pivot.add(inside);
+    // elastic band
+    const band=box(0.05,FILE.H+FILE.COVER*2+0.02,FILE.D,0x3a3f55);band.position.set(FILE.W/2-0.35,(FILE.H+FILE.COVER*2)/2,0);g.add(band);
+    // flip sheet
+    const flip=new THREE.Group();flip.position.set(-FILE.W/2+0.06,FILE.COVER+FILE.H+0.004,0);flip.visible=false;g.add(flip);
+    const fFront=texPlane(FILE.W-0.14,FILE.D-0.14,paperTex);fFront.rotation.x=-Math.PI/2;fFront.position.x=(FILE.W-0.14)/2;flip.add(fFront);
+    const fBack=texPlane(FILE.W-0.16,FILE.D-0.16,insideTexture(c,'',1,''));fBack.rotation.x=Math.PI/2;fBack.rotateZ(Math.PI);fBack.position.set((FILE.W-0.14)/2,-0.003,0);flip.add(fBack);
+    // scene anchor
+    const anchor=new THREE.Group();anchor.position.set(0,FILE.COVER+FILE.H+0.01,0);g.add(anchor);
+    // glow ring (hover)
+    const glow=new THREE.Mesh(new THREE.PlaneGeometry(FILE.W+0.5,FILE.D+0.5),new THREE.MeshBasicMaterial({color:c.color,transparent:true,opacity:0,depthWrite:false}));glow.rotation.x=-Math.PI/2;glow.position.y=0.005;g.add(glow);
+    Object.assign(g.userData,{pivot,label,inside,flip,fBack,anchor,glow,band,cover,stack});
+    return g;
+  }
+  const CASE_META=[
+    {num:'CASE 01',title:'消失的維度',sub:'PCA × Factor Analysis',genre:'科學懸疑片',tag:'我們發現的是變異方向，還是真正的構念？',hex:'2e8b84',color:0x2e8b84},
+    {num:'CASE 02',title:'錯誤的分類',sub:'Cluster × Discriminant',genre:'犯罪調查／數據推理',tag:'96% 的正確率，對誰正確？',hex:'d69a3a',color:0xd69a3a},
+    {num:'CASE 03',title:'顯著性的陷阱',sub:'MANOVA × Multivariate Inference',genre:'法庭攻防／學術辯論',tag:'整體顯著，等於全面改善嗎？',hex:'b34a4a',color:0xb34a4a}
+  ];
+  const files=CASE_META.map((c,i)=>{const f=makeFile(c);const x=[-2.75,0,2.75][i];f.position.set(x,0,0.35);f.rotation.y=[0.14,-0.04,-0.16][i];f.userData.home={x,z:0.35,ry:f.rotation.y};f.userData.idx=i;scene.add(f);return f;});
+
+  // ---------- characters ----------
+  function makeChar(o){
+    o=Object.assign({skin:0xf2c9a7,shirt:0x4f7cc1,pants:0x2f3550,hair:0x3a2a22,hairStyle:'short',glasses:false,coat:false,hat:null,acc:null,scale:1,shoes:0x2a2a2a},o);
+    const g=new THREE.Group();
+    [-0.09,0.09].forEach(x=>{g.add(at(cyl(0.07,0.08,0.26,o.pants,8),x,0.13,0));g.add(at(box(0.16,0.07,0.22,o.shoes),x,0.035,0.04));});
+    const bodyC=o.coat?0xf5f5f0:(o.acc==='robe'?0x1b1b26:o.shirt);
+    const body=cyl(0.2,0.24,0.42,bodyC,10);body.position.y=0.47;g.add(body);
+    if(o.coat||o.acc==='robe'){g.add(at(box(0.13,0.36,0.05,o.coat?o.shirt:0xf5f5f0),0,0.48,0.22));}
+    if(o.acc==='tie'){g.add(at(box(0.05,0.22,0.02,0xb34a4a),0,0.5,0.24));}
+    if(o.acc==='bowtie'){[-1,1].forEach(s=>{const b=cone(0.035,0.09,0xb34a4a,4);b.rotation.z=s*Math.PI/2;b.position.set(s*0.05,0.64,0.23);g.add(b);});}
+    [-1,1].forEach(s=>{const arm=cyl(0.055,0.06,0.36,bodyC,8);arm.position.set(s*0.27,0.48,0);arm.rotation.z=s*0.18;g.add(arm);g.add(at(sph(0.065,o.skin,8),s*0.31,0.28,0));});
+    const head=new THREE.Group();head.position.y=0.95;g.add(head);
+    head.add(sph(0.27,o.skin,16));
+    [-0.1,0.1].forEach(x=>{head.add(at(sph(0.035,0x1a1a1a,8),x,0.03,0.245));head.add(at(sph(0.012,0xffffff,6),x+0.012,0.045,0.275));});
+    [-0.15,0.15].forEach(x=>{const c=sph(0.04,0xf09a9a,8);c.material.flatShading=false;head.add(at(c,x,-0.05,0.225));});
+    head.add(at(box(0.08,0.02,0.02,0xa05050),0,-0.11,0.262));
+    if(o.hairStyle!=='bald'){const hair=M(new THREE.SphereGeometry(0.29,16,12,0,Math.PI*2,0,Math.PI*0.52),o.hair);hair.position.y=0.03;head.add(hair);
+      if(o.hairStyle==='ponytail'){const pt=cyl(0.07,0.03,0.4,o.hair,8);pt.position.set(0,-0.08,-0.3);pt.rotation.x=0.45;head.add(pt);}
+      if(o.hairStyle==='long'){[-1,1].forEach(s=>{const sd=box(0.1,0.32,0.18,o.hair);sd.position.set(s*0.24,-0.08,-0.06);head.add(sd);});}
+      if(o.hairStyle==='bun'){head.add(at(sph(0.1,o.hair,10),0,0.24,-0.1));}
+    }else{head.add(at(sph(0.09,o.hair,8),-0.21,0.08,-0.05));head.add(at(sph(0.09,o.hair,8),0.21,0.08,-0.05));}
+    if(o.glasses){[-0.1,0.1].forEach(x=>{const r=M(new THREE.TorusGeometry(0.065,0.012,8,16),0x222222);r.position.set(x,0.03,0.262);head.add(r);});head.add(at(box(0.08,0.012,0.012,0x222222),0,0.03,0.268));}
+    if(o.hat==='cap'){const cap=M(new THREE.SphereGeometry(0.295,16,12,0,Math.PI*2,0,Math.PI*0.42),o.hatColor||0xd04040);cap.position.y=0.07;head.add(cap);head.add(at(box(0.3,0.03,0.22,o.hatColor||0xd04040),0,0.12,0.3));}
+    if(o.hat==='detective'){head.add(at(cyl(0.4,0.4,0.03,0x4a3a2a,16),0,0.2,0));head.add(at(cyl(0.2,0.22,0.2,0x4a3a2a,16),0,0.31,0));head.add(at(cyl(0.21,0.21,0.05,0xb34a4a,16),0,0.24,0));}
+    if(o.hat==='wig'){const wig=M(new THREE.SphereGeometry(0.3,16,12,0,Math.PI*2,0,Math.PI*0.5),0xe8e2d0);wig.position.y=0.04;head.add(wig);[-1,1].forEach(s=>{head.add(at(cyl(0.07,0.07,0.3,0xe8e2d0,8),s*0.27,-0.1,-0.05));});}
+    if(o.acc==='headphones'){const band=M(new THREE.TorusGeometry(0.29,0.025,8,20,Math.PI),0x222222);band.rotation.z=0;band.position.y=0.03;head.add(band);[-1,1].forEach(s=>head.add(at(cyl(0.07,0.07,0.06,0x222222,10).rotateZ(Math.PI/2),s*0.29,0,0)));}
+    if(o.acc==='camera'){const cam=box(0.22,0.14,0.12,0x222222);cam.position.set(0.33,0.42,0.12);g.add(cam);g.add(at(cyl(0.05,0.06,0.08,0x444444,10).rotateX(Math.PI/2),0.33,0.42,0.2));}
+    if(o.acc==='whistle'){g.add(at(cyl(0.004,0.004,0.3,0xdddddd,6),0,0.62,0.24));g.add(at(sph(0.035,0xc9c9c9,8),0,0.5,0.25));}
+    if(o.acc==='notebook'){g.add(at(box(0.16,0.2,0.03,0xe8e2d0),-0.33,0.4,0.1));}
+    g.userData={type:'char',head,body,baseY:0,phase:Math.random()*6.28};
+    g.scale.setScalar(o.scale);return g;
+  }
+  const CHAR_DEFS={
+    hero:{name:'沈以安',desc:'運動科學研究者',o:{shirt:0x2e8b84,coat:true,glasses:true,hair:0x2a1e18,hairStyle:'bun',acc:'notebook'},quips:['資料不會說謊，但會被誤讀。','先問問題，再選方法。','我想再看一次相關矩陣。']},
+    prof:{name:'周啟宏教授',desc:'研究團隊主持人',o:{shirt:0x2b3a6b,hair:0x9a9a9a,acc:'tie'},quips:['我們解釋了 60% 的變異！','審查委員當初都說很好。','轉軸只是數學技巧吧？']},
+    ra:{name:'柏哲',desc:'研究生',o:{shirt:0x5c9c6a,hair:0x1a1a1a,pants:0x3a3f55},quips:['學姊，要不要先吃宵夜？','我把資料重新整理好了！','原來 Kaiser 準則會騙人……']},
+    athlete:{name:'雅薇',desc:'短跑選手',o:{shirt:0xd04040,pants:0xd04040,hair:0x2a1e18,hairStyle:'ponytail',skin:0xe8b892},quips:['我是短跑選手，不是耐力型。','0.2 秒，在 100 公尺是一輩子。','讓我回去練衝刺吧！']},
+    coach:{name:'黃教練',desc:'田徑教練',o:{shirt:0x3a4a6a,hair:0x4a3a2a,hat:'cap',hatColor:0x2b3a6b,acc:'whistle'},quips:['系統說的，我能不信嗎？','我只想排一份對的課表。','96% 聽起來很可靠啊……']},
+    eng:{name:'Kevin',desc:'資料工程師',o:{shirt:0x222233,hair:0x1a1a1a,acc:'headphones',pants:0x2a2a3a},quips:['數字我重算過三次。','我以為切分之後再訓練就夠了……','洩漏是從哪裡開始的？']},
+    stat:{name:'方靜儀',desc:'統計學家',o:{shirt:0x8a6bbf,hair:0x3a2a22,hairStyle:'long',glasses:true},quips:['整體顯著，只是一句話的開頭。','Pillai 在這裡比較穩。','假設不是儀式，是前提。']},
+    reporter:{name:'陳記者',desc:'體育記者',o:{shirt:0xd69a3a,hair:0x2a1e18,acc:'camera'},quips:['教授，可以再說一次「突破」嗎？','明天頭條就靠這個了！','所以到底進步多少？']},
+    pi:{name:'高教授',desc:'訓練介入研究主持人',o:{shirt:0x5a4a6a,hair:0x777777,hairStyle:'bald',acc:'bowtie'},quips:['p = .002，還不夠嗎？','全面改善，我很確定。','審查委員太吹毛求疵了。']},
+    chair:{name:'吳主委',desc:'審查主席',o:{shirt:0x1b1b26,hair:0xe8e2d0,hat:'wig',acc:'robe'},quips:['請陳述證據。','本會只看資料能支持的範圍。','肅靜。']},
+    extra1:{name:'研究員',desc:'',o:{shirt:0xcf7f5a,hair:0x3a2a22,scale:0.9},quips:['（鼓掌）','（低頭做筆記）']},
+    extra2:{name:'攝影記者',desc:'',o:{shirt:0x4f7cc1,hair:0x1a1a1a,acc:'camera',scale:0.9},quips:['（喀嚓）','（換鏡頭）']},
+    rev1:{name:'審查委員',desc:'',o:{shirt:0x3a4a6a,hair:0x9a9a9a,glasses:true,scale:0.9},quips:['（翻閱報告）','這一頁的 p 值……']},
+    rev2:{name:'審查委員',desc:'',o:{shirt:0x6b4a63,hair:0x3a2a22,hairStyle:'long',scale:0.9},quips:['（點頭）','效果量在哪裡？']}
+  };
+  function spawnChar(id,x,z,ry,scale,extra){const d=CHAR_DEFS[id];const g=makeChar(Object.assign({},d.o,extra||{},{scale:(d.o.scale||1)*(scale||0.78)}));g.position.set(x,0,z);g.rotation.y=ry||0;g.userData.id=id;g.userData.name=d.name;g.userData.quips=d.quips;return g;}
+
+  // ---------- props ----------
+  function makeScreen(w,h,tex,standColor){const g=new THREE.Group();const frame=box(w+0.08,h+0.08,0.06,0x2b2f3f);frame.position.y=h/2+0.5;g.add(frame);const s=texPlane(w,h,tex,{emissive:0x111a33,emissiveIntensity:.3});s.position.set(0,h/2+0.5,0.035);g.add(s);g.add(at(box(0.06,0.5,0.06,standColor||0x2b2f3f),0,0.25,0));g.add(at(box(0.5,0.04,0.3,standColor||0x2b2f3f),0,0.02,0));return g;}
+  function makeBoard(w,h,tex){const g=new THREE.Group();const b=box(w+0.1,h+0.1,0.06,0x8c6240);b.position.y=h/2+0.55;g.add(b);const s=texPlane(w,h,tex);s.position.set(0,h/2+0.55,0.035);g.add(s);[-1,1].forEach(sg=>g.add(at(cyl(0.025,0.025,0.6,0x5a3b22,8),sg*(w/2-0.1),0.3,0)));return g;}
+  function makePodium(c){const g=new THREE.Group();g.add(at(box(0.5,0.62,0.36,c||0x6e4a2e),0,0.31,0));g.add(at(box(0.6,0.05,0.42,0x8c6240),0,0.64,0));g.add(at(cyl(0.012,0.012,0.3,0x333333,6),0.1,0.78,0.05));g.add(at(sph(0.035,0x222222,8),0.1,0.93,0.08));return g;}
+  function makeChair(c){const g=new THREE.Group();g.add(at(box(0.3,0.04,0.3,c||0x3b3f5c),0,0.22,0));g.add(at(box(0.3,0.3,0.04,c||0x3b3f5c),0,0.37,-0.13));[[-0.12,-0.12],[0.12,-0.12],[-0.12,0.12],[0.12,0.12]].forEach(([x,z])=>g.add(at(cyl(0.015,0.015,0.22,0x2b2f3f,6),x,0.11,z)));return g;}
+  function makeTable(w,d,c){const g=new THREE.Group();g.add(at(box(w,0.05,d,c||0x8c6240),0,0.4,0));[[-w/2+0.08,-d/2+0.08],[w/2-0.08,-d/2+0.08],[-w/2+0.08,d/2-0.08],[w/2-0.08,d/2-0.08]].forEach(([x,z])=>g.add(at(box(0.05,0.4,0.05,0x5a3b22),x,0.2,z)));return g;}
+  function makeDeskSmall(){const g=makeTable(1.3,0.6,0x8c6240);const mon=new THREE.Group();mon.position.set(0.1,0.43,-0.1);g.add(mon);mon.add(at(box(0.06,0.14,0.06,0x2b2f3f),0,0.07,0));mon.add(at(box(0.62,0.4,0.04,0x1a1d2a),0,0.34,0));const t=canvasTex(320,200,(g2,w,h)=>{g2.fillStyle='#0d1424';g2.fillRect(0,0,w,h);g2.strokeStyle='#2a3a5c';g2.beginPath();g2.moveTo(30,170);g2.lineTo(300,170);g2.moveTo(30,20);g2.lineTo(30,170);g2.stroke();const e=VALS.c1.eig.slice(0,10);const pa=VALS.c1.pa.slice(0,10);g2.strokeStyle='#4fd1c5';g2.lineWidth=3;g2.beginPath();e.forEach((v,i)=>{const x=40+i*28,y=170-v*20;i?g2.lineTo(x,y):g2.moveTo(x,y);});g2.stroke();g2.strokeStyle='#ffd27a';g2.setLineDash([5,4]);g2.lineWidth=2;g2.beginPath();pa.forEach((v,i)=>{const x=40+i*28,y=170-v*20;i?g2.lineTo(x,y):g2.moveTo(x,y);});g2.stroke();g2.setLineDash([]);g2.fillStyle='#4fd1c5';e.forEach((v,i)=>{g2.beginPath();g2.arc(40+i*28,170-v*20,4,0,7);g2.fill();});g2.fillStyle='#fff';g2.font='bold 16px '+FONT;g2.fillText('陡坡圖 vs 平行分析',120,24);});
+    const s=texPlane(0.58,0.36,t,{emissive:0x24406a,emissiveIntensity:.6});s.position.set(0,0.34,0.025);mon.add(s);g.add(at(cyl(0.05,0.045,0.1,0xe8e2d0,10),-0.45,0.48,0.12));return g;}
+  function makeServer(label){const g=new THREE.Group();g.add(at(box(0.42,1.0,0.42,0x24283a),0,0.5,0));for(let i=0;i<6;i++){g.add(at(box(0.34,0.09,0.02,0x33384d),0,0.12+i*0.14,0.215));const led=sph(0.018,0x5cff9a,6,{emissive:0x5cff9a,emissiveIntensity:1.5});led.position.set(-0.12+(i%3)*0.05,0.12+i*0.14,0.23);led.userData.blink=true;g.add(led);}
+    const t=canvasTex(256,110,(g2,w,h)=>{g2.fillStyle='#0d1424';g2.fillRect(0,0,w,h);g2.fillStyle='#4fd1c5';g2.font='bold 20px '+FONT;g2.textAlign='center';g2.fillText('AI 分類系統',w/2,32);g2.fillStyle='#ffd27a';g2.font='bold 44px '+FONT;g2.fillText(label,w/2,84);});
+    const s=texPlane(0.36,0.16,t,{emissive:0x24406a,emissiveIntensity:.7});s.position.set(0,1.1,0.0);g.add(s);g.add(at(box(0.4,0.2,0.04,0x2b2f3f),0,1.1,-0.03));return g;}
+  function makeTrack(){const g=new THREE.Group();const ring=M(new THREE.TorusGeometry(0.95,0.16,8,36),0xc9553d);ring.rotation.x=Math.PI/2;ring.scale.set(1,0.75,1);ring.position.y=0.02;g.add(ring);const grass=cyl(0.82,0.82,0.03,0x4f9a5e,36);grass.scale.set(1,1,0.72);grass.position.y=0.015;g.add(grass);const lanes=M(new THREE.TorusGeometry(0.95,0.01,4,36),0xffffff);lanes.rotation.x=Math.PI/2;lanes.scale.set(1,0.75,1);lanes.position.y=0.045;g.add(lanes);for(let i=0;i<3;i++){const h=new THREE.Group();h.position.set(-0.3+i*0.3,0,0.68);g.add(h);h.add(at(box(0.22,0.02,0.02,0xeeeeee),0,0.16,0));[-0.1,0.1].forEach(x=>h.add(at(box(0.015,0.16,0.015,0x2b2f3f),x,0.08,0)));}return g;}
+  function makeTree(h){const g=new THREE.Group();g.add(at(cyl(0.05,0.07,h*0.4,0x6b4a33,7),0,h*0.2,0));g.add(at(cone(h*0.32,h*0.55,0x3f8a52,7),0,h*0.55,0));g.add(at(cone(h*0.24,h*0.45,0x4f9a5e,7),0,h*0.8,0));return g;}
+  function makeMatrix(R,idx,size,gap){const g=new THREE.Group();const n=idx.length;for(let i=0;i<n;i++)for(let j=0;j<n;j++){const r=Math.abs(R[idx[i]][idx[j]]);const h=0.04+r*0.4;const c=i===j?0xffd27a:(r>0.5?0x2e8b84:(r>0.25?0x6fb3ad:0xcfd6e3));const b=box(size,h,size,c);b.position.set((i-(n-1)/2)*(size+gap),h/2,(j-(n-1)/2)*(size+gap));g.add(b);}return g;}
+  function makeCloud(pts,colors,r){const g=new THREE.Group();pts.forEach((p,i)=>{const s=sph(r||0.03,colors[i],6);s.material.flatShading=false;s.position.set(p[0],p[1],p[2]);g.add(s);});return g;}
+  function makeScales(){const g=new THREE.Group();g.add(at(cyl(0.2,0.24,0.04,0x8c6240,12),0,0.02,0));g.add(at(cyl(0.03,0.03,0.7,0xd8b56a,8),0,0.37,0));g.add(at(box(0.7,0.03,0.03,0xd8b56a),0,0.7,0));[-1,1].forEach(s=>{g.add(at(cyl(0.005,0.005,0.3,0x888888,4),s*0.33,0.55,0));const pan=cyl(0.14,0.1,0.03,0xd8b56a,12);pan.position.set(s*0.33,0.4+(s<0?-0.05:0.05),0);g.add(pan);});g.userData.sway=true;return g;}
+  function makeGavel(){const g=new THREE.Group();const head=cyl(0.07,0.07,0.22,0x6e4a2e,10);head.rotation.z=Math.PI/2;head.position.y=0.1;g.add(head);const h=cyl(0.02,0.025,0.32,0x8c6240,8);h.rotation.z=0.3;h.position.set(0.12,0.08,0);h.rotation.x=Math.PI/2;g.add(h);g.add(at(cyl(0.09,0.09,0.03,0x6e4a2e,12),0.2,0.015,0.15));return g;}
+  function makeBench(){const g=new THREE.Group();g.add(at(box(1.6,0.62,0.4,0x6e4a2e),0,0.31,0));g.add(at(box(1.7,0.05,0.5,0x8c6240),0,0.65,0));g.add(at(box(1.6,0.5,0.1,0x5a3b22),0,0.95,-0.22));return g;}
+  function makeNewspaper(headline){const t=canvasTex(512,360,(g,w,h)=>{g.fillStyle='#f4efe2';g.fillRect(0,0,w,h);g.fillStyle='#1b2238';g.font='bold 30px '+FONT;g.textAlign='center';g.fillText('運動日報',w/2,42);g.fillRect(30,56,w-60,2);g.font='bold 36px '+FONT;wrapText(g,headline,w/2,110,440,46);g.fillStyle='#777';for(let i=0;i<9;i++){g.fillRect(40,200+i*16,(i%3?200:180),5);g.fillRect(270,200+i*16,(i%2?200:170),5);}g.fillStyle='#b34a4a';g.fillRect(40,180,200,3);});const p=texPlane(0.6,0.42,t);p.rotation.x=-Math.PI/2+0.35;p.position.y=0.12;return p;}
+  function makeBars(vals,colors,labels,w){const g=new THREE.Group();const n=vals.length;vals.forEach((v,i)=>{const h=Math.max(0.05,v);const b=box(w||0.16,h,w||0.16,colors[i]);b.position.set((i-(n-1)/2)*((w||0.16)+0.08),h/2,0);g.add(b);if(labels&&labels[i]){const t=canvasTex(128,48,(g2,cw,ch)=>{g2.fillStyle='rgba(0,0,0,0)';g2.clearRect(0,0,cw,ch);g2.fillStyle='#1b2238';g2.font='bold 24px '+FONT;g2.textAlign='center';g2.fillText(labels[i],cw/2,32);});const l=new THREE.Mesh(new THREE.PlaneGeometry(0.32,0.12),new THREE.MeshBasicMaterial({map:t,transparent:true}));l.rotation.x=-Math.PI/2;l.position.set((i-(n-1)/2)*((w||0.16)+0.08),0.002,0.2);g.add(l);}});g.add(at(box((n)*((w||0.16)+0.08)+0.1,0.02,0.3,0xe8e2d0),0,0.0,0.02));return g;}
+  function makeLabel(text,w,h,color){const t=canvasTex(256,64,(g,cw,ch)=>{g.clearRect(0,0,cw,ch);g.fillStyle=color||'#1b2238';g.font='bold 28px '+FONT;g.textAlign='center';g.fillText(text,cw/2,42);});const m=new THREE.Mesh(new THREE.PlaneGeometry(w||0.5,h||0.125),new THREE.MeshBasicMaterial({map:t,transparent:true,side:THREE.DoubleSide}));return m;}
+  function makeMagnifier(){const g=new THREE.Group();const ring=M(new THREE.TorusGeometry(0.12,0.02,8,20),0xd8b56a);ring.rotation.x=Math.PI/2;ring.position.y=0.04;g.add(ring);const glass=new THREE.Mesh(new THREE.CircleGeometry(0.11,20),new THREE.MeshStandardMaterial({color:0xbfe6ff,transparent:true,opacity:.45,roughness:.1}));glass.rotation.x=-Math.PI/2;glass.position.y=0.04;g.add(glass);const h=cyl(0.02,0.025,0.26,0x6e4a2e,8);h.rotation.z=Math.PI/2;h.rotation.y=0.6;h.position.set(0.2,0.04,0.14);g.add(h);return g;}
+  function makePipeline(){const g=new THREE.Group();const names=['全資料','標準化+篩選','K-means 標籤','LDA'];names.forEach((n,i)=>{const b=box(0.34,0.26,0.26,[0x4f7cc1,0xd69a3a,0x8a6bbf,0x2e8b84][i]);b.position.set(i*0.5-0.75,0.4,0);g.add(b);const l=makeLabel(n,0.36,0.09,'#ffffff');l.position.set(i*0.5-0.75,0.4,0.135);g.add(l);if(i<3){const p=cyl(0.03,0.03,0.18,0x8e97b3,8);p.rotation.z=Math.PI/2;p.position.set(i*0.5-0.5,0.4,0);g.add(p);}});
+    // leak drops from pipe 1
+    const drops=new THREE.Group();drops.position.set(-0.5,0.33,0);g.add(drops);for(let i=0;i<4;i++){const d=sph(0.022,0x5cc8ff,6,{emissive:0x2a8ad0,emissiveIntensity:.6});d.userData.drop={t:i*0.5};drops.add(d);}g.userData.drops=drops;
+    const puddle=new THREE.Mesh(new THREE.CircleGeometry(0.14,16),new THREE.MeshStandardMaterial({color:0x5cc8ff,transparent:true,opacity:.5}));puddle.rotation.x=-Math.PI/2;puddle.position.set(-0.5,0.005,0.02);g.add(puddle);
+    [0,1,2,3].forEach(i=>g.add(at(box(0.04,0.27,0.04,0x5a5f73),i*0.5-0.75,0.135,0)));return g;}
+  function makeGlassWall(w,h){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({color:0xbfe6ff,transparent:true,opacity:.25,roughness:.1,side:THREE.DoubleSide}));m.position.y=h/2;const g=new THREE.Group();g.add(m);g.add(at(box(0.03,h,0.03,0x8e97b3),-w/2,h/2,0));g.add(at(box(0.03,h,0.03,0x8e97b3),w/2,h/2,0));g.add(at(box(w,0.03,0.03,0x8e97b3),0,h,0));return g;}
+  function makeMics(){const g=new THREE.Group();[-0.12,0,0.12].forEach((x,i)=>{g.add(at(cyl(0.008,0.008,0.3,0x333333,6),x,0.15,0));g.add(at(sph(0.035,[0x222222,0xd04040,0x4f7cc1][i],8),x,0.32,0));});return g;}
+  function makeBanner(tex,w,h){const g=new THREE.Group();const b=texPlane(w,h,tex);b.position.y=h/2+0.3;g.add(b);[-1,1].forEach(s=>g.add(at(cyl(0.02,0.02,h+0.3,0x8e97b3,8),s*(w/2),(h+0.3)/2,-0.02)));return g;}
+  function makeBook(c){const b=box(0.26,0.05,0.34,c);return b;}
+
+  // ---------- act scene definitions ----------
+  function sceneTex(kind){
+    switch(kind){
+      case 'c1screen':return canvasTex(560,360,(g,w,h)=>{g.fillStyle='#0f1a36';g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 30px '+FONT;g.textAlign='center';g.fillText('24 項指標 → 3 個核心因素',w/2,50);g.font='18px '+FONT;g.fillStyle='#9fb4ff';g.fillText('主成分分析（未轉軸）・解釋變異 56%',w/2,82);const names=['綜合運動潛能','心理韌性','有氧能力'];const hs=[6.88,3.78,2.86];hs.forEach((v,i)=>{const x=110+i*150;const bh=v*28;g.fillStyle=['#4fd1c5','#ffd27a','#8a6bbf'][i];g.fillRect(x-40,300-bh,80,bh);g.fillStyle='#fff';g.font='bold 20px '+FONT;g.fillText(names[i],x,330);g.font='16px '+FONT;g.fillText('λ = '+v.toFixed(2),x,290-bh);});g.strokeStyle='#2a3a5c';g.beginPath();g.moveTo(40,300);g.lineTo(w-40,300);g.stroke();});
+      case 'c1board':return canvasTex(560,320,(g,w,h)=>{g.fillStyle='#f6f6f2';g.fillRect(0,0,w,h);g.strokeStyle='#2e8b84';g.lineWidth=3;g.font='bold 34px '+FONT;g.fillStyle='#2e8b84';g.fillText('PCA ≠ FA ?',30,60);g.fillStyle='#b34a4a';g.font='26px '+FONT;g.fillText('PC2 = 心理 − 肌力 ??',30,120);g.fillStyle='#1b2238';g.font='22px '+FONT;g.fillText('轉軸前 vs 轉軸後',30,170);g.fillText('Kaiser: 4   平行分析: 3',30,210);g.fillText('共同性 < .40 → 反應力量指數、睡眠',30,250);g.strokeStyle='#b34a4a';g.beginPath();g.moveTo(330,100);g.lineTo(470,100);g.lineTo(470,60);g.stroke();g.fillStyle='#b34a4a';g.font='bold 22px '+FONT;g.fillText('負號是數學產物！',300,52);});
+      case 'c1tables':return canvasTex(640,360,(g,w,h)=>{g.fillStyle='#f6f6f2';g.fillRect(0,0,w,h);g.fillStyle='#1b2238';g.font='bold 22px '+FONT;g.fillText('未轉軸 PCA',60,40);g.fillText('Varimax EFA',360,40);const pcs=MV.pcaLoad(VALS.c1.R,3).L;const efa=VALS.c1L;const draw=(L,ox)=>{for(let i=0;i<24;i++)for(let j=0;j<3;j++){const v=L[i][j];const a=Math.min(1,Math.abs(v));g.fillStyle=v>=0?`rgba(46,139,132,${a})`:`rgba(179,74,74,${a})`;g.fillRect(ox+j*60,60+i*12,56,10);}};draw(pcs,60);draw(efa,360);g.fillStyle='#777';g.font='14px '+FONT;g.fillText('綠=正負荷 紅=負負荷',60,h-10);});
+      case 'c2board':return canvasTex(640,340,(g,w,h)=>{g.fillStyle='#c9a06a';g.fillRect(0,0,w,h);g.fillStyle='rgba(0,0,0,.08)';for(let i=0;i<400;i++)g.fillRect(Math.random()*w,Math.random()*h,2,2);const notes=[[60,50,'K-means 標籤','#fff3b0'],[380,40,'正確率 96%','#ffd1d1'],[80,200,'切分前標準化','#d1f0ff'],[400,210,'122 → 8 個指標','#d9ffd1']];notes.forEach(([x,y,t,c])=>{g.save();g.translate(x,y);g.rotate((Math.random()-.5)*.15);g.fillStyle=c;g.fillRect(0,0,190,90);g.fillStyle='#1b2238';g.font='bold 22px '+FONT;g.fillText(t,14,52);g.fillStyle='#b34a4a';g.beginPath();g.arc(95,8,6,0,7);g.fill();g.restore();});g.strokeStyle='#d03030';g.lineWidth=3;[[155,58,475,48],[155,58,175,208],[475,48,495,218],[175,208,495,218]].forEach(([a,b,c,d])=>{g.beginPath();g.moveTo(a,b);g.lineTo(c,d);g.stroke();});g.fillStyle='#1b2238';g.font='bold 28px '+FONT;g.fillText('？',300,140);});
+      case 'c2board2':return canvasTex(640,320,(g,w,h)=>{g.fillStyle='#f6f6f2';g.fillRect(0,0,w,h);g.fillStyle='#1b2238';g.font='bold 26px '+FONT;g.fillText('新流程',30,46);const steps=['① 先切分 訓練 / 測試','② 前處理只用訓練資料','③ 標籤 = 實際訓練反應','④ 模型','⑤ 只在測試資料報告正確率'];steps.forEach((s,i)=>{g.fillStyle=i===2?'#b34a4a':'#2e8b84';g.font='bold 22px '+FONT;g.fillText(s,40,96+i*44);});g.strokeStyle='#8e97b3';g.lineWidth=2;g.beginPath();g.moveTo(34,110);g.lineTo(34,270);g.stroke();});
+      case 'c3banner':return canvasTex(640,240,(g,w,h)=>{const gr=g.createLinearGradient(0,0,w,0);gr.addColorStop(0,'#b34a4a');gr.addColorStop(1,'#d69a3a');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 44px '+FONT;g.textAlign='center';g.fillText('全方位爆發訓練法',w/2,90);g.font='24px '+FONT;g.fillText('研究成果發表記者會',w/2,140);g.font='20px '+FONT;g.fillText('Wilks’ Λ = '+VALS.c3W+'，p '+VALS.c3P,w/2,190);});
+      case 'c3board':return canvasTex(640,320,(g,w,h)=>{g.fillStyle='#f6f6f2';g.fillRect(0,0,w,h);g.fillStyle='#1b2238';g.font='bold 24px '+FONT;g.fillText('整體顯著 ≠ 每項都顯著',30,46);g.font='20px '+FONT;const lines=['Wilks’ Λ = '+VALS.c3W+'   p '+VALS.c3P,'Box’s M   p '+VALS.c3BoxP+'  ← 共變異數同質？','Mahalanobis 離群值：'+VALS.c3nOut+' 筆','追蹤（Bonferroni α = '+VALS.c3alpha+'）','肌力 p '+VALS.c3uniP1[0]+'  速度 p '+VALS.c3uniP1[1]+'  爆發力 p '+VALS.c3uniP1[2]];lines.forEach((s,i)=>{g.fillStyle=i===4?'#b34a4a':'#2e8b84';g.fillText(s,36,92+i*42);});});
+    }
+  }
+  const PAGE={x:[-1.05,1.05],z:[-1.4,1.4]};
+  const SCENES={
+    0:[ // CASE 1
+      {title:'三個核心因素',sub:'研討會上，24 個變數被濃縮成三個指標。\n但有些結果，怎麼看都說不通。',view:{pos:[-0.2,4.9,5.4],target:[-0.3,0.45,-0.35]},
+        build(g){g.add(at(box(2.1,0.08,0.9,0x3b3f5c),0,0.04,-0.9));const sc=makeScreen(1.5,0.95,sceneTex('c1screen'));at(sc,-0.15,0.08,-1.28);g.add(sc);
+          g.add(at(makePodium(),0.62,0.08,-0.72));const ch={};ch.prof=spawnChar('prof',0.62,-0.92,0.1);ch.prof.position.y=0.08;g.add(ch.prof);
+          for(let r=0;r<2;r++)for(let i=0;i<4;i++){g.add(at(makeChair(),-0.75+i*0.42,0,0.05+r*0.42,0));}
+          g.add(at(spawnChar('extra1',-0.33,0.05,Math.PI,0.6),-0.33,0.12,0.05));g.add(at(spawnChar('rev2',0.09,0.47,Math.PI,0.6),0.09,0.12,0.47));
+          ch.hero=spawnChar('hero',0.95,0.95,-0.5);g.add(ch.hero);ch.ra=spawnChar('ra',0.55,1.1,-0.2);g.add(ch.ra);
+          g.add(at(makeTree(0.6),-1.05,0,-1.0));return ch;}},
+      {title:'牆上的矩陣',sub:'兩週後的研究室。\n24 × 24 的相關矩陣被貼滿了整面牆。',view:{pos:[-0.1,4.7,5.2],target:[-0.3,0.4,-0.2]},
+        build(g){g.add(at(makeDeskSmall(),0.15,0,-0.85));const bd=makeBoard(1.3,0.75,sceneTex('c1board'));at(bd,-0.9,0,-1.15,0.5);g.add(bd);
+          const mx=makeMatrix(VALS.c1.R,[0,3,5,8,11,14,16,20,21],0.08,0.03);at(mx,-0.6,0,0.55);g.add(mx);
+          g.add(at(makeBook(0x2e8b84),0.85,0.025,0.35,0.3));g.add(at(makeBook(0xd69a3a),0.9,0.08,0.4,-0.2));
+          const ch={};ch.hero=spawnChar('hero',0.55,0.25,0.15);g.add(ch.hero);ch.ra=spawnChar('ra',-0.05,0.75,-0.25);g.add(ch.ra);
+          const mug=cyl(0.06,0.05,0.12,0xe8e2d0,10);mug.position.set(0.7,0.49,-0.75);g.add(mug);return ch;}},
+      {title:'結構不等於構念',sub:'學術會議。\n統計模型呈現的結構，是否等同於研究者宣稱的理論構念？',view:{pos:[0,4.6,5.3],target:[-0.2,0.45,-0.3]},
+        build(g){g.add(at(makeTable(2.0,0.6,0x6e4a2e),0,0,-0.55));const sc=makeScreen(1.6,0.9,sceneTex('c1tables'));at(sc,-0.1,0.02,-1.3);g.add(sc);
+          const ch={};ch.prof=spawnChar('prof',-0.6,-0.85,0.2);g.add(ch.prof);ch.stat=spawnChar('stat',0.1,-0.85,0);g.add(ch.stat);ch.hero=spawnChar('hero',0.75,0.35,-0.35);g.add(ch.hero);
+          [-0.6,0.1].forEach(x=>{g.add(at(cyl(0.035,0.03,0.09,0xbfe6ff,8),x+0.25,0.47,-0.5));});g.add(at(makeBook(0xe8e2d0),-0.3,0.45,-0.45,0.2));
+          g.add(at(spawnChar('rev1',-0.95,0.5,Math.PI*0.75,0.62),-0.95,0,0.5));g.add(at(makeChair(0x5a3b22),-0.95,0,0.5,Math.PI*0.75));return ch;}}
+    ],
+    1:[ // CASE 2
+      {title:'九十六分',sub:'國家運動訓練中心。\n一套 AI 系統，把運動員分成三種訓練類型。',view:{pos:[-0.1,4.8,5.5],target:[-0.2,0.4,-0.1]},
+        build(g){const tr=makeTrack();at(tr,0.15,0,0.15);g.add(tr);const sv=makeServer('96%');at(sv,-0.95,0,-0.95,0.4);g.add(sv);g.add(at(makeTree(0.7),1.0,0,-1.15));g.add(at(makeTree(0.5),0.6,0,-1.25));
+          const ch={};ch.athlete=spawnChar('athlete',0.25,0.55,0.1);g.add(ch.athlete);ch.coach=spawnChar('coach',-0.35,0.35,0.35);g.add(ch.coach);ch.hero=spawnChar('hero',0.85,0.45,-0.45);g.add(ch.hero);ch.eng=spawnChar('eng',-0.75,-0.35,0.6);g.add(ch.eng);
+          [0.5,0.7].forEach((z,i)=>g.add(at(cone(0.05,0.12,0xffa040,8),-0.05+i*0.2,0.06,z)));return ch;}},
+      {title:'洩漏',sub:'資料室。\n把流程攤開，看看測試資料的資訊，是從哪裡滲進去的。',view:{pos:[-0.2,4.6,5.2],target:[-0.3,0.45,-0.2]},
+        build(g){const bd=makeBoard(1.7,0.9,sceneTex('c2board'));at(bd,-0.1,0,-1.25);g.add(bd);const pl=makePipeline();at(pl,-0.35,0,0.15,0.0);g.add(pl);g.userData.drops=pl.userData.drops;
+          g.add(at(makeMagnifier(),0.75,0,0.75,0.4));const ch={};ch.hero=spawnChar('hero',0.7,0.3,-0.3,0.78,{hat:'detective'});g.add(ch.hero);
+          ch.eng=spawnChar('eng',-0.85,0.75,0.3);g.add(ch.eng);g.add(at(makeBook(0x8a6bbf),0.95,0.025,-0.3,0.4));g.add(at(makeBook(0xd69a3a),1.0,0.08,-0.25,0.1));
+          const lamp=new THREE.Group();lamp.position.set(1.0,0,-1.0);g.add(lamp);lamp.add(at(cyl(0.1,0.12,0.03,0x2b2f3f,10),0,0.015,0));lamp.add(at(cyl(0.015,0.015,0.5,0x2b2f3f,6),0,0.25,0));const sh=cone(0.16,0.18,0xd8b56a,12);sh.rotation.x=Math.PI;sh.position.y=0.52;sh.material.side=THREE.DoubleSide;lamp.add(sh);return ch;}},
+      {title:'重建',sub:'天亮了。\n以安在白板上畫出一條新的分析流程。',view:{pos:[0,4.7,5.4],target:[-0.15,0.45,-0.2]},
+        build(g){const bd=makeBoard(1.6,0.8,sceneTex('c2board2'));at(bd,-0.35,0,-1.25,0.15);g.add(bd);const wall=makeGlassWall(1.2,0.7);at(wall,0.2,0,-0.1,Math.PI/2);g.add(wall);
+          const lab1=makeLabel('訓練資料',0.5,0.12,'#2e8b84');lab1.rotation.x=-Math.PI/2;lab1.position.set(-0.35,0.01,0.55);g.add(lab1);const lab2=makeLabel('測試資料',0.5,0.12,'#b34a4a');lab2.rotation.x=-Math.PI/2;lab2.position.set(0.72,0.01,0.55);g.add(lab2);
+          const km=VALS.c2km3;const X=VALS.c2.train.X;const pts=[],cols=[];for(let i=0;i<X.length;i+=4){pts.push([(X[i][0]-60)/40-0.35,0.08+Math.random()*0.02,(X[i][1]-60)/40+0.1]);cols.push([0x4fd1c5,0xffd27a,0x8a6bbf][km.lab[i]]);}g.add(makeCloud(pts,cols,0.028));
+          const tX=VALS.c2.test.X;const p2=[],c2=[];for(let i=0;i<tX.length;i+=3){p2.push([(tX[i][0]-60)/90+0.72,0.08,(tX[i][1]-60)/90+0.1]);c2.push(0x9aa3bd);}g.add(makeCloud(p2,c2,0.026));
+          const ch={};ch.hero=spawnChar('hero',0.95,0.95,-0.6);g.add(ch.hero);ch.eng=spawnChar('eng',-0.9,0.85,0.4);g.add(ch.eng);ch.coach=spawnChar('coach',-0.3,1.15,0.1);g.add(ch.coach);ch.athlete=spawnChar('athlete',0.35,1.2,-0.2,0.7);g.add(ch.athlete);return ch;}}
+    ],
+    2:[ // CASE 3
+      {title:'突破',sub:'記者會。\n「新訓練法對肌力、速度與爆發力有全面性的改善。」',view:{pos:[-0.1,4.8,5.5],target:[-0.2,0.5,-0.2]},
+        build(g){const bn=makeBanner(sceneTex('c3banner'),1.7,0.65);at(bn,0,0.0,-1.3);g.add(bn);g.add(at(makePodium(0x5a3b22),0,0,-0.6));g.add(at(makeMics(),0,0.66,-0.55));
+          const bars=makeBars([0.55,0.5,0.52],[0xb34a4a,0xd69a3a,0x8a6bbf],['肌力','速度','爆發力'],0.14);at(bars,-0.85,0,-0.7);g.add(bars);
+          g.add(at(makeNewspaper('突破性訓練法，全面提升運動表現！'),0.85,0,0.45,-0.3));
+          const ch={};ch.pi=spawnChar('pi',0,-0.9,0.05);g.add(ch.pi);ch.reporter=spawnChar('reporter',-0.75,0.4,0.6);g.add(ch.reporter);g.add(spawnChar('extra2',-0.25,0.75,0.2,0.66));ch.stat=spawnChar('stat',0.55,0.85,-0.4);g.add(ch.stat);ch.hero=spawnChar('hero',0.95,0.15,-0.7);g.add(ch.hero);return ch;}},
+      {title:'三個變數，一個檢定',sub:'原始資料：90 列、3 欄。\n整體顯著，可能來自一個變數的大差異。',view:{pos:[0,4.7,5.4],target:[-0.2,0.45,-0.3]},
+        build(g){const r=VALS.c3r;const ms=r.means;const mk=(j,x,lab,sc)=>{const b=makeBars([(ms[0][j]-ms[2][j])*sc+0.3,(ms[1][j]-ms[2][j])*sc+0.3,0.3],[0xb34a4a,0xd69a3a,0x9aa3bd],null,0.1);at(b,x,0,-1.0);g.add(b);const l=makeLabel(lab,0.5,0.12);l.rotation.x=-Math.PI/2;l.position.set(x,0.01,-0.7);g.add(l);};
+          mk(0,-0.75,'肌力',0.022);mk(1,-0.15,'速度',8);mk(2,0.45,'爆發力',0.003);
+          const X=VALS.c3.X,y=VALS.c3.y;const pts=[],cols=[];const sdw=r.Sp.map((row,i)=>Math.sqrt(row[i]));const gm=MV.colMeans(X);X.forEach((x,i)=>{const z=x.map((v,j)=>(v-gm[j])/sdw[j]);pts.push([z[0]*0.13+0.05,0.35+z[2]*0.1,z[1]*0.12+0.35]);cols.push(r.md[i]>16.27?0xff3030:[0xb34a4a,0xd69a3a,0x9aa3bd][y[i]]);});const cl=makeCloud(pts,cols,0.024);g.add(cl);cl.children.forEach((s,i)=>{if(r.md[i]>16.27)s.scale.setScalar(1.8);});
+          g.add(at(makeScales(),-0.95,0,0.55,0.4));const ch={};ch.hero=spawnChar('hero',0.8,0.6,-0.5);g.add(ch.hero);ch.ra=spawnChar('ra',0.35,1.05,-0.2);g.add(ch.ra);ch.stat=spawnChar('stat',-0.45,0.95,0.3);g.add(ch.stat);
+          const bd=makeBoard(1.1,0.6,sceneTex('c3board'));at(bd,0.95,0,-1.2,-0.4);g.add(bd);return ch;}},
+      {title:'審查',sub:'研究審查會議。\n報告的哪些結論可以保留？哪些必須修改？',view:{pos:[0,4.6,5.3],target:[-0.1,0.5,-0.3]},
+        build(g){g.add(at(makeBench(),0,0,-0.95));g.add(at(makeGavel(),0.45,0.66,-0.9,0.3));g.add(at(makeScales(),-0.5,0.66,-0.95));
+          const ch={};ch.chair=spawnChar('chair',0,-1.15,0,0.72);ch.chair.position.y=0.28;g.add(ch.chair);
+          g.add(at(box(0.5,0.5,0.4,0x6e4a2e),0.8,0.25,0.05));g.add(at(box(0.55,0.04,0.45,0x8c6240),0.8,0.52,0.05));ch.hero=spawnChar('hero',0.8,-0.05,-0.3);g.add(ch.hero);
+          ch.pi=spawnChar('pi',-0.75,0.15,0.4);g.add(ch.pi);ch.stat=spawnChar('stat',-0.2,0.6,0.1);g.add(ch.stat);
+          g.add(at(spawnChar('rev1',-0.95,1.05,-0.3,0.62),-0.95,0,1.05));g.add(at(spawnChar('rev2',0.95,1.05,0.3,0.62),0.95,0,1.05));g.add(at(makeChair(0x5a3b22),-0.95,0,1.05,-0.3));g.add(at(makeChair(0x5a3b22),0.95,0,1.05,0.3));
+          return ch;}}
+    ]
+  };
+
+  // ---------- animation registry ----------
+  const anim={t:0,chars:[],blinkers:[],sway:[],drops:[]};
+  function registerAnim(group){anim.chars=[];anim.blinkers=[];anim.sway=[];anim.drops=[];group.traverse(o=>{if(o.userData&&o.userData.type==='char')anim.chars.push(o);if(o.userData&&o.userData.blink)anim.blinkers.push(o);if(o.userData&&o.userData.sway)anim.sway.push(o);if(o.userData&&o.userData.drop)anim.drops.push(o);});}
+  function update(dt){anim.t+=dt;const t=anim.t;
+    anim.chars.forEach(c=>{if(c.userData.busy)return;const p=c.userData.phase;c.position.y=c.userData.baseY+Math.sin(t*2+p)*0.012;c.userData.head.rotation.y=Math.sin(t*0.6+p)*0.25;c.userData.head.rotation.z=Math.sin(t*0.9+p)*0.04;});
+    anim.blinkers.forEach((l,i)=>{l.material.emissiveIntensity=(Math.sin(t*6+i*1.7)>0.3)?1.6:0.15;});
+    anim.sway.forEach(s=>{s.rotation.z=Math.sin(t*1.2)*0.06;});
+    anim.drops.forEach(d=>{const ph=((t*0.8+d.userData.drop.t)%1);d.position.y=-ph*0.3;d.material.opacity=1;d.scale.setScalar(ph<0.1?ph*10:1);});
+    files.forEach(f=>{if(f.userData.hoverGlow){f.userData.glow.material.opacity=0.18+Math.sin(t*4)*0.08;}});
+  }
+  return {renderer,scene,camera,camTarget,controls,VIEW,files,CASE_META,FILE,SCENES,CHAR_DEFS,makeChar,spawnChar,insideTexture,coverTexture,registerAnim,update,readLight,lamp,office};
+})();
+
+/* =====================================================================
+   PART 4 : 劇本（台灣繁體中文）— 三份研究檔案 × 三幕 × 研究決策 × 分支結局
+   ===================================================================== */
+const N='n';
+const STORY=[
+{ // ===================== CASE 01 消失的維度 =====================
+  id:0,lab:'pca',
+  acts:[
+    {beats:[
+      {s:N,t:'深夜十一點，研究室只剩一盞燈。桌上的第一份檔案，封面寫著：<em>消失的維度</em>。'},
+      {s:N,t:'三個月前，年度運動科學研討會。周啟宏教授的團隊發表了一項大型研究：312 位菁英運動員、24 項表現指標。'},
+      {s:'prof',f:'prof',t:'「經過主成分分析，24 個變數被濃縮成三個核心因素：<em>綜合運動潛能</em>、<em>心理韌性</em>、以及<em>有氧能力</em>。三者合計解釋了 56% 的變異。」'},
+      {s:'prof',f:'prof',t:'「其中『心理韌性』與國手選拔結果高度相關。我們建議把它納入明年的選訓標準。」'},
+      {s:'hero',f:'hero',t:'（翻著手冊）等等……在『心理韌性』這個成分上，垂直跳和深蹲的負荷量是<em>負的</em>，專注力量表是正的？'},
+      {s:'hero',f:'hero',t:'一個「心理」構念，為什麼會被肌力測驗反向定義？'},
+      {s:'ra',f:'ra',t:'學姊，大家都在鼓掌耶。而且他們解釋了 56% 的變異，這不是很厲害嗎？'},
+      {s:'hero',f:'hero',t:'解釋了很多變異，不代表解釋了<em>對的東西</em>。回去之後，我想把相關矩陣重新跑一次。'},
+      {type:'choice',id:'q0',q:'面對 24 個彼此高度相關的表現指標，你認為這個研究問題真正需要的是什麼？',opts:[
+        {t:'降維：把 24 個變數壓縮成少數綜合分數，方便後續使用。',set:{q0:'pca'},pts:0,fb:'這是 PCA 的思維：用最少的成分保留最多變異。它回答的是「資料怎麼最有效地摘要」，但不保證任何成分對應到理論構念。如果團隊只想做摘要，這沒問題；但他們想談的是「心理韌性」。'},
+        {t:'探索潛在構念：找出是什麼共同原因，讓這些變數彼此相關。',set:{q0:'fa'},pts:1,fb:'這是因素分析的思維：變數之所以相關，是因為背後有共同因素。要宣稱「心理韌性」這種構念存在，需要的是這種測量模型，而不是單純的變異摘要。'},
+        {t:'不需要減少變數，直接用 24 個變數建模。',set:{q0:'none'},pts:0,fb:'24 個高度相關的預測變數會帶來嚴重的多重共線性，而且研究團隊的目的本來就是想討論「構念」。問題不在於要不要減少變數，而在於減少的方式要回答什麼問題。'}]},
+      {s:N,t:'研討會結束。以安把 24 × 24 的相關矩陣列印出來，貼滿了研究室的牆。'},
+      {type:'turn'}
+    ]},
+    {beats:[
+      {s:N,t:'兩週後。研究室。'},
+      {s:'ra',f:'ra',t:'學姊，資料拿到了。312 人、24 個變數，和他們用的一模一樣。'},
+      {s:'hero',f:'hero',t:'先別急著跑模型。看看相關矩陣：肌力類指標彼此相關 .5 到 .7，心理量表彼此相關 .4 到 .6，但跨區塊的相關只有 .1 到 .3。'},
+      {s:'ra',f:'ra',t:'所以資料本來就有「區塊結構」？'},
+      {s:'hero',f:'hero',t:'對。真正的問題是：他們的三個成分，是怎麼切出這個結構的。'},
+      {s:'hero',f:'hero',t:'周教授的團隊用的是<em>未轉軸</em>的主成分。第一主成分是所有變數的加權總和；第二主成分是「心理量表 對 肌力測驗」的對比。'},
+      {s:'ra',f:'ra',t:'所以「心理韌性」其實是……一個「心理強、肌力弱」的方向？'},
+      {s:'hero',f:'hero',t:'它是變異第二大的方向，不是一個構念。該進實驗室了。'},
+      {type:'lab',lab:'pca',t:'統計實驗室已準備好同一批資料。比較 PCA 與因素分析、改變因素數與轉軸方式，看看結構會怎麼變。'},
+      {type:'choice',id:'q1',q:'跑完分析，你會保留幾個因素？（特徵值：{{c1eig}}；Kaiser 準則建議 {{c1kaiser}} 個，平行分析建議 {{c1pa}} 個）',opts:[
+        {t:'4 個：Kaiser 準則（特徵值 > 1）說有 4 個。',set:{q1:'4'},pts:0,fb:'第 4 個特徵值 1.15 只是略高於 1，平行分析顯示它低於隨機資料的期望值。第 4 個因素上只有反應力量指數、睡眠品質、HRV 三個低負荷題目，它們的共同點是都來自同一台穿戴裝置：這是<b>測量方法</b>，不是構念。'},
+        {t:'3 個：平行分析與陡坡圖都指向 3，而且三個因素都能解釋。',set:{q1:'3'},pts:1,fb:'平行分析與陡坡圖一致支持 3 個因素。轉軸後三個因素分別對應爆發力／力量、耐力／恢復、心理／專注，具有理論可解釋性。'},
+        {t:'2 個：因素越少越簡潔。',set:{q1:'2'},pts:0,fb:'2 個因素時，耐力與心理指標被迫併在一起，交叉負荷大量增加、共同性下降。簡潔不能以結構失真為代價。'},
+        {t:'5 個以上：解釋變異越多越好。',set:{q1:'5'},pts:0,fb:'解釋變異會隨因素數單調上升，這不是選擇依據。過度萃取會產生只有一、兩個題目的「碎片因素」，無法複製也無法命名。'}]},
+      {type:'choice',id:'q2',q:'「教練評分」同時負荷在爆發力與心理因素上（約 .52 / .43）；「反應力量指數」的共同性只有 .09。你會怎麼處理？',opts:[
+        {t:'全部刪掉，讓結構變乾淨。',set:{q2:'del'},pts:0,fb:'刪題能讓表格變好看，但也可能刪掉理論上重要的內容。教練評分的交叉負荷其實合理：教練本來就同時在看身體與心理。'},
+        {t:'回到題目的測量內容，區分「合理的交叉負荷」與「測量不良」，分別處理並在報告中揭露。',set:{q2:'ok'},pts:1,fb:'教練評分的交叉負荷有理論意義，可保留並說明；反應力量指數與睡眠品質共同性極低，顯示它們與其他指標幾乎沒有共同變異，應檢討測量方式，或在報告中揭露為獨立指標。'},
+        {t:'忽略，反正整體結構看起來不錯。',set:{q2:'ignore'},pts:0,fb:'低共同性的題目會讓因素分數的信度下降；交叉負荷不處理，會讓「心理韌性」的定義混進肌力成分，這正是周教授團隊犯的錯。'}]},
+      {s:'ra',f:'ra',t:'所以……他們的「心理韌性」，其實是轉軸之前的第二主成分？'},
+      {s:'hero',f:'hero',t:'對。轉軸後它會分開成「心理」和「爆發力」兩個因素，負號消失了。那個反向的肌力負荷，是<em>數學產物</em>。'},
+      {s:N,t:'三天後，學術會議。周教授的團隊將回應質疑。'},
+      {type:'turn'}
+    ]},
+    {beats:[
+      {s:N,t:'會議室裡，投影幕上並排著兩張表：未轉軸的 PCA，以及轉軸後的因素分析。'},
+      {s:'prof',f:'prof',t:'「沈博士，你的分析和我們的差別只是轉軸而已。轉軸不會改變解釋的總變異。」'},
+      {s:'hero',f:'hero',t:'「是的，總變異不變。但<em>構念的定義</em>改變了。轉軸前，你們把『心理量表高、肌力低』這個對比方向，命名為心理韌性。」'},
+      {s:'hero',f:'hero',t:'「轉軸後，心理量表自成一個因素，肌力指標自成另一個。原本的負號消失了。那不是心理韌性的特徵，而是未轉軸成分的數學性質。」'},
+      {s:'stat',f:'stat',t:'「我補充一點。主成分分析回答的是『怎麼用最少的成分保留最多變異』；因素分析才是在問『什麼共同原因讓這些變數相關』。兩者的目的不同。」'},
+      {s:'prof',f:'prof',t:'「但我們的三成分模型，在國手選拔上預測得很好。」'},
+      {s:'hero',f:'hero',t:'「預測好，不代表命名對。你可以用它預測，但不能把它當成『心理韌性』，去告訴教練：這個選手心理不夠強。」'},
+      {type:'choice',id:'q3',q:'現在輪到你下結論：資料是否支持研究團隊原本的理論？',opts:[
+        {t:'完全支持：三個因素就是三個核心構念，可以直接作為選訓標準。',set:{q3:'full'},pts:0,fb:'探索性因素分析只能顯示資料「相容於」三因素結構。要宣稱構念存在並拿來做決策，還需要在新樣本上做驗證性因素分析，以及信度與效度證據。'},
+        {t:'部分支持：資料相容於三個相關的潛在因素，但 PCA 成分不能直接等同構念；需用 CFA 在新樣本驗證後，才能應用於選訓。',set:{q3:'partial'},pts:1,fb:'這是資料能支持的範圍：結構存在，命名需修正，應用需等待驗證。'},
+        {t:'不支持：這批資料無法產生任何有意義的結構。',set:{q3:'none'},pts:0,fb:'這太過了。轉軸後的三因素結構清楚且可解釋；問題在於研究者的解釋超出了模型能回答的範圍，而不是資料沒有結構。'}]},
+      {type:'ending'}
+    ]}
+  ],
+  ending(F,pts){
+    const method={pca:'採用主成分分析（PCA），目的為資料摘要；報告中不再使用「構念」一詞描述成分。',fa:'採用主軸因素分析（PAF）並進行 Varimax 轉軸，目的為探索潛在構念。',none:'保留 24 個原始變數直接建模。審查委員指出嚴重的多重共線性問題，要求重新分析。'}[F.q0];
+    const nf={'2':'保留 2 個因素。耐力與心理指標混在同一因素，審查委員指出共同性偏低與大量交叉負荷。','3':'保留 3 個因素（平行分析與陡坡圖支持），分別命名為爆發力／力量、耐力／恢復、心理／專注。','4':'保留 4 個因素。第 4 個因素僅含三個低負荷題目，審查委員質疑其為穿戴裝置的測量方法效應。','5':'保留 5 個以上因素。多個因素僅含一、兩個題目，無法命名，審查委員要求重做。'}[F.q1];
+    const cross={del:'刪除所有交叉負荷與低共同性題目。審查委員詢問：刪除「教練評分」是否損失理論上重要的內容？',ok:'保留「教練評分」並說明其雙重負荷的理論意義；將反應力量指數與睡眠品質列為共同性過低、建議改善測量的指標。',ignore:'未處理交叉負荷與低共同性。審查委員指出因素分數信度不足，且「心理」因素定義不清。'}[F.q2];
+    const concl={full:'結論宣稱三個因素即為三個核心構念並建議直接用於選訓。審查委員認為結論超出探索性分析所能支持的範圍。',partial:'結論：資料相容於三個相關的潛在因素；原「心理韌性」成分為未轉軸對比方向的數學產物。建議於新樣本以 CFA 驗證後再討論應用。',none:'結論宣稱資料無結構。審查委員指出轉軸後結構清楚，結論與分析結果矛盾。'}[F.q3];
+    const verdict=pts>=4?['審查通過','周教授同意修改「心理韌性」的命名，並與你的團隊合作規劃新樣本的驗證性因素分析。三個月後，修正版報告刊登；原本「反向肌力定義的心理韌性」從選訓標準中移除。']:pts>=2?['有條件接受','審查委員要求補充分析後再議。報告的核心結構被保留，但你在幾個關鍵決策上留下了可被質疑的空間。']:['退回重審','審查委員認為分析決策與研究問題不一致。周教授的團隊得以保留原本的解釋，「心理韌性」繼續出現在明年的選訓標準草案裡。'];
+    return {title:'結案報告：消失的維度',verdict:verdict[0],good:pts>=4,html:`<div class="report"><div class="stamp">${verdict[0]}</div><h4>修正版研究報告（由你的決策產生）</h4><ul><li><b>分析方法：</b>${method}</li><li><b>因素數：</b>${nf}</li><li><b>題目處理：</b>${cross}</li><li><b>結論：</b>${concl}</li></ul></div><div class="report"><h4>後記</h4><p>${verdict[1]}</p><p style="margin-top:8px;color:#5a5f73">本案核心：統計模型所呈現的「結構」是資料變異的幾何；研究者宣稱的「構念」是理論的語言。兩者之間，需要測量模型、轉軸選擇與新樣本驗證來搭橋。</p></div>`};
+  }
+},
+{ // ===================== CASE 02 錯誤的分類 =====================
+  id:1,lab:'cluster',
+  acts:[
+    {beats:[
+      {s:N,t:'第二份檔案。封面寫著：<em>錯誤的分類</em>。地點：國家運動訓練中心。'},
+      {s:N,t:'去年，中心導入一套 AI 分類系統。輸入運動員的生理與心理數據，系統會把他們分成三種訓練類型：速度型、耐力型、綜合型。'},
+      {s:'coach',f:'coach',t:'「系統說雅薇是『耐力型』。我們照它的建議，把她的衝刺訓練砍掉一半，改練長距離。」'},
+      {s:'athlete',f:'athlete',t:'「三個月後，我的 100 公尺慢了 0.2 秒。教練，我是<em>短跑選手</em>。」'},
+      {s:'coach',f:'coach',t:'「廠商說系統的分類正確率有 96%。96% 耶，我有什麼理由不信？」'},
+      {s:'hero',f:'hero',t:'「正確率 96%，是<em>對誰</em>正確？用什麼資料算出來的？」'},
+      {s:'eng',f:'eng',t:'「我是中心的資料工程師 Kevin。我可以把整個流程給你看。但先說，數字是真的，我自己重算過。」'},
+      {s:'hero',f:'hero',t:'「我相信數字是真的。我想知道的是，它回答的是哪個問題。」'},
+      {type:'choice',id:'q0',q:'分群（clustering）與分類（classification），是在回答同一個問題嗎？',opts:[
+        {t:'是，兩者都是把人分成幾類。',set:{q0:'same'},pts:0,fb:'表面相似，本質不同。分群是在沒有標準答案時，從資料裡找結構；分類則是有已知標籤時，學習如何預測它。混淆兩者，正是這個案子的核心。'},
+        {t:'不是。分群沒有標準答案，是在找資料裡的結構；分類是有已知標籤時學習預測。',set:{q0:'diff'},pts:1,fb:'正確。那麼關鍵問題來了：這套系統的「標籤」，是從哪裡來的？'},
+        {t:'分類只是用來驗證分群結果的工具。',set:{q0:'verify'},pts:0,fb:'用分類器在同一批資料上「驗證」分群結果，只能證明分群邊界大致是線性的，證明不了分群有意義。'}]},
+      {s:N,t:'Kevin 把系統的訓練流程圖攤開在桌上。以安拿起放大鏡。'},
+      {type:'turn'}
+    ]},
+    {beats:[
+      {s:'eng',f:'eng',t:'「流程是這樣：先把<em>全部</em> 270 位運動員的資料標準化，用 F 檢定從 122 個指標裡挑出最有區辨力的 8 個，然後用 K-means 分成三群。」'},
+      {s:'eng',f:'eng',t:'「接著用這三群當標籤，訓練一個線性區辨分析（LDA）模型。最後在<em>同一批資料</em>上算正確率：{{c2resub}}%。文件上寫 96%，已經是比較保守的版本。」'},
+      {s:'hero',f:'hero',t:'「我聽到三個漏洞。第一，標籤是 K-means 自己分出來的，再用 LDA 去預測它，當然準。這叫<em>循環論證</em>。」'},
+      {s:'hero',f:'hero',t:'「第二，正確率是在訓練資料上算的。模型已經背過答案了。」'},
+      {s:'hero',f:'hero',t:'「第三，標準化和挑變數都在切分資料<em>之前</em>做。測試資料的資訊，早就滲進訓練流程裡了。這叫<em>資料洩漏</em>。」'},
+      {s:'eng',f:'eng',t:'「……我以為只要模型沒看過測試資料的標籤就好。」'},
+      {s:'hero',f:'hero',t:'「挑變數的時候，你用了測試資料的標籤。那 8 個指標之所以被選中，有一部分是因為它們剛好在測試資料裡也有關。」'},
+      {type:'lab',lab:'cluster',t:'統計實驗室：重做分群、改變評估方式，並親手製造一次資料洩漏，看看正確率怎麼被灌水。'},
+      {type:'choice',id:'q1',q:'K-means 的群數，應該怎麼決定？',opts:[
+        {t:'直接設 3，因為訓練計畫剛好有三種。',set:{q1:'fixed'},pts:0,fb:'這是把答案塞進問題裡。資料若沒有三群的結構，K-means 仍然會「切」出三群，但那只是把連續分布切成三塊。'},
+        {t:'綜合肘點圖、輪廓係數與理論意義，並檢查不同方法（如 Ward 法）是否得到相似的群。',set:{q1:'multi'},pts:1,fb:'正確。這批資料的輪廓係數在 k = 2 到 3 都只有 .37–.38，沒有明顯的群集結構；K-means 與 Ward 法的分群也不一致。'},
+        {t:'選讓分類正確率最高的 k。',set:{q1:'acc'},pts:0,fb:'分類器預測的是 K-means 自己產生的標籤，正確率只反映群集邊界是否線性，與群數是否合理無關。'}]},
+      {type:'choice',id:'q2',q:'面對 96% 的正確率，你的下一步是？（這個決定將改變結局）',opts:[
+        {t:'數字夠好，建議系統正式上線。',set:{q2:'deploy'},pts:0,fb:'你簽下了建議書。系統上線後，分類結果開始與教練的觀察衝突……'},
+        {t:'重做交叉驗證，確認正確率是否穩定。',set:{q2:'cv'},pts:1,fb:'五折交叉驗證後，正確率仍有 {{c2cv}}%。因為標籤本身就是從同一批特徵分出來的，交叉驗證抓不到這個問題。你知道還有什麼沒查。'},
+        {t:'追查標籤的來源、切分前的處理流程，以及模型在獨立資料上的穩定性。',set:{q2:'leak'},pts:2,fb:'你發現：改用運動員「實際訓練反應」當標籤，在獨立測試資料上的正確率只有 {{c2trueTest}}%；而原系統的分類與實際反應的一致性更只有 {{c2sysTrueTest}}%。96% 回答的是另一個問題。'}]},
+      {s:N,t:'天亮了。以安在白板上畫出一條新的分析流程。'},
+      {type:'turn'}
+    ]},
+    {beats:[
+      {s:'hero',f:'hero',t:'「新的流程：<em>先</em>切分訓練與測試資料。所有前處理與變數篩選，只用訓練資料估計。」'},
+      {s:'hero',f:'hero',t:'「標籤改用能回答問題的東西：運動員接受不同訓練後的<em>實際反應</em>，而不是 K-means 的切片。」'},
+      {s:'eng',f:'eng',t:'「用真實反應當標籤，LDA 在獨立測試資料上的正確率是 {{c2trueTest}}%。比 96% 難看多了。」'},
+      {s:'hero',f:'hero',t:'「但這是誠實的數字。它告訴我們：光靠這兩個指標，預測訓練反應的能力有限。」'},
+      {type:'choice',id:'q3',q:'LDA 假設各群的共變異數矩陣相同、且資料大致呈多變量常態。你會怎麼處理？',opts:[
+        {t:'不用檢查，LDA 很穩健。',set:{q3:'skip'},pts:0,fb:'LDA 對共變異數異質性並不穩健，特別是群組大小不等時，它會偏向把邊界個案分到變異較大的群。'},
+        {t:'檢查各群共變異數同質性與分布形狀，必要時改用 QDA 或其他分類器，並用測試資料比較。',set:{q3:'check'},pts:1,fb:'正確。假設檢查的目的不是儀式，而是決定該用哪個模型，以及結果可以信到什麼程度。'},
+        {t:'LDA 只能用於兩群，所以要換方法。',set:{q3:'two'},pts:0,fb:'LDA 可以處理多群，最多有 min(群數 − 1, 變數數) 個區辨函數。這不是換方法的理由。'}]},
+      {s:'coach',f:'coach',t:'「所以系統到底能不能用？我需要一個答案來排雅薇的課表。」'},
+      {type:'choice',id:'q4',q:'分類結果，可以直接作為訓練處方的依據嗎？',opts:[
+        {t:'可以，模型說了算。',set:{q4:'yes'},pts:0,fb:'分類只描述「這個人像哪一群」，不能證明「照那一群的方式訓練對他最好」。那需要介入研究的證據。'},
+        {t:'不行。分類是描述性的；要知道哪種訓練對誰有效，需要介入研究的證據。分類至多作為教練判斷的參考。',set:{q4:'no'},pts:1,fb:'正確。雅薇的案例，正是把「描述」當成「處方」的代價。'},
+        {t:'可以，只要正確率超過 90%。',set:{q4:'90'},pts:0,fb:'正確率衡量的是對標籤的預測，而不是訓練處方的效果。再高的正確率，也回答不了「怎麼練比較好」。'}]},
+      {type:'checklist',id:'rec',q:'請向研究團隊提出模型修正建議（可複選，選完請按「送出建議」）。',items:[
+        {t:'先切分資料；所有標準化與變數篩選只用訓練資料估計。',ok:true},
+        {t:'把標籤改為可驗證的實際訓練反應，而非分群結果。',ok:true},
+        {t:'用獨立測試資料或嵌套交叉驗證報告正確率。',ok:true},
+        {t:'檢查群集結構是否穩定（不同方法、不同子樣本）。',ok:true},
+        {t:'把正確率門檻從 96% 提高到 98%。',ok:false},
+        {t:'加入更多變數，讓訓練資料的正確率更高。',ok:false},
+        {t:'分類結果只作為教練參考，不直接開立訓練處方。',ok:true}]},
+      {type:'ending'}
+    ]}
+  ],
+  ending(F,pts){
+    const branch={
+      deploy:['系統正式上線','系統正式上線。六個月後，三分之一的運動員申請調整訓練計畫；獨立追蹤顯示，系統分類與運動員實際訓練反應的一致性只有 '+VALS.c2sysTrueTest+'%。教練團全面停用系統，中心重新招標。雅薇在半年後才回到衝刺訓練。'],
+      cv:['半年後的追蹤','交叉驗證報告顯示正確率穩定在 '+VALS.c2cv+'%，系統上線。半年後，獨立追蹤顯示分類與實際訓練反應的一致性只有 '+VALS.c2sysTrueTest+'%。問題終於被找到了：標籤是循環的、前處理有洩漏。但晚了半年。'],
+      leak:['找到問題來源','你找到了問題來源：循環的標籤、訓練資料上的正確率、切分前的篩選。新流程以實際訓練反應為標籤，在獨立資料上誠實地報告 '+VALS.c2trueTest+'% 的正確率，並附上群集結構不穩定的證據。中心決定：系統降級為教練輔助工具，不再直接開立處方。雅薇下週就回到衝刺訓練。']}[F.q2];
+    const rec=F.rec||{right:0,wrong:0,total:5};
+    const recTxt=`你的修正建議：命中 ${rec.right} / ${rec.total} 項關鍵建議${rec.wrong?`，另有 ${rec.wrong} 項會讓問題更糟（提高門檻或增加變數，只會讓訓練資料上的數字更漂亮）`:''}。`;
+    const good=F.q2==='leak'&&pts>=5;
+    return {title:'結案報告：錯誤的分類',verdict:branch[0],good,html:`<div class="report"><div class="stamp">${good?'問題已定位':F.q2==='deploy'?'系統停用':'延遲發現'}</div><h4>結局</h4><p>${branch[1]}</p></div><div class="report"><h4>你的分析決策</h4><ul><li><b>分群 vs 分類：</b>${{same:'視為相同問題。',diff:'正確區分：分群找結構、分類學預測。',verify:'把分類當成分群的驗證工具。'}[F.q0]}</li><li><b>群數決定：</b>${{fixed:'直接設定 k = 3。',multi:'綜合肘點、輪廓係數、理論意義與方法一致性。',acc:'以分類正確率選 k。'}[F.q1]}</li><li><b>LDA 假設：</b>${{skip:'未檢查。',check:'檢查共變異數同質性與分布，必要時改用 QDA。',two:'誤以為 LDA 只能用於兩群。'}[F.q3]}</li><li><b>分類→處方：</b>${{yes:'直接作為處方依據。',no:'分類僅為描述，處方需介入研究證據。','90':'以正確率門檻決定可否作為處方。'}[F.q4]}</li><li><b>修正建議：</b>${recTxt}</li></ul></div><div class="report"><h4>本案核心</h4><p>正確率回答的是它被問的問題。訓練資料上的 ${VALS.c2resub}%、交叉驗證的 ${VALS.c2cv}%、以實際反應為標籤的 ${VALS.c2trueTest}%：三個數字都是真的，但只有一個與「運動員該怎麼練」有關。</p></div>`};
+  }
+},
+{ // ===================== CASE 03 顯著性的陷阱 =====================
+  id:2,lab:'manova',
+  acts:[
+    {beats:[
+      {s:N,t:'第三份檔案。封面寫著：<em>顯著性的陷阱</em>。地點：記者會現場。'},
+      {s:N,t:'高教授的團隊發表「全方位爆發訓練法」。90 位運動員分成三組：新訓練法、傳統訓練、對照組。12 週後，比較肌力、速度與爆發力。'},
+      {s:'pi',f:'pi',t:'「多變量變異數分析顯示：Wilks’ Λ = {{c3W}}，p {{c3P}}。新訓練法對肌力、速度與爆發力有<em>全面性</em>的改善。」'},
+      {s:'reporter',f:'reporter',t:'「教授，所以每一項都進步了？」'},
+      {s:'pi',f:'pi',t:'「整體檢定顯著，當然是全面進步。」'},
+      {s:N,t:'隔天的頭條：「突破性訓練法，全面提升運動表現！」'},
+      {s:'stat',f:'stat',t:'「我是方靜儀，審查委員之一。我讀了原始報告：三個結果變數、一個多變量檢定，沒有後續分析，沒有假設檢查。」'},
+      {s:'hero',f:'hero',t:'「整體顯著，只說明三個變數的<em>某個線性組合</em>在組間有差異。它沒說是哪一個，也沒說有多大。」'},
+      {type:'choice',id:'q0',q:'研究團隊為什麼應該用 MANOVA，而不是對三個變數各做一次 ANOVA？',opts:[
+        {t:'因為 MANOVA 比較高級，審查委員比較喜歡。',set:{q0:'fancy'},pts:0,fb:'方法的選擇取決於問題，不是階級。'},
+        {t:'因為三個結果變數彼此相關，MANOVA 能控制整體型一錯誤率，並檢驗變數的線性組合是否有組間差異。',set:{q0:'right'},pts:1,fb:'正確。三次獨立的 ANOVA 會讓整體型一錯誤率膨脹到約 14%，而且忽略了變數之間的相關。'},
+        {t:'因為 MANOVA 不需要任何假設。',set:{q0:'noassume'},pts:0,fb:'相反，MANOVA 的假設更多：多變量常態、各組共變異數矩陣同質、沒有多變量離群值、結果變數之間有適度相關。'}]},
+      {s:N,t:'以安取得原始資料。90 列、3 欄。'},
+      {type:'turn'}
+    ]},
+    {beats:[
+      {s:'hero',f:'hero',t:'「先看描述統計。肌力：新訓練法平均比對照組高 {{c3d0}} 公斤。速度：30 公尺進步幅度差 {{c3d1}} 秒。爆發力：幾乎沒有差別。」'},
+      {s:'ra',f:'ra',t:'「所以『全面改善』其實是……肌力改善？」'},
+      {s:'hero',f:'hero',t:'「先別下結論。多變量檢定顯著，可能來自一個變數的大差異，也可能來自幾個變數的小差異。要看追蹤分析。」'},
+      {s:'hero',f:'hero',t:'「還有，對照組裡有幾個人的數值很奇怪。Mahalanobis 距離遠超過臨界值，一共 {{c3nOut}} 筆。」'},
+      {s:'stat',f:'stat',t:'「離群值會膨脹共變異數矩陣，也會讓各組的共變異數矩陣看起來不同質。Box’s M 檢定的 p {{c3BoxP}}。」'},
+      {type:'lab',lab:'manova',t:'統計實驗室：檢查假設、處理離群值、比較四種多變量統計量，並進行追蹤分析。'},
+      {type:'choice',id:'q1',q:'Wilks’ Λ 和 Pillai’s Trace，要怎麼選？',opts:[
+        {t:'永遠用 Wilks’ Λ，它最常見。',set:{q1:'wilks'},pts:0,fb:'Wilks 常見，但在共變異數異質、群組大小不等或有離群值時，Pillai’s Trace 較為穩健。'},
+        {t:'當共變異數同質性可疑、群組大小不等或有離群值時，優先報告 Pillai’s Trace。',set:{q1:'pillai'},pts:1,fb:'正確。本例 Box’s M 顯著（p {{c3BoxP}}），Pillai 是較穩健的選擇；移除離群值後 Box’s M 不再顯著（p {{c3BoxP2}}），兩者結論一致。'},
+        {t:'哪個 p 值小就報哪個。',set:{q1:'phack'},pts:0,fb:'這是選擇性報告。四個統計量在本例結論相同，但選擇標準必須在分析之前決定。'}]},
+      {type:'choice',id:'q2',q:'整體檢定顯著之後，應該怎麼做？',opts:[
+        {t:'宣布三個變數都有改善。',set:{q2:'all'},pts:0,fb:'整體顯著不蘊含每個變數都顯著。本例追蹤分析顯示，只有肌力達到校正後的顯著水準（α = {{c3alpha}}）。'},
+        {t:'進行 Bonferroni 校正的單變量追蹤分析，並以描述性區辨分析檢視差異來自哪些變數的組合。',set:{q2:'follow'},pts:1,fb:'正確。區辨函數的標準化係數顯示，組間差異主要由肌力驅動；爆發力的係數甚至是負的。'},
+        {t:'不需要後續分析，多變量檢定已經回答了。',set:{q2:'none'},pts:0,fb:'多變量檢定只回答「有沒有差異」，不回答「差在哪、差多少」。'}]},
+      {s:N,t:'一週後，研究審查會議。'},
+      {type:'turn'}
+    ]},
+    {beats:[
+      {s:'chair',f:'chair',t:'「本次審查的目的，是決定研究報告的哪些結論可以保留。沈博士，請陳述。」'},
+      {s:'hero',f:'hero',t:'「移除 {{c3nOut}} 個多變量離群值後，整體檢定仍顯著（Pillai = {{c3Pillai2}}，p {{c3PP2}}）。但追蹤分析顯示：只有肌力在校正後顯著（p {{c3uniP0}}），速度未達校正後水準（p {{c3uniP1x}}），爆發力沒有差異（p {{c3uniP2}}）。」'},
+      {s:'pi',f:'pi',t:'「但整體就是顯著的。這代表訓練法有效。」'},
+      {s:'hero',f:'hero',t:'「有效於肌力，是的。『全面改善』則沒有證據。而且肌力進步 {{c3d0}} 公斤，約 {{c3dz0}} 個標準差：有意義，但不是『突破』。」'},
+      {type:'choice',id:'q3',q:'統計顯著，等於實際的訓練效益嗎？',opts:[
+        {t:'是，p 值小就表示效果大。',set:{q3:'yes'},pts:0,fb:'p 值反映的是樣本量與效果量的綜合，它不是效果的大小。'},
+        {t:'否。要看效果量與實務意義：肌力進步約 {{c3dz0}} 個標準差，速度進步不到 0.1 秒。',set:{q3:'no'},pts:1,fb:'正確。效果量與該領域的「最小有意義差異」，才是判斷效益的依據。'},
+        {t:'只要 p < .05 就有效。',set:{q3:'p05'},pts:0,fb:'.05 是慣例門檻，不是效益的證據。'}]},
+      {s:'stat',f:'stat',t:'「還有一件事。三組<em>不是隨機分派</em>的。新訓練法組，是由自願參加的教練帶領的選手。」'},
+      {type:'choice',id:'q4',q:'非隨機分派的研究設計，可以宣稱訓練法「造成」改善嗎？',opts:[
+        {t:'可以，統計已經顯著了。',set:{q4:'yes'},pts:0,fb:'顯著只說明組間有差異。差異可能來自自我選擇：願意嘗試新方法的教練，可能本來就帶著進步較快的選手。'},
+        {t:'不行。只能說有關聯；要宣稱因果，需要隨機分派，或至少控制基線與選擇機制。',set:{q4:'no'},pts:1,fb:'正確。報告結論必須從「造成」改為「相關」，並揭露分派方式。'},
+        {t:'只要樣本夠大就可以。',set:{q4:'n'},pts:0,fb:'樣本量不能修正選擇偏誤；偏誤不會因為 n 變大而消失。'}]},
+      {type:'review',id:'rev',q:'你是統計審查委員。請決定報告中每一項結論：保留、修改或刪除。',items:[
+        {t:'新訓練法對肌力、速度與爆發力有全面性的改善。',ok:['修改'],note:'應修改為：僅肌力達校正後顯著；速度未達顯著；爆發力無差異。'},
+        {t:'多變量檢定顯著（Wilks’ Λ = {{c3W}}，p {{c3P}}）。',ok:['保留','修改'],note:'可保留，但建議補充 Pillai’s Trace、離群值處理與 Box’s M 結果。'},
+        {t:'新訓練法「造成」運動表現的提升。',ok:['修改'],note:'非隨機分派，應改為「與…相關」並揭露分派方式。'},
+        {t:'爆發力顯著提升。',ok:['刪除'],note:'爆發力的單變量檢定 p {{c3uniP2}}，沒有證據。'},
+        {t:'新訓練法應立即推廣至所有國家隊。',ok:['刪除','修改'],note:'結論超出證據範圍；至多建議在隨機分派設計中進一步驗證。'},
+        {t:'肌力的改善約為 {{c3d0}} 公斤（約 {{c3dz0}} 個標準差）。',ok:['保留'],note:'以效果量與原始單位描述，是報告中最可靠的一句。'}]},
+      {type:'ending'}
+    ]}
+  ],
+  ending(F,pts){
+    const rev=F.rev||{right:0,total:6,rows:[]};
+    const good=rev.right>=5&&pts>=4;
+    const verdict=good?'審查決議：有條件接受（修改後刊登）':rev.right>=3?'審查決議：大幅修改後再審':'審查決議：退回';
+    const after=good?'高教授接受修改。刊登版的標題從「全面改善」改為「對肌力的改善」，並加註非隨機分派的限制。半年後，另一個團隊以隨機分派重做研究：肌力效果複製成功，速度與爆發力仍無差異。':rev.right>=3?'部分不當結論被保留在報告裡。隨後的媒體引用仍以「全面改善」為題，直到一年後的複製研究才更正。':'報告以原貌刊登。「突破性訓練法」被三支國家隊採用；一年後的複製研究找不到速度與爆發力的效果，訓練計畫被迫中途修改。';
+    const rows=rev.rows.map(r=>`<li>${r.t}<br><span style="color:${r.right?'#2e8b84':'#b34a4a'}">你的裁定：${r.pick}${r.right?' ✓':' ✗（委員會：'+r.ok.join('／')+'）'}</span></li>`).join('');
+    return {title:'結案報告：顯著性的陷阱',verdict,good,html:`<div class="report"><div class="stamp" style="--stampColor:${good?'#2e8b84':'#b34a4a'}">${good?'ACCEPTED':'REVISE'}</div><h4>${verdict}</h4><ul>${rows}</ul></div><div class="report"><h4>你的分析決策</h4><ul><li><b>為何用 MANOVA：</b>${{fancy:'因為比較高級。',right:'結果變數相關、控制型一錯誤、檢驗線性組合。',noassume:'誤以為不需假設。'}[F.q0]}</li><li><b>統計量選擇：</b>${{wilks:'一律 Wilks。',pillai:'假設可疑時優先 Pillai。',phack:'挑 p 值最小者。'}[F.q1]}</li><li><b>追蹤分析：</b>${{all:'宣布全面改善。',follow:'Bonferroni 單變量追蹤 + 描述性區辨分析。',none:'不做追蹤。'}[F.q2]}</li><li><b>顯著 vs 效益：</b>${{yes:'混為一談。',no:'以效果量與實務意義判斷。',p05:'以 .05 為效益門檻。'}[F.q3]}</li><li><b>因果宣稱：</b>${{yes:'接受因果。',no:'改為關聯並揭露分派方式。',n:'以樣本量合理化因果。'}[F.q4]}</li></ul></div><div class="report"><h4>後記</h4><p>${after}</p></div>`};
+  }
+}
+];
+
+/* =====================================================================
+   PART 5 : 狀態機、UI、統計實驗室、游標粒子、主迴圈
+   ===================================================================== */
+const $=s=>document.querySelector(s);
+const UI={intro:$('#intro'),hud:$('#hud'),badge:$('#badge'),dialog:$('#dialog'),speaker:$('#dialog .speaker'),text:$('#dialog .text'),btnNext:$('#btnNext'),btnLab:$('#btnLab'),choice:$('#choice'),lab:$('#lab'),ending:$('#ending'),toast:$('#toast'),hint:$('#hint'),progress:$('#progress'),officeTip:$('#officeTip'),final:$('#final'),btnHome:$('#btnHome'),btnOrbit:$('#btnOrbit'),btnMute:$('#btnMute'),loading:$('#loading'),tip:$('#dialog .tip')};
+// derived template values
+VALS.c3uniP0=VALS.c3uniP[0];VALS.c3uniP1x=VALS.c3uniP[1];VALS.c3uniP2=VALS.c3uniP[2];
+gsap.ticker.lagSmoothing(0); // 背景分頁回前景時直接補齊動畫，避免狀態機卡在 busy
+const tpl=s=>String(s).replace(/\{\{(\w+)\}\}/g,(m,k)=>(VALS[k]!==undefined?VALS[k]:m));
+
+const S={state:'INTRO',busy:false,caseIdx:-1,actIdx:0,beatIdx:0,flags:{},pts:0,done:[false,false,false],results:[null,null,null],sceneGroup:null,chars:{},file:null,orbit:false,focused:false,hoverFile:null};
+function setState(s){S.state=s;document.body.dataset.state=s;UI.btnOrbit.classList.toggle('hidden',s!=='SCENE_INTERACTION');UI.btnHome.classList.toggle('hidden',!(s==='SCENE_INTERACTION'||s==='QUIZ'));}
+async function locked(fn){if(S.busy)return;S.busy=true;try{await fn();}catch(e){console.error(e);}finally{S.busy=false;}}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function camTo(pos,target,dur,ease){return new Promise(res=>{const tl=gsap.timeline({onComplete:res});tl.to(W3.camera.position,{x:pos[0],y:pos[1],z:pos[2],duration:dur,ease:ease||'power2.inOut'},0);tl.to(W3.camTarget,{x:target[0],y:target[1],z:target[2],duration:dur,ease:ease||'power2.inOut'},0);});}
+function toast(msg,ms){UI.toast.textContent=msg;UI.toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>UI.toast.classList.remove('show'),ms||2200);}
+
+/* ---------- intro / office ---------- */
+UI.intro.addEventListener('click',()=>{if(S.state!=='INTRO')return;AUDIO.init();AUDIO.resume();setState('BOOKSHELF');UI.intro.style.opacity=0;setTimeout(()=>UI.intro.classList.add('hidden'),900);UI.hud.classList.remove('hidden');updateBadge();AUDIO.chime(true);});
+UI.btnMute.addEventListener('click',()=>{if(!AUDIO.ready){AUDIO.init();}const m=AUDIO.toggle();UI.btnMute.classList.toggle('off',m);$('#icoSound').innerHTML=m?'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M19 9l-4 6M15 9l4 6"/>':'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8a5 5 0 0 1 0 8M19 5a9 9 0 0 1 0 14"/>';toast(m?'音樂已靜音':'音樂開啟');});
+function updateBadge(){const k=UI.badge.querySelector('.k'),t=UI.badge.querySelector('.t'),a=UI.badge.querySelector('.a');if(S.caseIdx<0){k.textContent='RESEARCH OFFICE';t.textContent='深夜的研究室';a.textContent=S.done.every(Boolean)?'三份檔案皆已結案':'選擇一份研究檔案';UI.progress.innerHTML='';return;}const c=W3.CASE_META[S.caseIdx];k.textContent=c.num+' ・ '+c.sub;t.textContent=c.title;const act=W3.SCENES[S.caseIdx][S.actIdx];a.textContent='第 '+(S.actIdx+1)+' 幕 ・ '+act.title;
+  const total=STORY[S.caseIdx].acts.reduce((s,ac)=>s+ac.beats.length,0);let cur=0;for(let i=0;i<S.actIdx;i++)cur+=STORY[S.caseIdx].acts[i].beats.length;cur+=S.beatIdx;UI.progress.innerHTML=STORY[S.caseIdx].acts.map((ac,i)=>`<i class="${i<S.actIdx?'done':i===S.actIdx?'cur':''}"></i>`).join('')+`<span style="font-size:11px;color:#8e97b3;margin-left:6px">${Math.min(100,Math.round(cur/total*100))}%</span>`;}
+
+/* ---------- raycast ---------- */
+const ray=new THREE.Raycaster();const mouse=new THREE.Vector2();let downPos=null;
+function pick(objs,ev){mouse.x=(ev.clientX/window.innerWidth)*2-1;mouse.y=-(ev.clientY/window.innerHeight)*2+1;ray.setFromCamera(mouse,W3.camera);const hits=ray.intersectObjects(objs,true);if(!hits.length)return null;let o=hits[0].object;while(o&&!(o.userData&&(o.userData.type==='file'||o.userData.type==='char')))o=o.parent;return o;}
+const canvas=W3.renderer.domElement;
+canvas.addEventListener('pointerdown',ev=>{downPos=[ev.clientX,ev.clientY];});
+canvas.addEventListener('pointerup',ev=>{if(!downPos)return;const moved=Math.hypot(ev.clientX-downPos[0],ev.clientY-downPos[1]);downPos=null;if(moved>6)return;onCanvasClick(ev);});
+canvas.addEventListener('pointermove',ev=>{if(S.busy){canvas.style.cursor='default';return;}
+  if(S.state==='BOOKSHELF'){const f=pick(W3.files,ev);W3.files.forEach(x=>x.userData.hoverGlow=false);if(f&&!S.done[f.userData.idx]){f.userData.hoverGlow=true;canvas.style.cursor='pointer';UI.hint.style.opacity=1;UI.hint.style.left=ev.clientX+'px';UI.hint.style.top=ev.clientY+'px';const c=f.userData.c;UI.hint.innerHTML=`<b>${c.num}</b> ${c.title}｜${c.sub}`;}else{canvas.style.cursor=f?'not-allowed':'default';UI.hint.style.opacity=0;W3.files.forEach(x=>x.userData.glow.material.opacity=0);if(f&&S.done[f.userData.idx]){UI.hint.style.opacity=1;UI.hint.style.left=ev.clientX+'px';UI.hint.style.top=ev.clientY+'px';UI.hint.innerHTML=`<b>已結案</b> ${f.userData.c.title}`;}}}
+  else if(S.state==='SCENE_INTERACTION'&&S.sceneGroup){const ch=pick([S.sceneGroup],ev);canvas.style.cursor=ch?'pointer':'default';}else canvas.style.cursor='default';});
+function onCanvasClick(ev){if(S.busy)return;
+  if(S.state==='BOOKSHELF'){const f=pick(W3.files,ev);if(f){if(S.done[f.userData.idx]){toast('這份檔案已經結案。');return;}selectFile(f.userData.idx);}return;}
+  if(S.state==='SCENE_INTERACTION'){const ch=S.sceneGroup?pick([S.sceneGroup],ev):null;if(ch){charClick(ch);return;}if(S.orbit)return;const beat=curBeat();if(beat&&(beat.s!==undefined)&&!UI.dialog.classList.contains('hidden'))advance();}}
+document.addEventListener('keydown',ev=>{if(ev.code==='Space'||ev.code==='Enter'||ev.code==='ArrowRight'){if(S.state==='SCENE_INTERACTION'&&!S.busy){const beat=curBeat();if(beat&&beat.s!==undefined){ev.preventDefault();advance();}}}});
+
+/* ---------- character click: squash & stretch ---------- */
+function charClick(ch){if(ch.userData.busy)return;ch.userData.busy=true;const s=ch.scale.x;AUDIO.pop(Math.floor(Math.random()*4));const head=ch.userData.head;const dir=Math.random()<0.5?1:-1;
+  const tl=gsap.timeline({onComplete:()=>{ch.userData.busy=false;}});
+  tl.to(ch.scale,{x:s*1.25,y:s*0.72,z:s*1.25,duration:0.1,ease:'power2.out'}).to(ch.scale,{x:s*0.85,y:s*1.22,z:s*0.85,duration:0.12}).to(ch.scale,{x:s,y:s,z:s,duration:0.7,ease:'elastic.out(1,0.4)'});
+  tl.to(head.rotation,{y:dir*0.7,duration:0.25,ease:'power2.out'},0.1).to(head.rotation,{y:0,duration:0.5,ease:'elastic.out(1,0.5)'},0.45);
+  tl.to(ch.position,{y:ch.userData.baseY+0.18,duration:0.22,ease:'power2.out'},0.08).to(ch.position,{y:ch.userData.baseY,duration:0.35,ease:'bounce.out'},0.3);
+  const q=ch.userData.quips;toast(ch.userData.name+'：'+q[Math.floor(Math.random()*q.length)],2400);}
+
+/* ---------- file open / close ---------- */
+async function selectFile(idx){await locked(async()=>{setState('BOOK_ZOOM');AUDIO.click();UI.hint.style.opacity=0;UI.officeTip.style.opacity=0;const file=W3.files[idx];S.file=file;S.caseIdx=idx;S.actIdx=0;S.beatIdx=0;S.flags={};S.pts=0;W3.files.forEach(f=>{f.userData.hoverGlow=false;f.userData.glow.material.opacity=0;});
+    const tl=gsap.timeline();W3.files.forEach((f,i)=>{if(i===idx)return;const dir=f.position.x<=file.position.x?-1:1;tl.to(f.position,{x:f.position.x+dir*5.5,y:-0.2,duration:0.9,ease:'power2.inOut'},0);tl.to(f.rotation,{y:f.rotation.y+dir*0.3,duration:0.9},0);});
+    tl.to(file.position,{x:0,y:0.4,z:0.0,duration:0.5,ease:'power2.out'},0.1).to(file.position,{y:0,duration:0.5,ease:'bounce.out'},0.6);tl.to(file.rotation,{y:0,duration:0.9,ease:'power2.inOut'},0);
+    tl.to(W3.readLight,{intensity:1.8,duration:1.2},0.3);tl.to(W3.lamp,{intensity:1.0,duration:1.2},0.3);
+    await Promise.all([new Promise(r=>tl.eventCallback('onComplete',r)),camTo(W3.VIEW.read.pos,W3.VIEW.read.target,1.4)]);AUDIO.thud();
+    await openCover();});
+  runBeat();}
+async function openCover(){setState('OPEN_COVER');const file=S.file,ud=file.userData;const act=W3.SCENES[S.caseIdx][0];ud.inside.material.map=W3.insideTexture(ud.c,act.title,1,act.sub);ud.inside.material.needsUpdate=true;AUDIO.flip();
+  await new Promise(r=>gsap.to(ud.pivot.rotation,{z:Math.PI,duration:1.1,ease:'power2.inOut',onComplete:r}));ud.open=true;updateBadge();await buildAct(0);}
+async function buildAct(a){S.actIdx=a;S.beatIdx=0;const def=W3.SCENES[S.caseIdx][a];const g=new THREE.Group();S.chars=def.build(g)||{};S.file.userData.anchor.add(g);S.sceneGroup=g;W3.registerAnim(g);g.children.forEach(c=>{c.userData.baseScale=c.scale.x;c.scale.setScalar(0.001);});g.traverse(o=>{if(o.userData&&o.userData.type==='char')o.userData.baseY=o.position.y;});
+  updateBadge();camTo(def.view.pos,def.view.target,1.2);S.focused=false;await popIn(g);setState('SCENE_INTERACTION');}
+function popIn(g){return new Promise(res=>{const kids=g.children;let n=0;kids.forEach((c,i)=>{const s=c.userData.baseScale||1;gsap.to(c.scale,{x:s,y:s,z:s,duration:0.9,ease:'elastic.out(1,0.5)',delay:i*0.07,onStart:()=>{if(i%2===0)AUDIO.pop(i%5);},onComplete:()=>{n++;if(n===kids.length)res();}});});if(!kids.length)res();});}
+function flatten(g){return new Promise(res=>{const kids=g.children;let n=0;if(!kids.length)return res();kids.forEach((c,i)=>{gsap.to(c.scale,{y:0.001,z:0.001,duration:0.45,ease:'power3.in',delay:i*0.03,onComplete:()=>{n++;if(n===kids.length){g.parent&&g.parent.remove(g);res();}}});});});}
+async function turnPage(){await locked(async()=>{setState('PAGE_TURN');UI.dialog.classList.add('hidden');const file=S.file,ud=file.userData;const next=S.actIdx+1;const def=W3.SCENES[S.caseIdx][next];
+    await camTo([0,5.2,5.6],[-0.4,0.4,-0.3],0.8);await flatten(S.sceneGroup);S.sceneGroup=null;W3.registerAnim(new THREE.Group());
+    const tex=W3.insideTexture(ud.c,def.title,next+1,def.sub);ud.fBack.material.map=tex;ud.fBack.material.needsUpdate=true;ud.flip.rotation.z=0;ud.flip.visible=true;AUDIO.flip();
+    await new Promise(r=>gsap.to(ud.flip.rotation,{z:Math.PI,duration:1.0,ease:'power2.inOut',onComplete:r}));ud.inside.material.map=tex;ud.inside.material.needsUpdate=true;ud.flip.visible=false;ud.flip.rotation.z=0;
+    await buildAct(next);});runBeat();}
+async function closeFile(){await locked(async()=>{setState('CLOSING');UI.dialog.classList.add('hidden');const file=S.file,ud=file.userData;if(S.orbit)toggleOrbit(false,true);
+    await camTo([0,5.2,5.6],[-0.4,0.4,-0.3],0.7);if(S.sceneGroup){await flatten(S.sceneGroup);S.sceneGroup=null;}W3.registerAnim(new THREE.Group());
+    AUDIO.flip();await new Promise(r=>gsap.to(ud.pivot.rotation,{z:0,duration:1.0,ease:'power2.inOut',onComplete:r}));ud.open=false;AUDIO.thud();
+    if(S.done[S.caseIdx]){ud.label.material.map=W3.coverTexture(ud.c,true);ud.label.material.needsUpdate=true;}
+    const tl=gsap.timeline();W3.files.forEach((f,i)=>{const h=f.userData.home;tl.to(f.position,{x:h.x,y:0,z:h.z,duration:1.0,ease:'power2.inOut'},0);tl.to(f.rotation,{y:h.ry,duration:1.0,ease:'power2.inOut'},0);});
+    tl.to(W3.readLight,{intensity:0,duration:1.0},0);tl.to(W3.lamp,{intensity:1.6,duration:1.0},0);
+    await Promise.all([new Promise(r=>tl.eventCallback('onComplete',r)),camTo(W3.VIEW.office.pos,W3.VIEW.office.target,1.4)]);
+    S.caseIdx=-1;S.file=null;setState('BOOKSHELF');updateBadge();UI.officeTip.style.opacity=1;UI.officeTip.textContent=S.done.every(Boolean)?'三份檔案皆已結案':'點擊桌上的研究檔案，開啟案件';
+    if(S.done.every(Boolean)&&!S.finalShown){S.finalShown=true;showFinal();}});}
+UI.btnHome.addEventListener('click',()=>{if(S.busy)return;UI.choice.classList.add('hidden');toast('已闔上檔案（本案進度未保存）');closeFile();});
+
+/* ---------- orbit toggle ---------- */
+function toggleOrbit(on,silent){S.orbit=on;UI.btnOrbit.classList.toggle('on',on);UI.btnOrbit.classList.toggle('off',!on);if(on){W3.controls.target.copy(W3.camTarget);W3.controls.enabled=true;if(!silent)toast('自由視角：拖曳旋轉、滾輪縮放。再按一次回到劇情鏡頭。');}else{W3.controls.enabled=false;W3.camTarget.copy(W3.controls.target);if(!silent&&S.caseIdx>=0){const def=W3.SCENES[S.caseIdx][S.actIdx];locked(()=>camTo(def.view.pos,def.view.target,1.0));S.focused=false;}}}
+UI.btnOrbit.addEventListener('click',()=>{if(S.busy)return;toggleOrbit(!S.orbit);});
+
+/* ---------- beats ---------- */
+function curBeat(){if(S.caseIdx<0)return null;return STORY[S.caseIdx].acts[S.actIdx].beats[S.beatIdx];}
+function advance(){if(S.busy)return;S.beatIdx++;runBeat();}
+function showDialog(speakerId,text,opts){opts=opts||{};const d=UI.dialog;d.classList.remove('hidden');d.classList.remove('pop');void d.offsetWidth;d.classList.add('pop');const sp=UI.speaker;if(speakerId===N||!speakerId){sp.textContent='旁白';sp.classList.add('narr');}else if(speakerId==='lab'){sp.textContent='統計實驗室';sp.classList.remove('narr');}else{const def=W3.CHAR_DEFS[speakerId];sp.textContent=def.name+(def.desc?'｜'+def.desc:'');sp.classList.remove('narr');}
+  UI.text.innerHTML=tpl(text);UI.btnLab.classList.toggle('hidden',!opts.lab);UI.btnNext.classList.toggle('hidden',!!opts.lab);UI.tip.textContent=opts.lab?'劇情暫停。請進入實驗室操作資料。':'點擊畫面或按空白鍵繼續 ・ 點擊角色有驚喜';}
+async function focusChar(id){const ch=S.chars[id];if(!ch||S.orbit)return;const v=new THREE.Vector3();ch.userData.head.getWorldPosition(v);const side=ch.position.x>0?-0.35:0.35;await camTo([v.x+side,v.y+0.35,v.z+2.4],[v.x,v.y-0.2,v.z],1.0);S.focused=true;}
+async function unfocus(){if(!S.focused||S.orbit)return;const def=W3.SCENES[S.caseIdx][S.actIdx];await camTo(def.view.pos,def.view.target,1.0);S.focused=false;}
+function runBeat(){const beat=curBeat();if(!beat)return;updateBadge();
+  if(beat.s!==undefined){showDialog(beat.s,beat.t);AUDIO.click();if(beat.f)locked(()=>focusChar(beat.f));else if(S.focused)locked(unfocus);return;}
+  switch(beat.type){
+    case 'choice':UI.dialog.classList.add('hidden');locked(unfocus).then(()=>openChoice(beat));break;
+    case 'lab':showDialog('lab',beat.t,{lab:true});locked(unfocus);break;
+    case 'turn':turnPage();break;
+    case 'checklist':UI.dialog.classList.add('hidden');locked(unfocus).then(()=>openChecklist(beat));break;
+    case 'review':UI.dialog.classList.add('hidden');locked(unfocus).then(()=>openReview(beat));break;
+    case 'ending':UI.dialog.classList.add('hidden');locked(unfocus).then(showEnding);break;
+  }}
+UI.btnNext.addEventListener('click',()=>{if(S.state==='SCENE_INTERACTION')advance();});
+UI.btnLab.addEventListener('click',()=>{const beat=curBeat();if(beat&&beat.type==='lab')openLab(beat.lab);});
+
+/* ---------- choice modal ---------- */
+function openChoice(beat){setState('QUIZ');const panel=UI.choice.querySelector('.panel');panel.style.setProperty('--accentBar','#'+W3.CASE_META[S.caseIdx].hex);UI.choice.querySelector('.q').innerHTML=tpl(beat.q);const opts=UI.choice.querySelector('.opts');opts.innerHTML='';const fb=UI.choice.querySelector('.fb');fb.classList.add('hidden');fb.className='fb hidden';const btn=$('#btnChoiceNext');btn.classList.add('hidden');UI.choice.classList.remove('hidden');let picked=false;
+  beat.opts.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=`<span class="k">${'ABCD'[i]}</span><span>${tpl(o.t)}</span>`;b.addEventListener('click',()=>{if(picked)return;picked=true;AUDIO.click();Object.assign(S.flags,o.set||{});S.pts+=o.pts||0;[...opts.children].forEach((c,j)=>c.classList.add(j===i?'sel':'dim'));fb.className='fb '+(o.pts>0?'good':'');fb.innerHTML=`<span class="tag">${o.pts>0?'分析上站得住腳':'值得再想想'}</span><br>${tpl(o.fb)}`;fb.classList.remove('hidden');btn.classList.remove('hidden');AUDIO.chime(o.pts>0);});opts.appendChild(b);});
+  btn.onclick=()=>{UI.choice.classList.add('hidden');setState('SCENE_INTERACTION');advance();};}
+function openChecklist(beat){setState('QUIZ');const panel=UI.choice.querySelector('.panel');panel.style.setProperty('--accentBar','#'+W3.CASE_META[S.caseIdx].hex);UI.choice.querySelector('.q').innerHTML=tpl(beat.q);const opts=UI.choice.querySelector('.opts');opts.innerHTML='';const fb=UI.choice.querySelector('.fb');fb.className='fb hidden';const btn=$('#btnChoiceNext');btn.classList.remove('hidden');btn.textContent='送出建議';UI.choice.classList.remove('hidden');let submitted=false;
+  const rows=beat.items.map(it=>{const l=document.createElement('label');l.className='chk';l.innerHTML=`<input type="checkbox"><span>${tpl(it.t)}</span>`;l.querySelector('input').addEventListener('change',e=>{l.classList.toggle('sel',e.target.checked);AUDIO.click();});opts.appendChild(l);return l;});
+  btn.onclick=()=>{if(!submitted){submitted=true;let right=0,wrong=0;const total=beat.items.filter(i=>i.ok).length;rows.forEach((l,i)=>{const on=l.querySelector('input').checked;const ok=beat.items[i].ok;if(on&&ok)right++;if(on&&!ok)wrong++;l.classList.toggle('right',on&&ok);l.classList.toggle('wrong',on&&!ok);if(!on&&ok)l.style.outline='2px dashed #2e8b84';l.querySelector('input').disabled=true;});S.flags[beat.id]={right,wrong,total};S.pts+=Math.max(0,right-wrong);fb.className='fb '+(right>=4&&wrong===0?'good':'');fb.innerHTML=`<span class="tag">建議評估</span><br>命中 ${right} / ${total} 項關鍵建議${wrong?`；有 ${wrong} 項會讓問題更糟。`:'。'}虛線標示的是你遺漏的建議。`;fb.classList.remove('hidden');btn.textContent='繼續 ▸';AUDIO.chime(right>=4&&wrong===0);return;}UI.choice.classList.add('hidden');btn.textContent='繼續 ▸';setState('SCENE_INTERACTION');advance();};}
+function openReview(beat){setState('QUIZ');const panel=UI.choice.querySelector('.panel');panel.style.setProperty('--accentBar','#'+W3.CASE_META[S.caseIdx].hex);UI.choice.querySelector('.q').innerHTML=tpl(beat.q);const opts=UI.choice.querySelector('.opts');opts.innerHTML='';const fb=UI.choice.querySelector('.fb');fb.className='fb hidden';const btn=$('#btnChoiceNext');btn.classList.remove('hidden');btn.textContent='送出審查裁定';btn.disabled=true;UI.choice.classList.remove('hidden');let submitted=false;const picks=new Array(beat.items.length).fill(null);
+  const rows=beat.items.map((it,i)=>{const r=document.createElement('div');r.className='revRow';r.innerHTML=`<div>${i+1}. ${tpl(it.t)}</div><div class="seg">${['保留','修改','刪除'].map(v=>`<button data-v="${v}">${v}</button>`).join('')}</div>`;r.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{if(submitted)return;picks[i]=b.dataset.v;r.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));AUDIO.click();btn.disabled=picks.some(p=>!p);}));opts.appendChild(r);return r;});
+  btn.onclick=()=>{if(!submitted){submitted=true;let right=0;const out=[];rows.forEach((r,i)=>{const it=beat.items[i];const ok=it.ok.includes(picks[i]);if(ok)right++;r.classList.add(ok?'right':'wrong');const n=document.createElement('div');n.className='note';n.innerHTML=(ok?'✓ ':'✗ 委員會意見：'+it.ok.join('／')+'。')+tpl(it.note);r.appendChild(n);out.push({t:tpl(it.t),pick:picks[i],ok:it.ok,right:ok});});S.flags[beat.id]={right,total:beat.items.length,rows:out};S.pts+=right>=5?2:right>=3?1:0;fb.className='fb '+(right>=5?'good':'');fb.innerHTML=`<span class="tag">審查結果</span><br>你的裁定與委員會一致 ${right} / ${beat.items.length} 項。`;fb.classList.remove('hidden');btn.textContent='繼續 ▸';AUDIO.chime(right>=5);return;}UI.choice.classList.add('hidden');btn.textContent='繼續 ▸';setState('SCENE_INTERACTION');advance();};}
+
+/* ---------- ending ---------- */
+function showEnding(){setState('ENDING');const c=STORY[S.caseIdx];const e=c.ending(S.flags,S.pts);S.done[S.caseIdx]=true;S.results[S.caseIdx]={title:W3.CASE_META[S.caseIdx].title,verdict:e.verdict,good:e.good,pts:S.pts};const panel=UI.ending.querySelector('.panel');panel.style.setProperty('--accentBar','#'+W3.CASE_META[S.caseIdx].hex);$('#endTitle').textContent=e.title;$('#endBody').innerHTML=e.html;UI.ending.classList.remove('hidden');AUDIO.chime(e.good);
+  // celebratory bounce of scene objects
+  if(S.sceneGroup)S.sceneGroup.children.forEach((o,i)=>{gsap.to(o.position,{y:o.position.y+0.15,duration:0.25,delay:i*0.04,yoyo:true,repeat:1,ease:'power2.out'});});}
+$('#btnEndClose').addEventListener('click',()=>{UI.ending.classList.add('hidden');closeFile();});
+function showFinal(){$('#finalBody').innerHTML=`<div class="grid3">${S.results.map((r,i)=>`<div class="c" style="border-top:4px solid #${W3.CASE_META[i].hex}"><b>${W3.CASE_META[i].num}・${r.title}</b>${r.verdict}<br><span style="color:#7b7461">決策分數 ${r.pts}</span></div>`).join('')}</div>`;UI.final.classList.remove('hidden');AUDIO.chime(true);}
+$('#btnFinalClose').addEventListener('click',()=>UI.final.classList.add('hidden'));
+
+/* =====================================================================
+   統計實驗室
+   ===================================================================== */
+const LAB={pca:{method:'paf',k:3,rot:'varimax',view:'load'},cluster:{tab:'cluster',method:'kmeans',k:3,target:'cluster',evalm:'resub',sel:'all'},manova:{out:'keep',view:'tests'}};
+function seg(title,key,obj,options,onchange){const d=document.createElement('div');d.className='ctl';d.innerHTML=`<h5>${title}</h5>`;const s=document.createElement('div');s.className='seg';options.forEach(([v,label])=>{const b=document.createElement('button');b.textContent=label;b.classList.toggle('sel',obj[key]===v);b.addEventListener('click',()=>{obj[key]=v;[...s.children].forEach(x=>x.classList.toggle('sel',x===b));AUDIO.click();onchange();});s.appendChild(b);});d.appendChild(s);return d;}
+function slider(title,key,obj,min,max,onchange){const d=document.createElement('div');d.className='ctl';d.innerHTML=`<h5>${title}</h5><div>目前：<span class="val">${obj[key]}</span></div>`;const i=document.createElement('input');i.type='range';i.min=min;i.max=max;i.value=obj[key];i.addEventListener('input',()=>{obj[key]=+i.value;d.querySelector('.val').textContent=i.value;onchange();});d.appendChild(i);return d;}
+function noteBox(html){const d=document.createElement('div');d.className='note';d.innerHTML=html;return d;}
+function mkCanvas(parent,h){const c=document.createElement('canvas');const w=Math.max(320,parent.clientWidth-32);c.width=w*2;c.height=h*2;c.style.height=h+'px';c.style.width='100%';const g=c.getContext('2d');g.scale(2,2);parent.appendChild(c);g.font='12px '+'"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';return {c,g,w,h};}
+function axes(g,x0,y0,x1,y1){g.strokeStyle='#8e97b3';g.lineWidth=1;g.beginPath();g.moveTo(x0,y0);g.lineTo(x0,y1);g.lineTo(x1,y1);g.stroke();}
+function openLab(kind){setState('LAB');const c=W3.CASE_META[S.caseIdx];UI.lab.querySelector('.panel').style.setProperty('--accentBar','#'+c.hex);$('#labTitle').textContent={pca:'降維與潛在構念：PCA vs 因素分析',cluster:'分群、分類與資料洩漏',manova:'MANOVA：整體顯著之後'}[kind];UI.lab.classList.remove('hidden');renderLab(kind);}
+$('#btnLabClose').addEventListener('click',()=>{UI.lab.classList.add('hidden');setState('SCENE_INTERACTION');AUDIO.click();advance();});
+function renderLab(kind){const ctl=$('#labCtl'),viz=$('#labViz');ctl.innerHTML='';viz.innerHTML='';({pca:labPCA,cluster:labCluster,manova:labMANOVA})[kind](ctl,viz);}
+
+/* ---- Lab 1 : PCA / EFA ---- */
+function labPCA(ctl,viz){const L=LAB.pca;const re=()=>renderLab('pca');const d=VALS.c1;
+  ctl.appendChild(seg('檢視','view',L,[['load','負荷量表'],['scree','陡坡圖 / 平行分析'],['corr','相關矩陣']],re));
+  ctl.appendChild(seg('萃取方法','method',L,[['pca','主成分分析 PCA'],['paf','主軸因素分析 PAF']],re));
+  ctl.appendChild(slider('因素／成分數','k',L,1,6,re));
+  ctl.appendChild(seg('轉軸','rot',L,[['none','未轉軸'],['varimax','Varimax']],re));
+  ctl.appendChild(noteBox('<b>資料</b>：312 位運動員、24 項指標（模擬，固定種子，可重現）。<br>PCA 以成分摘要變異；PAF 以共同性估計潛在因素。'));
+  const k=L.k;let Lm,h;if(L.method==='pca'){Lm=MV.pcaLoad(d.R,k).L;}else{const r=MV.paf(d.R,k);Lm=r.L;h=r.h;}if(L.rot==='varimax'&&k>1)Lm=MV.varimax(Lm).L;if(!h)h=Lm.map(r=>r.reduce((s,v)=>s+v*v,0));
+  const ss=Array.from({length:k},(_,j)=>Lm.reduce((s,r)=>s+r[j]*r[j],0));
+  if(L.view==='load'){
+    const cross=[],low=[];Lm.forEach((r,i)=>{if(r.filter(v=>Math.abs(v)>0.3).length>1)cross.push(d.vars[i]);if(h[i]<0.4)low.push(d.vars[i]);});
+    const groupOf=i=>i<8?0:i<16?1:2;const fnames=Array.from({length:k},(_,j)=>{const m=[0,0,0];Lm.forEach((r,i)=>m[groupOf(i)]+=Math.abs(r[j]));const g=m.indexOf(Math.max(...m));const dom=Math.max(...m)/m.reduce((s,v)=>s+v,0);return dom>0.55?d.groups[g]:'混合（無法命名）';});
+    const big=document.createElement('div');big.className='big';big.innerHTML=`<div class="card"><div class="k">解釋變異</div><div class="v">${Math.round(ss.reduce((s,v)=>s+v,0)/24*100)}%</div><div class="s">${k} 個${L.method==='pca'?'成分':'因素'}</div></div><div class="card"><div class="k">交叉負荷題目</div><div class="v ${cross.length>4?'warn':''}">${cross.length}</div><div class="s">|負荷| > .30 於兩個以上因素</div></div><div class="card"><div class="k">低共同性題目</div><div class="v ${low.length>3?'warn':''}">${low.length}</div><div class="s">h² < .40</div></div>`;viz.appendChild(big);
+    let html=`<table class="tbl"><tr><th>指標</th>${Array.from({length:k},(_,j)=>`<th>F${j+1}<br><span style="font-weight:400">${fnames[j]}</span></th>`).join('')}<th>h²</th></tr>`;
+    Lm.forEach((r,i)=>{const nb=r.filter(v=>Math.abs(v)>0.3).length;html+=`<tr><td>${d.vars[i]}</td>${r.map(v=>{const a=Math.min(1,Math.abs(v));const bg=v>=0?`rgba(46,139,132,${a*0.8})`:`rgba(179,74,74,${a*0.8})`;const cls=Math.abs(v)>0.3&&nb>1?'cross':(Math.abs(v)>0.4?'hi':'');return `<td class="${cls}"><span class="cell" style="background:${bg};color:${a>0.5?'#fff':'#1b2238'}">${v.toFixed(2)}</span></td>`;}).join('')}<td class="${h[i]<0.4?'low':''}">${h[i].toFixed(2)}</td></tr>`;});
+    html+=`<tr><td><b>SS 負荷量</b></td>${ss.map(v=>`<td><b>${v.toFixed(2)}</b></td>`).join('')}<td></td></tr></table>`;const t=document.createElement('div');t.innerHTML=html;viz.appendChild(t);
+    viz.appendChild(noteBox(`<b>解讀</b>：${L.rot==='none'?'未轉軸時，第一個成分／因素是所有指標的加權總和（全部同號），第二個是「心理量表 vs 肌力測驗」的<b>對比</b>（正負號相反）。研究團隊把這個對比命名為「心理韌性」，負號其實是數學產物。':'轉軸後，每個因素由一組指標主導，正負號對比消失。'}${k===3?' 三個因素分別對應爆發力／力量、耐力／恢復、心理／專注。':k===4?' 第 4 個因素只有反應力量指數、睡眠品質、HRV 三個低負荷題目，共同點是皆來自同一台穿戴裝置：這是測量方法效應。':k<3?' 因素數太少：耐力與心理指標被迫合併，交叉負荷增加。':' 因素數過多：出現只有一、兩個題目的碎片因素。'}<br><b>PCA 與 PAF 的差別</b>：PAF 的負荷量略小、共同性較低，因為它只分析共同變異；PCA 把獨特變異也算進成分裡。交叉負荷：${cross.join('、')||'無'}；低共同性：${low.join('、')||'無'}。`));
+  }else if(L.view==='scree'){
+    const {g,w,h:H}=mkCanvas(viz,340);const x0=50,y0=20,x1=w-20,y1=H-40;axes(g,x0,y0,x1,y1);const n=12;const sx=i=>x0+20+i*((x1-x0-40)/(n-1));const sy=v=>y1-(v/7.5)*(y1-y0);
+    for(let v=0;v<=7;v++){g.fillStyle='#8e97b3';g.fillText(v,x0-18,sy(v)+4);g.strokeStyle='#eee5d0';g.beginPath();g.moveTo(x0,sy(v));g.lineTo(x1,sy(v));g.stroke();}
+    g.strokeStyle='#d69a3a';g.setLineDash([6,4]);g.beginPath();g.moveTo(x0,sy(1));g.lineTo(x1,sy(1));g.stroke();g.setLineDash([]);g.fillStyle='#d69a3a';g.fillText('Kaiser：λ = 1',x1-90,sy(1)-6);
+    const line=(arr,col,dash)=>{g.strokeStyle=col;g.lineWidth=2.5;if(dash)g.setLineDash([5,4]);g.beginPath();arr.slice(0,n).forEach((v,i)=>i?g.lineTo(sx(i),sy(v)):g.moveTo(sx(i),sy(v)));g.stroke();g.setLineDash([]);g.fillStyle=col;arr.slice(0,n).forEach((v,i)=>{g.beginPath();g.arc(sx(i),sy(v),4,0,7);g.fill();});};
+    line(d.eig,'#2e8b84');line(d.pa,'#b34a4a',true);g.fillStyle='#1b2238';for(let i=0;i<n;i++)g.fillText(i+1,sx(i)-3,y1+16);g.fillText('成分 / 因素序號',w/2-40,y1+32);
+    g.fillStyle='#2e8b84';g.fillRect(x0+20,y0+6,14,4);g.fillStyle='#1b2238';g.fillText('實際資料特徵值',x0+40,y0+12);g.fillStyle='#b34a4a';g.fillRect(x0+160,y0+6,14,4);g.fillStyle='#1b2238';g.fillText('平行分析（隨機資料平均，15 次）',x0+180,y0+12);
+    viz.appendChild(noteBox(`<b>三個準則、三個答案？</b> Kaiser 準則（λ > 1）建議 <b>${VALS.c1kaiser}</b> 個；平行分析（實際特徵值 > 隨機資料）建議 <b>${VALS.c1pa}</b> 個；陡坡圖在第 3 點之後明顯趨平。第 4 個特徵值 ${d.eig[3].toFixed(2)} 只略高於 1，而且低於隨機資料的期望值 ${d.pa[3].toFixed(2)}。Kaiser 準則在變數多時傾向過度萃取，平行分析是較穩健的依據。`));
+  }else{
+    const {g,w}=mkCanvas(viz,440);const n=24;const cs=Math.min(16,(w-120)/n);const ox=110,oy=10;
+    for(let i=0;i<n;i++)for(let j=0;j<n;j++){const r=d.R[i][j];const a=Math.abs(r);g.fillStyle=r>=0?`rgba(46,139,132,${a})`:`rgba(179,74,74,${a})`;g.fillRect(ox+j*cs,oy+i*cs,cs-1,cs-1);}
+    g.fillStyle='#1b2238';g.font='10px sans-serif';d.vars.forEach((v,i)=>g.fillText(v,4,oy+i*cs+cs*0.75));
+    g.strokeStyle='#ffd27a';g.lineWidth=2;[0,8,16].forEach(s=>g.strokeRect(ox+s*cs,oy+s*cs,8*cs,8*cs));
+    viz.appendChild(noteBox('<b>區塊結構</b>：黃框內是同一類指標（爆發力／耐力／心理）之間的相關，明顯高於跨區塊的相關。這就是「資料本來就有結構」的意思。「教練評分」與「疲勞自評」同時和兩個區塊相關，是交叉負荷的來源；「反應力量指數」與「睡眠品質」和所有指標的相關都很低，是低共同性的來源。'));
+  }}
+
+/* ---- Lab 2 : Cluster / LDA / leakage ---- */
+function labCluster(ctl,viz){const L=LAB.cluster;const re=()=>renderLab('cluster');const d=VALS.c2;const X=d.train.X,y=d.train.y;
+  const tabs=document.createElement('div');tabs.className='tabs';[['cluster','① 分群'],['classify','② 分類評估'],['leak','③ 洩漏實驗']].forEach(([v,l])=>{const b=document.createElement('button');b.textContent=l;b.classList.toggle('sel',L.tab===v);b.onclick=()=>{L.tab=v;AUDIO.click();re();};tabs.appendChild(b);});viz.appendChild(tabs);
+  if(L.tab==='cluster'){
+    ctl.appendChild(seg('分群方法','method',L,[['kmeans','K-means'],['ward','階層式（Ward）']],re));ctl.appendChild(slider('群數 k','k',L,2,6,re));
+    ctl.appendChild(noteBox('<b>資料</b>：180 位運動員（訓練集），兩個核心指標：爆發力指數、恢復能力指數。問題：資料裡真的有「三群」嗎？'));
+    const k=L.k;let lab;if(L.method==='kmeans')lab=VALS.c2sil[k-2].lab;else{VALS.c2ward=VALS.c2ward||MV.ward(X,8);lab=VALS.c2ward.labelsAt[k];}
+    const cols=['#2e8b84','#d69a3a','#8a6bbf','#b34a4a','#4f7cc1','#5c9c6a'];
+    const {g,w}=mkCanvas(viz,330);const x0=50,y0=15,x1=w-20,y1=300;axes(g,x0,y0,x1,y1);const sx=v=>x0+((v-20)/80)*(x1-x0),sy=v=>y1-((v-20)/80)*(y1-y0);
+    X.forEach((p,i)=>{g.fillStyle=cols[lab[i]];g.beginPath();g.arc(sx(p[0]),sy(p[1]),4,0,7);g.fill();});
+    if(L.method==='kmeans'){const km=MV.kmeans(X,k,MV.RNG(100+k));km.C.forEach((c,j)=>{g.strokeStyle='#1b2238';g.lineWidth=2;g.beginPath();g.moveTo(sx(c[0])-7,sy(c[1])-7);g.lineTo(sx(c[0])+7,sy(c[1])+7);g.moveTo(sx(c[0])+7,sy(c[1])-7);g.lineTo(sx(c[0])-7,sy(c[1])+7);g.stroke();});}
+    g.fillStyle='#1b2238';g.fillText('爆發力指數',w/2-30,y1+22);g.save();g.translate(14,160);g.rotate(-Math.PI/2);g.fillText('恢復能力指數',0,0);g.restore();
+    // elbow + silhouette
+    const row=document.createElement('div');row.style.display='grid';row.style.gridTemplateColumns='1fr 1fr';row.style.gap='10px';viz.appendChild(row);
+    const a=document.createElement('div'),b=document.createElement('div');row.appendChild(a);row.appendChild(b);
+    {const {g,w}=mkCanvas(a,170);const x0=45,y0=12,x1=w-10,y1=140;axes(g,x0,y0,x1,y1);const ks=VALS.c2sil;const mx=ks[0].wss;g.strokeStyle='#2e8b84';g.lineWidth=2;g.beginPath();ks.forEach((s,i)=>{const px=x0+20+i*((x1-x0-40)/4),py=y1-(s.wss/mx)*(y1-y0-10);i?g.lineTo(px,py):g.moveTo(px,py);});g.stroke();ks.forEach((s,i)=>{const px=x0+20+i*((x1-x0-40)/4),py=y1-(s.wss/mx)*(y1-y0-10);g.fillStyle=s.k===k?'#b34a4a':'#2e8b84';g.beginPath();g.arc(px,py,5,0,7);g.fill();g.fillStyle='#1b2238';g.fillText('k='+s.k,px-10,y1+14);});g.fillText('組內平方和（肘點圖）',x0,y0+2);}
+    {const {g,w}=mkCanvas(b,170);const x0=45,y0=12,x1=w-10,y1=140;axes(g,x0,y0,x1,y1);const ks=VALS.c2sil;ks.forEach((s,i)=>{const bw=(x1-x0-40)/5-8;const px=x0+20+i*((x1-x0-40)/5);const bh=s.sil/0.6*(y1-y0-10);g.fillStyle=s.k===k?'#b34a4a':'#d69a3a';g.fillRect(px,y1-bh,bw,bh);g.fillStyle='#1b2238';g.fillText('k='+s.k,px,y1+14);g.fillText(s.sil.toFixed(2),px,y1-bh-4);});g.fillText('平均輪廓係數',x0,y0+2);}
+    // agreement kmeans vs ward
+    VALS.c2ward=VALS.c2ward||MV.ward(X,8);const lk=VALS.c2sil[k-2].lab,lw=VALS.c2ward.labelsAt[k];let best=0;const perms=p=>p.length<=1?[p]:p.flatMap((v,i)=>perms(p.filter((_,j)=>j!==i)).map(r=>[v,...r]));perms([...Array(k).keys()]).forEach(pm=>{let a2=0;for(let i=0;i<X.length;i++)if(pm[lk[i]]===lw[i])a2++;best=Math.max(best,a2);});
+    viz.appendChild(noteBox(`<b>讀圖</b>：肘點圖沒有明顯的「肘」，組內平方和隨 k 平滑下降；輪廓係數最高只有 ${Math.max(...VALS.c2sil.map(s=>s.sil)).toFixed(2)}（> .50 才算有合理結構）。K-means 與 Ward 法在 k = ${k} 時的分群一致性為 <b>${Math.round(best/X.length*100)}%</b>。結論：這批資料比較像一個連續分布，K-means 只是把它切成 ${k} 塊；「三種訓練類型」是被<b>設定</b>出來的，不是被<b>發現</b>的。`));
+  }else if(L.tab==='classify'){
+    ctl.appendChild(seg('標籤來源','target',L,[['cluster','K-means 群集標籤（k=3）'],['true','實際訓練反應類型']],re));
+    ctl.appendChild(seg('評估方式','evalm',L,[['resub','訓練資料重代'],['cv','5 折交叉驗證'],['test','獨立測試資料（n=90）']],re));
+    const pre=document.createElement('div');pre.className='ctl';pre.innerHTML='<h5>快速設定</h5>';const pb=document.createElement('button');pb.className='btn';pb.textContent='重現原系統（群集標籤 × 重代）';pb.onclick=()=>{L.target='cluster';L.evalm='resub';AUDIO.click();re();};pre.appendChild(pb);ctl.appendChild(pre);
+    const km=VALS.c2km3;const lab=L.target==='cluster'?km.lab:y;const names=L.target==='cluster'?['群 1','群 2','群 3']:d.typeNames;let acc,pred,truth;
+    if(L.evalm==='resub'){const m=MV.lda(X,lab,3);pred=X.map(x=>m.predict(x));truth=lab;}else if(L.evalm==='cv'){const idx=MV.RNG(9).shuffle(X.map((_,i)=>i));pred=new Array(X.length);for(let f=0;f<5;f++){const te=idx.filter((_,i)=>i%5===f),tr=idx.filter((_,i)=>i%5!==f);const m=MV.lda(tr.map(i=>X[i]),tr.map(i=>lab[i]),3);te.forEach(i=>pred[i]=m.predict(X[i]));}truth=lab;}
+    else{const m=MV.lda(X,lab,3);const tX=d.test.X;pred=tX.map(x=>m.predict(x));truth=L.target==='cluster'?tX.map(x=>{let bi=0,bd=Infinity;km.C.forEach((c,j)=>{const dd=(x[0]-c[0])**2+(x[1]-c[1])**2;if(dd<bd){bd=dd;bi=j;}});return bi;}):d.test.y;}
+    acc=MV.accuracy(pred,truth);const cm=MV.confusion(pred,truth,3);
+    const q={cluster:{resub:'LDA 能不能在同一批資料上重現 K-means 的切法？',cv:'LDA 能不能在同批資料的其他折上重現 K-means 的切法？',test:'LDA 能不能在新資料上重現「最近質心」的切法？'},true:{resub:'這兩個指標能不能背下訓練資料中的實際訓練反應？',cv:'這兩個指標能不能預測同批資料其他折的實際訓練反應？',test:'這兩個指標能不能預測<b>新運動員</b>的實際訓練反應？'}}[L.target][L.evalm];
+    const big=document.createElement('div');big.className='big';big.innerHTML=`<div class="card"><div class="k">正確率</div><div class="v ${acc>0.9?(L.target==='cluster'?'warn':'ok'):''}">${(acc*100).toFixed(1)}%</div><div class="s">${L.evalm==='test'?'獨立測試資料 n=90':'訓練資料 n=180'}</div></div><div class="card" style="flex:2 1 260px"><div class="k">這個數字回答的問題是</div><div class="s" style="font-size:14px;margin-top:6px;line-height:1.6">${q}</div></div>`;viz.appendChild(big);
+    let html=`<table class="tbl"><tr><th>實際＼預測</th>${names.map(n=>`<th>${n}</th>`).join('')}<th>合計</th></tr>`;cm.forEach((r,i)=>{html+=`<tr><td>${names[i]}</td>${r.map((v,j)=>`<td class="${i===j?'hi':''}">${v}</td>`).join('')}<td>${r.reduce((s,v)=>s+v,0)}</td></tr>`;});html+='</table>';const t=document.createElement('div');t.innerHTML=html;viz.appendChild(t);
+    viz.appendChild(noteBox(L.target==='cluster'?`<b>循環論證</b>：標籤是 K-means 用這兩個指標切出來的，LDA 再用同樣的指標去預測它，當然準（${(acc*100).toFixed(1)}%）。${L.evalm==='cv'?'連交叉驗證都抓不到這個問題，因為每一折的標籤都還是從同樣的特徵定義出來的。':L.evalm==='test'?'在新資料上一樣準，因為新資料的「標籤」也只是最近質心。':''}這個正確率證明的是「群集邊界是線性的」，與「運動員該怎麼練」無關。`:`<b>誠實的數字</b>：以實際訓練反應為標籤，${L.evalm==='resub'?'即使在訓練資料上重代，正確率也只有':L.evalm==='cv'?'交叉驗證的正確率是':'獨立測試資料上的正確率是'} ${(acc*100).toFixed(1)}%（多數類別基準約 ${Math.round(Math.max(...[0,1,2].map(c=>truth.filter(v=>v===c).length))/truth.length*100)}%）。這才是「系統能不能幫運動員選訓練」的答案：有一點訊號，但遠不足以直接開處方。`));
+  }else{
+    ctl.appendChild(seg('變數篩選使用的資料','sel',L,[['all','全部資料（切分前）'],['train','只用訓練資料']],re));
+    ctl.appendChild(noteBox('<b>實驗設計</b>：2 個真實指標 + 120 個純噪音「生物標記」，用 F 檢定挑出前 8 個，再以 LDA 預測實際訓練反應。訓練／測試 = 120 / 60。唯一的差別：挑變數時有沒有偷看測試資料。'));
+    const A=VALS.c2leakAll,B=VALS.c2leakTrain;const cur=L.sel==='all'?A:B;
+    const big=document.createElement('div');big.className='big';big.innerHTML=`<div class="card"><div class="k">訓練正確率</div><div class="v">${cur.tr}%</div></div><div class="card"><div class="k">測試正確率</div><div class="v ${L.sel==='all'?'warn':'ok'}">${cur.te}%</div><div class="s">${L.sel==='all'?'被灌水：測試資料參與了篩選':'誠實：篩選未使用測試資料'}</div></div><div class="card"><div class="k">兩種流程的測試差距</div><div class="v warn">+${(A.te-B.te).toFixed(1)} 點</div><div class="s">來自純噪音變數的「運氣」</div></div>`;viz.appendChild(big);
+    const {g,w}=mkCanvas(viz,230);const x0=60,y0=15,x1=w-20,y1=190;axes(g,x0,y0,x1,y1);const bars=[['全部資料篩選・訓練',A.tr,'#9aa3bd'],['全部資料篩選・測試',A.te,'#b34a4a'],['只用訓練篩選・訓練',B.tr,'#9aa3bd'],['只用訓練篩選・測試',B.te,'#2e8b84']];const bw=(x1-x0)/bars.length;bars.forEach(([n,v,c],i)=>{const h=v/100*(y1-y0-10);g.fillStyle=c;g.fillRect(x0+i*bw+20,y1-h,bw-40,h);g.fillStyle='#1b2238';g.fillText(v+'%',x0+i*bw+bw/2-14,y1-h-5);g.font='11px sans-serif';g.fillText(n,x0+i*bw+8,y1+14);g.font='12px sans-serif';});g.strokeStyle='#d69a3a';g.setLineDash([5,4]);g.beginPath();g.moveTo(x0,y1-45/100*(y1-y0-10));g.lineTo(x1,y1-45/100*(y1-y0-10));g.stroke();g.setLineDash([]);g.fillStyle='#d69a3a';g.fillText('多數類別基準 ≈ 45%',x1-150,y1-45/100*(y1-y0-10)-5);
+    viz.appendChild(noteBox(`<b>被選中的 8 個變數</b>：${cur.sel.map(j=>j<2?`<b>${d.featNames[j]}</b>`:`噪音#${j-1}`).join('、')}。<br>${L.sel==='all'?'有 6 個是純噪音，但它們被選中是因為「碰巧」在全部資料（含測試）上與標籤相關，所以到了測試資料上還是「碰巧」有關：測試正確率因此被高估。':'只用訓練資料篩選時，噪音變數的「運氣」不會延伸到測試資料，測試正確率回到誠實的水準。'}原系統在切分前完成標準化與篩選，正是這種洩漏。`));
+  }}
+
+/* ---- Lab 3 : MANOVA ---- */
+function labMANOVA(ctl,viz){const L=LAB.manova;const re=()=>renderLab('manova');const d=VALS.c3;
+  ctl.appendChild(seg('離群值處理','out',L,[['keep','保留全部 (n=90)'],['drop','移除多變量離群值']],re));
+  ctl.appendChild(seg('檢視','view',L,[['tests','多變量檢定'],['assume','假設檢查'],['follow','追蹤分析'],['effect','效果量與實務意義']],re));
+  ctl.appendChild(noteBox('<b>設計</b>：三組（新訓練法／傳統訓練／對照組）各 30 人，非隨機分派；三個結果變數：肌力、30m 速度進步、爆發力。'));
+  const r=L.out==='keep'?VALS.c3r:VALS.c3r2;const fp=VALS.fmtP;const n=L.out==='keep'?90:VALS.c3keep.length;
+  if(L.view==='tests'){
+    const big=document.createElement('div');big.className='big';big.innerHTML=`<div class="card"><div class="k">Wilks’ Λ</div><div class="v">${r.wilks.toFixed(3)}</div><div class="s">p ${fp(r.pw)}</div></div><div class="card"><div class="k">Pillai’s Trace</div><div class="v">${r.pillai.toFixed(3)}</div><div class="s">p ${fp(r.pp)}</div></div><div class="card"><div class="k">多變量 η² (1−Λ)</div><div class="v">${(1-r.wilks).toFixed(2)}</div><div class="s">n = ${n}</div></div>`;viz.appendChild(big);
+    const rows=[['Pillai’s Trace',r.pillai,r.Fp,r.df1p,r.df2p,r.pp],['Wilks’ Λ',r.wilks,r.Fw,r.df1w,r.df2w,r.pw],['Hotelling–Lawley',r.hl,r.Fh,r.df1h,r.df2h,r.ph],['Roy’s Largest Root',r.roy,r.Fr,r.df1r,r.df2r,r.pr]];
+    let html='<table class="tbl"><tr><th>統計量</th><th>值</th><th>F</th><th>df1</th><th>df2</th><th>p</th></tr>';rows.forEach(([n2,v,F,d1,d2,p])=>{html+=`<tr class="${p<0.05?'sig':''}"><td>${n2}</td><td>${v.toFixed(3)}</td><td>${F.toFixed(2)}</td><td>${(+d1).toFixed(0)}</td><td>${(+d2).toFixed(1)}</td><td>${fp(p)}</td></tr>`;});html+='</table>';const t=document.createElement('div');t.innerHTML=html;viz.appendChild(t);
+    viz.appendChild(noteBox(`<b>四個統計量都顯著</b>：它們以不同方式彙整 E⁻¹H 的特徵值（${r.theta.map(v=>v.toFixed(3)).join('、')}）。三組（兩個自由度）時四者的 F 近似並不相同；Roy 只用最大特徵值，通常最寬鬆。<b>但注意</b>：整體顯著只說明「三個變數的某個線性組合在組間有差異」，不代表每一個變數都有差異，也不代表差異有實務意義。${L.out==='keep'?'此處包含 '+VALS.c3nOut+' 個多變量離群值。':'已移除 '+VALS.c3nOut+' 個多變量離群值，整體效果反而更清楚（離群值在對照組，膨脹了誤差）。'}`));
+  }else if(L.view==='assume'){
+    const big=document.createElement('div');big.className='big';big.innerHTML=`<div class="card"><div class="k">Box’s M</div><div class="v ${r.boxP<0.05?'warn':'ok'}">${r.boxM.toFixed(1)}</div><div class="s">χ²(${r.boxDf}) = ${r.boxChi.toFixed(2)}，p ${fp(r.boxP)}</div></div><div class="card"><div class="k">多變量離群值</div><div class="v ${L.out==='keep'&&VALS.c3nOut?'warn':'ok'}">${L.out==='keep'?VALS.c3nOut:0}</div><div class="s">Mahalanobis D² > χ²(3, .001) = 16.27</div></div>`;viz.appendChild(big);
+    const {g,w}=mkCanvas(viz,230);const x0=50,y0=15,x1=w-20,y1=200;axes(g,x0,y0,x1,y1);const md=r.md;const mx=Math.max(20,...md);const sy=v=>y1-(v/mx)*(y1-y0-10);g.strokeStyle='#b34a4a';g.setLineDash([5,4]);g.beginPath();g.moveTo(x0,sy(16.27));g.lineTo(x1,sy(16.27));g.stroke();g.setLineDash([]);g.fillStyle='#b34a4a';g.fillText('臨界值 16.27',x1-80,sy(16.27)-5);
+    const ys=L.out==='keep'?d.y:VALS.c3keep.map(i=>d.y[i]);md.forEach((v,i)=>{const px=x0+10+i*((x1-x0-20)/md.length);g.fillStyle=v>16.27?'#ff3030':['#b34a4a','#d69a3a','#9aa3bd'][ys[i]];g.beginPath();g.arc(px,sy(v),v>16.27?5:3,0,7);g.fill();});g.fillStyle='#1b2238';g.fillText('各觀察值的 Mahalanobis D²（依組排列：新訓練法 → 傳統 → 對照）',x0,y0+2);
+    let html='<table class="tbl"><tr><th>組別</th><th>n</th>'+d.dv.map(v=>`<th>SD ${v}</th>`).join('')+'</tr>';r.covs.forEach((C,gi)=>{html+=`<tr><td>${d.groups[gi]}</td><td>${r.ns[gi]}</td>${C.map((row,j)=>`<td>${Math.sqrt(row[j]).toFixed(2)}</td>`).join('')}</tr>`;});html+='</table>';const t=document.createElement('div');t.innerHTML=html;viz.appendChild(t);
+    viz.appendChild(noteBox(L.out==='keep'?`<b>假設有問題</b>：Box’s M 顯著（p ${fp(r.boxP)}）表示各組共變異數矩陣不同質；對照組的標準差明顯較大，來源是 ${VALS.c3nOut} 個多變量離群值（紅點）。在這種情況下 Pillai’s Trace 比 Wilks’ Λ 穩健。研究團隊沒有檢查這些。`:`<b>移除離群值後</b>：Box’s M 不再顯著（p ${fp(r.boxP)}），三組的標準差相近，共變異數同質性假設可接受；此時 Wilks 與 Pillai 的結論一致。離群值的處理必須在報告中揭露（是誰、為什麼、移除前後結果）。`));
+  }else if(L.view==='follow'){
+    let html='<table class="tbl"><tr><th>結果變數</th><th>F(2, '+(n-3)+')</th><th>p</th><th>partial η²</th><th>Bonferroni α = .0167</th></tr>';r.uni.forEach((u,j)=>{html+=`<tr class="${u.p<0.0167?'sig':''}"><td>${d.dv[j]}</td><td>${u.F.toFixed(2)}</td><td>${fp(u.p)}</td><td>${u.eta2.toFixed(3)}</td><td>${u.p<0.0167?'<b>顯著</b>':'未達顯著'}</td></tr>`;});html+='</table>';const t=document.createElement('div');t.innerHTML=html;viz.appendChild(t);
+    const {g,w}=mkCanvas(viz,200);const x0=120,y0=15,x1=w-30,y1=170;const mid=(x0+x1)/2;g.strokeStyle='#8e97b3';g.beginPath();g.moveTo(mid,y0);g.lineTo(mid,y1);g.stroke();r.coef.forEach((c,j)=>{const py=y0+20+j*45;const len=c*(x1-x0)/2;g.fillStyle=c>=0?'#2e8b84':'#b34a4a';g.fillRect(mid,py,len,24);g.fillStyle='#1b2238';g.fillText(d.dv[j],8,py+16);g.fillText(c.toFixed(2),c>=0?mid+len+6:mid+len-36,py+16);});g.fillText('第一區辨函數・標準化係數（以最大者為 1）',x0,y0+2);
+    viz.appendChild(noteBox(`<b>差異在哪裡</b>：Bonferroni 校正後（α = .05 / 3 = .0167），只有<b>肌力</b>顯著；速度 p ${fp(r.uni[1].p)}，爆發力 p ${fp(r.uni[2].p)}。描述性區辨分析的第一函數幾乎由肌力定義，爆發力的係數甚至是負的，表示組間差異的方向與「爆發力提升」無關。<b>結論</b>：整體顯著 ≠ 全面改善。`));
+  }else{
+    const sdw=r.Sp.map((row,i)=>Math.sqrt(row[i]));const ds=[0,1].map(gi=>d.dv.map((_,j)=>(r.means[gi][j]-r.means[2][j])/sdw[j]));
+    const row=document.createElement('div');row.style.display='grid';row.style.gridTemplateColumns='repeat(3,1fr)';row.style.gap='8px';viz.appendChild(row);
+    d.dv.forEach((name,j)=>{const cell=document.createElement('div');row.appendChild(cell);const {g,w}=mkCanvas(cell,200);const x0=40,y0=18,x1=w-8,y1=170;axes(g,x0,y0,x1,y1);const vals=r.means.map(m=>m[j]);const ses=r.ns.map((nn,gi)=>Math.sqrt(r.covs[gi][j][j]/nn));const lo=Math.min(...vals.map((v,i)=>v-2*ses[i])),hi=Math.max(...vals.map((v,i)=>v+2*ses[i]));const pad=(hi-lo)*0.4||1;const sy=v=>y1-((v-(lo-pad))/((hi+pad)-(lo-pad)))*(y1-y0);const bw=(x1-x0)/3;vals.forEach((v,i)=>{const px=x0+i*bw+10;g.fillStyle=['#b34a4a','#d69a3a','#9aa3bd'][i];g.fillRect(px,sy(v),bw-20,y1-sy(v));g.strokeStyle='#1b2238';g.beginPath();g.moveTo(px+(bw-20)/2,sy(v-ses[i]));g.lineTo(px+(bw-20)/2,sy(v+ses[i]));g.stroke();g.fillStyle='#1b2238';g.font='10px sans-serif';g.fillText(['新','傳','對'][i],px+(bw-20)/2-4,y1+12);g.font='12px sans-serif';});g.fillStyle='#1b2238';g.fillText(name,x0,y0-4);g.fillStyle='#8e97b3';g.font='10px sans-serif';g.fillText(lo.toFixed(j===1?2:0),2,y1);g.fillText(hi.toFixed(j===1?2:0),2,y0+8);});
+    let html='<table class="tbl"><tr><th>結果變數</th><th>新訓練法 vs 對照：平均差</th><th>Cohen’s d</th><th>傳統 vs 對照：d</th><th>實務解讀</th></tr>';const interp=[`肌力進步約 ${(r.means[0][0]-r.means[2][0]).toFixed(1)} kg，屬中到大效果`,`30m 速度差約 ${(r.means[0][1]-r.means[2][1]).toFixed(2)} 秒，未達校正後顯著；實務上接近測量誤差`,`爆發力差 ${Math.round(r.means[0][2]-r.means[2][2])} W，方向甚至為負`];d.dv.forEach((name,j)=>{html+=`<tr><td>${name}</td><td>${(r.means[0][j]-r.means[2][j]).toFixed(j===1?3:1)}</td><td class="${Math.abs(ds[0][j])>0.5?'hi':''}">${ds[0][j].toFixed(2)}</td><td>${ds[1][j].toFixed(2)}</td><td style="white-space:normal;text-align:left">${interp[j]}</td></tr>`;});html+='</table>';const t=document.createElement('div');t.innerHTML=html;viz.appendChild(t);
+    viz.appendChild(noteBox(`<b>統計顯著 vs 實務意義</b>：p 值取決於效果量與樣本量，不是效果大小本身。肌力的效果（d ≈ ${ds[0][0].toFixed(2)}）有實務意義；速度與爆發力則沒有可靠證據。<b>而且</b>：三組非隨機分派（新訓練法組由自願參加的教練帶領），任何差異都可能來自選擇效應，報告只能說「相關」，不能說「造成」。`));
+  }}
+
+/* =====================================================================
+   游標柔光粒子軌跡
+   ===================================================================== */
+(function trail(){const c=document.getElementById('trail');const g=c.getContext('2d');let pts=[];function rs(){c.width=window.innerWidth;c.height=window.innerHeight;}rs();window.addEventListener('resize',rs);
+  window.addEventListener('pointermove',e=>{for(let i=0;i<2;i++)pts.push({x:e.clientX+(Math.random()-.5)*6,y:e.clientY+(Math.random()-.5)*6,r:3+Math.random()*4,a:0.9,vx:(Math.random()-.5)*0.6,vy:(Math.random()-.5)*0.6-0.3,h:40+Math.random()*30});if(pts.length>160)pts.splice(0,pts.length-160);});
+  function draw(){g.clearRect(0,0,c.width,c.height);g.globalCompositeOperation='lighter';pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a-=0.02;p.r*=0.985;const gr=g.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*3);gr.addColorStop(0,`hsla(${p.h},90%,70%,${p.a*0.5})`);gr.addColorStop(1,`hsla(${p.h},90%,70%,0)`);g.fillStyle=gr;g.beginPath();g.arc(p.x,p.y,p.r*3,0,7);g.fill();});pts=pts.filter(p=>p.a>0);g.globalCompositeOperation='source-over';requestAnimationFrame(draw);}draw();})();
+
+/* =====================================================================
+   主迴圈
+   ===================================================================== */
+(function loop(){let last=performance.now();let first=true;function frame(now){const dt=Math.min(0.05,(now-last)/1000);last=now;W3.update(dt);if(S.orbit){W3.controls.update();}else{W3.camera.lookAt(W3.camTarget);}W3.renderer.render(W3.scene,W3.camera);if(first){first=false;window.__booted=true;UI.loading.style.opacity=0;setTimeout(()=>UI.loading.classList.add('hidden'),700);}requestAnimationFrame(frame);}requestAnimationFrame(frame);})();
+setState('INTRO');
+}
+</script>
+</body>
+</html>
