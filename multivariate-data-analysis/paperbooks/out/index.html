@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>研究案件書房</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--paper:#f4eddc;--ink:#1e1912;--teal:#0c4a45;--acc:#86200f}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -86,7 +85,7 @@ const LIB=[{"file": "MULTIVARIATE_CASE01_消失的維度_紙本書版.html", "id
 (function(){const SRC={three:['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js','https://unpkg.com/three@0.128.0/build/three.min.js'],gsap:['https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js','https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js','https://unpkg.com/gsap@3.12.5/dist/gsap.min.js']};
   const diag=m=>{const d=document.getElementById('diag');if(d)d.textContent=m;};
   function load(list,i,ok){if(i>=list.length){diag('無法載入 3D 函式庫，請確認網路連線後重新整理；也可以改用右上角「書目」清單。');return;}const s=document.createElement('script');s.src=list[i];s.onload=ok;s.onerror=()=>load(list,i+1,ok);document.head.appendChild(s);}
-  const fontReady=cb=>{if(!document.fonts||!document.fonts.load)return cb();const txt=[...new Set(JSON.stringify(typeof LIB!=='undefined'?LIB:'').replace(/[\x00-\x7f]/g,''))].join('')+'數據學院懸案書庫案例描述檢定變異數迴歸進階模型投稿0123456789CASE';let done=false;const go=()=>{if(!done){done=true;cb();}};Promise.all(['700','900'].map(w=>document.fonts.load(w+' 40px "Noto Serif TC"',txt))).then(go,go);setTimeout(go,6000);};
+  const fontReady=cb=>{if(!document.fonts||!document.fonts.load)return cb();const fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&display=swap';document.head.appendChild(fl);const txt=[...new Set(JSON.stringify(typeof LIB!=='undefined'?LIB:'').replace(/[\x00-\x7f]/g,''))].join('')+'數據學院懸案書庫案例描述檢定變異數迴歸進階模型投稿0123456789CASE';let done=false;const go=()=>{if(!done){done=true;cb();}};new Promise(r=>{fl.onload=r;fl.onerror=r;}).then(()=>Promise.all(['700','900'].map(w=>document.fonts.load(w+' 40px "Noto Serif TC"',txt)))).then(go,go);setTimeout(go,6000);};
 load(SRC.three,0,()=>load(SRC.gsap,0,()=>fontReady(()=>{try{__boot();}catch(e){console.error(e);diag('啟動失敗：'+e.message);}})));
   setTimeout(()=>{if(!window.__booted)diag('載入時間較長……若持續停在此畫面，請改用 Chrome 或 Edge，或點右上角「書目」。');},15000);})();
 
