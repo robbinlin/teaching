@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>研究案件書房</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--paper:#f4eddc;--ink:#1e1912;--teal:#0c4a45;--acc:#86200f}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -40,15 +41,29 @@ html,body{height:100%;overflow:hidden;background:#2a1c11;font-family:"Microsoft 
 #fade{position:absolute;inset:0;background:#f4eddc;opacity:0;visibility:hidden;transition:opacity .7s;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--ink)}
 #fade.on{opacity:1;visibility:visible}#fade .k{letter-spacing:.4em;font-size:12px;color:var(--teal)}#fade .t{font-size:30px;font-weight:700}
 #loading{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;background:#2a1c11;color:#d9c9a8;letter-spacing:.3em;font-size:13px;transition:opacity .8s;text-align:center;padding:16px}
+
+/* arcane archive skin */
+html,body{background:#0e0a18;font-family:"Noto Serif TC","Microsoft JhengHei",serif}
+.pill{background:rgba(20,15,32,.86);color:#f0dfb0;border:1px solid rgba(214,174,90,.55);box-shadow:0 0 18px rgba(214,174,90,.15),0 4px 14px rgba(0,0,0,.45)}
+#brand b{color:#d6ae5a}
+#tools a,#tools button{color:#f0dfb0}#tools svg{stroke:#e8c98a}#tools button.off svg{stroke:#6a5a40}#tools a:hover,#tools button:hover{background:rgba(214,174,90,.15)}
+#hint{background:rgba(14,10,24,.7);color:#f0dfb0;border:1px solid rgba(214,174,90,.35)}
+#prompt{background:rgba(20,15,32,.92);border:1.5px solid #d6ae5a;color:#f6e3b0;box-shadow:0 0 22px rgba(214,174,90,.35)}
+#tip{background:rgba(20,15,32,.95);color:#f0dfb0;border:1px solid rgba(214,174,90,.5)}#tip .k{color:#d6ae5a}
+#title{color:#f6e3b0;text-shadow:0 0 24px rgba(120,140,255,.45),0 2px 14px rgba(0,0,0,.8)}#title .k{color:#d6ae5a}#title p{color:#e8d6a8}
+#card{background:linear-gradient(#f3e6c6,#ead9b0);border:2px solid #b8913e;box-shadow:0 0 0 6px rgba(20,15,32,.6),0 18px 50px rgba(0,0,0,.6),0 0 40px rgba(214,174,90,.25)}
+#card .case{color:#5a2a7a}#open{background:linear-gradient(#2a1f4a,#1a1430);color:#f6e3b0;border:1px solid #d6ae5a}#open:hover{background:#3a2a62}
+#fade{background:#0e0a18;color:#f6e3b0}#fade .k{color:#d6ae5a}
+#loading{background:#0e0a18;color:#e8c98a}
 @media (max-width:640px){#card{top:auto;bottom:12px;transform:translate(0,30px);max-height:52vh}#card.on{transform:translate(0,0)}#card h2{font-size:24px}#hint{font-size:11px;letter-spacing:.04em}#title{top:10%}#brand span{display:none}}
 </style>
 </head>
 <body>
 <div id="three"></div>
 <div id="ui">
-  <div id="brand" class="pill pe"><b>STUDY ROOM</b><span>研究案件書房 ・ 多變量統計紙本書</span></div>
+  <div id="brand" class="pill pe"><b>ARCANE ARCHIVE</b><span>數據學院懸案書庫 ・ 多變量統計</span></div>
   <div id="tools" class="pill pe"><a href="list.html" title="以清單瀏覽全部的書"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>書目</a><button id="btnMute" title="音效開關"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8a5 5 0 0 1 0 8"/></svg></button></div>
-  <div id="title"><div class="k">R E S E A R C H &nbsp; C A S E &nbsp; L I B R A R Y</div><h1>研究案件書房</h1><p>走到書架前，挑一本你想調查的案件</p></div>
+  <div id="title"><div class="k">A R C A N E &nbsp; A R C H I V E &nbsp; O F &nbsp; D A T A</div><h1>數據學院・懸案書庫</h1><p>走到書架前，挑一本你想破解的研究懸案</p></div>
   <div id="tip"></div>
   <div id="prompt" class="pe"></div>
   <div id="hint">點地板走路 ・ WASD／方向鍵移動 ・ 點書背選書 ・ 靠近書架按 Enter 取書</div>
@@ -71,12 +86,13 @@ const LIB=[{"file": "MULTIVARIATE_CASE01_消失的維度_紙本書版.html", "id
 (function(){const SRC={three:['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js','https://unpkg.com/three@0.128.0/build/three.min.js'],gsap:['https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js','https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js','https://unpkg.com/gsap@3.12.5/dist/gsap.min.js']};
   const diag=m=>{const d=document.getElementById('diag');if(d)d.textContent=m;};
   function load(list,i,ok){if(i>=list.length){diag('無法載入 3D 函式庫，請確認網路連線後重新整理；也可以改用右上角「書目」清單。');return;}const s=document.createElement('script');s.src=list[i];s.onload=ok;s.onerror=()=>load(list,i+1,ok);document.head.appendChild(s);}
-  load(SRC.three,0,()=>load(SRC.gsap,0,()=>{try{__boot();}catch(e){console.error(e);diag('啟動失敗：'+e.message);}}));
+  const fontReady=cb=>{if(!document.fonts||!document.fonts.load)return cb();const txt=[...new Set(JSON.stringify(typeof LIB!=='undefined'?LIB:'').replace(/[\x00-\x7f]/g,''))].join('')+'數據學院懸案書庫案例描述檢定變異數迴歸進階模型投稿0123456789CASE';let done=false;const go=()=>{if(!done){done=true;cb();}};Promise.all(['700','900'].map(w=>document.fonts.load(w+' 40px "Noto Serif TC"',txt))).then(go,go);setTimeout(go,6000);};
+load(SRC.three,0,()=>load(SRC.gsap,0,()=>fontReady(()=>{try{__boot();}catch(e){console.error(e);diag('啟動失敗：'+e.message);}})));
   setTimeout(()=>{if(!window.__booted)diag('載入時間較長……若持續停在此畫面，請改用 Chrome 或 Edge，或點右上角「書目」。');},15000);})();
 
 function __boot(){
 const books=(typeof LIB!=='undefined'&&Array.isArray(LIB))?LIB:[];
-const FONT='"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif';
+const FONT='"Noto Serif TC","Microsoft JhengHei","PingFang TC","Noto Sans TC",serif';
 const store={get(k){try{return localStorage.getItem(k);}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
 /* ---------- audio ---------- */
 const AUDIO=(function(){let ctx,master,muted=false;function init(){if(ctx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=new AC();master=ctx.createGain();master.gain.value=0.6;master.connect(ctx.destination);}
@@ -86,7 +102,7 @@ const AUDIO=(function(){let ctx,master,muted=false;function init(){if(ctx)return
 
 /* ---------- renderer / scene ---------- */
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.95;document.getElementById('three').appendChild(renderer.domElement);
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x1e140c);scene.fog=new THREE.Fog(0x1e140c,16,30);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0e0a18);scene.fog=new THREE.Fog(0x0e0a18,15,30);
 const camera=new THREE.PerspectiveCamera(46,innerWidth/innerHeight,0.1,80);
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 const MAXANI=renderer.capabilities.getMaxAnisotropy();
@@ -99,16 +115,16 @@ function roundRect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,
 function fitFont(g,t,maxW,size,bold){let s=size;do{g.font=(bold?'bold ':'')+s+'px '+FONT;if(g.measureText(t).width<=maxW)break;s-=1;}while(s>8);return s;}
 
 /* lights */
-scene.add(new THREE.AmbientLight(0xffe2bd,0.22));scene.add(new THREE.HemisphereLight(0xfff0d8,0x3a2414,0.32));
-const sun=new THREE.DirectionalLight(0xffdcae,0.95);sun.position.set(-7,9,5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:30});sun.shadow.bias=-0.0006;scene.add(sun);
+scene.add(new THREE.AmbientLight(0xd8c8ff,0.2));scene.add(new THREE.HemisphereLight(0xb8b0ff,0x2a1a10,0.3));
+const sun=new THREE.DirectionalLight(0xffd0a0,0.7);sun.position.set(-7,9,5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:30});sun.shadow.bias=-0.0006;scene.add(sun);
 const shelfLight=new THREE.SpotLight(0xffd9a0,0.9,14,0.75,0.6,1.2);shelfLight.position.set(0,5.2,-0.5);shelfLight.target.position.set(0,1.4,-4.6);scene.add(shelfLight,shelfLight.target);
 const deskLamp=new THREE.PointLight(0xffb866,0.9,6,1.6);deskLamp.position.set(4.55,1.55,0.55);scene.add(deskLamp);
 
 /* ---------- room ---------- */
 const woodTex=canvasTex(1024,1024,(g,w,h)=>{const pw=128;for(let i=0;i<w/pw;i++){const base=[110+Math.random()*25,72+Math.random()*18,42+Math.random()*12].map(Math.round);g.fillStyle=`rgb(${base})`;g.fillRect(i*pw,0,pw,h);for(let k=0;k<40;k++){g.strokeStyle=`rgba(50,28,12,${0.12+Math.random()*0.2})`;g.lineWidth=1+Math.random()*2;g.beginPath();let x=i*pw+Math.random()*pw;g.moveTo(x,0);for(let y=0;y<=h;y+=64){x+=(Math.random()-.5)*3;g.lineTo(x,y);}g.stroke();}g.fillStyle='rgba(30,16,6,.6)';g.fillRect(i*pw,0,2,h);const cut=Math.random()*h;g.fillRect(i*pw,cut,pw,2);}});
 woodTex.wrapS=woodTex.wrapT=THREE.RepeatWrapping;woodTex.repeat.set(3,2.2);
-const floor=new THREE.Mesh(new THREE.PlaneGeometry(16,12),new THREE.MeshStandardMaterial({map:woodTex,roughness:.7}));floor.rotation.x=-Math.PI/2;floor.position.z=0.8;floor.receiveShadow=true;scene.add(floor);
-const wallTex=canvasTex(512,512,(g,w,h)=>{g.fillStyle='#cdb48c';g.fillRect(0,0,w,h);for(let i=0;i<5000;i++){g.fillStyle=`rgba(${120+Math.random()*60|0},${90+Math.random()*40|0},${50+Math.random()*30|0},${Math.random()*0.1})`;g.fillRect(Math.random()*w,Math.random()*h,2,2);}for(let x=0;x<w;x+=64){g.fillStyle='rgba(120,90,50,.08)';g.fillRect(x,0,26,h);}});
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(16,12),new THREE.MeshStandardMaterial({map:woodTex,roughness:.7}));floor.rotation.x=-Math.PI/2;floor.position.z=0.8;floor.receiveShadow=true;floor.material.color.setHex(0x8a7466);scene.add(floor);
+const wallTex=canvasTex(512,512,(g,w,h)=>{g.fillStyle='#3a3442';g.fillRect(0,0,w,h);const bh=64;for(let r=0;r<h/bh;r++){const off=r%2?64:0;for(let x=-off;x<w;x+=128){const v=50+Math.random()*22|0;g.fillStyle=`rgb(${v},${v-4},${v+8})`;g.fillRect(x+3,r*bh+3,122,bh-6);for(let k=0;k<60;k++){g.fillStyle=`rgba(0,0,0,${Math.random()*0.12})`;g.fillRect(x+3+Math.random()*120,r*bh+3+Math.random()*58,3,2);}}}});
 wallTex.wrapS=wallTex.wrapT=THREE.RepeatWrapping;wallTex.repeat.set(4,2.5);
 const wallMat=new THREE.MeshStandardMaterial({map:wallTex,roughness:.95});
 const back=new THREE.Mesh(new THREE.PlaneGeometry(16,10),wallMat);back.position.set(0,5,-5.2);back.receiveShadow=true;scene.add(back);
@@ -116,17 +132,17 @@ const left=new THREE.Mesh(new THREE.PlaneGeometry(12,10),wallMat);left.rotation.
 const right=new THREE.Mesh(new THREE.PlaneGeometry(12,10),wallMat);right.rotation.y=-Math.PI/2;right.position.set(8,5,0.8);right.receiveShadow=true;scene.add(right);
 [[-5.17,'back'],[-7.97,'left'],[7.97,'right']].forEach(([p,s])=>{const wb=box(s==='back'?16:12,0.9,0.06,0x5a3a22);if(s==='back')wb.position.set(0,0.45,p);else{wb.rotation.y=Math.PI/2;wb.position.set(p,0.45,0.8);}scene.add(wb);const tr=box(s==='back'?16:12,0.06,0.1,0x7a5232);tr.position.copy(wb.position);tr.position.y=0.92;tr.rotation.y=wb.rotation.y;scene.add(tr);});
 // window on left wall
-(function(){const fr=new THREE.Group();fr.position.set(-7.95,2.6,-0.6);fr.rotation.y=Math.PI/2;const glass=new THREE.Mesh(new THREE.PlaneGeometry(2.4,2.0),new THREE.MeshBasicMaterial({map:canvasTex(256,256,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#ffe8b8');gr.addColorStop(1,'#f2b56a');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='rgba(90,120,80,.55)';for(let i=0;i<14;i++){g.beginPath();g.arc(Math.random()*w,h-10-Math.random()*60,20+Math.random()*30,0,Math.PI*2);g.fill();}}),toneMapped:false}));glass.position.z=0.01;fr.add(glass);
+(function(){const fr=new THREE.Group();fr.position.set(-7.95,2.6,-0.6);fr.rotation.y=Math.PI/2;const glass=new THREE.Mesh(new THREE.PlaneGeometry(2.4,2.0),new THREE.MeshBasicMaterial({map:canvasTex(256,256,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#0b1640');gr.addColorStop(1,'#34508f');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='rgba(90,120,80,.55)';for(let i=0;i<14;i++){g.beginPath();g.arc(Math.random()*w,h-10-Math.random()*60,20+Math.random()*30,0,Math.PI*2);g.fill();}}),toneMapped:false}));glass.position.z=0.01;fr.add(glass);
   [[0,1.03,2.6,0.1],[0,-1.03,2.6,0.12],[1.25,0,0.1,2.16],[-1.25,0,0.1,2.16],[0,0,0.06,2.0],[0,0,2.4,0.06]].forEach(([x,y,w,h])=>fr.add(at(box(w,h,0.08,0x6b4628),x,y,0.03)));scene.add(fr);
-  const shaft=new THREE.Mesh(new THREE.PlaneGeometry(5,2.3),new THREE.MeshBasicMaterial({color:0xffe0a8,transparent:true,opacity:0.07,depthWrite:false,side:THREE.DoubleSide}));shaft.position.set(-5.6,1.6,-0.2);shaft.rotation.set(-Math.PI/2+0.5,0,0.35);scene.add(shaft);})();
+  const shaft=new THREE.Mesh(new THREE.PlaneGeometry(5,2.3),new THREE.MeshBasicMaterial({color:0x9ab8ff,transparent:true,opacity:0.06,depthWrite:false,side:THREE.DoubleSide}));shaft.position.set(-5.6,1.6,-0.2);shaft.rotation.set(-Math.PI/2+0.5,0,0.35);scene.add(shaft);})();
 // rug
-const rug=new THREE.Mesh(new THREE.CircleGeometry(2.6,48),new THREE.MeshStandardMaterial({map:canvasTex(512,512,(g,w,h)=>{g.fillStyle='#7a2f22';g.fillRect(0,0,w,h);[230,200,150,90].forEach((r,i)=>{g.strokeStyle=i%2?'#d9b26a':'#3a1a12';g.lineWidth=i===0?18:8;g.beginPath();g.arc(w/2,h/2,r,0,Math.PI*2);g.stroke();});for(let a=0;a<24;a++){g.save();g.translate(w/2,h/2);g.rotate(a*Math.PI/12);g.fillStyle='#d9b26a';g.fillRect(100,-6,40,12);g.restore();}}),roughness:1}));rug.rotation.x=-Math.PI/2;rug.position.set(0,0.006,0.6);rug.receiveShadow=true;scene.add(rug);
+const rug=new THREE.Mesh(new THREE.CircleGeometry(2.6,48),new THREE.MeshStandardMaterial({map:canvasTex(512,512,(g,w,h)=>{g.fillStyle='#22285a';g.fillRect(0,0,w,h);[230,200,150,90].forEach((r,i)=>{g.strokeStyle=i%2?'#d9b26a':'#0e1230';g.lineWidth=i===0?18:8;g.beginPath();g.arc(w/2,h/2,r,0,Math.PI*2);g.stroke();});for(let a=0;a<24;a++){g.save();g.translate(w/2,h/2);g.rotate(a*Math.PI/12);g.fillStyle='#d9b26a';g.fillRect(100,-6,40,12);g.restore();}}),roughness:1}));rug.rotation.x=-Math.PI/2;rug.position.set(0,0.006,0.6);rug.receiveShadow=true;scene.add(rug);
 // poster on right wall
 (function(){const t=canvasTex(512,680,(g,w,h)=>{g.fillStyle='#f1e6cc';g.fillRect(0,0,w,h);g.strokeStyle='#3a2a1a';g.lineWidth=6;g.strokeRect(18,18,w-36,h-36);g.fillStyle='#0c4a45';g.font='bold 30px '+FONT;g.textAlign='center';g.fillText('M U L T I V A R I A T E',w/2,90);g.fillStyle='#1e1912';g.font='bold 54px '+FONT;g.fillText('多變量統計',w/2,170);
   for(let i=0;i<180;i++){const a=(Math.random()-.5)*2,b=(Math.random()-.5);const x=w/2+(a*1+b*0.4)*150,y=430-(a*0.8-b*0.5)*120;g.fillStyle=i%3?'rgba(12,74,69,.75)':'rgba(134,32,15,.75)';g.beginPath();g.arc(x,y,5,0,Math.PI*2);g.fill();}g.strokeStyle='#86200f';g.lineWidth=5;g.beginPath();g.moveTo(w/2-190,430+150);g.lineTo(w/2+190,430-150);g.stroke();g.fillStyle='#4a3a20';g.font='22px '+FONT;g.fillText('R E S E A R C H   C A S E   F I L E S',w/2,h-60);});
   const p=new THREE.Mesh(new THREE.PlaneGeometry(1.5,2.0),new THREE.MeshStandardMaterial({map:t,roughness:.9}));p.rotation.y=-Math.PI/2;p.position.set(7.93,2.7,-1.4);scene.add(p);const fr=box(0.05,2.12,1.62,0x3a2414);fr.position.set(7.96,2.7,-1.4);scene.add(fr);})();
 // pendant lamps
-[-3,3].forEach(x=>{scene.add(at(cyl(0.01,0.01,1.4,0x222222,6),x,5.3,-1));const sh=cone(0.38,0.3,0x2e4a40,16);sh.position.set(x,4.5,-1);scene.add(sh);const bulb=new THREE.Mesh(new THREE.SphereGeometry(0.09,12,10),new THREE.MeshBasicMaterial({color:0xfff0c8,toneMapped:false}));bulb.position.set(x,4.36,-1);scene.add(bulb);const pl=new THREE.PointLight(0xffd59a,0.45,9,1.5);pl.position.set(x,4.2,-1);scene.add(pl);});
+[].forEach(x=>{scene.add(at(cyl(0.01,0.01,1.4,0x222222,6),x,5.3,-1));const sh=cone(0.38,0.3,0x2e4a40,16);sh.position.set(x,4.5,-1);scene.add(sh);const bulb=new THREE.Mesh(new THREE.SphereGeometry(0.09,12,10),new THREE.MeshBasicMaterial({color:0xfff0c8,toneMapped:false}));bulb.position.set(x,4.36,-1);scene.add(bulb);const pl=new THREE.PointLight(0xffd59a,0.45,9,1.5);pl.position.set(x,4.2,-1);scene.add(pl);});
 
 /* ---------- desk + hologram, armchair, plant, globe ---------- */
 const OBST=[];let holo=null,globe=null;
@@ -145,13 +161,65 @@ const OBST=[];let holo=null,globe=null;
 
 /* ---------- bookshelf ---------- */
 const SHELF_Z=-4.62,SW=7.8,ROWS=[2.02,1.06,0.1],BOARD=0.06,BOOKX=i=>-3.575+((i%4)*3+Math.floor(i/4))*0.65;
-(function(){const c=0x5c3b22,c2=0x744b2b;const g=new THREE.Group();g.add(at(box(SW+0.3,3.15,0.08,0x3e2716),0,1.57,-4.92));[-SW/2-0.08,SW/2+0.08,-SW/6,SW/6].forEach((x,i)=>g.add(at(box(i<2?0.16:0.07,3.15,0.6,i<2?c:c2),x,1.57,SHELF_Z)));
+(function(){const c=0x3e2618,c2=0x4c301e;const g=new THREE.Group();g.add(at(box(SW+0.3,3.15,0.08,0x3e2716),0,1.57,-4.92));[-SW/2-0.08,SW/2+0.08,-SW/6,SW/6].forEach((x,i)=>g.add(at(box(i<2?0.16:0.07,3.15,0.6,i<2?c:c2),x,1.57,SHELF_Z)));
   [0.04,1.0,1.96,2.92].forEach(y=>g.add(at(box(SW+0.32,BOARD+0.02,0.62,c),0,y,SHELF_Z)));g.add(at(box(SW+0.6,0.16,0.72,c),0,3.12,SHELF_Z));scene.add(g);
   const plaques=['案例 ・ 描述 ・ 檢定','變異數 ・ 迴歸','進階模型 ・ 投稿'];ROWS.forEach((y,i)=>{const t=canvasTex(512,80,(gg,w,h)=>{const gr=gg.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#e3c27a');gr.addColorStop(1,'#a8823e');gg.fillStyle=gr;roundRect(gg,2,2,w-4,h-4,10);gg.fill();gg.fillStyle='#3a2410';gg.font='bold 38px '+FONT;gg.textAlign='center';gg.textBaseline='middle';gg.fillText(plaques[i],w/2,h/2+2);});const p=new THREE.Mesh(new THREE.PlaneGeometry(1.1,0.17),new THREE.MeshStandardMaterial({map:t,metalness:.4,roughness:.4}));p.position.set(-1.95,y-0.035+(i===2?0.06:0),SHELF_Z+0.315);scene.add(p);});})();
 (function(){let s=7;const r=()=>{s=(s*16807)%2147483647;return s/2147483647;};const cols=[0x3a2016,0x22302a,0x4a3a26,0x30222f,0x5a4228,0x26323f,0x4e2e20,0x343f24,0x5a4a38,0x6e5a3c];
   ROWS.forEach(y=>{let x=-SW/2+0.12;while(x<SW/2-0.15){const near=[0,1,2,3,4,5,6,7,8,9,10,11].some(j=>Math.floor(j/4)===ROWS.indexOf(y)&&x>BOOKX(j)-0.36&&x<BOOKX(j)+0.2)||Math.abs(x+SW/6)<0.07||Math.abs(x-SW/6)<0.07;if(near){x+=0.04;continue;}
     if(r()<0.1){x+=0.12+r()*0.18;continue;}const th=0.05+r()*0.08,hh=0.5+r()*0.28;const b=box(th,hh,0.36+r()*0.06,cols[Math.floor(r()*cols.length)]);b.position.set(x+th/2,y+BOARD/2+hh/2,SHELF_Z+0.02);scene.add(b);
     if(r()<0.5){const band=box(th+0.004,0.03,0.02,0xc9a14a);band.position.set(x+th/2,y+BOARD/2+hh*0.82,SHELF_Z+0.22);scene.add(band);}x+=th+0.006;}});})();
+
+/* ---------- ARCANE ARCHIVE: gothic windows, star-map rose window, floating books, orbs, ladder ---------- */
+const ARCH=(function(){
+  const glowTex=canvasTex(128,128,(g,w,h)=>{const r=g.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(0.25,'rgba(255,255,255,.5)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,w,h);});
+  const glow=(c,s,o)=>{const m=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:c,transparent:true,opacity:o===undefined?1:o,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));m.scale.setScalar(s);m.raycast=()=>{};return m;};
+  const gold=new THREE.MeshStandardMaterial({color:0xc9a14a,metalness:.75,roughness:.35});
+  // gold trim on the shelf
+  [0.04,1.0,1.96,2.92].forEach(y=>{const s=new THREE.Mesh(new THREE.BoxGeometry(SW+0.32,0.025,0.02),gold);s.position.set(0,y+0.045,SHELF_Z+0.315);scene.add(s);});
+  const crown=new THREE.Mesh(new THREE.BoxGeometry(SW+0.64,0.04,0.03),gold);crown.position.set(0,3.2,SHELF_Z+0.37);scene.add(crown);
+  // gothic arched windows (night sky)
+  const archTex=canvasTex(256,576,(g,w,h)=>{g.save();g.beginPath();g.moveTo(8,h-4);g.lineTo(8,w/2);g.quadraticCurveTo(8,6,w/2,4);g.quadraticCurveTo(w-8,6,w-8,w/2);g.lineTo(w-8,h-4);g.closePath();g.clip();
+    const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#0b1640');gr.addColorStop(0.6,'#1d2f6a');gr.addColorStop(1,'#3a4f8a');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    for(let i=0;i<120;i++){g.fillStyle=`rgba(255,255,240,${0.3+Math.random()*0.7})`;const r=Math.random()*1.6;g.beginPath();g.arc(Math.random()*w,Math.random()*h*0.8,r,0,7);g.fill();}
+    g.fillStyle='rgba(255,245,210,.95)';g.beginPath();g.arc(w*0.68,h*0.2,22,0,7);g.fill();g.fillStyle='#0b1640';g.beginPath();g.arc(w*0.68+9,h*0.2-5,20,0,7);g.fill();g.restore();
+    g.strokeStyle='#2a1c12';g.lineWidth=12;g.beginPath();g.moveTo(8,h-4);g.lineTo(8,w/2);g.quadraticCurveTo(8,6,w/2,4);g.quadraticCurveTo(w-8,6,w-8,w/2);g.lineTo(w-8,h-4);g.closePath();g.stroke();
+    g.lineWidth=6;g.beginPath();g.moveTo(w/2,4);g.lineTo(w/2,h);g.moveTo(8,h*0.5);g.lineTo(w-8,h*0.5);g.moveTo(8,h*0.75);g.lineTo(w-8,h*0.75);g.stroke();
+    g.strokeStyle='rgba(201,161,74,.8)';g.lineWidth=3;g.beginPath();g.arc(w/2,w*0.55,w*0.22,0,7);g.stroke();});
+  const winMat=new THREE.MeshBasicMaterial({map:archTex,transparent:true,toneMapped:false});
+  [-5.9,5.9].forEach(x=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(1.5,3.4),winMat);m.position.set(x,3.0,-5.16);scene.add(m);const gl=glow(0x6f8cff,2.6,0.25);gl.position.set(x,3.2,-5.0);scene.add(gl);});
+  const moon=new THREE.DirectionalLight(0x8ea8ff,0.35);moon.position.set(0,6,-8);moon.target.position.set(0,0,2);scene.add(moon,moon.target);
+  // rose window = star map with statistical glyphs
+  const SYM=['μ','σ','β','χ²','r','ρ','λ','Σ','α','η²','F','t','R²','ω','κ','π'];
+  const roseTex=canvasTex(1024,1024,(g,w,h)=>{const c=w/2;g.fillStyle='#0d1238';g.beginPath();g.arc(c,c,c-6,0,7);g.fill();
+    const gr=g.createRadialGradient(c,c,0,c,c,c);gr.addColorStop(0,'rgba(90,110,220,.35)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    g.strokeStyle='#c9a14a';[c-10,c-70,c-80,c*0.42].forEach((r,i)=>{g.lineWidth=i===0?14:4;g.beginPath();g.arc(c,c,r,0,7);g.stroke();});
+    g.font='bold 46px "Noto Serif TC",serif';g.fillStyle='#f0d890';g.textAlign='center';g.textBaseline='middle';SYM.forEach((s,i)=>{const a=i/SYM.length*Math.PI*2-Math.PI/2;g.fillText(s,c+Math.cos(a)*(c-40),c+Math.sin(a)*(c-40));});
+    for(let i=0;i<48;i++){const a=i/48*Math.PI*2;g.lineWidth=2;g.beginPath();g.moveTo(c+Math.cos(a)*(c-80),c+Math.sin(a)*(c-80));g.lineTo(c+Math.cos(a)*(c-(i%4?96:116)),c+Math.sin(a)*(c-(i%4?96:116)));g.stroke();}
+    for(let i=0;i<260;i++){const a=Math.random()*7,r=Math.random()*(c-100);g.fillStyle=`rgba(255,250,230,${0.25+Math.random()*0.6})`;g.beginPath();g.arc(c+Math.cos(a)*r,c+Math.sin(a)*r,Math.random()*2.2,0,7);g.fill();}});
+  const rose=new THREE.Mesh(new THREE.CircleGeometry(1.08,64),new THREE.MeshBasicMaterial({map:roseTex,toneMapped:false}));rose.position.set(0,4.42,-5.15);scene.add(rose);
+  const roseRing=new THREE.Mesh(new THREE.TorusGeometry(1.1,0.045,8,64),gold);roseRing.position.copy(rose.position);scene.add(roseRing);
+  // inner constellation = a rotating scatter + regression line (data as stars)
+  const con=new THREE.Group();con.position.set(0,4.42,-5.1);con.scale.setScalar(0.86);scene.add(con);const cp=[];for(let i=0;i<22;i++){const x=(Math.random()-.5)*0.95,y=x*0.6+(Math.random()-.5)*0.3;if(Math.hypot(x,y)>0.5)continue;const s=glow(0xfff2c0,0.09+Math.random()*0.06);s.position.set(x,y,0.01);con.add(s);cp.push(s);}
+  const cl=new THREE.Mesh(new THREE.BoxGeometry(1.0,0.012,0.005),new THREE.MeshBasicMaterial({color:0xffc86a,toneMapped:false}));cl.rotation.z=Math.atan(0.6);con.add(cl);
+  const roseGlow=glow(0x6070ff,3.6,0.22);roseGlow.position.set(0,4.42,-5.0);scene.add(roseGlow);
+  // rolling ladder at the right end of the shelf
+  (function(){const g=new THREE.Group();const wood=0x5a3a22;[-0.22,0.22].forEach(x=>{const r=new THREE.Mesh(new THREE.BoxGeometry(0.05,3.5,0.05),new THREE.MeshStandardMaterial({color:wood,roughness:.8}));r.position.set(x,1.75,0);g.add(r);});
+    for(let i=0;i<9;i++){const s=new THREE.Mesh(new THREE.CylinderGeometry(0.018,0.018,0.44,6),gold);s.rotation.z=Math.PI/2;s.position.set(0,0.3+i*0.38,0);g.add(s);}
+    g.position.set(4.35,0,-4.1);g.rotation.x=-0.17;scene.add(g);})();
+  // floating books with flapping pages
+  const flyers=[];const pageMat=new THREE.MeshStandardMaterial({color:0xf2e6c6,roughness:.9,side:THREE.DoubleSide});
+  const fcol=[0x5a1f2a,0x1f3a5a,0x2a4a2a,0x4a2a5a,0x6a4a1a,0x1a4a4a,0x5a2a1a];
+  for(let i=0;i<7;i++){const g=new THREE.Group();const cm=new THREE.MeshStandardMaterial({color:fcol[i],roughness:.6});
+    const L=new THREE.Group(),R=new THREE.Group();[L,R].forEach((h,k)=>{const c=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.015,0.42),cm);c.position.x=(k?1:-1)*0.15;h.add(c);const p=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.03,0.4),pageMat);p.position.set((k?1:-1)*0.14,0.02,0);h.add(p);const tr=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.016,0.012),gold);tr.position.set((k?1:-1)*0.15,0,0.205);h.add(tr);g.add(h);});
+    const flap=new THREE.Mesh(new THREE.PlaneGeometry(0.27,0.38),pageMat);flap.rotation.x=-Math.PI/2;flap.position.x=0.135;const fp=new THREE.Group();fp.position.y=0.04;fp.add(flap);g.add(fp);
+    const gl=glow([0xffd27a,0x8fe0d0,0xc6a2ff][i%3],0.5,0.5);gl.position.y=0.12;g.add(gl);
+    const a=i/7*Math.PI*2;const base=new THREE.Vector3(Math.cos(a)*4.8,3.3+(i%3)*0.5,-1.6+Math.sin(a)*2.0);g.position.copy(base);scene.add(g);flyers.push({g,L,R,fp,base,ph:Math.random()*6,sp:0.12+Math.random()*0.1,a});}
+  // orbs + extra warm light pools (replacing the pendant lamps)
+  const orbs=[];for(let i=0;i<14;i++){const c=[0xffc86a,0x8fe0d0,0xc6a2ff][i%3];const o=glow(c,0.22+Math.random()*0.2,0.8);const b=new THREE.Vector3((Math.random()-.5)*13,1.4+Math.random()*3.4,-4.4+Math.random()*7);o.position.copy(b);scene.add(o);orbs.push({o,b,ph:Math.random()*6,sp:0.3+Math.random()*0.4});}
+  [[-3,3.2,-1.2,0xffc88a],[3,3.2,-1.2,0xffc88a],[0,2.6,-3.4,0xb8a0ff]].forEach(([x,y,z,c])=>{const l=new THREE.PointLight(c,0.5,9,1.6);l.position.set(x,y,z);scene.add(l);});
+  return {tick(dt,t){flyers.forEach(f=>{const a=f.a+t*f.sp;f.g.position.set(Math.cos(a)*4.8,f.base.y+Math.sin(t*0.9+f.ph)*0.18,-1.6+Math.sin(a)*2.0);f.g.rotation.set(0.25+Math.sin(t*0.7+f.ph)*0.12,-a+Math.PI/2,Math.sin(t+f.ph)*0.1);const o=0.55+Math.sin(t*2.2+f.ph)*0.25;f.L.rotation.z=o;f.R.rotation.z=-o;f.fp.rotation.z=-(0.2+((t*0.9+f.ph)%1)*2.6);});
+    orbs.forEach(q=>{q.o.position.set(q.b.x+Math.sin(t*q.sp+q.ph)*0.3,q.b.y+Math.sin(t*q.sp*1.4+q.ph)*0.2,q.b.z+Math.cos(t*q.sp+q.ph)*0.3);q.o.material.opacity=0.5+0.3*Math.sin(t*1.6+q.ph);});
+    con.rotation.z=Math.sin(t*0.15)*0.25;cp.forEach((s,i)=>s.material.opacity=0.6+0.4*Math.sin(t*2+i));roseGlow.material.opacity=0.18+0.06*Math.sin(t*0.8);}};})();
 
 /* ---------- story books ---------- */
 const PALETTE=['#183e4a','#6e2618','#244f30','#4c2f62','#7a4c12','#1c3466','#64182f','#2c5555','#5a3c22','#22447a','#713c1c','#35255a'];
@@ -266,6 +334,7 @@ let t=0,last=performance.now(),first=true,stepAcc=0;
   const goal=camGoal();const k=cam.mode==='book'?2.5:(t<4.5?0.9:3.0);cam.pos.lerp(goal.pos,Math.min(1,dt*k));cam.look.lerp(goal.look,Math.min(1,dt*k));camera.position.copy(cam.pos);camera.lookAt(cam.look);
   if(holo){holo.rotation.y+=dt*0.5;holo.position.y=1.75+Math.sin(t*1.2)*0.03;}if(globe)globe.rotation.y+=dt*0.15;
   const dp=dust.geometry.attributes.position;for(let i=0;i<dp.count;i++){let y=dp.getY(i)+dt*0.03*(1+(i%3));if(y>5)y=0;dp.setY(i,y);dp.setX(i,dp.getX(i)+Math.sin(t*0.3+i)*dt*0.02);}dp.needsUpdate=true;
+  if(typeof ARCH!=='undefined')ARCH.tick(dt,t);
   renderer.render(scene,camera);
   if(first){first=false;window.__booted=true;const L=$('loading');L.style.opacity=0;setTimeout(()=>L.style.display='none',900);setTimeout(hideTitle,5500);}
   requestAnimationFrame(frame);})(performance.now());

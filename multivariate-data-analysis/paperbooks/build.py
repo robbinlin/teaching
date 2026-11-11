@@ -216,6 +216,25 @@ def build(path, write=True):
     for x in W: print('  ⚠', x)
     if E or not write: return not E
     eng = open(os.path.join(HERE, 'engine.html'), encoding='utf-8').read()
+    if book.get('theme') == 'arcane':
+        eng = eng.replace('/*__ARCANE__*/', open(os.path.join(HERE, 'arcane.js'), encoding='utf-8').read())
+    else:
+        eng = eng.replace('/*__ARCANE__*/', 'const ARC=null;')
+    def embed(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k == 'img' and isinstance(v, str) and not v.startswith('data:'):
+                    fp = os.path.join(HERE, 'assets', v)
+                    if os.path.exists(fp):
+                        import base64, mimetypes
+                        o[k] = 'data:' + (mimetypes.guess_type(fp)[0] or 'image/jpeg') + ';base64,' + base64.b64encode(open(fp, 'rb').read()).decode()
+                    else:
+                        print('  ⚠ 找不到圖片 assets/' + v)
+                else:
+                    embed(v)
+        elif isinstance(o, list):
+            for v in o: embed(v)
+    embed(book)
     js = json.dumps(book, ensure_ascii=False).replace('</', '<\\/')
     html = eng.replace('/*__BOOK__*/', 'const BOOK=' + js + ';').replace('__TITLE__', (book.get('cover', {}).get('big') or 'MULTIVARIATE') + '｜' + book['title'] + '・紙本書版')
     os.makedirs(OUT, exist_ok=True)
@@ -257,6 +276,7 @@ header{{max-width:1100px;margin:0 auto 28px;color:#f3ead6}}header .k{{letter-spa
                     'summary': re.sub(r'<[^>]+>', '', c.get('summary', '')), 'acts': [a.get('title', '') for a in b.get('acts', [])],
                     'notes': len(b.get('notes', {})), 'viz': nviz, 'choices': nc, 'color': b.get('spineColor', '')})
     tpl = open(os.path.join(HERE, 'library.html'), encoding='utf-8').read()
+    tpl = tpl.replace('/*__ARCHIVE__*/', open(os.path.join(HERE, 'archive.js'), encoding='utf-8').read())
     js = json.dumps(lib, ensure_ascii=False).replace('</', '<\\/')
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(tpl.replace('/*__LIB__*/', 'const LIB=' + js + ';'))
     print('  → index.html (3D 書房) + list.html')
