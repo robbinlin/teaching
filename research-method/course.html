@@ -185,6 +185,27 @@ textarea{min-height:84px;resize:vertical}
 .toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));max-width:calc(100% - 32px);
   background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;z-index:20}
 .note{font-size:13px;color:var(--muted)}
+.tchlink{text-align:right;margin:10px 0 0;font-size:13px}.tchlink .link{color:var(--muted)}
+.dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:2px dashed var(--line);border-radius:10px;padding:26px 16px;text-align:center;cursor:pointer;background:var(--surface);margin:8px 0 18px}
+.dropzone b{color:var(--accent);font-size:16px}.dropzone span{font-size:13px;color:var(--muted)}.dropzone.over{border-color:var(--accent);background:var(--paper)}
+.tchstat{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;font-size:14px;margin:0 0 10px}.tchstat b{font-family:var(--mono);font-size:17px}
+.tchstat .legend{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px}.tchstat .legend i{margin-left:8px}
+.tchwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table.tch{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
+table.tch th,table.tch td{padding:8px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;white-space:nowrap}
+table.tch thead th{font-weight:600;color:var(--muted);font-size:12px;background:var(--paper)}
+table.tch tbody th{white-space:normal;width:170px;min-width:150px}table.tch tbody th span{display:block;font-size:12px;color:var(--muted);font-weight:400}
+table.tch tbody th .link{font-size:14px;font-weight:600;padding:0}
+table.tch tr.sel{background:var(--paper)}
+table.tch .num{font-family:var(--mono);text-align:right}table.tch .num small{color:var(--muted)}
+table.tch .when{font-size:12px;color:var(--muted)}
+.cells{display:flex;gap:1px}.cells i,.legend i{display:inline-block;width:7px;height:16px;border-radius:2px;background:var(--line)}
+.cells i.done,.legend i.done{background:var(--accent)}.cells i.draft,.legend i.draft{background:color-mix(in srgb,var(--accent) 45%,var(--line))}.cells i.run,.legend i.run{background:color-mix(in srgb,var(--navy) 35%,var(--line))}
+.chhead{display:flex;gap:1px;width:calc(29 * 8px)}.chhead span{font-size:11px;border-left:1px solid var(--line);padding-left:3px;overflow:hidden}
+.tchunits{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0 16px}
+.tchunits>div{display:flex;flex-direction:column;gap:3px}.tchunits b{font-size:13px}
+.tchunits .u{font-size:12px;padding:3px 8px;border-radius:6px;background:var(--paper);border-left:3px solid var(--line);display:flex;justify-content:space-between;gap:6px}
+.tchunits .u em{font-style:normal;color:var(--muted);flex:none}.tchunits .u.done{border-left-color:var(--accent)}.tchunits .u.draft{border-left-color:color-mix(in srgb,var(--accent) 45%,var(--line))}.tchunits .u.run{border-left-color:var(--navy)}
 .sumnav{justify-content:flex-end;margin-top:18px}
 .revisit{margin-top:20px}
 .pbpre{border:1px solid var(--line);border-left:3px solid var(--navy);border-radius:8px;background:var(--paper);padding:2px 14px 10px;margin:4px 0 14px}
@@ -1041,11 +1062,11 @@ async function getSample(){if(sampleNS)return sampleNS;if(!(window.claude&&claud
 const NOAI='目前無法使用 Claude 回饋。在課程的 Claude 頁面上，第一次使用時會跳出授權視窗，請按允許後再按一次；GitHub 公開版沒有這個功能。';
 const aiErr=err=>err&&err.code==='rate_limited'?'請求太頻繁，請稍等一分鐘再按一次。':err&&err.code==='not_granted'?'Claude 回饋沒有被允許。請在頁面的權限設定中允許後再試。':'取得回饋失敗，請再按一次。';
 const app=document.getElementById('app');
-const enc=v=>v.n==='mod'?`#mod/${v.id}`:v.n==='thesis'?'#thesis':v.n==='prompts'?'#prompts':v.n==='home'?'#home':`#${v.n}/${v.c}`;
+const enc=v=>v.n==='mod'?`#mod/${v.id}`:v.n==='thesis'?'#thesis':v.n==='prompts'?'#prompts':v.n==='teacher'?'#teacher':v.n==='home'?'#home':`#${v.n}/${v.c}`;
 const dec=h=>{const [n,a]=String(h||'').replace(/^#/,'').split('/');
   if(n==='mod'&&modById(a))return {n:'mod',id:a};
   if((n==='ch'||n==='sum'||n==='read')&&+a>=1&&+a<=CH.length&&CH[+a-1].open&&(n!=='read'||READ[+a]))return {n,c:+a};
-  if(n==='thesis')return {n:'thesis'};if(n==='prompts')return {n:'prompts'};return {n:'home'}};
+  if(n==='thesis')return {n:'thesis'};if(n==='prompts')return {n:'prompts'};if(n==='teacher')return {n:'teacher'};return {n:'home'}};
 function hideToast(){const e=document.getElementById('toast');if(e){clearTimeout(toast.t);e.hidden=true}}
 const go=v=>{view=v;lastCarry=null;hideToast();if(v.n==='mod'){S.last=v.id;save()}
   try{const h=enc(v);if(location.hash!==h)location.hash=h}catch(e){}
@@ -1168,7 +1189,7 @@ function refreshPB(){const y=window.scrollY;if(view.n==='prompts'){const l=docum
   const s=document.getElementById('s-pb');if(!s)return;const open=[...s.querySelectorAll('details.pbi')].map(d=>d.open);
   const tmp=document.createElement('div');tmp.innerHTML=view.n==='thesis'?pbThesisHTML():pbModHTML(curMod());const n=tmp.firstElementChild;
   n.querySelectorAll('details.pbi').forEach((d,i)=>{d.open=!!open[i]});s.replaceWith(n);window.scrollTo(0,y)}
-const DEPTH={home:0,ch:1,thesis:1,prompts:1,sum:2,read:2,mod:2};let lastDepth=null,lastKey='';
+const DEPTH={home:0,ch:1,thesis:1,prompts:1,teacher:1,sum:2,read:2,mod:2};let lastDepth=null,lastKey='';
 function animateView(){const k=JSON.stringify(view),d=DEPTH[view.n]??1;
   if(k===lastKey)return;let dir=lastDepth===null?'up':d>lastDepth?'fwd':d<lastDepth?'back':'up';
   if(view.n==='mod'&&animateView.id)dir=view.id>animateView.id?'fwd':'back';
@@ -1182,6 +1203,7 @@ function render(){
   else if(view.n==='thesis')app.innerHTML=thesisHTML();
   else if(view.n==='read')app.innerHTML=readHTML(view.c);
   else if(view.n==='prompts')app.innerHTML=promptsHTML();
+  else if(view.n==='teacher')app.innerHTML=teacherHTML();
   animateView();
   if(view.n==='home')startHero();
 }
@@ -1306,7 +1328,8 @@ function homeHTML(){
     <span>手繪動畫，每支 2–4 分鐘，從「研究是什麼」講到摘要怎麼寫。</span>
     <span class="vgo">打開播放清單 →</span></a>
   </div>
-  ${progHTML()}`;
+  ${progHTML()}
+  <p class="tchlink"><button class="link" data-act="teacher">教師檢視：看全班進度</button></p>`;
 }
 function chHTML(c){
   const rows=c.mods.map(m=>{
@@ -1463,6 +1486,54 @@ document.addEventListener('change',async e=>{const t=e.target;if(t.id!=='progfil
     if(!o||o.app!=='rm-course'||!o.S||typeof o.S!=='object')throw 0;
     progPending=o;refreshProgBox();const b=document.getElementById('progbox');if(b)flash(b)}
   catch(err){toast('這不是本課程的進度檔，請選擇檔名開頭為 research-methods-progress 的 .json 檔')}});
+
+/* ---------- 教師檢視：一次讀入多份進度檔（只在記憶體，不寫入本機進度） ---------- */
+let TCH=[],tchSel=null;
+const S0=()=>({judge:{},order:{},tpl:{},checks:{},ai:{},refs:[],mx:[],crit:{},pw:{},cho:{},ap:{}});
+function withStudent(st,fn){const bS=S,bM=META;S=Object.assign(S0(),st.S);META=Object.assign({},bM,st.META||{});try{return fn()}finally{S=bS;META=bM}}
+function tchSummary(st){return withStudent(st,()=>{const ck=checksHTML();
+  return {name:(META.student||'').trim()||st.file.replace(/\.json$/,''),saved:st.savedAt,drafts:allDrafts(),done:ALLMODS.filter(m=>steps(m)===3).length,
+   warn:(ck.match(/chip warn/g)||[]).length,title:g('1.0','title'),cells:ALLMODS.map(m=>[m.id,status(m)[0]]),last:(()=>{const d=ALLMODS.filter(m=>tplAny(m));return d.length?d[d.length-1].id:''})()}})}
+async function tchLoad(files){let ok=0,bad=[];
+  for(const f of files){try{const o=JSON.parse(await f.text());if(!o||o.app!=='rm-course'||!o.S)throw 0;
+    o.file=f.name;const s=tchSummary(o);const i=TCH.findIndex(x=>x.sum.name===s.name);
+    if(i>=0){if(new Date(o.savedAt)>=new Date(TCH[i].savedAt))TCH[i]=Object.assign(o,{sum:s})}else TCH.push(Object.assign(o,{sum:s}));ok++}
+   catch(e){bad.push(f.name)}}
+  TCH.sort((a,b)=>a.sum.name.localeCompare(b.sum.name,'zh-Hant'));render();
+  toast(`讀入 ${ok} 份進度檔${bad.length?`，${bad.length} 份不是本課程的進度檔：${bad.slice(0,3).join('、')}`:''}`)}
+const ST_CLS={'已完成':'done','草稿已寫':'draft','進行中':'run','未開始':''};
+function teacherHTML(){const n=TCH.length;
+  const head=`<button class="back" data-act="home">← 首頁</button>
+  <div class="top"><span class="mono">教師檢視</span><h1>全班進度</h1>
+   <p class="lede">把學生交來的進度檔（research-methods-progress_….json）一次全部拖進來，就能看到每個人做到哪裡。檔案只在這個分頁讀取，不會存起來，也不會覆蓋你自己的作答；關掉分頁就清空。</p></div>
+  <label class="dropzone" id="tchdrop"><input type="file" id="tchfile" accept=".json,application/json" multiple hidden><b>選擇或拖進進度檔</b><span>可一次選多份；同一位學生交了好幾份，會自動保留最新的一份。</span></label>`;
+  if(!n)return head;
+  const avg=k=>Math.round(TCH.reduce((s,x)=>s+x.sum[k],0)/n*10)/10;
+  const rows=TCH.map((x,i)=>{const s=x.sum;return `<tr class="${tchSel===i?'sel':''}"><th scope="row"><button class="link" data-act="tchsel" data-i="${i}">${esc(s.name)}</button><span>${esc(s.title||'（尚未定題）')}</span></th>
+   <td class="num">${s.drafts}<small>/${ALLMODS.length}</small></td><td class="num">${s.done}</td><td class="num">${s.warn?`<span class="chip warn">${s.warn}</span>`:'—'}</td><td class="when">${esc(fmtTime(s.saved))}</td>
+   <td><div class="cells">${s.cells.map(([id,st])=>`<i class="${ST_CLS[st]}" title="${id} ${st}"></i>`).join('')}</div></td></tr>`}).join('');
+  const chHead=CH.map(c=>`<span style="flex:${c.mods.length}">第${NUM[c.n]}章</span>`).join('');
+  let detail='';
+  if(tchSel!=null&&TCH[tchSel]){const st=TCH[tchSel];detail=withStudent(st,()=>`<section class="step" id="tchdetail"><header><span class="mono">${esc(st.sum.name)}</span><h3>${esc(g('1.0','title')||'（尚未定題）')}</h3></header>
+    <p class="note">進度檔存於 ${esc(fmtTime(st.savedAt))}，已寫 ${st.sum.drafts} 段草稿、完成 ${st.sum.done} 個單元。</p>
+    <div class="tchunits">${CH.map(c=>`<div><b>第${NUM[c.n]}章</b>${c.mods.map(m=>{const s=status(m)[0];return `<span class="u ${ST_CLS[s]}">${m.id} ${esc(m.title)}<em>${s}</em></span>`}).join('')}</div>`).join('')}</div>
+    ${checksHTML()}
+    <h3>論文初稿全文</h3><div class="paper">${esc(thesisText())}</div>
+    <div class="btnrow"><button class="btn" data-act="tchdocx">下載這位學生的 Word 檔</button></div></section>`)}
+  return head+`<div class="tchstat"><span><b>${n}</b> 位學生</span><span>平均已寫 <b>${avg('drafts')}</b> / ${ALLMODS.length} 段</span><span>平均完成 <b>${avg('done')}</b> 個單元</span>
+   <span class="legend"><i class="done"></i>已完成 <i class="draft"></i>草稿已寫 <i class="run"></i>進行中 <i></i>未開始</span></div>
+  <div class="tchwrap"><table class="tch"><thead><tr><th>學生</th><th>草稿</th><th>完成</th><th>待處理</th><th>存檔時間</th><th><div class="chhead">${chHead}</div></th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div class="btnrow"><button class="btn" data-act="tchcsv">下載總表（Excel 可開）</button><button class="btn" data-act="tchclear">清空</button></div>
+  ${detail||'<p class="note">點學生姓名，可以看他每個單元的狀態、口試前檢查和論文初稿全文。</p>'}`}
+function tchCSV(){const q=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const hd=['學生','論文題目','已寫草稿','完成單元','待處理','存檔時間'].concat(ALLMODS.map(m=>m.id));
+  const L=[hd.map(q).join(',')].concat(TCH.map(x=>{const s=x.sum;return [s.name,s.title,s.drafts,s.done,s.warn,fmtTime(s.saved)].concat(s.cells.map(c=>c[1])).map(q).join(',')}));
+  const d=new Date(),p=n=>String(n).padStart(2,'0');
+  return saveFile(`class-progress_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.csv`,'﻿'+L.join('\r\n'),'text/csv')}
+document.addEventListener('change',e=>{const t=e.target;if(t.id==='tchfile'&&t.files&&t.files.length){const fs=[...t.files];t.value='';tchLoad(fs)}});
+document.addEventListener('dragover',e=>{const z=e.target.closest&&e.target.closest('#tchdrop');if(z){e.preventDefault();z.classList.add('over')}});
+document.addEventListener('dragleave',e=>{const z=e.target.closest&&e.target.closest('#tchdrop');if(z)z.classList.remove('over')});
+document.addEventListener('drop',e=>{const z=e.target.closest&&e.target.closest('#tchdrop');if(!z)return;e.preventDefault();z.classList.remove('over');const fs=[...(e.dataTransfer.files||[])];if(fs.length)tchLoad(fs)});
 /* ---------- 存檔：先用 Claude 下載，不行就用瀏覽器下載 ---------- */
 async function saveFile(name,data,type){
   if(dlNS){try{await dlNS.save({filename:name,data});return true}catch(err){if(err&&err.code==='declined')return false}}
@@ -2234,6 +2305,13 @@ document.addEventListener('click',async e=>{
   if(act==='read')return go({n:'read',c:+t.dataset.c});
   if(act==='prompts')return go({n:'prompts'});
   if(act==='progdl')return progDownload();
+  if(act==='teacher')return go({n:'teacher'});
+  if(act==='tchsel'){const i=+t.dataset.i;tchSel=tchSel===i?null:i;render();const d=document.getElementById('tchdetail');if(d)d.scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(act==='tchcsv')return tchCSV();
+  if(act==='tchclear'){TCH=[];tchSel=null;return render()}
+  if(act==='tchdocx'){const st=TCH[tchSel];if(!st)return;if(!window.docx)return toast('Word 產生器尚未載入，請稍後再試');
+    try{const [doc,name]=withStudent(st,()=>[buildThesisDocx(window.docx),`${st.sum.name}_${g('1.0','title')||'論文初稿'}.docx`]);const blob=await window.docx.Packer.toBlob(doc);if(await saveFile(name,blob))toast('已存檔')}
+    catch(err){console.error(err);toast('下載失敗：'+(err.message||''))}return}
   if(act==='progno'){progPending=null;return refreshProgBox()}
   if(act==='progok'){const o=progPending;progPending=null;if(!o)return;
     S=Object.assign({judge:{},order:{},tpl:{},checks:{},ai:{},refs:[],mx:[],crit:{},pw:{},cho:{},ap:{}},o.S);save();
