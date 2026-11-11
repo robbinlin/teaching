@@ -185,6 +185,10 @@ textarea{min-height:84px;resize:vertical}
 .toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));max-width:calc(100% - 32px);
   background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;z-index:20}
 .note{font-size:13px;color:var(--muted)}
+.progwho{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;flex:1 1 100%;order:3}
+.progwho label{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--muted)}
+.progwho input{width:110px;min-height:32px;padding:4px 8px;font-size:14px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.fchip small{color:inherit;opacity:.7;font-family:var(--mono)}
 .tchlink{text-align:right;margin:10px 0 0;font-size:13px}.tchlink .link{color:var(--muted)}
 .dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:2px dashed var(--line);border-radius:10px;padding:26px 16px;text-align:center;cursor:pointer;background:var(--surface);margin:8px 0 18px}
 .dropzone b{color:var(--accent);font-size:16px}.dropzone span{font-size:13px;color:var(--muted)}.dropzone.over{border-color:var(--accent);background:var(--paper)}
@@ -317,7 +321,9 @@ const P=s=>/[。！？＿]$/.test(s)?s:s+'。';
 const KEY='rm-course-v1';
 let S={judge:{},order:{},tpl:{},checks:{},ai:{},refs:[],mx:[],crit:{},pw:{},cho:{},ap:{}};
 try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const termOf=d=>{d=new Date(d);if(isNaN(d))d=new Date();const y=d.getFullYear(),m=d.getMonth()+1;return `${(m>=8?y:y-1)-1911}${m>=8||m===1?1:2}`};
+const termLabel=t=>t&&t.length>=4?`${t.slice(0,-1)} 學年度第${t.slice(-1)==='1'?'一':'二'}學期`:'';
+const save=()=>{try{if(!S.term&&Object.values(S.tpl||{}).some(o=>Object.values(o||{}).some(v=>v&&String(v).trim())))S.term=termOf(Date.now());localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 
 /* ---------- 第一章教材 ---------- */
 const MODS=[
@@ -1457,7 +1463,7 @@ function thesisHTML(){
   <p class="lede">題目、摘要、五章與參考文獻依論文順序合成。尚未完成的單元會標示（尚未完成）。</p></div>
   <section class="step"><header><span class="mono">封面資料</span><h3>下載 Word 論文檔</h3></header>
     <p class="note">填好封面資料，下載的 Word 檔會有封面、摘要、目錄、五章與參考文獻。目錄在 Word 開啟時會提示更新；若沒有，在目錄上按右鍵選「更新功能變數」。</p>
-    ${[['school','學校'],['dept','系所'],['degree','學位論文'],['student','研究生'],['advisor','指導教授'],['date','年月（例：中華民國 115 年 6 月）']].map(([k,l])=>`<div class="field"><label for="meta-${k}">${l}</label><input type="text" id="meta-${k}" data-meta="${k}" value="${esc(META[k])}"></div>`).join('')}
+    ${[['school','學校'],['dept','系所'],['degree','學位論文'],['student','研究生'],['sid','學號（交進度檔用，不會印在論文上）'],['advisor','指導教授'],['date','年月（例：中華民國 115 年 6 月）']].map(([k,l])=>`<div class="field"><label for="meta-${k}">${l}</label><input type="text" id="meta-${k}" data-meta="${k}" value="${esc(META[k])}"></div>`).join('')}
     <div class="btnrow"><button class="btn pri" data-act="docx">下載 Word 論文檔（.docx）</button><button class="btn" data-act="copyt">複製全文</button><button class="btn" data-act="dlt">下載 Markdown</button></div></section>
   ${progHTML()}
   ${consHTML()}
@@ -1473,13 +1479,15 @@ const fmtTime=t=>{try{const d=new Date(t);return `${d.getFullYear()}/${d.getMont
 function progHTML(){const le=S.lastExport;
   if(progPending)return `<section class="step" id="progbox"><div class="tip"><b>要載入的進度檔：</b>${esc(progPending.META&&progPending.META.student||'未填姓名')}，已寫 ${draftsIn(progPending.S)} / ${ALLMODS.length} 段草稿，存於 ${esc(fmtTime(progPending.savedAt))}。<br>載入後會<b>取代</b>這台裝置目前的進度（目前已寫 ${allDrafts()} 段）。</div>
     <div class="btnrow"><button class="btn pri" data-act="progok">確定載入</button><button class="btn" data-act="progno">取消</button></div></section>`;
-  return `<div class="progstrip" id="progbox"><p><b>換電腦接著寫</b>　作答只存在這台瀏覽器，換電腦前先下載進度檔。${le?`<span class="note">上次下載 ${esc(fmtTime(le))}</span>`:''}</p>
+  const who=`<span class="progwho"><label>姓名<input type="text" data-meta="student" value="${esc(META.student||'')}" autocomplete="name"></label><label>學號<input type="text" data-meta="sid" value="${esc(META.sid||'')}" inputmode="text" autocomplete="off"></label>${S.term?`<span class="note">${esc(S.term)} 學期</span>`:''}</span>`;
+  return `<div class="progstrip" id="progbox"><p><b>換電腦接著寫</b>　作答只存在這台瀏覽器，換電腦前先下載進度檔；交給老師前請填姓名與學號。${le?`<span class="note">上次下載 ${esc(fmtTime(le))}</span>`:''}</p>${who}
    <div class="pbtns"><button class="btn sm" data-act="progdl">下載進度檔</button><label class="btn sm filebtn">載入<input type="file" accept=".json,application/json" id="progfile" hidden></label></div></div>`}
 function refreshProgBox(){const b=document.getElementById('progbox');if(!b)return;const t=document.createElement('div');t.innerHTML=progHTML();b.replaceWith(t.firstElementChild)}
 async function progDownload(){const d=new Date(),p=n=>String(n).padStart(2,'0');
-  const name=`research-methods-progress_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.json`;
+  if(!S.term)S.term=termOf(d);const sid=String(META.sid||'').replace(/[^A-Za-z0-9]/g,'');
+  const name=`research-methods-progress_${S.term}_${sid||'nosid'}_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.json`;
   const data=JSON.stringify({app:'rm-course',v:1,savedAt:d.toISOString(),S,META},null,1);
-  if(await saveFile(name,data,'application/json')){S.lastExport=d.toISOString();save();refreshProgBox();toast('已下載進度檔')}}
+  if(await saveFile(name,data,'application/json')){S.lastExport=d.toISOString();save();refreshProgBox();toast(sid&&String(META.student||'').trim()?'已下載進度檔':'已下載進度檔。提醒：還沒填姓名或學號，老師會分不出是誰的檔案')}}
 document.addEventListener('change',async e=>{const t=e.target;if(t.id!=='progfile'||!t.files||!t.files[0])return;
   const f=t.files[0];t.value='';
   try{const o=JSON.parse(await f.text());
@@ -1488,28 +1496,31 @@ document.addEventListener('change',async e=>{const t=e.target;if(t.id!=='progfil
   catch(err){toast('這不是本課程的進度檔，請選擇檔名開頭為 research-methods-progress 的 .json 檔')}});
 
 /* ---------- 教師檢視：一次讀入多份進度檔（只在記憶體，不寫入本機進度） ---------- */
-let TCH=[],tchSel=null;
+let TCH=[],tchSel=null,tchTerm='all';
 const S0=()=>({judge:{},order:{},tpl:{},checks:{},ai:{},refs:[],mx:[],crit:{},pw:{},cho:{},ap:{}});
-function withStudent(st,fn){const bS=S,bM=META;S=Object.assign(S0(),st.S);META=Object.assign({},bM,st.META||{});try{return fn()}finally{S=bS;META=bM}}
-function tchSummary(st){return withStudent(st,()=>{const ck=checksHTML();
-  return {name:(META.student||'').trim()||st.file.replace(/\.json$/,''),saved:st.savedAt,drafts:allDrafts(),done:ALLMODS.filter(m=>steps(m)===3).length,
+const META0=()=>({school:'國立體育大學',dept:'競技與教練科學研究所',degree:'碩士論文',student:'',sid:'',advisor:'',date:''});
+function withStudent(st,fn){const bS=S,bM=META;S=Object.assign(S0(),st.S);META=Object.assign(META0(),st.META||{});try{return fn()}finally{S=bS;META=bM}}
+function tchSummary(st){return withStudent(st,()=>{const ck=checksHTML();const sid=String(META.sid||'').trim(),name=(META.student||'').trim()||st.file.replace(/\.json$/,''),term=S.term||termOf(st.savedAt);
+  return {name,sid,term,key:term+'|'+(sid||name),saved:st.savedAt,drafts:allDrafts(),done:ALLMODS.filter(m=>steps(m)===3).length,
    warn:(ck.match(/chip warn/g)||[]).length,title:g('1.0','title'),cells:ALLMODS.map(m=>[m.id,status(m)[0]]),last:(()=>{const d=ALLMODS.filter(m=>tplAny(m));return d.length?d[d.length-1].id:''})()}})}
 async function tchLoad(files){let ok=0,bad=[];
   for(const f of files){try{const o=JSON.parse(await f.text());if(!o||o.app!=='rm-course'||!o.S)throw 0;
-    o.file=f.name;const s=tchSummary(o);const i=TCH.findIndex(x=>x.sum.name===s.name);
+    o.file=f.name;const s=tchSummary(o);const i=TCH.findIndex(x=>x.sum.key===s.key);
     if(i>=0){if(new Date(o.savedAt)>=new Date(TCH[i].savedAt))TCH[i]=Object.assign(o,{sum:s})}else TCH.push(Object.assign(o,{sum:s}));ok++}
    catch(e){bad.push(f.name)}}
-  TCH.sort((a,b)=>a.sum.name.localeCompare(b.sum.name,'zh-Hant'));render();
+  TCH.sort((a,b)=>b.sum.term.localeCompare(a.sum.term)||(a.sum.sid||a.sum.name).localeCompare(b.sum.sid||b.sum.name,'zh-Hant'));render();
   toast(`讀入 ${ok} 份進度檔${bad.length?`，${bad.length} 份不是本課程的進度檔：${bad.slice(0,3).join('、')}`:''}`)}
 const ST_CLS={'已完成':'done','草稿已寫':'draft','進行中':'run','未開始':''};
-function teacherHTML(){const n=TCH.length;
+function teacherHTML(){const terms=[...new Set(TCH.map(x=>x.sum.term))].sort().reverse();if(tchTerm!=='all'&&!terms.includes(tchTerm))tchTerm='all';
+  const VIS=TCH.map((x,i)=>[x,i]).filter(([x])=>tchTerm==='all'||x.sum.term===tchTerm);const n=VIS.length;
   const head=`<button class="back" data-act="home">← 首頁</button>
   <div class="top"><span class="mono">教師檢視</span><h1>全班進度</h1>
    <p class="lede">把學生交來的進度檔（research-methods-progress_….json）一次全部拖進來，就能看到每個人做到哪裡。檔案只在這個分頁讀取，不會存起來，也不會覆蓋你自己的作答；關掉分頁就清空。</p></div>
-  <label class="dropzone" id="tchdrop"><input type="file" id="tchfile" accept=".json,application/json" multiple hidden><b>選擇或拖進進度檔</b><span>可一次選多份；同一位學生交了好幾份，會自動保留最新的一份。</span></label>`;
-  if(!n)return head;
-  const avg=k=>Math.round(TCH.reduce((s,x)=>s+x.sum[k],0)/n*10)/10;
-  const rows=TCH.map((x,i)=>{const s=x.sum;return `<tr class="${tchSel===i?'sel':''}"><th scope="row"><button class="link" data-act="tchsel" data-i="${i}">${esc(s.name)}</button><span>${esc(s.title||'（尚未定題）')}</span></th>
+  <label class="dropzone" id="tchdrop"><input type="file" id="tchfile" accept=".json,application/json" multiple hidden><b>選擇或拖進進度檔</b><span>可一次選多份；同一位學生（同學期、同學號）交了好幾份，會自動保留最新的一份。不同學期的學生用上方的學期按鈕切換。</span></label>`;
+  if(!TCH.length)return head;
+  const chips=terms.length>1?`<div class="chips" role="group" aria-label="依學期篩選">${[['all','全部']].concat(terms.map(t=>[t,t+' 學期'])).map(([k,l])=>`<button class="fchip ${tchTerm===k?'on':''}" data-act="tchterm" data-k="${k}" aria-pressed="${tchTerm===k}">${esc(l)}<small> ${k==='all'?TCH.length:TCH.filter(x=>x.sum.term===k).length}</small></button>`).join('')}</div>`:'';
+  const avg=k=>n?Math.round(VIS.reduce((s,[x])=>s+x.sum[k],0)/n*10)/10:0;
+  const rows=VIS.map(([x,i])=>{const s=x.sum;return `<tr class="${tchSel===i?'sel':''}"><th scope="row"><button class="link" data-act="tchsel" data-i="${i}">${esc(s.name)}</button><span>${esc([s.term+' 學期',s.sid||'未填學號'].join('｜'))}</span><span>${esc(s.title||'（尚未定題）')}</span></th>
    <td class="num">${s.drafts}<small>/${ALLMODS.length}</small></td><td class="num">${s.done}</td><td class="num">${s.warn?`<span class="chip warn">${s.warn}</span>`:'—'}</td><td class="when">${esc(fmtTime(s.saved))}</td>
    <td><div class="cells">${s.cells.map(([id,st])=>`<i class="${ST_CLS[st]}" title="${id} ${st}"></i>`).join('')}</div></td></tr>`}).join('');
   const chHead=CH.map(c=>`<span style="flex:${c.mods.length}">第${NUM[c.n]}章</span>`).join('');
@@ -1520,16 +1531,16 @@ function teacherHTML(){const n=TCH.length;
     ${checksHTML()}
     <h3>論文初稿全文</h3><div class="paper">${esc(thesisText())}</div>
     <div class="btnrow"><button class="btn" data-act="tchdocx">下載這位學生的 Word 檔</button></div></section>`)}
-  return head+`<div class="tchstat"><span><b>${n}</b> 位學生</span><span>平均已寫 <b>${avg('drafts')}</b> / ${ALLMODS.length} 段</span><span>平均完成 <b>${avg('done')}</b> 個單元</span>
+  return head+chips+`<div class="tchstat"><span>${tchTerm==='all'?'':esc(termLabel(tchTerm))+'　'}<b>${n}</b> 位學生</span><span>平均已寫 <b>${avg('drafts')}</b> / ${ALLMODS.length} 段</span><span>平均完成 <b>${avg('done')}</b> 個單元</span>
    <span class="legend"><i class="done"></i>已完成 <i class="draft"></i>草稿已寫 <i class="run"></i>進行中 <i></i>未開始</span></div>
   <div class="tchwrap"><table class="tch"><thead><tr><th>學生</th><th>草稿</th><th>完成</th><th>待處理</th><th>存檔時間</th><th><div class="chhead">${chHead}</div></th></tr></thead><tbody>${rows}</tbody></table></div>
   <div class="btnrow"><button class="btn" data-act="tchcsv">下載總表（Excel 可開）</button><button class="btn" data-act="tchclear">清空</button></div>
   ${detail||'<p class="note">點學生姓名，可以看他每個單元的狀態、口試前檢查和論文初稿全文。</p>'}`}
 function tchCSV(){const q=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
-  const hd=['學生','論文題目','已寫草稿','完成單元','待處理','存檔時間'].concat(ALLMODS.map(m=>m.id));
-  const L=[hd.map(q).join(',')].concat(TCH.map(x=>{const s=x.sum;return [s.name,s.title,s.drafts,s.done,s.warn,fmtTime(s.saved)].concat(s.cells.map(c=>c[1])).map(q).join(',')}));
+  const hd=['學期','學號','學生','論文題目','已寫草稿','完成單元','待處理','存檔時間'].concat(ALLMODS.map(m=>m.id));
+  const L=[hd.map(q).join(',')].concat(TCH.filter(x=>tchTerm==='all'||x.sum.term===tchTerm).map(x=>{const s=x.sum;return [s.term,s.sid,s.name,s.title,s.drafts,s.done,s.warn,fmtTime(s.saved)].concat(s.cells.map(c=>c[1])).map(q).join(',')}));
   const d=new Date(),p=n=>String(n).padStart(2,'0');
-  return saveFile(`class-progress_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.csv`,'﻿'+L.join('\r\n'),'text/csv')}
+  return saveFile(`class-progress_${tchTerm==='all'?'all':tchTerm}_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.csv`,'﻿'+L.join('\r\n'),'text/csv')}
 document.addEventListener('change',e=>{const t=e.target;if(t.id==='tchfile'&&t.files&&t.files.length){const fs=[...t.files];t.value='';tchLoad(fs)}});
 document.addEventListener('dragover',e=>{const z=e.target.closest&&e.target.closest('#tchdrop');if(z){e.preventDefault();z.classList.add('over')}});
 document.addEventListener('dragleave',e=>{const z=e.target.closest&&e.target.closest('#tchdrop');if(z)z.classList.remove('over')});
@@ -1542,7 +1553,7 @@ async function saveFile(name,data,type){
   catch(e){toast('這個畫面無法下載，請按「複製全文」後貼到 Word');return false}}
 /* ---------- 論文 Word 檔 ---------- */
 const META_KEY='rm-course-meta-v1';
-let META={school:'國立體育大學',dept:'競技與教練科學研究所',degree:'碩士論文',student:'',advisor:'',date:''};
+let META={school:'國立體育大學',dept:'競技與教練科學研究所',degree:'碩士論文',student:'',sid:'',advisor:'',date:''};
 try{const r=localStorage.getItem(META_KEY);if(r)META=Object.assign(META,JSON.parse(r))}catch(e){}
 const saveMeta=()=>{try{localStorage.setItem(META_KEY,JSON.stringify(META))}catch(e){}};
 function thesisParts(){
@@ -2308,6 +2319,7 @@ document.addEventListener('click',async e=>{
   if(act==='teacher')return go({n:'teacher'});
   if(act==='tchsel'){const i=+t.dataset.i;tchSel=tchSel===i?null:i;render();const d=document.getElementById('tchdetail');if(d)d.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(act==='tchcsv')return tchCSV();
+  if(act==='tchterm'){tchTerm=t.dataset.k;tchSel=null;return render()}
   if(act==='tchclear'){TCH=[];tchSel=null;return render()}
   if(act==='tchdocx'){const st=TCH[tchSel];if(!st)return;if(!window.docx)return toast('Word 產生器尚未載入，請稍後再試');
     try{const [doc,name]=withStudent(st,()=>[buildThesisDocx(window.docx),`${st.sum.name}_${g('1.0','title')||'論文初稿'}.docx`]);const blob=await window.docx.Packer.toBlob(doc);if(await saveFile(name,blob))toast('已存檔')}
