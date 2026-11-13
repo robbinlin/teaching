@@ -1,0 +1,23 @@
+/* ===== episode flow: watch one, play one ===== */
+.epflow{display:grid;gap:40px;margin-top:4px}
+.ep{position:relative;padding-left:60px}
+.ep::before{content:"";position:absolute;left:19px;top:48px;bottom:-40px;width:2px;background:var(--line)}
+.ep:last-child::before{bottom:0}
+.ep-badge{position:absolute;left:0;top:0;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:15px;font-weight:600;background:var(--surface);color:var(--accent);border:2px solid var(--accent);transition:background .3s,color .3s,border-color .3s}
+.ep.watched .ep-badge{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+.ep-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:40px;margin-bottom:12px}
+.ep-head .label{color:var(--accent)}
+.ep-head h3{font-family:var(--display);font-size:20px;margin:0}
+.ep-state{font-size:12px;border-radius:20px;padding:2px 10px;border:1px solid var(--line);color:var(--muted)}
+.ep.watched .ep-state{border-color:var(--ok);color:var(--ok)}
+.ep .video{flex-direction:row}
+.ep .video .thumb{flex:0 0 min(42%,400px);align-self:flex-start}
+.ep-go{display:flex;align-items:center;gap:10px;margin:22px 0 16px;font-size:14px;color:var(--muted)}
+.ep-go::before{content:"";width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:var(--soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230B7A80' stroke-width='2.4'%3E%3Cpath d='M12 5v14M6 13l6 6 6-6'/%3E%3C/svg%3E") center/14px no-repeat}
+.ep-go b{color:var(--ink);font-weight:600}
+.ep-concepts{display:grid;gap:28px}
+@media (max-width:860px){
+ .ep{padding-left:0}.ep::before{display:none}
+ .ep-badge{position:static;flex:0 0 auto;width:34px;height:34px;font-size:14px}
+ .ep .video{flex-direction:column}.ep .video .thumb{flex:none;width:100%}
+}
