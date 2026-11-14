@@ -1,0 +1,79 @@
+<div class="band">
+  <div class="wrap top">
+    <div class="brand"><span class="brand-mark">Real World Data</span><span><strong>真實世界運動大數據分析</strong><small>國立體育大學・林彥光 老師</small></span></div>
+    <div class="meter" aria-live="polite"><span>本週進度</span><span class="meter-track"><span class="meter-fill" id="meterFill"></span></span><b id="meterPct">0%</b></div>
+  </div>
+  <div class="wrap"><nav class="chapnav" id="chapnav" aria-label="課程週次"></nav></div>
+  <div class="wrap hero">
+    <div>
+      <span class="label" id="hEyebrow"></span>
+      <h1 id="hTitle"></h1>
+      <p id="hLede"></p>
+      <div class="facts" id="hFacts"></div>
+    </div>
+    <ul aria-label="學習目標" id="hObj"></ul>
+  </div>
+</div>
+
+<div class="stagebar"><nav class="wrap stages" aria-label="本週學習階段" id="stageNav"></nav></div>
+
+<main class="wrap">
+<section class="stage" data-stage="learn" aria-labelledby="h-learn">
+  <div class="stage-head"><span class="label">步驟 1</span><h2 id="h-learn">概念與互動工具</h2><p>每個概念先讀左邊的說明，再動手操作右邊的工具，照「動手試」的提示做一次，看數字怎麼變。</p></div>
+  <div class="videos" id="videos"></div>
+  <div id="concepts" style="display:grid;gap:28px"></div>
+  <div class="example"><span class="label">帶著例子理解</span><p id="exampleText"></p></div>
+  <div class="pager"><span></span><a class="btn primary" href="#slides" data-learndone>下一步：投影片 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<section class="stage" data-stage="slides" aria-labelledby="h-slides" hidden>
+  <div class="stage-head"><span class="label">步驟 2</span><h2 id="h-slides">課程投影片</h2><p id="slidesNote"></p></div>
+  <div class="viewer">
+    <div class="slide-frame"><img id="slideImg" alt="" src="slides/s-01.jpg"></div>
+    <div class="slide-nav">
+      <span class="count" id="slideCount"></span>
+      <button class="btn" id="slidePrev" aria-label="上一張"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>上一張</button>
+      <button class="btn" id="slideNext" aria-label="下一張">下一張<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+    <div class="strip" id="slideStrip" aria-label="投影片縮圖"></div>
+    <div class="dl-row" id="slideDl"></div>
+  </div>
+  <div class="pager"><a class="btn" href="#learn">上一步：概念與工具</a><a class="btn primary" href="#spss" id="toSpss">下一步 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<section class="stage" data-stage="spss" aria-labelledby="h-spss" hidden>
+  <div class="stage-head"><span class="label">步驟 3</span><h2 id="h-spss"></h2><p id="spssLede"></p></div>
+  <div class="panel" id="filesPanel">
+    <div class="widget-title"><h3>本週資料</h3><span id="zipBtn"></span></div>
+    <p class="note" style="margin:4px 0 12px" id="filesNote"></p>
+    <div class="files" id="files"></div>
+  </div>
+  <div class="guide-layout">
+    <nav class="toc" id="toc" aria-label="指南章節"></nav>
+    <div id="guide"></div>
+  </div>
+  <div class="pager"><a class="btn" href="#slides">上一步：投影片</a><a class="btn primary" href="#quiz">下一步：自我檢測 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<section class="stage" data-stage="quiz" aria-labelledby="h-quiz" hidden>
+  <div class="stage-head"><span class="label">步驟 4</span><h2 id="h-quiz">自我檢測</h2><p>選完立刻知道對錯和理由，可以重選。題目取自本週講義與課程資料的實際數字。</p></div>
+  <div class="panel score"><div><span class="label">目前答對</span><div><b id="quizScore">0</b> <span class="mono" id="quizTotal"></span></div></div><p class="status-line" id="quizStatus" style="margin:0"></p></div>
+  <div class="qlist" id="quiz"></div>
+  <div class="panel">
+    <h3>思考題（不計分）</h3>
+    <p style="margin:0 0 10px" id="thinkP"></p>
+    <textarea id="thinkText" aria-label="思考題作答" placeholder="寫下你的判斷…"></textarea>
+    <div style="margin-top:10px"><button class="btn" id="thinkBtn" aria-expanded="false" aria-controls="thinkRef">查看參考答案與自我檢核</button></div>
+    <div class="ref" id="thinkRef" hidden style="margin-top:12px"></div>
+  </div>
+  <div class="pager"><a class="btn" href="#spss" id="backSpss">上一步</a><a class="btn primary" href="#homework">下一步：課後作業 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<section class="stage" data-stage="homework" aria-labelledby="h-hw" hidden>
+  <div class="stage-head"><span class="label" id="hwSource"></span><h2 id="h-hw"></h2><p>選擇題與數值題可立即核對。文字題先寫下自己的做法，再展開參考項目對照。這裡的作答只存在這台裝置的瀏覽器，不會傳給老師；正式的驗證紀錄請依老師指定方式繳交。</p></div>
+  <div class="qlist" id="hw"></div>
+  <div class="panel score"><div><span class="label">作業狀態</span><div class="status-line" id="hwStatus"></div></div><span class="confirm" id="hwClear"><button class="btn" id="hwClearBtn">清除我的作答</button></span></div>
+  <div class="pager"><a class="btn" href="#quiz">上一步：自我檢測</a><span id="nextCh"></span></div>
+</section>
+</main>
+<footer><div class="wrap" id="footText"></div></footer>

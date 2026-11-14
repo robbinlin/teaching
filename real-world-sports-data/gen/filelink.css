@@ -1,0 +1,4 @@
+.dl-file{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:.92em;color:var(--accent);background:var(--soft);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:6px;padding:1px 7px;margin:0 2px;text-decoration:none;white-space:nowrap;vertical-align:baseline;transition:background .15s,color .15s}
+.dl-file:hover{background:var(--accent);color:var(--accent-ink)}
+.dl-file svg{width:13px;height:13px;flex:0 0 auto}
+.dl-file.dl-btn{font-family:var(--body);font-size:13px;padding:4px 10px;margin:6px 0 0;width:max-content}

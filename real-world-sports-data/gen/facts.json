@@ -1,0 +1,453 @@
+{
+ "n_total": 37822,
+ "file": "survey4.sas7bdat（108 學年度學生運動參與情形調查，課程既有衍生檔）",
+ "county_urban": [
+  {
+   "county": 1,
+   "n": 3925,
+   "urban": 1
+  },
+  {
+   "county": 2,
+   "n": 4053,
+   "urban": null
+  },
+  {
+   "county": 3,
+   "n": 4075,
+   "urban": 3
+  },
+  {
+   "county": 4,
+   "n": 2404,
+   "urban": 3
+  },
+  {
+   "county": 5,
+   "n": 3006,
+   "urban": 3
+  },
+  {
+   "county": 6,
+   "n": 1105,
+   "urban": 5
+  },
+  {
+   "county": 7,
+   "n": 2580,
+   "urban": 3
+  },
+  {
+   "county": 8,
+   "n": 1223,
+   "urban": 4
+  },
+  {
+   "county": 9,
+   "n": 1130,
+   "urban": 4
+  },
+  {
+   "county": 10,
+   "n": 1469,
+   "urban": 3
+  },
+  {
+   "county": 11,
+   "n": 1091,
+   "urban": 5
+  },
+  {
+   "county": 12,
+   "n": 1323,
+   "urban": 4
+  },
+  {
+   "county": 13,
+   "n": 1271,
+   "urban": 4
+  },
+  {
+   "county": 14,
+   "n": 1412,
+   "urban": 4
+  },
+  {
+   "county": 15,
+   "n": 977,
+   "urban": 6
+  },
+  {
+   "county": 16,
+   "n": 1103,
+   "urban": 6
+  },
+  {
+   "county": 17,
+   "n": 947,
+   "urban": 3
+  },
+  {
+   "county": 18,
+   "n": 1214,
+   "urban": 2
+  },
+  {
+   "county": 19,
+   "n": 1196,
+   "urban": 2
+  },
+  {
+   "county": 20,
+   "n": 1190,
+   "urban": 2
+  },
+  {
+   "county": 21,
+   "n": 787,
+   "urban": 3
+  },
+  {
+   "county": 22,
+   "n": 339,
+   "urban": 4
+  }
+ ],
+ "urban_missing_n": 4055,
+ "county2_n": 4053,
+ "b9_2_missing": 3953,
+ "b9_1a_minus1": 980,
+ "weight_missing": 574,
+ "regular_all": {
+  "n": 37822,
+  "k": 19386,
+  "pct": 51.3
+ },
+ "regular_complete": {
+  "n": 33499,
+  "k": 19386,
+  "pct": 57.9
+ },
+ "by_urban_all": [
+  {
+   "urban": 1,
+   "n": 3925,
+   "k": 1845,
+   "pct": 47.0
+  },
+  {
+   "urban": 2,
+   "n": 3600,
+   "k": 1847,
+   "pct": 51.3
+  },
+  {
+   "urban": 3,
+   "n": 15268,
+   "k": 7968,
+   "pct": 52.2
+  },
+  {
+   "urban": 4,
+   "n": 6698,
+   "k": 3643,
+   "pct": 54.4
+  },
+  {
+   "urban": 5,
+   "n": 2196,
+   "k": 1147,
+   "pct": 52.2
+  },
+  {
+   "urban": 6,
+   "n": 2080,
+   "k": 1138,
+   "pct": 54.7
+  }
+ ],
+ "by_urban_complete": [
+  {
+   "urban": 1,
+   "n": 3465,
+   "k": 1845,
+   "pct": 53.2
+  },
+  {
+   "urban": 2,
+   "n": 3187,
+   "k": 1847,
+   "pct": 58.0
+  },
+  {
+   "urban": 3,
+   "n": 13542,
+   "k": 7968,
+   "pct": 58.8
+  },
+  {
+   "urban": 4,
+   "n": 5986,
+   "k": 3643,
+   "pct": 60.9
+  },
+  {
+   "urban": 5,
+   "n": 1895,
+   "k": 1147,
+   "pct": 60.5
+  },
+  {
+   "urban": 6,
+   "n": 1799,
+   "k": 1138,
+   "pct": 63.3
+  }
+ ],
+ "decision_grid": [
+  {
+   "def": "days",
+   "miss": "keep",
+   "den": "all",
+   "wt": "none",
+   "n": 37822,
+   "pct": 81.0
+  },
+  {
+   "def": "days",
+   "miss": "keep",
+   "den": "all",
+   "wt": "weight",
+   "n": 37248,
+   "pct": 81.9
+  },
+  {
+   "def": "days",
+   "miss": "keep",
+   "den": "complete",
+   "wt": "none",
+   "n": 37822,
+   "pct": 81.0
+  },
+  {
+   "def": "days",
+   "miss": "keep",
+   "den": "complete",
+   "wt": "weight",
+   "n": 37248,
+   "pct": 81.9
+  },
+  {
+   "def": "days",
+   "miss": "na",
+   "den": "all",
+   "wt": "none",
+   "n": 37822,
+   "pct": 81.0
+  },
+  {
+   "def": "days",
+   "miss": "na",
+   "den": "all",
+   "wt": "weight",
+   "n": 37248,
+   "pct": 81.9
+  },
+  {
+   "def": "days",
+   "miss": "na",
+   "den": "complete",
+   "wt": "none",
+   "n": 36842,
+   "pct": 83.2
+  },
+  {
+   "def": "days",
+   "miss": "na",
+   "den": "complete",
+   "wt": "weight",
+   "n": 36660,
+   "pct": 83.2
+  },
+  {
+   "def": "days_sweat",
+   "miss": "keep",
+   "den": "all",
+   "wt": "none",
+   "n": 37822,
+   "pct": 51.3
+  },
+  {
+   "def": "days_sweat",
+   "miss": "keep",
+   "den": "all",
+   "wt": "weight",
+   "n": 37248,
+   "pct": 51.4
+  },
+  {
+   "def": "days_sweat",
+   "miss": "keep",
+   "den": "complete",
+   "wt": "none",
+   "n": 33869,
+   "pct": 57.2
+  },
+  {
+   "def": "days_sweat",
+   "miss": "keep",
+   "den": "complete",
+   "wt": "weight",
+   "n": 33710,
+   "pct": 56.9
+  },
+  {
+   "def": "days_sweat",
+   "miss": "na",
+   "den": "all",
+   "wt": "none",
+   "n": 37822,
+   "pct": 51.3
+  },
+  {
+   "def": "days_sweat",
+   "miss": "na",
+   "den": "all",
+   "wt": "weight",
+   "n": 37248,
+   "pct": 51.4
+  },
+  {
+   "def": "days_sweat",
+   "miss": "na",
+   "den": "complete",
+   "wt": "none",
+   "n": 33499,
+   "pct": 57.9
+  },
+  {
+   "def": "days_sweat",
+   "miss": "na",
+   "den": "complete",
+   "wt": "weight",
+   "n": 33353,
+   "pct": 57.5
+  }
+ ],
+ "b13_21_by_regular": [
+  {
+   "var": "b13",
+   "n1": 18776,
+   "n0": 17247,
+   "m1": 2.64,
+   "m0": 2.47,
+   "diff": 0.17,
+   "d": 0.1,
+   "p_lt_001": true
+  },
+  {
+   "var": "b14",
+   "n1": 19168,
+   "n0": 17700,
+   "m1": 3.56,
+   "m0": 3.33,
+   "diff": 0.23,
+   "d": 0.25,
+   "p_lt_001": true
+  },
+  {
+   "var": "b15",
+   "n1": 19148,
+   "n0": 17623,
+   "m1": 3.93,
+   "m0": 3.62,
+   "diff": 0.31,
+   "d": 0.36,
+   "p_lt_001": true
+  },
+  {
+   "var": "b16",
+   "n1": 18937,
+   "n0": 17523,
+   "m1": 3.99,
+   "m0": 3.77,
+   "diff": 0.22,
+   "d": 0.28,
+   "p_lt_001": true
+  },
+  {
+   "var": "b17",
+   "n1": 19043,
+   "n0": 17501,
+   "m1": 3.6,
+   "m0": 3.33,
+   "diff": 0.27,
+   "d": 0.3,
+   "p_lt_001": true
+  },
+  {
+   "var": "b18",
+   "n1": 19001,
+   "n0": 17509,
+   "m1": 3.69,
+   "m0": 3.5,
+   "diff": 0.19,
+   "d": 0.23,
+   "p_lt_001": true
+  },
+  {
+   "var": "b19",
+   "n1": 19033,
+   "n0": 17526,
+   "m1": 3.69,
+   "m0": 3.5,
+   "diff": 0.2,
+   "d": 0.22,
+   "p_lt_001": true
+  },
+  {
+   "var": "b20",
+   "n1": 19068,
+   "n0": 17536,
+   "m1": 3.23,
+   "m0": 3.04,
+   "diff": 0.19,
+   "d": 0.19,
+   "p_lt_001": true
+  },
+  {
+   "var": "b21",
+   "n1": 19034,
+   "n0": 17515,
+   "m1": 3.58,
+   "m0": 3.44,
+   "diff": 0.15,
+   "d": 0.18,
+   "p_lt_001": true
+  }
+ ],
+ "chisq_urban_regular": {
+  "chi2": 61.5,
+  "df": 5,
+  "p_lt_001": true
+ },
+ "a1": {
+  "1": 19026,
+  "2": 17996,
+  "missing": 800
+ },
+ "by_a1": [
+  {
+   "a1": 1,
+   "n": 19026,
+   "pct": 54.8
+  },
+  {
+   "a1": 2,
+   "n": 17996,
+   "pct": 49.0
+  }
+ ],
+ "schools": 4,
+ "note": "regular 為檔案內既有變項，等同 b9_1a>=3 且 b9_2=1，遺漏者記為 0；與 SRDA example v2.sas 寫的 b9_1a>=4 不同。b9_1a、a1 等選項文字未對照編碼簿。"
+}

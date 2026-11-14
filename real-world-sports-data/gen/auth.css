@@ -1,0 +1,21 @@
+/* ===== account widget ===== */
+.acct{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--band-muted)}
+.wrap.top .acct{margin-left:auto}
+.wrap.top .meter{margin-left:0}
+.intro-top .acct{margin-left:16px}
+.acct-in{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:13px;font-weight:500;padding:7px 12px;border-radius:8px;border:1px solid rgba(232,241,238,.35);background:rgba(255,255,255,.06);color:var(--band-ink);cursor:pointer;transition:background .2s,border-color .2s}
+.acct-in:hover{background:rgba(255,255,255,.12);border-color:var(--band-ink)}
+.acct-in svg{width:16px;height:16px;flex:0 0 auto;background:#fff;border-radius:50%;padding:1px}
+.acct-user{display:inline-flex;align-items:center;gap:7px;color:var(--band-ink)}
+.acct-user img{width:24px;height:24px;border-radius:50%;object-fit:cover}
+.acct-name{max-width:14ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct-sync{font-family:var(--mono);font-size:12px}
+.acct-out{font:inherit;font-size:12px;background:none;border:0;color:var(--band-muted);text-decoration:underline;cursor:pointer;padding:2px}
+.acct-out:hover{color:var(--band-ink)}
+.acct-teacher{font-size:12px;color:#04201F;background:#F0A24A;border-radius:20px;padding:2px 10px;text-decoration:none!important;font-weight:600}
+.acct-wait{opacity:.5}
+.my-prog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:10px 0 0}
+.my-prog .mp-bar{width:120px;height:6px;border-radius:3px;background:var(--soft);overflow:hidden;display:inline-block}
+.my-prog .mp-bar span{display:block;height:100%;background:var(--accent)}
+.my-prog b{font-family:var(--mono);font-weight:500;color:var(--accent)}
+@media (max-width:900px){.intro-top .acct{margin-left:auto}.acct-name{display:none}.acct-sync{display:none}}
