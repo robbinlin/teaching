@@ -168,8 +168,8 @@ const RW6E1 = (() => {
       txt('第一條路徑', 960, 345, 28, { color: COL.blue, p: prog(lt, 3.6, .5) }); txt('第二條路徑', 960, 600, 28, { color: COL.green, p: prog(lt, 4.5, .5) });
     });
     stick(300, GY, 1.2, { glasses: true, la: waveArm(RLT), bob: idle(RLT) * .4 });
-    stick(1560, GY, 1.05, { hair: 'pony', ra: [-Math.PI * .3, -Math.PI * .5 + Math.sin(RLT * 5 + 1) * .25], bob: idle(RLT, 1) * .4 });
-    stick(1740, GY, .8, { hair: 'tuft', la: waveArm(RLT + 2), bob: -Math.abs(Math.sin(RLT * 6)) * 14 });
+    stick(500, GY, 1.05, { hair: 'pony', ra: [-Math.PI * .3, -Math.PI * .5 + Math.sin(RLT * 5 + 1) * .25], bob: idle(RLT, 1) * .4 });
+    stick(680, GY, .8, { hair: 'tuft', la: waveArm(RLT + 2), bob: -Math.abs(Math.sin(RLT * 6)) * 14 });
   } };
 
   const order = [[s1, 36], [s2, 19], [s3, 32], [s4, 34], [s5, 30], [s6, 22], [s7, 10]];
