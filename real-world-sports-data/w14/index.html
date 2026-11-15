@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>真實世界運動大數據分析 第 14 週</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+/* Layout: one chapter, five stages as tabs under a sticky bar; each stage is one focused page with prev/next. Paper ground, deep-teal ink, two analytic marks (teal = mean, amber = median). */
+:root{
+  --bg:#F5F4EE; --surface:#FFFFFF; --ink:#152826; --muted:#566865; --line:#D8DCD4;
+  --accent:#0B7A80; --accent-ink:#FFFFFF; --amber:#B4530A; --soft:#E7EEEB;
+  --ok:#1E7B45; --bad:#B42318; --band:#163533; --band-ink:#E8F1EE; --band-muted:#9FBDB7;
+  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1716; --surface:#152220; --ink:#E4ECE9; --muted:#9AAEA9; --line:#2B3B38;
+  --accent:#45C1C6; --accent-ink:#04201F; --amber:#F0A24A; --soft:#1B2C2A;
+  --ok:#5BC98A; --bad:#F2877D; --band:#0A2321; --band-ink:#DDEBE7; --band-muted:#86A8A2; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1716; --surface:#152220; --ink:#E4ECE9; --muted:#9AAEA9; --line:#2B3B38;
+  --accent:#45C1C6; --accent-ink:#04201F; --amber:#F0A24A; --soft:#1B2C2A;
+  --ok:#5BC98A; --bad:#F2877D; --band:#0A2321; --band-ink:#DDEBE7; --band-muted:#86A8A2; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
+.hero>*,.top>*,.concept>*,.guide-layout>*{min-width:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--band)}
+a{color:var(--accent)}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* top band */
+.band{background:var(--band);color:var(--band-ink)}
+.top{display:flex;align-items:center;gap:16px;padding-block:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand-mark{font-family:var(--mono);font-size:12px;border:1px solid var(--band-muted);padding:4px 6px;letter-spacing:.06em}
+.brand strong{display:block;font-size:15px;line-height:1.2}
+.brand small{display:block;font-size:12px;color:var(--band-muted)}
+.meter{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--band-muted)}
+.meter-track{width:140px;height:6px;background:rgba(255,255,255,.14);border-radius:3px;overflow:hidden}
+.meter-fill{height:100%;background:var(--band-ink);width:0;transition:width .3s ease}
+.meter b{color:var(--band-ink);font-family:var(--mono);font-weight:500}
+.hero{padding-block:28px 34px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:32px;align-items:end}
+.hero .label{color:var(--band-muted)}
+.hero h1{font-family:var(--display);font-size:clamp(28px,4.4vw,44px);line-height:1.2;margin:8px 0 10px;font-weight:700}
+.hero p{margin:0;color:var(--band-muted);max-width:56ch}
+.hero ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:14px}
+.hero li{display:flex;gap:10px;align-items:baseline;border-top:1px solid rgba(255,255,255,.12);padding-top:8px}
+.hero li span{font-family:var(--mono);font-size:12px;color:var(--band-muted)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:16px;font-size:13px;color:var(--band-muted)}
+.facts b{color:var(--band-ink);font-family:var(--mono);font-weight:500}
+
+/* stage bar */
+.stagebar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.stages{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-block:8px}
+.stages::-webkit-scrollbar{display:none}
+.stage-tab{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1px solid transparent;background:none;padding:8px 12px;border-radius:8px;font-size:15px;color:var(--muted);transition:background .2s,color .2s}
+.stage-tab:hover{background:var(--soft);color:var(--ink)}
+.stage-tab[aria-current="page"]{background:var(--surface);border-color:var(--line);color:var(--ink);font-weight:700}
+.stage-tab .n{font-family:var(--mono);font-size:12px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line)}
+.stage-tab.done .n{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+
+main{padding-block:28px 64px}
+.stage{display:grid;gap:28px}
+.stage[hidden]{display:none}
+.stage-head h2{font-family:var(--display);font-size:clamp(24px,3.2vw,32px);line-height:1.25;margin-top:4px}
+.stage-head p{margin:8px 0 0;color:var(--muted);max-width:65ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.panel h3{font-size:18px;margin-bottom:6px}
+.prose{max-width:68ch}
+.prose p{margin:0 0 10px}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:10px 16px;font-weight:500;border:1px solid var(--line);background:var(--surface);transition:background .2s,border-color .2s,transform .2s}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+.btn svg{width:16px;height:16px;flex:0 0 auto}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:20px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:7px 12px;font-size:14px;color:var(--muted);transition:background .2s,color .2s}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.controls label{font-size:14px;color:var(--muted);display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:var(--accent)}
+
+/* videos */
+.videos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.video{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.video .thumb{position:relative;display:block;aspect-ratio:16/9;max-width:100%;background:var(--soft)}
+.video .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.video .play{position:absolute;inset:auto 12px 12px auto;width:44px;height:44px;border-radius:50%;background:rgba(10,20,20,.78);display:grid;place-items:center;transition:transform .2s}
+.video .thumb:hover .play{transform:translateY(-2px)}
+.video .play svg{width:18px;height:18px;fill:#fff;margin-left:3px}
+.video .seen{position:absolute;left:10px;top:10px;font-size:12px;background:var(--ok);color:var(--bg);padding:2px 8px;border-radius:20px}
+.video .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.video h3{font-size:16px;line-height:1.4}
+.video p{margin:0;font-size:14px;color:var(--muted)}
+.chips{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:2px}
+.chips a{display:grid;grid-template-columns:44px 1fr;gap:8px;text-decoration:none;color:var(--ink);font-size:13px;padding:4px 6px;border-radius:6px;transition:background .2s}
+.chips a:hover{background:var(--soft)}
+.chips .t{font-family:var(--mono);color:var(--accent)}
+.note{font-size:13px;color:var(--muted)}
+
+/* concepts */
+.concept{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:24px;align-items:start}
+.concept-text .num{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.06em}
+.concept-text h3{font-family:var(--display);font-size:22px;margin:4px 0 8px}
+.concept-text p{margin:0 0 10px;color:var(--ink)}
+.concept-text .tip{font-size:14px;color:var(--muted);border-left:2px solid var(--line);padding-left:12px}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;min-width:0}
+.widget-title{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.widget-title strong{font-size:15px}
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:300px}
+.chart text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+.chart .axis{stroke:var(--line)}
+.chart .grid{stroke:var(--line);stroke-dasharray:2 4}
+.chart .bar{fill:var(--accent);opacity:.28}
+.chart .bar:hover{opacity:.45}
+.chart .mean{stroke:var(--accent);stroke-width:2;stroke-dasharray:6 4}
+.chart .median{stroke:var(--amber);stroke-width:2}
+.chart .meanlab{fill:var(--accent);font-weight:500}
+.chart .medlab{fill:var(--amber);font-weight:500}
+.chart .box{fill:var(--soft);stroke:var(--ink);stroke-width:1.2}
+.chart .whisk{stroke:var(--ink);stroke-width:1.2}
+.chart .out{fill:var(--surface);stroke:var(--ink);stroke-width:1.2;cursor:pointer}
+.chart .out.ext{fill:var(--ink)}
+.chart .out:hover,.chart .out.sel{stroke:var(--amber);stroke-width:2.5}
+.chart .grp{fill:var(--ink);font-size:12px}
+.chart .dot{fill:var(--ink);cursor:grab;transition:fill .15s}
+.chart .dot:hover,.chart .dot.active{fill:var(--amber)}
+.chart .iqr{fill:var(--amber);opacity:.12}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px}
+.stat{border-top:1px solid var(--line);padding-top:6px}
+.stat span{display:block;font-size:12px;color:var(--muted)}
+.stat b{font-family:var(--mono);font-weight:500;font-size:16px;font-variant-numeric:tabular-nums}
+.stat.mean b{color:var(--accent)} .stat.med b{color:var(--amber)}
+.readout{font-size:14px;background:var(--soft);border-radius:8px;padding:10px 12px;margin:0}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:500;color:var(--muted);font-size:13px}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+th.n{text-align:right}
+.example{background:var(--band);color:var(--band-ink);border-radius:var(--r);padding:20px 22px;display:grid;gap:6px}
+.example .label{color:var(--band-muted)}
+.example p{margin:0;max-width:70ch}
+
+/* slides */
+.viewer{display:grid;gap:12px}
+.slide-frame{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;aspect-ratio:16/9;max-width:100%}
+.slide-frame img{width:100%;height:100%;object-fit:contain;display:block}
+.slide-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.slide-nav .count{font-family:var(--mono);font-size:14px;margin-right:auto}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.strip button{flex:0 0 auto;width:112px;border:2px solid transparent;border-radius:6px;padding:0;background:var(--surface);overflow:hidden;opacity:.7;transition:opacity .2s,border-color .2s}
+.strip button img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.strip button[aria-current="true"]{border-color:var(--accent);opacity:1}
+.strip button:hover{opacity:1}
+.dl-row{display:flex;flex-wrap:wrap;gap:10px}
+
+/* spss */
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.file{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface)}
+.file .ext{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:2px 5px;color:var(--muted);flex:0 0 auto;margin-top:2px}
+.file div{min-width:0;flex:1}
+.file strong{display:block;font-size:14px;font-weight:500;line-height:1.45}
+.file small{display:block;font-size:12px;color:var(--muted);word-break:break-all}
+.file button{margin-top:6px;border:0;background:none;color:var(--accent);padding:0;font-size:13px;font-weight:500}
+.file .inzip{margin-top:6px;font-size:12px;color:var(--muted)}
+.guide-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;align-items:start}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);display:grid;gap:2px;font-size:14px}
+.toc a{display:flex;gap:8px;text-decoration:none;color:var(--muted);padding:6px 8px;border-radius:6px;transition:background .2s,color .2s}
+.toc a:hover{background:var(--soft);color:var(--ink)}
+.toc a.done{color:var(--ok)}
+.toc a .ck{width:14px;flex:0 0 auto}
+.sec{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);margin-bottom:12px;scroll-margin-top:80px}
+.sec>summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;gap:12px;align-items:center;font-weight:700;font-size:17px}
+.sec>summary::-webkit-details-marker{display:none}
+.sec>summary .chev{margin-left:auto;transition:transform .2s;width:18px;height:18px;flex:0 0 auto}
+.sec[open]>summary .chev{transform:rotate(180deg)}
+.sec>summary .badge{font-size:12px;font-weight:500;color:var(--ok);font-family:var(--mono)}
+.sec-body{padding:0 18px 18px;border-top:1px solid var(--line)}
+.sec-body h3{font-size:17px;margin:22px 0 8px}
+.sec-body h4{font-size:15px;margin:18px 0 6px;color:var(--accent)}
+.sec-body p,.sec-body li{max-width:72ch}
+.sec-body p{margin:0 0 10px}
+.sec-body ol,.sec-body ul{margin:0 0 10px;padding-left:22px}
+.sec-body code{font-family:var(--mono);font-size:.88em;background:var(--soft);padding:1px 5px;border-radius:4px}
+.code{position:relative;background:var(--band);color:var(--band-ink);border-radius:8px;padding:14px 16px;margin:6px 0 12px;overflow-x:auto}
+.code pre{margin:0;font-family:var(--mono);font-size:13px;line-height:1.6}
+.code button{position:absolute;right:8px;top:8px;font-size:12px;border:1px solid var(--band-muted);background:none;color:var(--band-ink);border-radius:6px;padding:2px 8px}
+figure{margin:8px 0 16px}
+figure img{display:block;max-width:100%;height:auto;border:1px solid var(--line);border-radius:6px;cursor:zoom-in;background:var(--soft)}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.borrowed{font-size:12px;color:var(--amber);margin:0 0 6px}
+.sec-done{display:flex;justify-content:flex-end;margin-top:12px}
+.slideref{border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;background:var(--soft);padding:12px 14px;margin:6px 0 14px;display:grid;gap:8px}
+.slideref .label{color:var(--amber)}
+.slideref p{margin:0;font-size:14px}
+.slideref .pics{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.slideref figure{margin:0}
+.slideref img{border-radius:4px}
+.slideref figcaption{display:flex;justify-content:space-between;gap:8px}
+.slideref figcaption a{font-size:13px}
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(5,12,12,.86);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lightbox img{max-width:100%;max-height:85vh;border-radius:6px;background:#fff}
+.lightbox p{color:#e8f1ee;font-size:14px;margin:10px 0 0;text-align:center}
+.lightbox button{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:calc(env(safe-area-inset-right,0px) + 12px);background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:8px;padding:8px 12px}
+
+/* quiz & homework */
+.qlist{display:grid;gap:14px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:10px}
+.q legend,.q .prompt{font-weight:500;font-size:16px;padding:0;display:flex;gap:10px}
+.q .qn{font-family:var(--mono);font-size:13px;color:var(--accent);flex:0 0 auto;padding-top:2px}
+fieldset.q{margin:0;min-width:0}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:9px 12px;cursor:pointer;transition:border-color .2s,background .2s}
+.opt:hover{border-color:var(--accent)}
+.opt input{margin-top:5px;accent-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,transparent)}
+.fb{border-radius:8px;padding:10px 12px;font-size:14px;margin:0}
+.fb.ok{background:color-mix(in srgb,var(--ok) 12%,transparent)}
+.fb.no{background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.fb b{display:block;margin-bottom:2px}
+.fb.ok b{color:var(--ok)} .fb.no b{color:var(--bad)}
+.numrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.numrow input{font:inherit;font-family:var(--mono);width:160px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{font:inherit;width:100%;min-height:120px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+textarea:focus,.numrow input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.ref{border-left:3px solid var(--accent);background:var(--soft);border-radius:0 8px 8px 0;padding:12px 14px;font-size:14px}
+.ref h4{font-size:14px;margin-bottom:6px;color:var(--accent)}
+.ref p{margin:0 0 6px}
+.ref table{font-size:13px;background:var(--surface)}
+.score{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.score b{font-family:var(--mono);font-size:28px;font-weight:500}
+.status-line{font-size:13px;color:var(--muted)}
+.confirm{display:inline-flex;gap:8px;align-items:center;font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:60;max-width:calc(100% - 32px)}
+footer{border-top:1px solid var(--line);padding-block:20px 32px;font-size:13px;color:var(--muted)}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;gap:20px}
+  .videos{grid-template-columns:1fr}
+  .concept{grid-template-columns:1fr}
+  .guide-layout{grid-template-columns:1fr}
+  .toc{position:static;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .meter-track{width:90px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.chapnav{display:flex;gap:4px;flex-wrap:wrap;align-items:center;padding-bottom:4px}
+.chapnav a,.chapnav span{font-family:var(--mono);font-size:12px;text-decoration:none;color:var(--band-muted);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:3px 7px;transition:color .2s,border-color .2s}
+.chapnav a:hover{color:var(--band-ink);border-color:var(--band-muted)}
+.chapnav .cur{color:var(--band);background:var(--band-ink);border-color:var(--band-ink)}
+.chapnav .home{font-family:var(--body);font-size:13px}
+.concept.solo{grid-template-columns:minmax(0,1fr)}
+.concept.solo .concept-text{max-width:68ch}
+.ct{border-collapse:separate;border-spacing:0;font-size:14px;width:auto;min-width:100%}
+.ct th,.ct td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:right;white-space:nowrap}
+.ct th:first-child,.ct td:first-child{text-align:left}
+.ct td.cell{cursor:pointer;font-family:var(--mono);transition:background .2s}
+.ct td.cell:hover{background:var(--soft)}
+.ct td.num,.ct td.tot{font-family:var(--mono)}
+.ct .hl-num{background:color-mix(in srgb,var(--accent) 22%,transparent);font-weight:700}
+.ct .hl-den{background:color-mix(in srgb,var(--amber) 16%,transparent)}
+.ct input{width:72px;font:inherit;font-family:var(--mono);text-align:right;padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.ct .exp{display:block;font-size:11px;color:var(--muted)}
+.ct .exp.low{color:var(--bad);font-weight:700}
+.frac{font-family:var(--mono);font-size:18px}
+.frac b{color:var(--accent);font-weight:500}
+.frac i{font-style:normal;color:var(--amber)}
+.slider-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 18px}
+.slider-row label{display:grid;gap:2px;font-size:13px;color:var(--muted)}
+.slider-row label span{display:flex;justify-content:space-between}
+.slider-row label b{font-family:var(--mono);font-weight:500;color:var(--ink)}
+.slider-row input[type=range]{width:100%}
+.chart .area-p{fill:var(--accent);opacity:.35}
+.chart .area-r{fill:var(--amber);opacity:.18}
+.chart .curve{fill:none;stroke:var(--ink);stroke-width:1.6}
+.chart .curve2{fill:none;stroke:var(--amber);stroke-width:1.6}
+.chart .curve3{fill:none;stroke:var(--accent);stroke-width:1.6}
+.chart .zline{stroke:var(--ink);stroke-width:2}
+.chart .bar2{fill:var(--amber);opacity:.55}
+.chart .bar.sel,.chart .bar.ext{opacity:.8}
+.chart .bar2.sel{opacity:.95}
+.chart .ci-hit{stroke:var(--accent);stroke-width:1.6}
+.chart .ci-miss{stroke:var(--amber);stroke-width:2.4}
+.chart .ptA{fill:var(--accent)}
+.chart .ptB{fill:var(--amber)}
+.chart .ptN{fill:var(--ink);opacity:.55}
+.chart .fit{stroke:var(--ink);stroke-width:2}
+.chart .fitA{stroke:var(--accent);stroke-width:2}
+.chart .fitB{stroke:var(--amber);stroke-width:2}
+.chart .drag{cursor:grab}
+.decision{font-weight:700}
+.decision.rej{color:var(--accent)} .decision.keep{color:var(--amber)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.num-in{width:96px;font:inherit;font-variant-numeric:tabular-nums;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.num-in:focus{outline:2px solid var(--accent);outline-offset:1px}
+.in-row{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:10px 0}
+.in-row label{display:flex;align-items:center;gap:8px}
+.in-row .btn{padding:5px 10px;font-size:13px}
+.area-q{fill:var(--amber);opacity:.4}
+
+/* ---- 18-week nav ---- */
+.chapnav{flex-wrap:wrap;row-gap:6px}
+/* ---- home ---- */
+.home-hero h1{font-size:clamp(28px,4.4vw,46px);line-height:1.3}
+.home-main{padding-block:36px 56px;display:grid;gap:52px}
+.home-sec{display:grid;gap:18px}
+.flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);counter-reset:fl}
+.flow li{padding:16px 16px 18px;border-left:1px solid var(--line);counter-increment:fl;display:grid;gap:4px;align-content:start}
+.flow li:first-child{border-left:0}
+.flow li::before{content:counter(fl);font-family:var(--mono);font-size:12px;color:var(--muted)}
+.flow b{font-size:16px}
+.flow span{font-size:14px;color:var(--muted);line-height:1.6}
+.unit{display:grid;grid-template-columns:150px 1fr;gap:8px 24px;padding:18px 0;border-top:1px solid var(--line)}
+.unit h3{font-family:var(--display);font-size:20px;padding-top:10px}
+.wks{display:grid;gap:0}
+.wk{display:grid;grid-template-columns:52px 1fr auto 48px;gap:12px;align-items:baseline;padding:10px 12px;border-radius:8px;text-decoration:none;color:var(--ink)}
+.wk:hover{background:var(--soft)}
+.wk .wn{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.wk .wt{font-weight:500}
+.wk .wm{font-size:13px;color:var(--muted)}
+.wk .wp{font-family:var(--mono);font-size:13px;color:var(--accent);text-align:right}
+.wk.done .wn{color:var(--ok)}
+@media (max-width:760px){
+  .flow{grid-template-columns:1fr}
+  .flow li{border-left:0;border-top:1px solid var(--line)}
+  .flow li:first-child{border-top:0}
+  .unit{grid-template-columns:1fr}
+  .unit h3{padding-top:0}
+  .wk{grid-template-columns:44px 1fr 40px;padding-inline:4px}
+  .wk .wm{display:none}
+}
+</style>
+<div class="band">
+  <div class="wrap top">
+    <div class="brand"><span class="brand-mark">Real World Data</span><span><strong>真實世界運動大數據分析</strong><small>國立體育大學・林彥光 老師</small></span></div>
+    <div class="meter" aria-live="polite"><span>本週進度</span><span class="meter-track"><span class="meter-fill" id="meterFill"></span></span><b id="meterPct">0%</b></div>
+  </div>
+  <div class="wrap"><nav class="chapnav" id="chapnav" aria-label="課程週次"></nav></div>
+  <div class="wrap hero">
+    <div>
+      <span class="label" id="hEyebrow"></span>
+      <h1 id="hTitle"></h1>
+      <p id="hLede"></p>
+      <div class="facts" id="hFacts"></div>
+    </div>
+    <ul aria-label="學習目標" id="hObj"></ul>
+  </div>
+</div>
+
+<div class="stagebar"><nav class="wrap stages" aria-label="本週學習階段" id="stageNav"></nav></div>
+
+<main class="wrap">
+<section class="stage" data-stage="learn" aria-labelledby="h-learn">
+  <div class="stage-head"><span class="label">步驟 1</span><h2 id="h-learn">概念與互動工具</h2><p>每個概念先讀左邊的說明，再動手操作右邊的工具，照「動手試」的提示做一次，看數字怎麼變。</p></div>
+  <div class="videos" id="videos"></div>
+  <div id="concepts" style="display:grid;gap:28px"></div>
+  <div class="example"><span class="label">帶著例子理解</span><p id="exampleText"></p></div>
+  <div class="pager"><span></span><a class="btn primary" href="#slides" data-learndone>下一步：投影片 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<section class="stage" data-stage="slides" aria-labelledby="h-slides" hidden>
+  <div class="stage-head"><span class="label">步驟 2</span><h2 id="h-slides">課程投影片</h2><p id="slidesNote"></p></div>
+  <div class="viewer">
+    <div class="slide-frame"><img id="slideImg" alt="" src="slides/s-01.jpg"></div>
+    <div class="slide-nav">
+      <span class="count" id="slideCount"></span>
+      <button class="btn" id="slidePrev" aria-label="上一張"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>上一張</button>
+      <button class="btn" id="slideNext" aria-label="下一張">下一張<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+    <div class="strip" id="slideStrip" aria-label="投影片縮圖"></div>
+    <div class="dl-row" id="slideDl"></div>
+  </div>
+  <div class="pager"><a class="btn" href="#learn">上一步：概念與工具</a><a class="btn primary" href="#spss" id="toSpss">下一步 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<section class="stage" data-stage="spss" aria-labelledby="h-spss" hidden>
+  <div class="stage-head"><span class="label">步驟 3</span><h2 id="h-spss"></h2><p id="spssLede"></p></div>
+  <div class="panel" id="filesPanel">
+    <div class="widget-title"><h3>本週資料</h3><span id="zipBtn"></span></div>
+    <p class="note" style="margin:4px 0 12px" id="filesNote"></p>
+    <div class="files" id="files"></div>
+  </div>
+  <div class="guide-layout">
+    <nav class="toc" id="toc" aria-label="指南章節"></nav>
+    <div id="guide"></div>
+  </div>
+  <div class="pager"><a class="btn" href="#slides">上一步：投影片</a><a class="btn primary" href="#quiz">下一步：自我檢測 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<section class="stage" data-stage="quiz" aria-labelledby="h-quiz" hidden>
+  <div class="stage-head"><span class="label">步驟 4</span><h2 id="h-quiz">自我檢測</h2><p>選完立刻知道對錯和理由，可以重選。題目取自本週講義與課程資料的實際數字。</p></div>
+  <div class="panel score"><div><span class="label">目前答對</span><div><b id="quizScore">0</b> <span class="mono" id="quizTotal"></span></div></div><p class="status-line" id="quizStatus" style="margin:0"></p></div>
+  <div class="qlist" id="quiz"></div>
+  <div class="panel">
+    <h3>思考題（不計分）</h3>
+    <p style="margin:0 0 10px" id="thinkP"></p>
+    <textarea id="thinkText" aria-label="思考題作答" placeholder="寫下你的判斷…"></textarea>
+    <div style="margin-top:10px"><button class="btn" id="thinkBtn" aria-expanded="false" aria-controls="thinkRef">查看參考答案與自我檢核</button></div>
+    <div class="ref" id="thinkRef" hidden style="margin-top:12px"></div>
+  </div>
+  <div class="pager"><a class="btn" href="#spss" id="backSpss">上一步</a><a class="btn primary" href="#homework">下一步：課後作業 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</section>
+
+<section class="stage" data-stage="homework" aria-labelledby="h-hw" hidden>
+  <div class="stage-head"><span class="label" id="hwSource"></span><h2 id="h-hw"></h2><p>選擇題與數值題可立即核對。文字題先寫下自己的做法，再展開參考項目對照。這裡的作答只存在這台裝置的瀏覽器，不會傳給老師；正式的驗證紀錄請依老師指定方式繳交。</p></div>
+  <div class="qlist" id="hw"></div>
+  <div class="panel score"><div><span class="label">作業狀態</span><div class="status-line" id="hwStatus"></div></div><span class="confirm" id="hwClear"><button class="btn" id="hwClearBtn">清除我的作答</button></span></div>
+  <div class="pager"><a class="btn" href="#quiz">上一步：自我檢測</a><span id="nextCh"></span></div>
+</section>
+</main>
+<footer><div class="wrap" id="footText"></div></footer>
+
+<script type="application/json" id="chData">{"id": 14, "title": "因果推論（二）：傾向分數", "eyebrow": "W14 / 18 · 因果", "lede": "這一頁用一份 600 人的模擬資料，讓你親手調整卡尺、切換配對與加權，看平衡診斷與估計值怎麼跟著變。接著對照講義的六個步驟與 R 程式骨架，把「社團參與和規律運動」做一次配對與一次加權。", "objectives": ["說明傾向分數如何把多個混淆因子的平衡問題變成一個分數的平衡問題，以及它無法處理什麼。", "分別以配對與加權調整，並用標準化平均差、Love plot 與傾向分數分布圖報告平衡。", "說清楚配對與加權各自估計的對象，以及配對後被捨棄了多少人。"], "videos": [], "concepts": [{"title": "傾向分數把多個變項壓成一個分數", "text": "傾向分數是給定一個人的特徵之後，他接受處理的機率。十幾個混淆因子無法逐一配對，但傾向分數相同的兩個人，這些因子的分布平均而言相同。它只能平衡放進模型的變項；沒測到的混淆因子，它無能為力。放哪些變項由第 13 週畫的 DAG 決定。", "tip": "傾向分數模型的變項依 DAG 事先決定。依 p 值或逐步法挑變項、把中介或結果的後果放進去，都是講義列出的常見錯誤。"}, {"title": "設計與分析分離", "text": "傾向分數方法可以在完全不看結果變項的情況下，先把兩組調整到平衡，平衡達成之後才打開結果。這樣就不可能為了得到想要的結果而反覆修改模型。請 AI 執行時，明確要求分成兩個階段，第一階段的程式不得讀取結果變項。", "tip": "檢查 AI 交回的第一階段程式：整段不應該出現結果變項的名稱。講義的程式骨架中，`regular` 到階段二才出現。"}, {"title": "配對與加權回答不同的問題", "text": "配對替每位處理組的人找一位傾向分數最接近的對照，超過卡尺就不配，配不到的人被捨棄；估計的是處理組的平均效果。加權不捨棄任何人，依傾向分數給每個人權重，估計的是全體的平均效果；傾向分數接近 0 或 1 的人權重極大。兩者結果不同，未必是哪一個錯了。", "tip": "在右邊的工具先看「未調整」：估計值 2.53，真值是 1.00。切到「1:1 配對」，卡尺 0.20 時配成 179 對、捨棄 62 位處理組，估計值 1.29；把卡尺拉到 0.05，剩 159 對、捨棄 82 人，估計值 1.18。再切到「加權 IPTW」：沒有人被捨棄，估計值 1.12，但最大權重是 24.6。"}, {"title": "用標準化平均差檢查平衡", "text": "標準化平均差是兩組平均的差除以合併標準差，一般以小於 0.1 為可接受。不用 p 值的原因是它隨樣本數變動：配對後樣本變小，p 值自然變大，看起來沒有顯著差異，實際上差異可能沒變。也不要用傾向分數模型的區辨力評估它的好壞，目的是平衡，不是預測誰參加社團。", "tip": "同一個工具裡看「Z 的 SMD」：調整前 1.09。卡尺 0.20 時調整後是 0.12，還沒低於 0.1；卡尺縮到 0.05 降到 0.02。卡尺愈窄，平衡愈好，被捨棄的人也愈多。"}], "widgets": [null, null, "psm", null], "example": "講義的程式骨架分成兩段。階段一用 `matchit()` 以性別、年級、學校類型與都市化層級估計傾向分數，採最近鄰配對、卡尺 0.2，再用 `love.plot()` 與 `bal.plot()` 檢查平衡，整段沒有出現結果變項。階段二才在配對後的資料上以 `regular ~ club` 估計比例差。", "slidesNote": "〈因果推論（二）：傾向分數〉，共 13 張。", "stepRefs": [["1. 傾向分數是什麼", [2], "投影片第 2 張列出定義與「只能平衡放進模型的變項」這個限制。"], ["2. 設計與分析分離", [3], "第 3 張說明先平衡、後看結果的順序。"], ["3. 六個步驟", [4], "第 4 張是六個步驟與各步常見錯誤的對照表。"], ["4. 配對", [5], "第 5 張把配對與加權並列，比較捨棄樣本與估計對象。"], ["6. 平衡診斷", [6], "第 6 張說明標準化平均差與兩張必備的圖。"], ["7. 程式骨架", [7, 8], "第 7 張是階段一（設計），第 8 張是階段二（分析）。"]], "secRefs": [["課堂任務", [11], "第 11 張是課堂任務的四個步驟。"], ["檢核清單", [12], "第 12 張把六項檢查對應到程式中可以看到的位置。"]], "quiz": [{"id": "q1", "p": "傾向分數的定義是什麼？", "o": ["處理對結果的效果大小", "給定一個人的特徵之後，他接受處理的機率", "兩組在結果變項上的標準化差異", "模型預測結果的準確度"], "a": 1, "e": "傾向分數是 e(X) = P(處理 = 1 | X)，描述的是誰比較可能接受處理，與結果無關。"}, {"id": "q2", "p": "配對後要檢查兩組是否平衡，講義建議看哪一個指標？", "o": ["各變項 t 檢定的 p 值", "傾向分數模型的區辨力", "標準化平均差，一般以小於 0.1 為可接受", "配對成功的比例"], "a": 2, "e": "p 值隨樣本數變動，配對後樣本變小，p 值自然變大。標準化平均差不受樣本數影響。"}, {"id": "q3", "p": "一位處理組學生的傾向分數是 0.25。在 IPTW 中，他的權重是多少？", "num": 4, "tol": 0.01, "hint": "處理組的權重是 1 除以傾向分數。", "e": "處理組權重為 1/e = 1/0.25 = 4。"}, {"id": "q4", "p": "1:1 配對並設定卡尺後，有一部分處理組的人配不到對而被捨棄。這對結論的影響是什麼？", "o": ["沒有影響，只是樣本變小", "估計會自動變成全體的平均效果", "平衡一定變差", "結論只適用於配對成功的那群人，必須報告配對前後的人數"], "a": 3, "e": "被捨棄的人不在估計範圍內。講義要求報告原本兩組各多少人、配對後各剩多少人。"}, {"id": "q5", "p": "在本頁的「配對、加權與平衡」工具切到「1:1 配對」，把卡尺設為 0.05。配對成功幾對？", "num": 159, "tol": 0.5, "unit": "對", "hint": "先按「1:1 配對」，再把滑桿拉到最左邊，看「配對成功」。", "e": "卡尺 0.05 時配成 159 對，241 位處理組中有 82 位被捨棄；Z 的 SMD 降到 0.02。"}, {"id": "q6", "p": "請 AI 做傾向分數分析，它把資料中所有變項都放進傾向分數模型。最需要擔心的是什麼？", "o": ["其中可能包含中介或結果的後果，調整它們會扭曲估計", "模型的區辨力會太低", "計算時間太長", "標準化平均差無法計算"], "a": 0, "e": "傾向分數模型的變項應來自 DAG。講義列出 AI 常把中介與結果的後果一併放入。"}, {"id": "q7", "p": "同一份資料，配對得到的估計與加權得到的估計不同。下列哪一個說法正確？", "o": ["其中一個一定算錯了", "應該取兩者的平均", "配對通常估計處理組的平均效果，加權估計全體的平均效果，兩者回答的問題不同", "加權的結果永遠比較可信"], "a": 2, "e": "配對估計 ATT，加權估計 ATE。對象不同，數字不同未必代表有錯。"}, {"id": "q8", "p": "「設計與分析分離」在實作上的意思是什麼？", "o": ["由兩個不同的人分別寫程式", "先看結果是否顯著，再決定要不要配對", "把資料隨機分成兩半", "在不讀取結果變項的情況下完成平衡調整，平衡達成後才估計效果"], "a": 3, "e": "先完成設計階段，就不可能為了得到想要的結果而反覆修改傾向分數模型。"}], "think": {"p": "King 與 Nielsen（2019）批評傾向分數配對：為了追求更好的平衡而持續捨棄樣本，可能反而增加不平衡與對模型的依賴。如果你的配對在卡尺 0.2 時 SMD 還有 0.12，你會怎麼做？", "answer": ["講義給的實務回應有三點：設定卡尺後就不再反覆修剪；同時報告加權的結果；考慮直接在共變項上配對的方法。", "重點在於卡尺是事先決定的。看到 SMD 不滿意就一再縮小卡尺，等於在設計階段走岔路，每縮一次也改變了結論適用的對象。"], "check": ["你的回答有沒有提到被捨棄的人數與結論適用的對象？", "你有沒有另一種調整方法的結果可以並列？", "卡尺是在看到平衡結果之前還是之後決定的？"]}, "hw": {"title": "把配對與加權的結果整理成報告段落", "source": "第 14 週 · 本週無驗證紀錄", "questions": [{"id": "h1", "type": "long", "p": "把課堂任務的產出整理成一段可以放進期末專案的「方法與平衡診斷」文字：以社團參與和規律運動為例，寫出你的配對與加權各做了什麼、平衡如何、估計對象是誰。", "ref": "<h4>應包含的項目<\/h4><ul><li>傾向分數模型放了哪些變項，以及它們來自第 13 週的 DAG。<\/li><li>配對方法與卡尺；配對前兩組各多少人，配對後各剩多少人。<\/li><li>各變項調整前後的標準化平均差，附 Love plot；是否都低於 0.1。<\/li><li>傾向分數分布的重疊情形；加權時權重的最大值與分布，是否截尾。<\/li><li>配對估計的是處理組的平均效果，加權估計的是全體的平均效果。<\/li><li>配對、加權與第 10 週迴歸調整三個比例差並列，說明差異從哪裡來。<\/li><\/ul><p>數值以你自己的輸出為準。這一段不寫效果的因果解讀，未測混淆留到第 15 週處理。<\/p>"}, {"id": "h2", "type": "single", "p": "加權後發現少數幾個人的權重極大。講義建議怎麼處理？", "o": ["把這些人刪除，不必說明", "改用 p 值檢查平衡", "檢查權重的分布，必要時截尾，並報告截尾前後的結果", "把所有人的權重設為 1"], "a": 2, "e": "極端權重讓少數人主導結果。講義要求檢查權重分布；截尾時兩種結果都要報告。"}, {"id": "h3", "type": "multi", "p": "下列哪些是講義列出的、AI 在傾向分數分析中常犯的錯？（複選）", "o": ["把中介與結果的後果放進傾向分數模型", "用 t 檢定與 p 值報告平衡", "配對後沒有報告捨棄了多少人", "使用最近鄰配對"], "a": [0, 1, 2], "e": "前三項都在講義第 9 小節。最近鄰配對本身是標準做法。"}]}, "slidesN": 13, "deckName": "RWD_W14", "guide": "# 第 14 週　因果推論（二）：傾向分數\n\n## 本週要回答的問題\n\n要比較的兩組在十幾個特徵上都不一樣。怎麼把它們調整到可比，又怎麼證明調整成功了？\n\n## 講授重點\n\n### 1. 傾向分數是什麼\n\n傾向分數是給定一個人的特徵之後，他接受處理的機率：e(X) = P(處理 = 1 | X)。\n\n它的用處是降維。十幾個混淆因子無法逐一配對，但傾向分數相同的兩個人，這些因子的分布平均而言相同。把多個變項的平衡問題，變成一個分數的平衡問題。\n\n傾向分數只能平衡放進模型的變項。沒測到的混淆因子，它無能為力。第 13 週畫的 DAG 決定了放什麼。\n\n### 2. 設計與分析分離\n\n傾向分數方法的一個優點：在完全不看結果變項的情況下，先把兩組調整到平衡。平衡達成之後才打開結果。這樣就不可能為了得到想要的結果而反覆修改模型。\n\n請 AI 執行時，明確要求分成兩個階段，第一階段的程式不得讀取結果變項。\n\n### 3. 六個步驟\n\n| 步驟 | 做什麼 | 常見錯誤 |\n|---|---|---|\n| 1 資料準備 | 處理遺漏；定義處理與結果 | 完整個案刪掉太多人 |\n| 2 估計傾向分數 | 以處理為結果的邏輯斯迴歸 | 依 p 值或逐步法選變項；放入中介或結果的後果 |\n| 3 配對或加權 | 見下 | 沒有說明估計的對象是誰 |\n| 4 平衡診斷 | 標準化差異、分布重疊 | 用 p 值檢查平衡 |\n| 5 估計效果 | 在配對或加權後的樣本上比較結果 | 標準誤未考慮配對或權重 |\n| 6 敏感度分析 | 未測混淆要多強才能推翻結論 | 省略 |\n\n### 4. 配對\n\n每位處理組的人，找一位傾向分數最接近的對照組的人。\n\n- **卡尺**：兩人傾向分數的差距不得超過某個寬度，常用傾向分數 logit 的 0.2 個標準差（Austin, 2011）。超過就不配對。\n- **代價**：配不到對的人被捨棄。結論只適用於配對成功的那群人。\n- **估計對象**：處理組的平均效果（ATT），也就是「對那些參加社團的學生而言，社團的效果」。\n\n務必報告：原本兩組各多少人，配對後各剩多少人。\n\n### 5. 加權\n\n不捨棄任何人。每個人依傾向分數給一個權重：處理組 1/e，對照組 1/(1−e)。加權後的樣本中，處理與特徵無關。\n\n- **估計對象**：全體的平均效果（ATE），也就是「如果所有學生都參加，相對於都不參加」。\n- **問題**：傾向分數接近 0 或 1 的人權重極大，少數幾個人主導結果。檢查權重的分布；必要時截尾，並報告截尾前後的結果。\n\n配對與加權回答的是不同問題。兩者結果不同，未必是哪一個錯了。\n\n### 6. 平衡診斷\n\n**標準化平均差（SMD）**：兩組平均的差除以合併標準差。一般以小於 0.1 為可接受。\n\n為什麼不用 p 值：p 值隨樣本數變動。配對後樣本變小，p 值自然變大，看起來「沒有顯著差異」，實際上差異可能沒變。SMD 不受樣本數影響。\n\n兩張必備的圖：\n\n- **Love plot**：每個變項調整前後的 SMD。\n- **傾向分數分布圖**：兩組的重疊情形。沒有重疊的區域代表正值性不成立，那些人沒有可比的對象。\n\n也不要用傾向分數模型的區辨力評估它的好壞。目的是平衡，不是預測誰參加社團。\n\n### 7. 程式骨架\n\n```r\nlibrary(MatchIt); library(cobalt); library(marginaleffects)\n\n# 階段一：設計（不使用結果變項）\nm <- matchit(club ~ sex + grade + school_type + urban,\n             data = d, method = \"nearest\",\n             distance = \"glm\", link = \"linear.logit\",\n             caliper = 0.2)\nsummary(m)                         # 配對前後人數與平衡\nlove.plot(m, thresholds = c(m = .1))\nbal.plot(m, var.name = \"distance\", which = \"both\")\n\n# 階段二：分析\nmd  <- match.data(m)\nfit <- glm(regular ~ club, data = md, weights = weights,\n           family = quasibinomial)\navg_comparisons(fit, variables = \"club\",\n                vcov = ~subclass, newdata = subset(md, club == 1))\n```\n\n加權改用 `WeightIt::weightit(..., method = \"glm\", estimand = \"ATE\")`，平衡診斷的函數相同。SAS 對應的程序是 `PROC PSMATCH`。\n\n### 8. 一個需要知道的批評\n\nKing 與 Nielsen（2019）指出，傾向分數配對在追求更好的平衡而持續捨棄樣本時，可能反而增加不平衡與對模型的依賴。實務上的回應：設定卡尺後就不再反覆修剪；同時報告加權的結果；考慮直接在共變項上配對的方法。\n\n### 9. AI 在這一步常犯的錯\n\n- 把資料中所有變項放進傾向分數模型，包含中介與結果的後果。\n- 用 t 檢定與 p 值報告平衡。\n- 配對後沒有報告捨棄了多少人。\n- 把配對後的結果稱為「因果效果」而未提未測混淆。\n\n## 課堂任務（70 分鐘）\n\n沿用第 13 週的 DAG 與調整集，估計社團參與和規律運動的關聯。\n\n1. 階段一：配對。報告配對前後人數、SMD 表、Love plot、傾向分數分布圖（25 分鐘）。\n2. 階段一：加權。報告權重的最大值與分布、加權後的 SMD（15 分鐘）。\n3. 階段二：分別估計比例差與信賴區間（15 分鐘）。\n4. 與第 10 週的迴歸調整結果並列。三個數字相同嗎？差異從哪裡來？（15 分鐘）\n\n## 檢核清單\n\n- [ ] 傾向分數模型的變項來自 DAG\n- [ ] 設計階段沒有使用結果變項\n- [ ] 報告了配對前後的人數\n- [ ] 以 SMD 報告平衡，附 Love plot\n- [ ] 檢查了傾向分數的重疊與權重的極端值\n- [ ] 說明了估計的對象是誰\n\n## 搭配工具\n\nR `MatchIt`、`WeightIt`、`cobalt`、`marginaleffects`；SAS `PROC PSMATCH`；AI 助理。\n\n## 延伸閱讀\n\n- Austin PC. An introduction to propensity score methods for reducing the effects of confounding in observational studies. *Multivariate Behavioral Research*. 2011;46(3):399–424.\n- Ho DE, Imai K, King G, Stuart EA. MatchIt: nonparametric preprocessing for parametric causal inference. *Journal of Statistical Software*. 2011;42(8):1–28.\n- King G, Nielsen R. Why propensity scores should not be used for matching. *Political Analysis*. 2019;27(4):435–454.\n", "guideType": "concept", "files": [], "zip": null, "nav": {"1": "../w01/", "2": "../w02/", "3": "../w03/", "4": "../w04/", "5": "../w05/", "6": "../w06/", "7": "../w07/", "8": "../w08/", "9": "../w09/", "10": "../w10/", "11": "../w11/", "12": "../w12/", "13": "../w13/", "14": "../w14/", "15": "../w15/", "16": "../w16/", "17": "../w17/", "18": "../w18/", "home": "../"}, "static": true}</script>
+<script>(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const NS='http://www.w3.org/2000/svg';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString('zh-TW',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function niceStep(range,target){const raw=range/target;const p=Math.pow(10,Math.floor(Math.log10(raw)));const m=raw/p;return (m<1.5?1:m<3?2:m<7?5:10)*p;}
+const CH=JSON.parse(document.getElementById('chData').textContent);
+const KEY='rwd-w'+CH.id+'-v1';
+let S={videos:{},slidesDone:false,slideMax:1,spss:{},quiz:{},hw:{},hwChecked:{},think:''};
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let toastTimer;
+function toast(msg){let t=$('.toast');if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true},2600);}
+/* ===== stats library ===== */
+const ST=(()=>{
+  function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,tmp=x+5.5;tmp-=(x+0.5)*Math.log(tmp);let ser=1.000000000190015;for(let j=0;j<6;j++)ser+=c[j]/++y;return -tmp+Math.log(2.5066282746310005*ser/x);}
+  function betacf(a,b,x){const MAXIT=300,EPS=3e-14,FPMIN=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FPMIN)d=FPMIN;d=1/d;let h=d;for(let m=1;m<=MAXIT;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FPMIN)d=FPMIN;c=1+aa/c;if(Math.abs(c)<FPMIN)c=FPMIN;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FPMIN)d=FPMIN;c=1+aa/c;if(Math.abs(c)<FPMIN)c=FPMIN;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+  function ibeta(x,a,b){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+  function gammp(a,x){if(x<=0)return 0;if(x<a+1){let ap=a,sum=1/a,del=sum;for(let n=0;n<500;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}let b=x+1-a,c=1e300,d=1/b,h=d;for(let i=1;i<500;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return 1-Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+  const pnorm=z=>z<0?0.5*(1-gammp(0.5,z*z/2)):0.5*(1+gammp(0.5,z*z/2));
+  const dnorm=(x,m=0,s=1)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+  function qnorm(p){const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.3577518672690,-30.66479806614716,2.506628277459239],b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],c=[-7.784894002430293e-3,-0.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],d=[7.784695709041462e-3,0.3224671290700398,2.445134137142996,3.754408661907416];const pl=0.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+  function pt(t,df){const x=df/(df+t*t);const tail=0.5*ibeta(x,df/2,0.5);return t>=0?1-tail:tail;}
+  const dt=(t,df)=>Math.exp(lgamma((df+1)/2)-lgamma(df/2)-0.5*Math.log(df*Math.PI)-(df+1)/2*Math.log(1+t*t/df));
+  function qt(p,df){let lo=-60,hi=60;for(let i=0;i<120;i++){const m=(lo+hi)/2;if(pt(m,df)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+  const pf=(f,d1,d2)=>f<=0?0:ibeta(d1*f/(d1*f+d2),d1/2,d2/2);
+  const pchisq=(x,k)=>gammp(k/2,x/2);
+  const lchoose=(n,k)=>lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);
+  const dbinom=(k,n,p)=>p<=0?(k===0?1:0):p>=1?(k===n?1:0):Math.exp(lchoose(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));
+  const dhyper=(a,r1,r2,c1)=>Math.exp(lchoose(r1,a)+lchoose(r2,c1-a)-lchoose(r1+r2,c1));
+  function rng(seed){let s=seed>>>0;return()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+  function rnorm(r){let u=0,v=0;while(u===0)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+  const sd=a=>{const m=mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1));};
+  function ols(x,y){const mx=mean(x),my=mean(y);let sxy=0,sxx=0,syy=0;for(let i=0;i<x.length;i++){sxy+=(x[i]-mx)*(y[i]-my);sxx+=(x[i]-mx)**2;syy+=(y[i]-my)**2;}const b=sxy/sxx,a=my-b*mx,r=sxy/Math.sqrt(sxx*syy),n=x.length;const sse=syy-b*sxy;const se=Math.sqrt(sse/(n-2)/sxx);const tt=b/se;return{a,b,r,r2:r*r,n,se,t:tt,p:2*(1-pt(Math.abs(tt),n-2))};}
+  function ranks(a){const idx=a.map((v,i)=>[v,i]).sort((p,q)=>p[0]-q[0]);const r=new Array(a.length);for(let i=0;i<idx.length;){let j=i;while(j+1<idx.length&&idx[j+1][0]===idx[i][0])j++;const avg=(i+j)/2+1;for(let k=i;k<=j;k++)r[idx[k][1]]=avg;i=j+1;}return r;}
+  const spearman=(x,y)=>ols(ranks(x),ranks(y)).r;
+  return{lgamma,ibeta,gammp,pnorm,dnorm,qnorm,pt,dt,qt,pf,pchisq,dbinom,dhyper,rng,rnorm,mean,sd,ols,ranks,spearman};
+})();
+
+/* ===== widget helpers ===== */
+const W={};
+const SV=(vb,label)=>`<div class="chart"><svg viewBox="${vb}" role="img" aria-label="${esc(label)}"></svg></div>`;
+function axisX(svg,x,lo,hi,Y,step,fmtf,label,L,R){el('line',{x1:L,x2:R,y1:Y,y2:Y,class:'axis'},svg);for(let t=Math.ceil(lo/step)*step;t<=hi+1e-9;t+=step){el('line',{x1:x(t),x2:x(t),y1:Y,y2:Y+4,class:'axis'},svg);const tx=el('text',{x:x(t),y:Y+17,'text-anchor':'middle'},svg);tx.textContent=fmtf?fmtf(t):(+t.toFixed(6));}if(label){const l=el('text',{x:R,y:Y+32,'text-anchor':'end'},svg);l.textContent=label;}}
+function axisY(svg,y,lo,hi,X,step,fmtf,label,T){for(let t=Math.ceil(lo/step)*step;t<=hi+1e-9;t+=step){el('line',{x1:X,x2:X+560,y1:y(t),y2:y(t),class:'grid'},svg);const tx=el('text',{x:X-6,y:y(t)+4,'text-anchor':'end'},svg);tx.textContent=fmtf?fmtf(t):(+t.toFixed(6));}if(label){const l=el('text',{x:4,y:Math.max(11,T-6),'text-anchor':'start'},svg);l.textContent=label;}}
+function pathOf(pts){return pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');}
+function sliders(defs){return `<div class="slider-row">${defs.map(d=>`<label for="${d.id}"><span>${d.label}<b id="${d.id}-v"></b></span><input type="range" id="${d.id}" min="${d.min}" max="${d.max}" step="${d.step}" value="${d.value}"></label>`).join('')}</div>`;}
+function bindSliders(root,defs,on){defs.forEach(d=>{const i=root.querySelector('#'+d.id);const upd=()=>{root.querySelector('#'+d.id+'-v').textContent=d.fmt?d.fmt(+i.value):i.value;};i.addEventListener('input',()=>{upd();on();});upd();});}
+const val=(root,id)=>+root.querySelector('#'+id).value;
+function segHTML(name,opts,cur){return `<div class="seg" role="group">${opts.map(([v,l])=>`<button type="button" data-${name}="${v}" aria-pressed="${v===cur}">${l}</button>`).join('')}</div>`;}
+function segBind(root,name,on){root.addEventListener('click',e=>{const b=e.target.closest(`[data-${name}]`);if(!b)return;root.querySelectorAll(`[data-${name}]`).forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));on(b.dataset[name]);});}
+function statsHTML(items){return `<div class="stats">${items.map(([l,v,c])=>`<div class="stat ${c||''}"><span>${l}</span><b>${v}</b></div>`).join('')}</div>`;}
+const fp=p=>p<0.001?'< .001':p.toFixed(3).replace(/^0/,'');
+const f2=(x,d=2)=>fmt(x,d);
+function curveArea(svg,x,y,f,a,b,cls,steps=120){if(b<=a)return;const pts=[[x(a),y(0)]];for(let i=0;i<=steps;i++){const t=a+(b-a)*i/steps;pts.push([x(t),y(f(t))]);}pts.push([x(b),y(0)]);el('path',{d:pathOf(pts)+'Z',class:cls},svg);}
+function curve(svg,x,y,f,a,b,cls,steps=200){const pts=[];for(let i=0;i<=steps;i++){const t=a+(b-a)*i/steps;pts.push([x(t),y(f(t))]);}el('path',{d:pathOf(pts),class:cls},svg);}
+
+/* ---------- W14: psm ---------- */
+W.psm=(w)=>{
+  const N=600,TRUE=1.0;
+  const r=ST.rng(20270514);const D=[];
+  for(let i=0;i<N;i++){const z=ST.rnorm(r);const lp=-0.4+1.2*z;const e=1/(1+Math.exp(-lp));const t=r()<e?1:0;const y=2+TRUE*t+1.5*z+ST.rnorm(r);D.push({z,lp,e,t,y});}
+  const T1=D.filter(d=>d.t===1),T0=D.filter(d=>d.t===0);
+  const sdLp=ST.sd(D.map(d=>d.lp));
+  const pooled=Math.sqrt((ST.sd(T1.map(d=>d.z))**2+ST.sd(T0.map(d=>d.z))**2)/2);
+  const smdRaw=(ST.mean(T1.map(d=>d.z))-ST.mean(T0.map(d=>d.z)))/pooled;
+  const rawEst=ST.mean(T1.map(d=>d.y))-ST.mean(T0.map(d=>d.y));
+  const wmean=(a,f,g)=>{let s=0,ws=0;a.forEach(d=>{s+=g(d)*f(d);ws+=g(d);});return s/ws;};
+  const w1=d=>1/d.e,w0=d=>1/(1-d.e);
+  const ipw={est:wmean(T1,d=>d.y,w1)-wmean(T0,d=>d.y,w0),smd:(wmean(T1,d=>d.z,w1)-wmean(T0,d=>d.z,w0))/pooled,max:Math.max(...T1.map(w1),...T0.map(w0))};
+  function match(c){const cal=c*sdLp;const used=new Array(T0.length).fill(false);const pairs=[];
+    T1.slice().sort((a,b)=>b.lp-a.lp).forEach(a=>{let best=-1,bd=Infinity;for(let j=0;j<T0.length;j++){if(used[j])continue;const dd=Math.abs(T0[j].lp-a.lp);if(dd<bd){bd=dd;best=j;}}if(best>=0&&bd<=cal){used[best]=true;pairs.push([a,T0[best]]);}});
+    const a=pairs.map(p=>p[0]),b=pairs.map(p=>p[1]);
+    return{pairs,a,b,est:pairs.length?ST.mean(a.map(d=>d.y))-ST.mean(b.map(d=>d.y)):NaN,smd:pairs.length?(ST.mean(a.map(d=>d.z))-ST.mean(b.map(d=>d.z)))/pooled:NaN};}
+  const defs=[{id:'psmC',label:'卡尺寬度（傾向分數 logit 標準差的倍數）',min:0.05,max:1,step:0.05,value:0.2,fmt:v=>' '+v.toFixed(2)}];
+  let mode='raw';
+  w.innerHTML=`<div class="widget-title"><strong>配對、加權與平衡</strong>${segHTML('psm',[['raw','未調整'],['match','1:1 配對'],['iptw','加權 IPTW']],'raw')}</div>
+  ${sliders(defs)}${SV('0 0 640 280','兩組傾向分數的分布')}<div id="psmS"></div><p class="readout" id="psmM"></p>
+  <p class="note" style="margin:0">模擬資料，${N} 人（處理組 ${T1.length}、對照組 ${T0.length}）。一個混淆因子 Z 同時提高接受處理的機率與結果；處理的真實效果設定為 ${TRUE.toFixed(2)}。為了示範，傾向分數直接用產生資料時的真實機率，省略了估計這一步。</p>`;
+  const svg=w.querySelector('svg');const NB=20;
+  const hist=(arr,wf)=>{const h=new Array(NB).fill(0);arr.forEach(d=>{h[Math.min(NB-1,Math.floor(d.e*NB))]+=wf?wf(d):1;});return h;};
+  const draw=()=>{const c=val(w,'psmC');const m=match(c);svg.innerHTML='';
+    let h1,h0,est,smd,items,msg;
+    if(mode==='raw'){h1=hist(T1);h0=hist(T0);est=rawEst;smd=smdRaw;}
+    if(mode==='match'){h1=hist(m.a);h0=hist(m.b);est=m.est;smd=m.smd;}
+    if(mode==='iptw'){h1=hist(T1,w1);h0=hist(T0,w0);est=ipw.est;smd=ipw.smd;}
+    const L=48,R=608,T=30,B=236,mid=(T+B)/2;const ym=Math.max(...h1,...h0,1);const x=v=>L+v*(R-L),hh=v=>v/ym*(mid-T-4),bw=(R-L)/NB-2;
+    for(let i=0;i<NB;i++){const cx=x((i+0.5)/NB);
+      if(h1[i]>0)el('rect',{x:cx-bw/2,y:mid-hh(h1[i]),width:bw,height:hh(h1[i]),fill:'var(--amber)',opacity:.85},svg);
+      if(h0[i]>0)el('rect',{x:cx-bw/2,y:mid,width:bw,height:hh(h0[i]),fill:'var(--accent)',opacity:.85},svg);}
+    el('line',{x1:L,x2:R,y1:mid,y2:mid,class:'axis'},svg);
+    axisX(svg,x,0,1,B,0.2,v=>v.toFixed(1),'傾向分數',L,R);
+    const t1=el('text',{x:L,y:T-12,fill:'var(--amber)'},svg);t1.textContent='處理組（向上）'+(mode==='iptw'?'，加權後':mode==='match'?'，配對成功者':'');
+    const t0=el('text',{x:R,y:T-12,'text-anchor':'end',fill:'var(--accent)'},svg);t0.textContent='對照組（向下）';
+    const base=[['估計值',Number.isFinite(est)?est.toFixed(2):'—','med'],['真值',TRUE.toFixed(2),'mean'],['Z 的 SMD（調整前）',smdRaw.toFixed(2)],['Z 的 SMD（調整後）',mode==='raw'?'—':Number.isFinite(smd)?smd.toFixed(2):'—']];
+    if(mode==='match')base.push(['配對成功',m.pairs.length+' 對'],['被捨棄的處理組',(T1.length-m.pairs.length)+' 人']);
+    if(mode==='iptw')base.push(['最大權重',ipw.max.toFixed(1)]);
+    w.querySelector('#psmS').innerHTML=statsHTML(base);
+    if(mode==='raw')msg=`直接比較兩組，差異是 ${rawEst.toFixed(2)}，高於真值 ${TRUE.toFixed(2)}。Z 的 SMD 為 ${smdRaw.toFixed(2)}，遠超過 0.1：處理組的 Z 本來就比較高，多出來的差異來自 Z。圖中兩組的傾向分數分布明顯錯開。`;
+    if(mode==='match')msg=`卡尺 ${c.toFixed(2)}：${T1.length} 位處理組中 ${m.pairs.length} 位配對成功，${T1.length-m.pairs.length} 位被捨棄。Z 的 SMD 由 ${smdRaw.toFixed(2)} 降到 ${m.smd.toFixed(2)}${Math.abs(m.smd)<0.1?'，低於 0.1':'，仍高於 0.1'}，估計值 ${m.est.toFixed(2)}。把卡尺往左拉：SMD 變小，被捨棄的人變多，結論只適用於留下來的人。`;
+    if(mode==='iptw')msg=`加權不捨棄任何人。加權後 Z 的 SMD 為 ${ipw.smd.toFixed(2)}，估計值 ${ipw.est.toFixed(2)}。最大權重 ${ipw.max.toFixed(1)}：這一個人在加權後的樣本中代表約 ${Math.round(ipw.max)} 人，傾向分數接近 0 或 1 的人愈多，估計愈不穩。卡尺對加權沒有作用。`;
+    w.querySelector('#psmM').textContent=msg;};
+  segBind(w,'psm',v=>{mode=v;draw();});bindSliders(w,defs,draw);draw();
+};
+/* ---------- hero & nav ---------- */
+const pad2=n=>String(n).padStart(2,'0');
+$('#hEyebrow').textContent=CH.eyebrow;$('#hTitle').textContent=CH.title;$('#hLede').textContent=CH.lede;
+$('#hObj').innerHTML=CH.objectives.map((o,i)=>`<li><span>目標 ${i+1}</span>${esc(o)}</li>`).join('');
+const nImg=(CH.guide.match(/!\[/g)||[]).length;
+const nW=(CH.widgets||[]).filter(Boolean).length;$('#hFacts').innerHTML=[CH.videos.length?[CH.videos.length,'集動畫']:null,nW?[nW,'個互動工具']:null,[CH.slidesN,'張投影片'],[CH.quiz.length,'題自我檢測'],[CH.hw.questions.length,'題作業']].filter(Boolean).map(([n,l])=>`<span><b>${n}</b> ${l}</span>`).join('');
+const NAV=CH.nav||{};
+const TGT=CH.static?'':' target="_blank" rel="noopener"';
+$('#chapnav').innerHTML=(NAV.home?`<a class="home" href="${esc(NAV.home)}"${TGT}>課程首頁</a>`:'')+Array.from({length:18},(_,k)=>k+1).map(i=>i===CH.id?`<span class="cur" aria-current="page">W${pad2(i)}</span>`:NAV[i]?`<a href="${esc(NAV[i])}"${TGT}>W${pad2(i)}</a>`:`<span>W${pad2(i)}</span>`).join('');
+document.title='真實世界運動大數據分析 第 '+CH.id+' 週';
+$('#footText').textContent=`真實世界運動大數據分析專題討論・第 ${CH.id} 週。實際資料的數字由課程資料檔重新計算；標示為模擬的工具使用模擬資料。進度與作答只保存在你目前使用的瀏覽器。`;
+const nxt=CH.id<18&&NAV[CH.id+1];$('#nextCh').innerHTML=nxt?`<a class="btn primary" href="${esc(nxt)}"${TGT}>下一週：第 ${CH.id+1} 週</a>`:'<a class="btn" href="#learn">回到概念與工具</a>';
+
+/* ---------- stages / router ---------- */
+const isSpss=CH.guideType==='spss';
+const STAGES=[['learn',CH.videos.length?'影片與工具':'概念與工具'],['slides','投影片'],['spss','講義'],['quiz','自我檢測'],['homework','課後作業']];
+$('#stageNav').innerHTML=STAGES.map(([id,lab],i)=>`<a class="stage-tab" href="#${id}" data-tab="${id}"><span class="n">${i+1}</span>${lab}</a>`).join('');
+$('#toSpss').firstChild.textContent='下一步：'+STAGES[2][1]+' ';$('#backSpss').textContent='上一步：'+STAGES[2][1];
+function route(){
+  let h=(location.hash||'').slice(1);let sub=null;
+  if(/^spss-\d+$/.test(h)){sub=h;h='spss';}
+  if(!STAGES.some(s=>s[0]===h))h='learn';
+  $$('.stage').forEach(s=>s.hidden=s.dataset.stage!==h);
+  $$('.stage-tab').forEach(t=>{if(t.dataset.tab===h)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
+  const cur=$(`.stage-tab[data-tab="${h}"]`);if(cur)cur.scrollIntoView({block:'nearest',inline:'nearest'});
+  if(sub){const d=document.getElementById(sub);if(d){d.open=true;setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'start'}),30);}}
+  else window.scrollTo({top:0});
+}
+window.addEventListener('hashchange',route);
+
+/* ---------- progress ---------- */
+const SPSS_TRACK=[];
+function answered(q){const v=S.hw[q.id];if(q.type==='multi')return Array.isArray(v)&&v.length>0;if(q.type==='single')return v!==undefined&&v!==null;return typeof v==='string'&&v.trim().length>0;}
+function progress(){
+  const v=CH.videos.filter(x=>S.videos[x.k]).length;const sp=SPSS_TRACK.filter(k=>S.spss[k]).length;
+  const qz=CH.quiz.filter(q=>S.quiz[q.id]&&S.quiz[q.id].ok).length;const hwDone=CH.hw.questions.filter(answered).length;
+  const NV=CH.videos.length;const lf=NV?v/NV:(S.learnDone?1:0);const done={learn:lf===1,slides:!!S.slidesDone,spss:SPSS_TRACK.length>0&&sp===SPSS_TRACK.length,quiz:qz===CH.quiz.length,homework:hwDone===CH.hw.questions.length};
+  const units=lf+(S.slidesDone?1:0)+(SPSS_TRACK.length?sp/SPSS_TRACK.length:0)+(qz/CH.quiz.length)+(hwDone/CH.hw.questions.length);
+  const p=Math.round(units/5*100);if(S.pct!==p){S.pct=p;save();}$('#meterFill').style.width=p+'%';$('#meterPct').textContent=p+'%';
+  for(const k in done){const t=$(`.stage-tab[data-tab="${k}"]`);if(t)t.classList.toggle('done',done[k]);}
+}
+
+/* ---------- downloads ---------- */
+const dlP=(window.claude&&window.claude.use)?window.claude.use('downloads').catch(()=>null):Promise.resolve(null);
+async function download(path,name){
+  if(CH.static){const a=document.createElement('a');a.href=path;a.download=name;document.body.appendChild(a);a.click();a.remove();return;}
+  const dl=await dlP;if(!dl){toast('這個檢視無法下載檔案，請在 claude.ai 開啟本頁。');return;}
+  try{let blob;if(/\.b64\.txt$/.test(path)){const txt=(await fetch(path).then(r=>{if(!r.ok)throw new Error(r.status);return r.text();})).trim();const bin=atob(txt);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);blob=new Blob([u]);}else blob=await fetch(path).then(r=>{if(!r.ok)throw new Error(r.status);return r.blob();});
+    const res=await dl.save({filename:name,data:blob});if(res&&res.status==='saved')toast('已儲存 '+name);}
+  catch(e){const c=e&&e.code;if(c==='declined')return;if(c==='rate_limited'){toast('上一個下載確認還沒結束，稍後再試。');return;}toast('下載沒有完成，請再試一次。');}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-dl]');if(b){e.preventDefault();download(b.dataset.dl,b.dataset.name);}});
+const DLI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>';
+
+/* ---------- videos ---------- */
+const secs=t=>{const [m,s]=t.split(':').map(Number);return m*60+s;};
+function renderVideos(){
+  if(!CH.videos.length){$('#videos').hidden=true;return;}
+  $('#videos').innerHTML=CH.videos.map(v=>`<article class="video">
+   <a class="thumb" href="https://youtu.be/${v.id}" target="_blank" rel="noopener" data-video="${v.k}" aria-label="在 YouTube 觀看 ${esc(v.t)}">
+     <img src="thumbs/${v.k}.jpg" alt="" loading="lazy">${S.videos[v.k]?'<span class="seen">已觀看</span>':''}
+     <span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span></a>
+   <div class="body"><h3>${esc(v.t)}</h3><p>${esc(v.d)}</p>
+   <ul class="chips">${v.c.map(([t,l])=>`<li><a href="https://youtu.be/${v.id}?t=${secs(t)}" target="_blank" rel="noopener" data-video="${v.k}"><span class="t">${t}</span><span>${esc(l)}</span></a></li>`).join('')}</ul></div></article>`).join('');
+}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-video]');if(a){S.videos[a.dataset.video]=true;save();setTimeout(()=>{renderVideos();progress();},400);}});
+
+/* ---------- concepts ---------- */
+function renderConcepts(){
+  $('#concepts').innerHTML=CH.concepts.map((c,i)=>{const w=CH.widgets[i];return `<article class="concept${w?'':' solo'}"><div class="concept-text"><span class="num">概念 ${i+1}</span><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>${c.tip?`<p class="tip">${esc(c.tip)}</p>`:''}</div>${w?`<div class="widget" id="w${i}"></div>`:''}</article>`;}).join('');
+  $('#exampleText').textContent=CH.example;
+  CH.widgets.forEach((w,i)=>{if(w&&W[w]){try{W[w]($('#w'+i),CH);}catch(err){$('#w'+i).innerHTML='<p class="note">這個互動工具載入失敗。</p>';console.error(err);}}});
+}
+
+/* ---------- slides ---------- */
+const NSL=CH.slidesN;let slide=1;
+function renderSlides(){
+  $('#slidesNote').textContent=CH.slidesNote+' 用左右鍵或下方縮圖翻頁；翻到最後一張即完成本步驟。';
+  $('#slideStrip').innerHTML=Array.from({length:NSL},(_,i)=>`<button data-s="${i+1}" aria-label="第 ${i+1} 張"><img src="slides/s-${pad2(i+1)}.jpg" alt="" loading="lazy"></button>`).join('');
+  $('#slideDl').innerHTML=`<button class="btn" data-dl="slides/deck.pdf" data-name="${esc(CH.deckName)}.pdf">${DLI}下載 PDF</button>`;
+  $('#slideStrip').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)goSlide(+b.dataset.s);});
+  $('#slidePrev').addEventListener('click',()=>goSlide(slide-1));$('#slideNext').addEventListener('click',()=>goSlide(slide+1));
+  document.addEventListener('keydown',e=>{if($('[data-stage="slides"]').hidden)return;if(e.target.closest('input,textarea'))return;if(e.key==='ArrowRight')goSlide(slide+1);if(e.key==='ArrowLeft')goSlide(slide-1);});
+  goSlide(1,true);
+}
+function goSlide(n,silent){
+  slide=Math.max(1,Math.min(NSL,n));$('#slideImg').src='slides/s-'+pad2(slide)+'.jpg';$('#slideImg').alt='第 '+CH.id+' 週投影片第 '+slide+' 張';
+  $('#slideCount').textContent=slide+' / '+NSL;$('#slidePrev').disabled=slide===1;$('#slideNext').disabled=slide===NSL;
+  $$('#slideStrip button').forEach(b=>b.setAttribute('aria-current',+b.dataset.s===slide?'true':'false'));
+  const cur=$(`#slideStrip [data-s="${slide}"]`);if(cur&&!silent)cur.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  if(slide===NSL&&!S.slidesDone){S.slidesDone=true;toast('投影片看完了，步驟 2 完成。');}
+  save();progress();
+}
+
+/* ---------- files ---------- */
+function renderFiles(){
+  if(!CH.files.length){$('#filesPanel').hidden=true;return;}
+  $('#zipBtn').innerHTML=CH.zip?`<button class="btn primary" data-dl="${esc(CH.zip)}" data-name="高等體育統計_CH${pad2(CH.id)}_資料.zip">${DLI}下載全部（ZIP，${CH.files.length} 個檔）</button>`:'';
+  $('#filesNote').textContent=CH.files.every(f=>f.path)?'每個檔案都可以單獨下載，也可以一次下載全部（ZIP）。下載後在 SPSS 選「檔案 → 開啟 → 資料」開啟 .sav，不需要匯入或執行語法。':CH.zip?'CSV 可單獨下載；其他格式（SAV、SPS、XLS、XLSX）包含在 ZIP 內。SPS 語法裡的路徑要改成自己的下載位置。':'下載後在 SPSS 開啟。';
+  $('#files').innerHTML=CH.files.map(f=>`<div class="file"><span class="ext">${esc(f.ext)}</span><div><strong>${esc(f.label)}</strong><small>${esc(f.file)}</small>${f.path?`<button data-dl="${esc(f.path)}" data-name="${esc(f.file)}">下載 ${esc(f.ext)}</button>`:'<span class="inzip">在 ZIP 內</span>'}</div></div>`).join('');
+}
+
+/* ---------- guide ---------- */
+function inline(t){return esc(t).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');}
+function slideRef(nums,note){return `<div class="slideref"><span class="label">講義對照 · 第 ${nums.join('、')} 張</span><p>${esc(note)}</p><div class="pics">${nums.map(n=>`<figure><img src="slides/s-${pad2(n)}.jpg" alt="講義第 ${n} 張" loading="lazy" data-zoom><figcaption><span>講義第 ${n} 張</span><a href="#slides" data-goslide="${n}">在投影片檢視器開啟</a></figcaption></figure>`).join('')}</div></div>`;}
+function blocks(text){
+  const lines=text.split('\n');let h='';let list=null;const close=()=>{if(list){h+=`</${list}>`;list=null;}};
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i].trim();if(!line){close();continue;}
+    if(line==='---')continue;
+    if(line.startsWith('```')){close();const code=[];while(++i<lines.length&&!lines[i].trim().startsWith('```'))code.push(lines[i]);h+=`<div class="code"><button type="button" data-copy>複製</button><pre>${esc(code.join('\n'))}</pre></div>`;continue;}
+    const shot=/!\[([^\]]*)\]\(截圖\/([^)]+)\)/.exec(line);
+    if(shot){close();const file=shot[2];const src='spss/'+file;const ch=Number((/^ch(\d+)/.exec(file)||[])[1]);
+      const rest=line.replace(shot[0],'').replace(/^[-*]\s*/,'').trim();const restC=rest.replace(/^（|）$/g,'');
+      const alt=/\.(png|bmp|jpg)$/i.test(shot[1])||/^SPSS ch/i.test(shot[1])?(restC||'SPSS 操作畫面'):shot[1];
+      h+=`<figure>${ch&&ch!==CH.id?`<p class="borrowed">共用介面示意：本圖來自第 ${ch} 章。請依本節文字選擇資料與變數，勿照填背景欄位。</p>`:''}<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" data-zoom><figcaption>${inline(alt)}${restC&&alt!==restC?'　'+inline(restC):''}</figcaption></figure>`;continue;}
+    const hd=/^(#{1,6}) (.*)/.exec(line);
+    if(hd){close();const lv=hd[1].length;h+=lv<=3?`<h3>${inline(hd[2])}</h3>`:`<h4>${inline(hd[2])}</h4>`;const m=(CH.stepRefs||[]).find(r=>hd[2].startsWith(r[0]));if(m)h+=slideRef(m[1],m[2]);continue;}
+    if(line.startsWith('|')){close();const rows=[line];while(i+1<lines.length&&lines[i+1].trim().startsWith('|'))rows.push(lines[++i].trim());const cells=rows.filter(r=>!/^\|[\s:|-]+\|$/.test(r)).map(r=>r.replace(/^\||\|$/g,'').split('|'));h+=`<div class="tbl-wrap"><table>${cells.map((r,j)=>`<tr>${r.map(c=>j===0?`<th>${inline(c.trim())}</th>`:`<td>${inline(c.trim())}</td>`).join('')}</tr>`).join('')}</table></div>`;continue;}
+    const ol=/^\d+\.\s+(.*)/.exec(line),ul=/^[-*]\s+(.*)/.exec(line);
+    if(ol){if(list!=='ol'){close();h+='<ol>';list='ol';}h+=`<li>${inline(ol[1])}</li>`;continue;}
+    if(ul){if(list!=='ul'){close();h+='<ul>';list='ul';}h+=`<li>${inline(ul[1].replace(/^\[ \]\s*/,''))}</li>`;continue;}
+    close();h+=`<p>${inline(line)}</p>`;
+  }
+  close();return h;
+}
+function renderGuide(){
+  $('#h-spss').textContent='本週講義';
+  $('#spssLede').textContent='這是上課用的完整講義，含程式範例、課堂任務與檢核清單。每一節旁邊附上對應的投影片。讀完一節按「完成這一節」。';const _unused=isSpss?'先下載資料，再依各節步驟在自己的 SPSS 操作，把輸出和截圖對照。每節做完按「完成這一節」，進度會記在這台裝置的瀏覽器。':'本章講義沒有指定 SPSS 操作。下面依投影片頁序整理計算核對與講義更正，每節都附上對應的講義頁。讀完一節按「完成這一節」。';
+  const md=CH.guide;const parts=md.split(/^## /m);const intro=parts.shift().replace(/^# .*\n?/,'').trim();
+  const secsArr=parts.map(p=>{const nl=p.indexOf('\n');return{title:(nl<0?p:p.slice(0,nl)).trim(),body:nl<0?'':p.slice(nl+1)};});
+  const ck='<svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>';
+  const chev='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
+  let html=intro?`<p class="prose" style="margin:0 0 14px">${inline(intro)}</p>`:'';
+  secsArr.forEach((s,k)=>{const id='spss-'+(k+1);const track=!/核對狀態/.test(s.title);if(track)SPSS_TRACK.push(id);
+    const sr=(CH.secRefs||[]).find(x=>s.title.startsWith(x[0]));
+    html+=`<details class="sec" id="${id}"${k===0?' open':''}><summary><span class="mono" style="color:var(--muted);font-size:13px">${pad2(k+1)}</span><span>${inline(s.title)}</span><span class="badge" data-badge="${id}"></span>${chev}</summary><div class="sec-body">${sr?slideRef(sr[1],sr[2]):''}${blocks(s.body)}${track?`<div class="sec-done"><button class="btn" data-done="${id}"></button></div>`:''}</div></details>`;});
+  $('#guide').innerHTML=html;
+  $('#toc').innerHTML='<span class="label" style="padding:0 8px 6px">本頁章節</span>'+secsArr.map((s,k)=>`<a href="#spss-${k+1}" data-toc="spss-${k+1}">${ck}<span>${inline(s.title)}</span></a>`).join('');
+  refreshSpss();
+}
+function refreshSpss(){
+  SPSS_TRACK.forEach(id=>{const d=!!S.spss[id];const b=$(`[data-done="${id}"]`);if(b){b.innerHTML=d?'已完成 · 取消標記':'完成這一節';b.classList.toggle('primary',!d);}
+    const bd=$(`[data-badge="${id}"]`);if(bd)bd.textContent=d?'已完成':'';const t=$(`[data-toc="${id}"]`);if(t)t.classList.toggle('done',d);});
+  $$('#toc a .ck').forEach(c=>c.style.visibility=c.parentElement.classList.contains('done')?'visible':'hidden');
+}
+document.addEventListener('click',e=>{
+  const d=e.target.closest('[data-done]');if(d){const id=d.dataset.done;S.spss[id]=!S.spss[id];save();refreshSpss();progress();if(S.spss[id]){const sec=document.getElementById(id);if(sec)sec.open=false;}return;}
+  const c=e.target.closest('[data-copy]');if(c){const txt=c.nextElementSibling.textContent;const ok=()=>{c.textContent='已複製';setTimeout(()=>c.textContent='複製',1500);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok).catch(()=>selectText(c.nextElementSibling));}else selectText(c.nextElementSibling);return;}
+  const z=e.target.closest('[data-zoom]');if(z){openLight(z.src,z.alt);return;}
+  const gs=e.target.closest('[data-goslide]');if(gs){const n=+gs.dataset.goslide;setTimeout(()=>goSlide(n),60);return;}
+  const t=e.target.closest('[data-toc]');if(t){const sec=document.getElementById(t.dataset.toc);if(sec)sec.open=true;}
+});
+function selectText(n){const r=document.createRange();r.selectNodeContents(n);const s=getSelection();s.removeAllRanges();s.addRange(r);toast('已選取，請按 Ctrl+C 複製');}
+function openLight(src,alt){const o=document.createElement('div');o.className='lightbox';o.setAttribute('role','dialog');o.setAttribute('aria-label','放大檢視');
+  o.innerHTML=`<button type="button">關閉</button><div><img src="${esc(src)}" alt="${esc(alt)}"><p>${esc(alt)}</p></div>`;
+  const close=()=>{o.remove();document.removeEventListener('keydown',k);};const k=e=>{if(e.key==='Escape')close();};
+  o.addEventListener('click',e=>{if(e.target===o||e.target.tagName==='BUTTON')close();});document.addEventListener('keydown',k);document.body.appendChild(o);o.querySelector('button').focus();}
+
+/* ---------- quiz ---------- */
+const QUIZ=CH.quiz;
+function renderQuiz(){
+  $('#quizTotal').textContent='/ '+QUIZ.length;
+  $('#quiz').innerHTML=QUIZ.map((q,k)=>{const st=S.quiz[q.id]||{};
+    const body=q.num!==undefined?`<div class="numrow"><input id="in-${q.id}" inputmode="decimal" aria-label="${esc(q.p)}" value="${st.v!==undefined?esc(st.v):''}"><button class="btn" data-qnum="${q.id}">檢查</button>${q.unit?`<span class="note">單位：${esc(q.unit)}</span>`:''}</div>`:
+      `<div class="opts">${q.o.map((o,i)=>`<label class="opt${st.v===i?(i===q.a?' right':' wrong'):''}"><input type="radio" name="${q.id}" value="${i}"${st.v===i?' checked':''}><span>${esc(o)}</span></label>`).join('')}</div>`;
+    return `<fieldset class="q" id="card-${q.id}"><legend><span class="qn">${pad2(k+1)}</span><span>${esc(q.p)}</span></legend>${body}<div data-fb="${q.id}">${fb(q,st)}</div></fieldset>`;}).join('');
+  updQuiz();
+}
+function fb(q,st){if(st.v===undefined||st.v==='')return '';return st.ok?`<p class="fb ok"><b>答對了</b>${esc(q.e)}</p>`:`<p class="fb no"><b>再想想</b>${q.num!==undefined?esc(q.hint||'再算一次。'):'這個選項不對，換一個試試。'}</p>`;}
+function setQ(q,v,ok){S.quiz[q.id]={v,ok};save();const card=$('#card-'+q.id);$(`[data-fb="${q.id}"]`,card).innerHTML=fb(q,S.quiz[q.id]);
+  $$('.opt',card).forEach((l,i)=>{l.classList.remove('right','wrong');if(i===v)l.classList.add(ok?'right':'wrong');});updQuiz();progress();}
+function updQuiz(){const n=QUIZ.filter(q=>S.quiz[q.id]&&S.quiz[q.id].ok).length;$('#quizScore').textContent=n;$('#quizStatus').textContent=n===QUIZ.length?'全部答對，步驟 4 完成。':`還有 ${QUIZ.length-n} 題沒答對。全部答對即完成本步驟。`;}
+document.addEventListener('change',e=>{const r=e.target;if(r.type==='radio'){const q=QUIZ.find(x=>x.id===r.name);if(q){const v=+r.value;setQ(q,v,v===q.a);}}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-qnum]');if(!b)return;const q=QUIZ.find(x=>x.id===b.dataset.qnum);const raw=$('#in-'+q.id).value.trim().replace(/,/g,'').replace(/%$/,'');const v=Number(raw);
+  if(raw===''||!Number.isFinite(v)){toast('請輸入數字');return;}setQ(q,raw,Math.abs(v-q.num)<=q.tol);});
+
+/* ---------- think ---------- */
+$('#thinkP').textContent=CH.think.p;
+$('#thinkRef').innerHTML=`<h4>參考答案</h4>${CH.think.answer.map(p=>`<p>${esc(p)}</p>`).join('')}<h4 style="margin-top:10px">自我檢核</h4>${CH.think.check.map(p=>`<p>${esc(p)}</p>`).join('')}`;
+
+/* ---------- homework ---------- */
+const HW=CH.hw.questions;
+$('#h-hw').textContent='課後作業：'+CH.hw.title;$('#hwSource').textContent='步驟 5 · '+CH.hw.source;
+function renderHW(){
+  $('#hw').innerHTML=HW.map((q,k)=>{const v=S.hw[q.id];let body='';
+    if(q.type==='multi')body=`<div class="opts">${q.o.map((o,i)=>`<label class="opt"><input type="checkbox" data-hwm="${q.id}" value="${i}"${Array.isArray(v)&&v.includes(i)?' checked':''}><span>${esc(o)}</span></label>`).join('')}</div><div><button class="btn" data-hwcheck="${q.id}">核對答案</button></div>`;
+    if(q.type==='single')body=`<div class="opts">${q.o.map((o,i)=>`<label class="opt"><input type="radio" name="hw-${q.id}" data-hws="${q.id}" value="${i}"${v===i?' checked':''}><span>${esc(o)}</span></label>`).join('')}</div>`;
+    if(q.type==='num')body=`<div class="numrow"><input id="hw-${q.id}" inputmode="decimal" aria-label="${esc(q.p)}" value="${typeof v==='string'?esc(v):''}"><button class="btn" data-hwcheck="${q.id}">核對答案</button></div>${q.hint?`<span class="note">${esc(q.hint)}</span>`:''}`;
+    if(q.type==='long')body=`<textarea data-hwt="${q.id}" aria-label="${esc(q.p)}" placeholder="寫下分析步驟、結果與解釋…">${typeof v==='string'?esc(v):''}</textarea><div><button class="btn" data-hwref="${q.id}" aria-expanded="false">對照參考結果</button></div><div class="ref" data-ref="${q.id}" hidden>${q.ref||''}</div>`;
+    return `<fieldset class="q" id="hwcard-${q.id}"><legend><span class="qn">${pad2(k+1)}</span><span>${esc(q.p)}</span></legend>${body}<div data-hwfb="${q.id}"></div></fieldset>`;}).join('');
+  HW.forEach(q=>{if((q.type==='single'&&S.hw[q.id]!==undefined)||(S.hwChecked&&S.hwChecked[q.id]&&answered(q)))checkHW(q,true);});updHW();
+}
+function checkHW(q,quiet){const box=$(`[data-hwfb="${q.id}"]`);const card=$('#hwcard-'+q.id);let ok=false;
+  if(q.type==='multi'){const v=(S.hw[q.id]||[]).slice().sort();const a=q.a.slice().sort();ok=v.length===a.length&&v.every((x,i)=>x===a[i]);
+    $$('.opt',card).forEach((l,i)=>{l.classList.remove('right','wrong');const sel=v.includes(i),should=a.includes(i);if(sel&&should)l.classList.add('right');else if(sel!==should)l.classList.add('wrong');});}
+  if(q.type==='single'){const v=S.hw[q.id];ok=v===q.a;$$('.opt',card).forEach((l,i)=>{l.classList.remove('right','wrong');if(i===v)l.classList.add(ok?'right':'wrong');});}
+  if(q.type==='num'){const v=Number(String(S.hw[q.id]).replace(/,/g,'').replace(/%$/,''));ok=Number.isFinite(v)&&Math.abs(v-q.num)<=q.tol;}
+  box.innerHTML=ok?`<p class="fb ok"><b>正確</b>${esc(q.e||'')}</p>`:`<p class="fb no"><b>還不對</b>${q.type==='multi'?'標紅的選項要再想想：有該選沒選的，也有不該選的。':q.type==='num'?esc(q.hint||'再檢查一次計算與分母。'):'再想想題目問的是哪一種情況。'}</p>`;
+  if(!quiet){S.hwChecked=S.hwChecked||{};S.hwChecked[q.id]=true;save();}
+}
+function updHW(){const n=HW.filter(answered).length;$('#hwStatus').textContent=n===HW.length?`${n} / ${HW.length} 題已作答，步驟 5 完成。`:`${n} / ${HW.length} 題已作答`;progress();}
+let hwTimer;
+document.addEventListener('input',e=>{const t=e.target;
+  if(t.dataset.hwt){S.hw[t.dataset.hwt]=t.value;clearTimeout(hwTimer);hwTimer=setTimeout(()=>{save();updHW();},400);}
+  if(t.id&&t.id.startsWith('hw-')&&t.tagName==='INPUT'&&t.type!=='radio'){S.hw[t.id.slice(3)]=t.value;save();updHW();}
+  if(t.id==='thinkText'){S.think=t.value;save();}
+});
+document.addEventListener('change',e=>{const t=e.target;
+  if(t.dataset.hwm){const id=t.dataset.hwm;S.hw[id]=$$(`[data-hwm="${id}"]`).filter(x=>x.checked).map(x=>+x.value);save();updHW();}
+  if(t.dataset.hws){const q=HW.find(x=>x.id===t.dataset.hws);S.hw[q.id]=+t.value;save();checkHW(q);updHW();}
+});
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-hwcheck]');if(c){const q=HW.find(x=>x.id===c.dataset.hwcheck);if(!answered(q)){toast('先作答再核對');return;}checkHW(q);return;}
+  const r=e.target.closest('[data-hwref]');if(r){const box=$(`[data-ref="${r.dataset.hwref}"]`);box.hidden=!box.hidden;r.setAttribute('aria-expanded',String(!box.hidden));r.textContent=box.hidden?'對照參考結果':'收起對照';return;}
+  if(e.target.id==='hwClearBtn'){$('#hwClear').innerHTML='<span>確定清除這些作答？</span><button class="btn" id="hwYes">清除</button><button class="btn" id="hwNo">取消</button>';return;}
+  if(e.target.id==='hwNo'){$('#hwClear').innerHTML='<button class="btn" id="hwClearBtn">清除我的作答</button>';return;}
+  if(e.target.id==='hwYes'){S.hw={};S.hwChecked={};save();renderHW();$('#hwClear').innerHTML='<button class="btn" id="hwClearBtn">清除我的作答</button>';toast('已清除作答');return;}
+  if(e.target.id==='thinkBtn'){const box=$('#thinkRef');box.hidden=!box.hidden;e.target.setAttribute('aria-expanded',String(!box.hidden));e.target.textContent=box.hidden?'查看參考答案與自我檢核':'收起參考答案';}
+});
+
+/* ---------- boot ---------- */
+renderVideos();renderConcepts();renderSlides();renderFiles();renderGuide();renderQuiz();renderHW();
+$('#thinkText').value=S.think||'';
+document.addEventListener('click',e=>{if(e.target.closest('[data-learndone]')&&!S.learnDone){S.learnDone=true;save();progress();}});
+route();progress();
+
+})();</script>
+</html>

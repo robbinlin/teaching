@@ -5,7 +5,7 @@ import json, os, re, shutil, sys
 
 G = os.path.dirname(os.path.abspath(__file__))
 OUT = sys.argv[1]
-HANDOUTS = os.environ.get('RWD_HANDOUTS', '/home/user/robbinlin/1152-RWD-course/講義')
+HANDOUTS = os.environ.get('RWD_HANDOUTS', os.path.join(G, 'handouts'))
 SLIDES = os.environ.get('RWD_SLIDES', '/home/user/rwd-build/slides')
 WEEKS = [int(x) for x in os.environ['RWD_WEEKS'].split(',')] if os.environ.get('RWD_WEEKS') else range(1, 19)
 UNITS = [('問題與規格', [1, 2, 3]), ('讀程式與驗證', [4, 5, 6]), ('描述與推論', [7, 8, 9, 10]),
