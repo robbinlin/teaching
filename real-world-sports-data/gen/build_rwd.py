@@ -52,6 +52,11 @@ def build_week(n):
     slides = sorted(f for f in os.listdir(f'{SLIDES}/w{n:02d}') if f.startswith('s-'))
     for f in slides + ['deck.pdf']:
         shutil.copy(f'{SLIDES}/w{n:02d}/{f}', f'{dst}/slides/{f}')
+    tdir = f'{G}/thumbs/w{n:02d}'  # video thumbnails: gen/thumbs/wNN/<k>.jpg -> wNN/thumbs/<k>.jpg
+    if os.path.isdir(tdir):
+        os.makedirs(dst + '/thumbs', exist_ok=True)
+        for f in os.listdir(tdir):
+            shutil.copy(f'{tdir}/{f}', f'{dst}/thumbs/{f}')
     assert len(c['widgets']) == len(c['concepts']), n
     for r in c['secRefs'] + c['stepRefs']:
         assert all(1 <= s <= len(slides) for s in r[1]), (n, r)
