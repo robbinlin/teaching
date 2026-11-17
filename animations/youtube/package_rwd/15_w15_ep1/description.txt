@@ -1,0 +1,32 @@
+﻿沒測到的混淆因子一定存在。這一集說明雙重穩健估計保護什麼、不保護什麼，用 E 值回答「未測因子要多強才能把觀察到的關聯解釋掉」，並示範限制段落怎麼寫。
+
+課程：真實世界運動大數據分析專題討論（國立體育大學　林彥光老師）
+第 15 週　因果推論（三）：雙重穩健與敏感度分析　EP1
+課程網站：https://robbinlin.github.io/teaching/real-world-sports-data/w15/
+
+章節
+0:00 1959 年：吸菸與肺癌的論證
+0:29 回到課堂：沒測到的運動興趣
+0:45 雙重穩健：兩次機會
+1:07 E 值：公式與對照表
+1:47 和已測最強的混淆因子比
+2:04 四種方法一致代表什麼
+2:27 限制段落怎麼寫
+
+本集重點
+・雙重穩健估計同時使用結果模型與處理模型，只要其中一個設定正確，估計就是一致的。它保護的是模型設定錯誤；兩個模型都少了同一個變項時，兩次機會都是錯的。
+・E 值 = 風險比 + √(風險比 ×（風險比 − 1）)。風險比 1.2、1.5、2.0 對應的 E 值是 1.69、2.37、3.41。
+・信賴區間靠近 1 的那一端也要算：風險比 1.5、下限 1.3 時，區間端的 E 值是 1.92。
+・E 值本身不說明結論可不可信，要和資料中已測量的最強混淆因子比較。
+・迴歸調整、配對、加權、分層結果一致，只說明結果不受「怎麼調整」影響，不說明調整的變項夠不夠。
+・限制段落四個要素：未測混淆與偏誤方向、敏感度分析的結果、資料結構的限制、結論能說到哪裡。
+
+資料來源
+・林彥光老師講義〈第 15 週 因果推論（三）：雙重穩健與敏感度分析〉
+・VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the E-value. Annals of Internal Medicine. 2017;167(4):268–274.
+・Cornfield J, Haenszel W, Hammond EC, Lilienfeld AM, Shimkin MB, Wynder EL. Smoking and lung cancer: recent evidence and a discussion of some questions (1959)；重刊於 International Journal of Epidemiology. 2009;38(5):1175–1191.
+・Greenhouse JB, Phillips CJ. Commentary: Smoking and Lung Cancer: A Historical Perspective. Observational Studies. 12(2):145.
+・畫面中長條的高度與估計點的位置為示意
+
+製作說明：動畫以程式繪製，旁白為語音合成。
+#資料分析 #運動大數據 #統計學
