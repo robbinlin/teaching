@@ -23,6 +23,8 @@ const qs = new URLSearchParams(location.search);
 const EPKEY = qs.get('ep') || '1';
 // "1v" = 第 1 支的配音版：場景時間由旁白決定
 if (EPKEY.endsWith('v')) document.write('<script src="voice/ep' + EPKEY.slice(0, -1) + '_timeline.js"><\/script>');
+// 真實世界運動大數據分析：每週一個檔 episodes_rwd_wNN.js（key 形如 rw07e1）；第 6 週在 episodes_rwd.js
+{ const m = /^rw(\d\d)e\d/.exec(EPKEY); if (m && m[1] !== '06') document.write('<script src="episodes_rwd_w' + m[1] + '.js"><\/script>'); }
 </script>
 <script>
 // piecewise map from narrated scene time to the original animation time, keyed on each line's beat
