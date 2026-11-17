@@ -1,0 +1,57 @@
+[
+ {
+  "file": "table13-1_freq.csv",
+  "label": "表 13-1　25 位學生三次測驗的分數與頻次",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-1_students.csv",
+  "label": "表 13-1　學生 A、B、C、D 的三次分數與總分",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-3_pr_to_t.csv",
+  "label": "表 13-3　百分等級與 T 分數換算表（T＝25 已更正為 0.62）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-4_normalize.csv",
+  "label": "表 13-4　常態化方式的六個原始分數",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-5_observe.csv",
+  "label": "表 13-5　觀察法：15 人的分數與等第",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-6_percent.csv",
+  "label": "表 13-6　預定百分比法：45 人的分數與等第",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-7_composite.csv",
+  "label": "表 13-7　65 位學生的複合分數",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-9_curve.csv",
+  "label": "表 13-9　依曲線訂等第・方法二（已採更正值）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-10_defined.csv",
+  "label": "表 13-10　定義評等系統的例子",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-11_norm.csv",
+  "label": "表 13-11　1 英里走路測驗的百分位數常模",
+  "ext": "CSV"
+ },
+ {
+  "file": "table13-12_standard.csv",
+  "label": "表 13-12　100 分知識測驗的自訂標準",
+  "ext": "CSV"
+ }
+]

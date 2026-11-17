@@ -1,0 +1,27 @@
+[
+ {
+  "file": "table5-3_chi2.csv",
+  "label": "表 5-3　卡方考驗原始資料（30 人的性別與班級）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table5-4_serve_independent.csv",
+  "label": "表 5-4　發球分數（正選與候補各 8 人，獨立樣本）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table5-5_serve_paired.csv",
+  "label": "表 5-5　配對 t 考驗資料（同 8 人季節前、季節後）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table5-6_benchpress_oneway.csv",
+  "label": "表 5-6　單因子變異數分析資料（三組各 5 人的臥舉最大重量）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table5-7_fielding_twoway.csv",
+  "label": "表 5-7　二因子變異數分析資料（方法 × 位置，每格 6 人）",
+  "ext": "CSV"
+ }
+]

@@ -1,0 +1,17 @@
+[
+ {
+  "file": "table2-1_matrix.csv",
+  "label": "表 2-1　十位受試者的資料矩陣（中文欄名）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table2-1_matrix_en.csv",
+  "label": "表 2-1　同一份資料，英文欄名（讀進 SPSS 用）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table2-2_descriptives.csv",
+  "label": "表 2-2　描述統計（對答案用）",
+  "ext": "CSV"
+ }
+]

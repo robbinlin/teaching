@@ -1,0 +1,22 @@
+[
+ {
+  "file": "table8-1_blueprint.csv",
+  "label": "表 8-1　羽球 60 題紙筆測驗的雙向細目表（題數，器材×分析用更正值 1.2）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table8-2_confidence.csv",
+  "label": "表 8-2　是非題信賴加權的計分",
+  "ext": "CSV"
+ },
+ {
+  "file": "fig8-3_item_analysis.csv",
+  "label": "圖 8-3　體適能選擇題初稿與修正版的選答人數",
+  "ext": "CSV"
+ },
+ {
+  "file": "table8-3_indices.csv",
+  "label": "表 8-3　難度指數與鑑別指數的範圍",
+  "ext": "CSV"
+ }
+]

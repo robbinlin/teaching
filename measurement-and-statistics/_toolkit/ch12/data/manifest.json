@@ -1,0 +1,37 @@
+[
+ {
+  "file": "table12-3_scat_norms.csv",
+  "label": "表 12-3　競賽焦慮測驗常模（原始分數 10–30，四個組別的百分等級）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table12-5_csai2_norms.csv",
+  "label": "表 12-5　競賽狀態焦慮問卷-2 常模（原始分數 9–36，男女各三個分量表）",
+  "ext": "CSV"
+ },
+ {
+  "file": "practice_csai2_answers.csv",
+  "label": "自編練習　小安的 27 題作答（算三個分量表分數用）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table12-4_sas2.csv",
+  "label": "表 12-4　競技運動焦慮量表-2 四個年齡組的平均數與標準差",
+  "ext": "CSV"
+ },
+ {
+  "file": "table12-6_astqs.csv",
+  "label": "表 12-6　自我對話問卷八個分量表的平均數與標準差",
+  "ext": "CSV"
+ },
+ {
+  "file": "table12-7_btais.csv",
+  "label": "表 12-7　棒球注意力與人際關係測驗六個分量表的平均數與標準差",
+  "ext": "CSV"
+ },
+ {
+  "file": "table12-8_breq2.csv",
+  "label": "表 12-8　健身運動行為調節問卷五個分量表的平均數與標準差",
+  "ext": "CSV"
+ }
+]

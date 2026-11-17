@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>體育測驗與統計</title>
+<meta name="description" content="國立體育大學「體育測驗與統計」自學網站：十二章、48 集短片、互動統計工具、講義、檢測與作業。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+
+/* Layout: one chapter, five stages as tabs under a sticky bar; each stage is one focused page with prev/next. Paper ground, deep-teal ink, two analytic marks (teal = mean, amber = median). */
+:root{
+  --bg:#F5F4EE; --surface:#FFFFFF; --ink:#152826; --muted:#566865; --line:#D8DCD4;
+  --accent:#0B7A80; --accent-ink:#FFFFFF; --amber:#B4530A; --soft:#E7EEEB;
+  --ok:#1E7B45; --bad:#B42318; --band:#163533; --band-ink:#E8F1EE; --band-muted:#9FBDB7;
+  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1716; --surface:#152220; --ink:#E4ECE9; --muted:#9AAEA9; --line:#2B3B38;
+  --accent:#45C1C6; --accent-ink:#04201F; --amber:#F0A24A; --soft:#1B2C2A;
+  --ok:#5BC98A; --bad:#F2877D; --band:#0A2321; --band-ink:#DDEBE7; --band-muted:#86A8A2; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1716; --surface:#152220; --ink:#E4ECE9; --muted:#9AAEA9; --line:#2B3B38;
+  --accent:#45C1C6; --accent-ink:#04201F; --amber:#F0A24A; --soft:#1B2C2A;
+  --ok:#5BC98A; --bad:#F2877D; --band:#0A2321; --band-ink:#DDEBE7; --band-muted:#86A8A2; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
+.hero>*,.top>*,.concept>*,.guide-layout>*{min-width:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--band)}
+a{color:var(--accent)}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* top band */
+.band{background:var(--band);color:var(--band-ink)}
+.top{display:flex;align-items:center;gap:16px;padding-block:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand-mark{font-family:var(--mono);font-size:12px;border:1px solid var(--band-muted);padding:4px 6px;letter-spacing:.06em}
+.brand strong{display:block;font-size:15px;line-height:1.2}
+.brand small{display:block;font-size:12px;color:var(--band-muted)}
+.meter{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--band-muted)}
+.meter-track{width:140px;height:6px;background:rgba(255,255,255,.14);border-radius:3px;overflow:hidden}
+.meter-fill{height:100%;background:var(--band-ink);width:0;transition:width .3s ease}
+.meter b{color:var(--band-ink);font-family:var(--mono);font-weight:500}
+.hero{padding-block:28px 34px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:32px;align-items:end}
+.hero .label{color:var(--band-muted)}
+.hero h1{font-family:var(--display);font-size:clamp(28px,4.4vw,44px);line-height:1.2;margin:8px 0 10px;font-weight:700}
+.hero p{margin:0;color:var(--band-muted);max-width:56ch}
+.hero ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:14px}
+.hero li{display:flex;gap:10px;align-items:baseline;border-top:1px solid rgba(255,255,255,.12);padding-top:8px}
+.hero li span{font-family:var(--mono);font-size:12px;color:var(--band-muted)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:16px;font-size:13px;color:var(--band-muted)}
+.facts b{color:var(--band-ink);font-family:var(--mono);font-weight:500}
+
+/* stage bar */
+.stagebar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.stages{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-block:8px}
+.stages::-webkit-scrollbar{display:none}
+.stage-tab{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1px solid transparent;background:none;padding:8px 12px;border-radius:8px;font-size:15px;color:var(--muted);transition:background .2s,color .2s}
+.stage-tab:hover{background:var(--soft);color:var(--ink)}
+.stage-tab[aria-current="page"]{background:var(--surface);border-color:var(--line);color:var(--ink);font-weight:700}
+.stage-tab .n{font-family:var(--mono);font-size:12px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line)}
+.stage-tab.done .n{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+
+main{padding-block:28px 64px}
+.stage{display:grid;gap:28px}
+.stage[hidden]{display:none}
+.stage-head h2{font-family:var(--display);font-size:clamp(24px,3.2vw,32px);line-height:1.25;margin-top:4px}
+.stage-head p{margin:8px 0 0;color:var(--muted);max-width:65ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.panel h3{font-size:18px;margin-bottom:6px}
+.prose{max-width:68ch}
+.prose p{margin:0 0 10px}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:10px 16px;font-weight:500;border:1px solid var(--line);background:var(--surface);transition:background .2s,border-color .2s,transform .2s}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+.btn svg{width:16px;height:16px;flex:0 0 auto}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:20px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:7px 12px;font-size:14px;color:var(--muted);transition:background .2s,color .2s}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.controls label{font-size:14px;color:var(--muted);display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:var(--accent)}
+
+/* videos */
+.videos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.video{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.video .thumb{position:relative;display:block;aspect-ratio:16/9;max-width:100%;background:var(--soft)}
+.video .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.video .play{position:absolute;inset:auto 12px 12px auto;width:44px;height:44px;border-radius:50%;background:rgba(10,20,20,.78);display:grid;place-items:center;transition:transform .2s}
+.video .thumb:hover .play{transform:translateY(-2px)}
+.video .play svg{width:18px;height:18px;fill:#fff;margin-left:3px}
+.video .seen{position:absolute;left:10px;top:10px;font-size:12px;background:var(--ok);color:var(--bg);padding:2px 8px;border-radius:20px}
+.video .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.video h3{font-size:16px;line-height:1.4}
+.video p{margin:0;font-size:14px;color:var(--muted)}
+.chips{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:2px}
+.chips a{display:grid;grid-template-columns:44px 1fr;gap:8px;text-decoration:none;color:var(--ink);font-size:13px;padding:4px 6px;border-radius:6px;transition:background .2s}
+.chips a:hover{background:var(--soft)}
+.chips .t{font-family:var(--mono);color:var(--accent)}
+.note{font-size:13px;color:var(--muted)}
+
+/* concepts */
+.concept{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:24px;align-items:start}
+.concept-text .num{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.06em}
+.concept-text h3{font-family:var(--display);font-size:22px;margin:4px 0 8px}
+.concept-text p{margin:0 0 10px;color:var(--ink)}
+.concept-text .tip{font-size:14px;color:var(--muted);border-left:2px solid var(--line);padding-left:12px}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;min-width:0}
+.widget-title{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.widget-title strong{font-size:15px}
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:300px}
+.chart text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+.chart .axis{stroke:var(--line)}
+.chart .grid{stroke:var(--line);stroke-dasharray:2 4}
+.chart .bar{fill:var(--accent);opacity:.28}
+.chart .bar:hover{opacity:.45}
+.chart .mean{stroke:var(--accent);stroke-width:2;stroke-dasharray:6 4}
+.chart .median{stroke:var(--amber);stroke-width:2}
+.chart .meanlab{fill:var(--accent);font-weight:500}
+.chart .medlab{fill:var(--amber);font-weight:500}
+.chart .box{fill:var(--soft);stroke:var(--ink);stroke-width:1.2}
+.chart .whisk{stroke:var(--ink);stroke-width:1.2}
+.chart .out{fill:var(--surface);stroke:var(--ink);stroke-width:1.2;cursor:pointer}
+.chart .out.ext{fill:var(--ink)}
+.chart .out:hover,.chart .out.sel{stroke:var(--amber);stroke-width:2.5}
+.chart .grp{fill:var(--ink);font-size:12px}
+.chart .dot{fill:var(--ink);cursor:grab;transition:fill .15s}
+.chart .dot:hover,.chart .dot.active{fill:var(--amber)}
+.chart .iqr{fill:var(--amber);opacity:.12}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px}
+.stat{border-top:1px solid var(--line);padding-top:6px}
+.stat span{display:block;font-size:12px;color:var(--muted)}
+.stat b{font-family:var(--mono);font-weight:500;font-size:16px;font-variant-numeric:tabular-nums}
+.stat.mean b{color:var(--accent)} .stat.med b{color:var(--amber)}
+.readout{font-size:14px;background:var(--soft);border-radius:8px;padding:10px 12px;margin:0}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:500;color:var(--muted);font-size:13px}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+th.n{text-align:right}
+.example{background:var(--band);color:var(--band-ink);border-radius:var(--r);padding:20px 22px;display:grid;gap:6px}
+.example .label{color:var(--band-muted)}
+.example p{margin:0;max-width:70ch}
+
+/* slides */
+.viewer{display:grid;gap:12px}
+.slide-frame{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;aspect-ratio:16/9;max-width:100%}
+.slide-frame img{width:100%;height:100%;object-fit:contain;display:block}
+.slide-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.slide-nav .count{font-family:var(--mono);font-size:14px;margin-right:auto}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.strip button{flex:0 0 auto;width:112px;border:2px solid transparent;border-radius:6px;padding:0;background:var(--surface);overflow:hidden;opacity:.7;transition:opacity .2s,border-color .2s}
+.strip button img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.strip button[aria-current="true"]{border-color:var(--accent);opacity:1}
+.strip button:hover{opacity:1}
+.dl-row{display:flex;flex-wrap:wrap;gap:10px}
+
+/* spss */
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.file{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface)}
+.file .ext{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:2px 5px;color:var(--muted);flex:0 0 auto;margin-top:2px}
+.file div{min-width:0;flex:1}
+.file strong{display:block;font-size:14px;font-weight:500;line-height:1.45}
+.file small{display:block;font-size:12px;color:var(--muted);word-break:break-all}
+.file button{margin-top:6px;border:0;background:none;color:var(--accent);padding:0;font-size:13px;font-weight:500}
+.file .inzip{margin-top:6px;font-size:12px;color:var(--muted)}
+.guide-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;align-items:start}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);display:grid;gap:2px;font-size:14px}
+.toc a{display:flex;gap:8px;text-decoration:none;color:var(--muted);padding:6px 8px;border-radius:6px;transition:background .2s,color .2s}
+.toc a:hover{background:var(--soft);color:var(--ink)}
+.toc a.done{color:var(--ok)}
+.toc a .ck{width:14px;flex:0 0 auto}
+.sec{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);margin-bottom:12px;scroll-margin-top:80px}
+.sec>summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;gap:12px;align-items:center;font-weight:700;font-size:17px}
+.sec>summary::-webkit-details-marker{display:none}
+.sec>summary .chev{margin-left:auto;transition:transform .2s;width:18px;height:18px;flex:0 0 auto}
+.sec[open]>summary .chev{transform:rotate(180deg)}
+.sec>summary .badge{font-size:12px;font-weight:500;color:var(--ok);font-family:var(--mono)}
+.sec-body{padding:0 18px 18px;border-top:1px solid var(--line)}
+.sec-body h3{font-size:17px;margin:22px 0 8px}
+.sec-body h4{font-size:15px;margin:18px 0 6px;color:var(--accent)}
+.sec-body p,.sec-body li{max-width:72ch}
+.sec-body p{margin:0 0 10px}
+.sec-body ol,.sec-body ul{margin:0 0 10px;padding-left:22px}
+.sec-body code{font-family:var(--mono);font-size:.88em;background:var(--soft);padding:1px 5px;border-radius:4px}
+.code{position:relative;background:var(--band);color:var(--band-ink);border-radius:8px;padding:14px 16px;margin:6px 0 12px;overflow-x:auto}
+.code pre{margin:0;font-family:var(--mono);font-size:13px;line-height:1.6}
+.code button{position:absolute;right:8px;top:8px;font-size:12px;border:1px solid var(--band-muted);background:none;color:var(--band-ink);border-radius:6px;padding:2px 8px}
+figure{margin:8px 0 16px}
+figure img{display:block;max-width:100%;height:auto;border:1px solid var(--line);border-radius:6px;cursor:zoom-in;background:var(--soft)}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.borrowed{font-size:12px;color:var(--amber);margin:0 0 6px}
+.sec-done{display:flex;justify-content:flex-end;margin-top:12px}
+.slideref{border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;background:var(--soft);padding:12px 14px;margin:6px 0 14px;display:grid;gap:8px}
+.slideref .label{color:var(--amber)}
+.slideref p{margin:0;font-size:14px}
+.slideref .pics{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.slideref figure{margin:0}
+.slideref img{border-radius:4px}
+.slideref figcaption{display:flex;justify-content:space-between;gap:8px}
+.slideref figcaption a{font-size:13px}
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(5,12,12,.86);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lightbox img{max-width:100%;max-height:85vh;border-radius:6px;background:#fff}
+.lightbox p{color:#e8f1ee;font-size:14px;margin:10px 0 0;text-align:center}
+.lightbox button{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:calc(env(safe-area-inset-right,0px) + 12px);background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:8px;padding:8px 12px}
+
+/* quiz & homework */
+.qlist{display:grid;gap:14px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:10px}
+.q legend,.q .prompt{font-weight:500;font-size:16px;padding:0;display:flex;gap:10px}
+.q .qn{font-family:var(--mono);font-size:13px;color:var(--accent);flex:0 0 auto;padding-top:2px}
+fieldset.q{margin:0;min-width:0}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:9px 12px;cursor:pointer;transition:border-color .2s,background .2s}
+.opt:hover{border-color:var(--accent)}
+.opt input{margin-top:5px;accent-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,transparent)}
+.fb{border-radius:8px;padding:10px 12px;font-size:14px;margin:0}
+.fb.ok{background:color-mix(in srgb,var(--ok) 12%,transparent)}
+.fb.no{background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.fb b{display:block;margin-bottom:2px}
+.fb.ok b{color:var(--ok)} .fb.no b{color:var(--bad)}
+.numrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.numrow input{font:inherit;font-family:var(--mono);width:160px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{font:inherit;width:100%;min-height:120px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+textarea:focus,.numrow input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.ref{border-left:3px solid var(--accent);background:var(--soft);border-radius:0 8px 8px 0;padding:12px 14px;font-size:14px}
+.ref h4{font-size:14px;margin-bottom:6px;color:var(--accent)}
+.ref p{margin:0 0 6px}
+.ref table{font-size:13px;background:var(--surface)}
+.score{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.score b{font-family:var(--mono);font-size:28px;font-weight:500}
+.status-line{font-size:13px;color:var(--muted)}
+.confirm{display:inline-flex;gap:8px;align-items:center;font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:60;max-width:calc(100% - 32px)}
+footer{border-top:1px solid var(--line);padding-block:20px 32px;font-size:13px;color:var(--muted)}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;gap:20px}
+  .videos{grid-template-columns:1fr}
+  .concept{grid-template-columns:1fr}
+  .guide-layout{grid-template-columns:1fr}
+  .toc{position:static;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .meter-track{width:90px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.chapnav{display:flex;gap:4px;flex-wrap:wrap;align-items:center;padding-bottom:4px}
+.chapnav a,.chapnav span{font-family:var(--mono);font-size:12px;text-decoration:none;color:var(--band-muted);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:3px 7px;transition:color .2s,border-color .2s}
+.chapnav a:hover{color:var(--band-ink);border-color:var(--band-muted)}
+.chapnav .cur{color:var(--band);background:var(--band-ink);border-color:var(--band-ink)}
+.chapnav .home{font-family:var(--body);font-size:13px}
+.concept.solo{grid-template-columns:minmax(0,1fr)}
+.concept.solo .concept-text{max-width:68ch}
+.ct{border-collapse:separate;border-spacing:0;font-size:14px;width:auto;min-width:100%}
+.ct th,.ct td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:right;white-space:nowrap}
+.ct th:first-child,.ct td:first-child{text-align:left}
+.ct td.cell{cursor:pointer;font-family:var(--mono);transition:background .2s}
+.ct td.cell:hover{background:var(--soft)}
+.ct td.num,.ct td.tot{font-family:var(--mono)}
+.ct .hl-num{background:color-mix(in srgb,var(--accent) 22%,transparent);font-weight:700}
+.ct .hl-den{background:color-mix(in srgb,var(--amber) 16%,transparent)}
+.ct input{width:72px;font:inherit;font-family:var(--mono);text-align:right;padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.ct .exp{display:block;font-size:11px;color:var(--muted)}
+.ct .exp.low{color:var(--bad);font-weight:700}
+.frac{font-family:var(--mono);font-size:18px}
+.frac b{color:var(--accent);font-weight:500}
+.frac i{font-style:normal;color:var(--amber)}
+.slider-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 18px}
+.slider-row label{display:grid;gap:2px;font-size:13px;color:var(--muted)}
+.slider-row label span{display:flex;justify-content:space-between}
+.slider-row label b{font-family:var(--mono);font-weight:500;color:var(--ink)}
+.slider-row input[type=range]{width:100%}
+.chart .area-p{fill:var(--accent);opacity:.35}
+.chart .area-r{fill:var(--amber);opacity:.18}
+.chart .curve{fill:none;stroke:var(--ink);stroke-width:1.6}
+.chart .curve2{fill:none;stroke:var(--amber);stroke-width:1.6}
+.chart .curve3{fill:none;stroke:var(--accent);stroke-width:1.6}
+.chart .zline{stroke:var(--ink);stroke-width:2}
+.chart .bar2{fill:var(--amber);opacity:.55}
+.chart .bar.sel,.chart .bar.ext{opacity:.8}
+.chart .bar2.sel{opacity:.95}
+.chart .ci-hit{stroke:var(--accent);stroke-width:1.6}
+.chart .ci-miss{stroke:var(--amber);stroke-width:2.4}
+.chart .ptA{fill:var(--accent)}
+.chart .ptB{fill:var(--amber)}
+.chart .ptN{fill:var(--ink);opacity:.55}
+.chart .fit{stroke:var(--ink);stroke-width:2}
+.chart .fitA{stroke:var(--accent);stroke-width:2}
+.chart .fitB{stroke:var(--amber);stroke-width:2}
+.chart .drag{cursor:grab}
+.decision{font-weight:700}
+.decision.rej{color:var(--accent)} .decision.keep{color:var(--amber)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.num-in{width:96px;font:inherit;font-variant-numeric:tabular-nums;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.num-in:focus{outline:2px solid var(--accent);outline-offset:1px}
+.in-row{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:10px 0}
+.in-row label{display:flex;align-items:center;gap:8px}
+.in-row .btn{padding:5px 10px;font-size:13px}
+.area-q{fill:var(--amber);opacity:.4}
+
+/* ===== 體育測驗與統計：沿用短片的配色（海軍藍單線、粉紅、芥末黃、米白紙） ===== */
+:root{
+  --bg:#F4F3EF; --surface:#FFFFFF; --ink:#1B2947; --muted:#56617A; --line:#D9DBE3;
+  --accent:#3B5A94; --accent-ink:#FFFFFF; --amber:#C8336F; --soft:#E9EDF5;
+  --ok:#1E7B45; --bad:#B42318; --band:#22355F; --band-ink:#F2F4FA; --band-muted:#AEBBD6;
+  --mustard:#EDB23F; --pink:#D6457F;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1524; --surface:#172036; --ink:#E6EAF4; --muted:#9BA6C0; --line:#2B3654;
+  --accent:#8FB0EE; --accent-ink:#0B1530; --amber:#F08BB3; --soft:#1D2843;
+  --ok:#5BC98A; --bad:#F2877D; --band:#141D36; --band-ink:#E3E9F7; --band-muted:#8E9DC0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1524; --surface:#172036; --ink:#E6EAF4; --muted:#9BA6C0; --line:#2B3654;
+  --accent:#8FB0EE; --accent-ink:#0B1530; --amber:#F08BB3; --soft:#1D2843;
+  --ok:#5BC98A; --bad:#F2877D; --band:#141D36; --band-ink:#E3E9F7; --band-muted:#8E9DC0; color-scheme:dark}
+.band{background-image:radial-gradient(rgba(255,255,255,.07) 1.4px,transparent 1.6px);background-size:14px 14px}
+.brand-mark{border-color:var(--mustard);color:var(--mustard)}
+.meter-fill{background:var(--mustard)}
+.chapnav .cur{background:var(--mustard);border-color:var(--mustard);color:#1B2947}
+.hero li span{color:var(--mustard)}
+
+/* 影片直接在頁面播放 */
+.video .thumb.vp{background:#0b1020}
+.video .thumb.vp video{width:100%;height:100%;display:block;background:#0b1020}
+.video .seen{pointer-events:none;z-index:1}
+.chips button{display:grid;grid-template-columns:44px 1fr;gap:8px;width:100%;text-align:left;background:none;border:0;color:var(--ink);font-size:13px;padding:4px 6px;border-radius:6px;transition:background .2s}
+.chips button:hover{background:var(--soft)}
+.ep-badge svg{display:block}
+
+/* 互動工具共用：小表格、可編輯數列 */
+.wtbl{border-collapse:collapse;font-size:14px;width:100%}
+.wtbl th,.wtbl td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:right;font-variant-numeric:tabular-nums}
+.wtbl th{font-weight:500;color:var(--muted);font-size:13px}
+.wtbl th:first-child,.wtbl td:first-child{text-align:left}
+.wtbl tr.sum td{font-weight:700;border-top:2px solid var(--ink);border-bottom:0}
+.wtbl input{width:68px;font:inherit;font-family:var(--mono);text-align:right;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.wtbl .hl{background:color-mix(in srgb,var(--mustard) 28%,transparent)}
+.widget textarea.nums{width:100%;min-height:64px;font:inherit;font-family:var(--mono);font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+.formula{font-family:var(--mono);font-size:14px;background:var(--soft);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.formula b{color:var(--accent);font-weight:500}.formula i{font-style:normal;color:var(--amber)}
+.tagrow{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-size:13px;border:1px solid var(--line);border-radius:20px;padding:3px 12px;background:var(--surface);color:var(--ink)}
+.tag[aria-pressed="true"],.tag.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tag.right{background:var(--ok);border-color:var(--ok);color:#fff}.tag.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
+.chart .pt{fill:var(--accent)}.chart .pt2{fill:var(--amber)}
+.chart .ln{stroke:var(--accent);stroke-width:2;fill:none}.chart .ln2{stroke:var(--amber);stroke-width:2;fill:none}
+.chart .dash{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:5 4;fill:none}
+.chart .bar{fill:var(--accent);opacity:.8}.chart .bar2{fill:var(--amber);opacity:.8}
+.chart .must{fill:var(--mustard)}.chart .lnm{stroke:var(--mustard);stroke-width:2.4;fill:none}
+
+/* 框架修正：長題目的框線、作業參考表格在手機溢出、表格文字換行、目標標籤不折行 */
+.q>*{min-width:0}
+.q legend{float:left;width:100%}
+.sec-body td,.sec-body th,.ref td,.ref th{white-space:normal}
+.hero li span{flex:0 0 auto;white-space:nowrap}
+.formula{white-space:normal;overflow-wrap:anywhere}
+.sec-body .tbl-wrap,.ref .tbl-wrap{margin:0 0 12px}
+
+/* YouTube 內嵌播放 */
+.video .thumb.yt{cursor:pointer}
+.video .thumb iframe{width:100%;height:100%;border:0;display:block}
+.ytlink{font-size:12px;color:var(--muted);margin-top:auto;align-self:flex-start}
+.ytlink:hover{color:var(--accent)}
+
+/* ===== animated intro ===== */
+.intro{--ball:#5CC9CE;--curve:#F0A24A;--peg:rgba(232,241,238,.38);position:relative;min-height:100vh;min-height:100svh;background:var(--band);color:var(--band-ink);overflow:hidden;display:flex;flex-direction:column;isolation:isolate}
+.intro::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(120% 90% at 78% 40%,rgba(92,201,206,.10),transparent 60%),radial-gradient(80% 60% at 10% 100%,rgba(240,162,74,.08),transparent 60%)}
+#galton{position:absolute;inset:0;width:100%;height:100%;z-index:-1;cursor:pointer;touch-action:manipulation}
+.intro>.wrap{width:100%}
+.intro a{text-decoration:none}
+.intro .brand-mark{white-space:nowrap}
+.intro-top{position:relative;z-index:1}
+.top-link{margin-left:auto;font-size:14px;color:var(--band-muted);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.top-link:hover{color:var(--band-ink);border-color:var(--band-muted)}
+.intro-body{flex:1;display:flex;align-items:center;position:relative;z-index:1;pointer-events:none;padding-block:12px 72px}
+.intro-text{max-width:min(520px,48%);pointer-events:auto}
+.intro .label{color:var(--band-muted)}
+.intro h1{font-family:var(--display);font-weight:700;line-height:1.02;margin:14px 0 18px;font-size:clamp(48px,7.4vw,96px);letter-spacing:.02em}
+.intro h1 .t1{display:block;font-size:.46em;letter-spacing:.3em;color:var(--band-muted);font-weight:500;margin-bottom:.15em}
+.intro h1 .t2{display:block;background:linear-gradient(100deg,var(--band-ink) 0%,var(--band-ink) 55%,var(--ball) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.intro .sub{color:var(--band-muted);font-size:17px;margin:0 0 24px;max-width:40ch}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.intro .btn.primary{background:var(--ball);border-color:var(--ball);color:#04201F}
+.intro .btn.primary:hover{box-shadow:0 8px 24px -8px rgba(92,201,206,.6)}
+.btn.ghost{background:transparent;color:var(--band-ink);border-color:rgba(232,241,238,.35)}
+.btn.ghost:hover{border-color:var(--band-ink)}
+.live{display:flex;gap:28px;margin-top:30px;padding-top:16px;border-top:1px solid rgba(232,241,238,.16)}
+.live div{display:grid;gap:2px}
+.live span{font-size:12px;color:var(--band-muted)}
+.live b{font-family:var(--mono);font-weight:500;font-size:22px;font-variant-numeric:tabular-nums;color:var(--band-ink)}
+.live div:nth-child(2) b{color:var(--ball)}
+.intro .cap{font-size:13px;color:var(--band-muted);margin:14px 0 0;max-width:46ch;line-height:1.65}
+.intro .cap .hint{display:block;color:var(--curve);margin-top:4px}
+.scroll-cue{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:40px;height:40px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(232,241,238,.25);color:var(--band-muted);z-index:1;animation:cue 2.2s ease-in-out infinite}
+.scroll-cue svg{width:20px;height:20px}
+.scroll-cue:hover{color:var(--band-ink);border-color:var(--band-ink)}
+@keyframes cue{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,6px)}}
+.rv{opacity:0;transform:translateY(18px);animation:rv .9s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--d) * 120ms + 150ms)}
+@keyframes rv{to{opacity:1;transform:none}}
+.flowband{padding-block:22px 26px}
+#chapters{scroll-margin-top:12px}
+.chrow.pre{opacity:0;transform:translateY(24px)}
+.chrow.in{opacity:1;transform:none;transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.chrow{transition:border-color .2s,box-shadow .2s}
+.chrow:hover{border-color:var(--accent);box-shadow:0 10px 30px -18px rgba(11,122,128,.45)}
+@media (max-width:900px){
+ .intro-body{align-items:flex-start;padding-top:8px;padding-bottom:calc(min(48svh,440px) + 40px)}
+ .intro-text{max-width:100%}
+ .intro .brand small{display:none}
+ .top-link{display:none}
+ .intro h1{font-size:clamp(44px,13vw,72px);margin:10px 0 12px}
+ .intro .sub{font-size:15px;margin-bottom:18px}
+ .live{margin-top:20px;gap:22px}
+ .live b{font-size:19px}
+ .intro .cap{display:none}
+ .scroll-cue{display:none}
+}
+@media (prefers-reduced-motion:reduce){.rv{animation:none;opacity:1;transform:none}.scroll-cue{animation:none}.chrow.pre{opacity:1;transform:none}}
+
+#hero{position:absolute;inset:0;width:100%;height:100%;z-index:-1;cursor:pointer;touch-action:manipulation}
+.live{flex-wrap:wrap;gap:14px 26px}
+.intro{--ball:#EDB23F;--curve:#F08BB3;--peg:rgba(226,232,247,.38)}
+.intro::after{background:radial-gradient(120% 90% at 78% 40%,rgba(237,178,63,.10),transparent 60%),radial-gradient(80% 60% at 10% 100%,rgba(214,69,127,.10),transparent 60%)}
+.intro h1 .t2{background:linear-gradient(100deg,var(--band-ink) 0%,var(--band-ink) 55%,var(--ball) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.intro .btn.primary{background:var(--ball);border-color:var(--ball);color:#1B2947}
+.intro .btn.primary:hover{box-shadow:0 8px 24px -8px rgba(237,178,63,.6)}
+.live div:nth-child(2) b{color:var(--ball)}
+.flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;counter-reset:f}
+.flow li{counter-increment:f;border-top:1px solid rgba(255,255,255,.18);padding-top:10px;font-size:14px;color:var(--band-muted)}
+.flow li::before{content:"0" counter(f);display:block;font-family:var(--mono);font-size:12px;color:var(--mustard);margin-bottom:2px}
+.flow b{display:block;color:var(--band-ink);font-size:15px;font-weight:700}
+.home-head{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.home-head h2{font-family:var(--display);font-size:clamp(24px,3.2vw,32px);line-height:1.25}
+.home-head p{margin:0;color:var(--muted);font-size:14px;max-width:52ch}
+.chlist{display:grid;gap:16px;padding-bottom:48px}
+.chrow{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr) auto;gap:22px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-decoration:none;color:var(--ink)}
+.chrow:hover{border-color:var(--accent);box-shadow:0 10px 30px -18px rgba(59,90,148,.5)}
+.chrow .pic{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:var(--soft)}
+.chrow .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.chrow .pic span{position:absolute;left:8px;top:8px;font-family:var(--mono);font-size:12px;background:#22355F;color:#fff;border-radius:6px;padding:2px 8px}
+.chrow h3{font-family:var(--display);font-size:22px;line-height:1.3;margin:2px 0 6px}
+.chrow p{margin:0 0 10px;font-size:14px;color:var(--muted)}
+.chrow ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 18px;font-size:13px}
+.chrow ol li{display:flex;gap:8px;align-items:baseline;min-width:0}
+.chrow ol li span{font-family:var(--mono);font-size:11px;color:var(--accent);flex:0 0 auto}
+.chrow .go{display:grid;gap:8px;justify-items:end;min-width:112px}
+.chrow .pct{font-family:var(--mono);font-size:26px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1}
+.chrow .pct small{font-size:12px;color:var(--muted);margin-left:2px}
+.chrow .bar{width:112px;height:6px;border-radius:3px;background:var(--soft);overflow:hidden}
+.chrow .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s ease}
+.chrow.done .bar i{background:var(--ok)}
+.chrow .cta{font-size:13px;color:var(--accent);display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.chrow .cta svg{width:14px;height:14px}
+.chyt,.allyt{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);text-decoration:none}
+.chyt svg,.allyt svg{width:16px;height:16px;color:var(--amber);flex:0 0 auto}
+.chyt:hover,.allyt:hover{color:var(--accent);text-decoration:underline}
+.chyt{margin:-8px 0 6px 18px;width:max-content}
+.allyt{display:flex;margin-top:6px}
+.home-note{font-size:13px;color:var(--muted);margin:0 0 40px}
+@media (max-width:860px){
+ .flow{grid-template-columns:1fr 1fr}
+ .chrow{grid-template-columns:1fr;gap:12px}
+ .chrow ol{grid-template-columns:1fr}
+ .chrow .go{grid-template-columns:auto 1fr auto;align-items:center;justify-items:start;min-width:0}
+ .chrow .bar{width:100%}
+}
+</style></head>
+<body>
+<section class="intro" id="top" aria-labelledby="intro-title">
+ <canvas id="hero" aria-hidden="true"></canvas>
+ <div class="wrap top intro-top"><div class="brand"><span class="brand-mark">Measurement &amp; Statistics</span><span><strong>體育測驗與統計</strong><small>國立體育大學・林彥光 老師</small></span></div><a class="top-link" href="#chapters">12 章目錄</a></div>
+ <div class="wrap intro-body">
+  <div class="intro-text">
+   <span class="label rv" style="--d:0">大學部課程 · 12 章 · 48 集單線插畫短片</span>
+   <h1 id="intro-title" class="rv" style="--d:1"><span class="t1">體育</span><span class="t2">測驗與統計</span></h1>
+   <p class="sub rv" style="--d:2">一個成績到底算好還是不好？這門課從測驗、測量、評價的差別談起，一路走到信度與效度。每章四集兩分鐘短片，配上可以動手玩的統計工具、講義、動手算的步驟，還有即時回饋的檢測與作業。</p>
+   <div class="cta rv" style="--d:3"><a class="btn primary" href="ch1/index.html">從第 1 章開始 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn ghost" href="#chapters">瀏覽 12 章</a></div>
+   <div class="live rv" style="--d:4" aria-live="off">
+    <div><span>已測人數 n</span><b id="gN">0</b></div><div><span>平均 x̄（秒）</span><b id="gM">—</b></div><div><span>標準差 s</span><b id="gS">—</b></div><div><span>達標比例</span><b id="gP">—</b></div>
+   </div>
+   <p class="cap rv" style="--d:5">每位跑者衝過終點，碼錶量到一個秒數，這是測量。秒數一顆顆堆起來，就看得出平均數、標準差和分配的形狀，這是統計。再畫一條 12.5 秒的標準線，才知道誰達標，這是評價。秒數是電腦模擬的示意資料。<span class="hint">點一下畫面，再派 20 位跑者上場。</span></p>
+  </div>
+ </div>
+ <a class="scroll-cue" href="#chapters" aria-label="往下看章節目錄"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
+</section>
+<div class="band"><div class="wrap flowband"><ol class="flow"><li><b>看一集短片</b>兩分鐘，一個情境帶出一個概念</li><li><b>玩一個工具</b>拖一拖、改一改，驗證影片的說法</li><li><b>翻講義</b>老師上課用的投影片，可下載</li><li><b>動手算</b>用講義的資料自己算一遍</li><li><b>檢測與作業</b>選完立刻知道對錯和理由</li></ol></div></div>
+<main class="wrap" id="chapters" style="padding-top:36px"><div class="home-head"><div><span class="label">課程內容</span><h2>12 章目錄</h2></div><p>全站共 48 集短片、60 個互動工具、96 題自我檢測。每章約需 40 到 60 分鐘，可以分次完成。<a class="allyt" href="https://www.youtube.com/playlist?list=PLI-QEvDoKmEA" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>在 YouTube 連續播放全部 48 集</a></p></div>
+<div class="chlist">
+<a class="chrow" href="ch1/index.html" data-ch="1"><div class="pic"><img src="ch1/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 01</span></div><div><span class="label">CH 01 / 06 · 基本概念</span><h3>測驗與測量的概念</h3><p>用收縮壓 135、每天 8,000 步、十週減重 4.5 公斤和一台每次多 3 公斤的體重計，把第 1 章的名詞一個一個分清楚。每看完一集短片，就動手拖下面的工具，看同一個數字換了標準之後，評價怎麼跟著變。</p><ol><li><span>EP1</span>測驗・測量・評價</li><li><span>EP2</span>跟誰比？常模與效標</li><li><span>EP3</span>什麼時候評？為什麼評？</li><li><span>EP4</span>這把尺可靠嗎？信度與效度</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLL1gDochNhs0" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 1 章播放清單（4 集）</a>
+<a class="chrow" href="ch2/index.html" data-ch="2"><div class="pic"><img src="ch2/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 02</span></div><div><span class="label">CH 02 / 06 · 用電腦處理資料</span><h3>測驗與評量的應用技術</h3><p>這一頁用講義表 2-1 的十位受試者資料，帶你把「排成資料矩陣、輸入軟體、做出描述統計表」走一遍。每看完一集短片，就用下面的工具點一點表格、改一改數字，最後自己在 Excel 算出 BMI 的平均 20.70 與標準差 2.13。</p><ol><li><span>EP1</span>一萬筆資料怎麼辦？為什麼要用電腦</li><li><span>EP2</span>資料矩陣：一列一個人，一欄一個變項</li><li><span>EP3</span>SPSS 與 Excel 起手式</li><li><span>EP4</span>第一張描述統計表</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLY5eggl_pW5o" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 2 章播放清單（4 集）</a>
+<a class="chrow" href="ch3/index.html" data-ch="3"><div class="pic"><img src="ch3/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 03</span></div><div><span class="label">CH 03 / 06 · 描述資料</span><h3>描述統計與常態分配</h3><p>這一章用 65 位同學的最大攝氧量（講義表 3-1）回答一個問題：James 測到 50，算高還是算低？你會看四集短片，動手玩五個工具（判斷測量尺度、加入極端值、一欄一欄算變異數、換算 z 分數與 T 分數、查常態曲線面積），再自己把每個數字算一遍。</p><ol><li><span>EP1</span>四種測量尺度</li><li><span>EP2</span>集中趨勢與分配形式</li><li><span>EP3</span>變異量數：全距、變異數、標準差</li><li><span>EP4</span>標準分數與常態曲線</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLPcMscIV_MaM" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 3 章播放清單（4 集）</a>
+<a class="chrow" href="ch4/index.html" data-ch="4"><div class="pic"><img src="ch4/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 04</span></div><div><span class="label">CH 04 / 06 · 相關與預測</span><h3>相關和預測</h3><p>這一章用講義表 4-1 的 10 位受試者（體重、反手與正手引體向上），先從散布圖看出相關的方向和強度，再親手把 r＝0.89 算出來。接著用互動工具拆開相關係數的幾個陷阱，最後畫出迴歸直線 Y′＝0.756X＋0.75，預測新同學的成績，並估計大概會差多少。</p><ol><li><span>EP1</span>相關係數是什麼</li><li><span>EP2</span>動手算相關係數</li><li><span>EP3</span>相關係數的陷阱</li><li><span>EP4</span>用相關來預測：迴歸直線</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLVhp50Zj1lvg" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 4 章播放清單（4 集）</a>
+<a class="chrow" href="ch5/index.html" data-ch="5"><div class="pic"><img src="ch5/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 05</span></div><div><span class="label">CH 05 / 06 · 從樣本推論母群體</span><h3>推論統計</h3><p>這一頁用講義的五份小資料（30 人的性別與課程、兩份發球分數、臥舉重量、守備測驗），把卡方考驗、t 考驗和變異數分析各算一次。先用六個互動工具看懂抽樣誤差、α、β 和 p 值，再到「動手算」用 Excel 算出和講義 SPSS 輸出一樣的數字。</p><ol><li><span>EP1</span>母群體、樣本與假設</li><li><span>EP2</span>兩種錯誤與 p 值</li><li><span>EP3</span>卡方與 t 考驗</li><li><span>EP4</span>變異數分析</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLHrOfkGy3M_M" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 5 章播放清單（4 集）</a>
+<a class="chrow" href="ch6/index.html" data-ch="6"><div class="pic"><img src="ch6/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 06</span></div><div><span class="label">CH 06 / 06 · 這個數字能不能相信</span><h3>信度與效度的理論</h3><p>這一章只問一件事：量到的數字能不能相信。你會用講義表 6-1 的十筆收縮壓把變異數拆開、算出信度 0.87，用表 6-2 到表 6-6 算出再測信度、折半信度、alpha 係數與測量標準誤，最後用表 6-9 兩台血壓計的資料畫出 Bland-Altman 圖。</p><ol><li><span>EP1</span>觀察分數＝真實分數＋誤差</li><li><span>EP2</span>信度怎麼算</li><li><span>EP3</span>效度的三種證據</li><li><span>EP4</span>兩種量法一致嗎？Bland-Altman 圖</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLQ7ywJGqScxE" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 6 章播放清單（4 集）</a>
+<a class="chrow" href="ch7/index.html" data-ch="7"><div class="pic"><img src="ch7/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 07</span></div><div><span class="label">CH 07 · 過或不過，分得準不準</span><h3>效標參照的信度與效度</h3><p>這一章的測驗只問「有沒有達到標準」。你會拖動一條及格線，看通過的人和分錯的人怎麼變；用講義表 7-2 的 400 人算出同意比例 0.825 和 kappa 0.58；用表 7-1 的 581 位學生算靈敏度與特異度；最後用表 7-10 算出相對風險 2.81 和勝算比 4.26。</p><ol><li><span>EP1</span>及格線怎麼訂</li><li><span>EP2</span>通過兩次才算穩</li><li><span>EP3</span>分對了嗎</li><li><span>EP4</span>風險高幾倍</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLAL0uDimATvY" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 7 章播放清單（4 集）</a>
+<a class="chrow" href="ch8/index.html" data-ch="8"><div class="pic"><img src="ch8/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 08</span></div><div><span class="label">CH 08 · 出考卷、分析題目、做問卷</span><h3>編製紙筆測驗與調查</h3><p>這一章學怎麼出一份好考卷和好問卷。你會用講義表 8-1 的權重算出羽球筆試 60 題每一格要出幾題，用表 8-2 試算是非題信賴加權的得分，再用圖 8-3 一題體適能選擇題的選答人數算出難度指數 36%、鑑別指數 4%，最後練習判斷問卷題目哪裡有毛病。</p><ol><li><span>EP1</span>雙向細目表</li><li><span>EP2</span>題目類型與信賴加權</li><li><span>EP3</span>項目分析</li><li><span>EP4</span>問卷與調查</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLFUMXA8vuqR4" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 8 章播放清單（4 集）</a>
+<a class="chrow" href="ch9/index.html" data-ch="9"><div class="pic"><img src="ch9/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 09</span></div><div><span class="label">CH 09 · 測量情意</span><h3>測量情意的行為</h3><p>喜不喜歡運動、想不想上課、有沒有尊重別人，這些看不到的東西也量得出來。這一頁用講義圖 9-1 的五題、圖 9-6 的 12 題問卷和圖 9-13 的教師評量表，讓你自己圈答案、把圈選換成分數，看反向題、代碼表和點數值怎麼影響總分。</p><ol><li><span>EP1</span>李克特量尺</li><li><span>EP2</span>二點與語意差異量尺</li><li><span>EP3</span>情意測量工具箱</li><li><span>EP4</span>社會行為怎麼評</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLSGFBly0qkP0" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 9 章播放清單（4 集）</a>
+<a class="chrow" href="ch10/index.html" data-ch="10"><div class="pic"><img src="ch10/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 10</span></div><div><span class="label">CH 10 · 評分</span><h3>評分</h3><p>用阿量的遲到扣分、壘球擲遠 132 英呎、10 歲女生仰臥起坐 49 下，和 C+、A、B−、C 四個等第，把評分的三件事走一遍：評什麼、跟誰比、怎麼算。每看完一集短片就動手玩下面的工具：判斷哪些項目該算進成績、拖曲線看 132 英呎落在哪一區、查常模表、改權重看學期成績怎麼變。</p><ol><li><span>EP1</span>評分還是不評分</li><li><span>EP2</span>評什麼才公平</li><li><span>EP3</span>常模參照與效標參照</li><li><span>EP4</span>算出學期成績</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLfk0mrroQO4g" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 10 章播放清單（4 集）</a>
+<a class="chrow" href="ch12/index.html" data-ch="12"><div class="pic"><img src="ch12/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 12</span></div><div><span class="label">CH 12 · 心理測量</span><h3>競技與健身運動的心理測量</h3><p>焦慮、信心、動機都看不見，要靠問卷量。這一頁用講義的常模表（表 12-3、表 12-5）查出競賽焦慮 22 分排在哪裡，用表 12-6、表 12-8 的平均數與標準差算 z 分數，再照圖 12-7 的流程圖判斷一個人在運動習慣的第幾階段。</p><ol><li><span>EP1</span>特質與狀態</li><li><span>EP2</span>焦慮量表與常模</li><li><span>EP3</span>心理技能怎麼量</li><li><span>EP4</span>健身運動的心理</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLMnkg_-mcQAg" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 12 章播放清單（4 集）</a>
+<a class="chrow" href="ch13/index.html" data-ch="13"><div class="pic"><img src="ch13/thumbs/ep1.jpg" alt="" loading="lazy"><span>CH 13</span></div><div><span class="label">CH 13 · 把一學期變成一個等第</span><h3>課室評等</h3><p>這一章把一學期的分數變成一個等第。你會用講義表 13-1 的四位學生比較「直接加總」和「T 分數乘比重」，看名次怎麼反過來；再用表 13-7 的 65 個複合分數，試試觀察法、預定百分比法、依曲線訂等第和自訂標準，看同一個 88 分會拿到哪些不同的等第。</p><ol><li><span>EP1</span>評等四步驟</li><li><span>EP2</span>合成複合分數</li><li><span>EP3</span>看全班切等第</li><li><span>EP4</span>先訂標準再對照</li></ol></div><div class="go"><div class="pct">0<small>%</small></div><div class="bar"><i></i></div><span class="cta"><span>開始這一章</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+<a class="chyt" href="https://www.youtube.com/playlist?list=PLdZ4V90UOwRA" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>第 13 章播放清單（4 集）</a>
+</div>
+<p class="home-note">進度與作答只保存在你目前使用的瀏覽器，換一台裝置或清除瀏覽資料後會重新計算。</p></main>
+<footer><div class="wrap">體育測驗與統計・國立體育大學・林彥光 老師。短片與網站內容依課堂講義製作，數值都由講義資料重新計算核對。</div></footer>
+<script type="application/json" id="homeData">[{"id": 1, "nV": 4, "nSec": 7, "nQ": 8, "nHW": 6}, {"id": 2, "nV": 4, "nSec": 6, "nQ": 8, "nHW": 6}, {"id": 3, "nV": 4, "nSec": 7, "nQ": 8, "nHW": 6}, {"id": 4, "nV": 4, "nSec": 7, "nQ": 8, "nHW": 6}, {"id": 5, "nV": 4, "nSec": 6, "nQ": 8, "nHW": 6}, {"id": 6, "nV": 4, "nSec": 7, "nQ": 8, "nHW": 6}, {"id": 7, "nV": 4, "nSec": 7, "nQ": 8, "nHW": 6}, {"id": 8, "nV": 4, "nSec": 7, "nQ": 8, "nHW": 6}, {"id": 9, "nV": 4, "nSec": 7, "nQ": 8, "nHW": 6}, {"id": 10, "nV": 4, "nSec": 6, "nQ": 8, "nHW": 6}, {"id": 12, "nV": 4, "nSec": 7, "nQ": 8, "nHW": 6}, {"id": 13, "nV": 4, "nSec": 7, "nQ": 8, "nHW": 6}]</script>
+<script>/* ===== 首頁動畫：跑者衝線 → 碼錶量到秒數 → 堆成分配 → 標準線評價 ===== */
+(()=>{
+const cv=document.getElementById('hero');if(!cv)return;
+const ctx=cv.getContext('2d');const intro=cv.closest('.intro');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const C={ink:'rgba(226,232,247,.92)',dim:'rgba(226,232,247,.38)',faint:'rgba(226,232,247,.16)',must:'#EDB23F',pink:'#F08BB3',blue:'#9DB8EC'};
+const MU=13.6,SD=1.15,LO=10,HI=17.5,BW=0.25,NB=Math.round((HI-LO)/BW),STD=12.5,LANES=5,CAP=320;
+let W=0,H=0,dpr=1,G=null;
+let times=[],counts=new Array(NB).fill(0),runners=[],drops=[],pops=[],fade=1,resetting=false,seq=0;
+let running=false,visible=true,last=0,spawnAcc=0,statAcc=0;
+function rnorm(){let u=0;while(u===0)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function newTime(){let t;do{t=MU+SD*rnorm();}while(t<LO+0.3||t>HI-0.3);return Math.round(t*100)/100;}
+function layout(){
+  const r=cv.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+  let x0,x1,y0,y1;
+  if(W>900){x0=W*0.53;x1=W-Math.max(28,W*0.04);y0=Math.max(120,H*0.16);y1=H-Math.max(64,H*0.09);}
+  else{const bh=Math.min(H*0.48,440);const tx=document.querySelector('.intro-text');const tb=tx?tx.getBoundingClientRect().bottom-r.top:0;x0=14;x1=W-14;y0=Math.max(H-bh,tb+30);y1=H-26;}
+  const bh=y1-y0;const trackH=bh*0.36;const laneH=trackH/LANES;
+  const histTop=y0+trackH+bh*0.10,base=y1-16;
+  G={x0,x1,y0,trackH,laneH,histTop,base,histH:base-histTop,binW:(x1-x0)/NB,startX:x0+10,finX:x1-Math.max(26,(x1-x0)*0.07),s:Math.max(0.55,Math.min(1,laneH/30))};
+}
+const tx=t=>G.x0+(t-LO)/(HI-LO)*(G.x1-G.x0);
+const laneY=l=>G.y0+G.laneH*(l+0.5);
+function dotR(){return Math.max(1.8,Math.min(G.binW*0.40,5));}
+function stackStep(){const r=dotR();const mx=Math.max(1,...counts);return Math.min(r*2.15,G.histH*0.92/mx);}
+function spawn(delay){runners.push({lane:(seq++)%LANES,t:newTime(),p:-(delay||0),ph:Math.random()*6});}
+function finish(rn){
+  const b=Math.min(NB-1,Math.max(0,Math.floor((rn.t-LO)/BW)));
+  pops.push({x:G.finX-10,y:laneY(rn.lane)+4,txt:rn.t.toFixed(2),a:1});
+  drops.push({x0:G.finX,y0:laneY(rn.lane),b,t:rn.t,p:0,slot:counts[b]+drops.filter(d=>d.b===b).length});
+}
+function step(dt){
+  const s=dt/1000;
+  for(const rn of runners){const dur=rn.t*0.20;rn.p+=s/dur;rn.ph+=s*(15-rn.t*0.35);if(rn.p>=1&&!rn.done){rn.done=true;finish(rn);}}
+  runners=runners.filter(rn=>rn.p<1.12);
+  for(const d of drops){d.p+=s/0.75;if(d.p>=1){counts[d.b]++;times.push(d.t);d.dead=true;}}
+  drops=drops.filter(d=>!d.dead);
+  for(const p of pops){p.a-=s/1.3;p.x-=s*16;}pops=pops.filter(p=>p.a>0);
+  if(times.length>=CAP&&!resetting&&!runners.length&&!drops.length)resetting=true;
+  if(resetting){fade-=s*0.8;if(fade<=0){times=[];counts.fill(0);fade=1;resetting=false;}}
+}
+function stats(){const n=times.length;if(n<2)return{n,m:NaN,sd:NaN,pass:NaN};const m=times.reduce((a,b)=>a+b,0)/n;const v=times.reduce((a,b)=>a+(b-m)**2,0)/(n-1);return{n,m,sd:Math.sqrt(v),pass:times.filter(t=>t<=STD).length/n};}
+function runner(x,y,ph,k){
+  const s=G.s*k;ctx.save();ctx.translate(x,y);ctx.lineWidth=1.7;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=C.ink;
+  const sw=Math.sin(ph),sw2=Math.sin(ph+Math.PI);
+  ctx.beginPath();ctx.moveTo(-2*s,-2*s);ctx.lineTo(2*s,-11*s);ctx.stroke();                         // 軀幹（前傾）
+  ctx.beginPath();ctx.moveTo(-2*s,-2*s);ctx.lineTo((-2+7*sw)*s,5*s);ctx.lineTo((-2+7*sw-3)*s,10*s);ctx.stroke(); // 腿
+  ctx.beginPath();ctx.moveTo(-2*s,-2*s);ctx.lineTo((-2+7*sw2)*s,5*s);ctx.lineTo((-2+7*sw2-3)*s,10*s);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(1*s,-9*s);ctx.lineTo((1+6*sw2)*s,-4*s);ctx.stroke();                   // 手
+  ctx.beginPath();ctx.moveTo(1*s,-9*s);ctx.lineTo((1+6*sw)*s,-4*s);ctx.stroke();
+  ctx.beginPath();ctx.arc(4*s,-15*s,3.4*s,0,7);ctx.fillStyle='#22355F';ctx.fill();ctx.stroke();      // 頭
+  ctx.beginPath();ctx.arc(-2*s,-2*s,2.2*s,0,7);ctx.fillStyle=C.pink;ctx.fill();                       // 短褲
+  ctx.restore();
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);const fs=Math.max(9,Math.min(12,(G.x1-G.x0)/42));ctx.font=`${fs}px "IBM Plex Mono",ui-monospace,monospace`;
+  // 跑道
+  ctx.strokeStyle=C.faint;ctx.lineWidth=1;ctx.beginPath();
+  for(let l=0;l<=LANES;l++){const y=G.y0+G.laneH*l;ctx.moveTo(G.x0,y);ctx.lineTo(G.x1,y);}ctx.stroke();
+  ctx.strokeStyle=C.dim;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(G.finX,G.y0);ctx.lineTo(G.finX,G.y0+G.trackH);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=C.dim;ctx.textAlign='left';ctx.fillText('100 公尺',G.x0,G.y0-8);ctx.textAlign='right';ctx.fillText('終點・碼錶',G.x1,G.y0-8);
+  for(const rn of runners){if(rn.p<0)continue;const p=Math.min(1,rn.p);runner(G.startX+(G.finX-G.startX)*p+(rn.p>1?(rn.p-1)*120:0),laneY(rn.lane)+G.laneH*0.18,rn.ph,1);}
+  ctx.textAlign='right';for(const p of pops){ctx.fillStyle=`rgba(237,178,63,${Math.max(0,p.a)})`;ctx.fillText(p.txt+' 秒',p.x,p.y);}
+  // 分配
+  ctx.globalAlpha=fade;const r=dotR(),st=stackStep();
+  const sx=tx(STD);ctx.fillStyle='rgba(237,178,63,.07)';ctx.fillRect(G.x0,G.histTop,sx-G.x0,G.histH);
+  for(let b=0;b<NB;b++){const cx=G.x0+G.binW*(b+0.5);const pass=LO+BW*(b+1)<=STD+1e-9;ctx.fillStyle=pass?C.must:C.blue;
+    for(let k=0;k<counts[b];k++){ctx.beginPath();ctx.arc(cx,G.base-r-k*st,r,0,7);ctx.fill();}}
+  const S=stats();
+  if(S.n>=12){ctx.strokeStyle=C.pink;ctx.lineWidth=2;ctx.beginPath();
+    for(let i=0;i<=140;i++){const t=LO+(HI-LO)*i/140;const e=S.n*BW*Math.exp(-0.5*((t-S.m)/S.sd)**2)/(S.sd*Math.sqrt(2*Math.PI));const y=G.base-Math.min(e*st,G.histH);i?ctx.lineTo(tx(t),y):ctx.moveTo(tx(t),y);}ctx.stroke();
+    ctx.strokeStyle=C.ink;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(tx(S.m),G.histTop+14);ctx.lineTo(tx(S.m),G.base);ctx.stroke();
+    ctx.fillStyle=C.ink;ctx.textAlign='center';ctx.fillText('平均 '+S.m.toFixed(2),tx(S.m),G.histTop+8);}
+  ctx.strokeStyle=C.must;ctx.lineWidth=1.6;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(sx,G.histTop-6);ctx.lineTo(sx,G.base);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=C.must;ctx.textAlign='left';ctx.fillText('標準 '+STD.toFixed(1)+' 秒',G.x0,G.histTop-10);
+  ctx.globalAlpha=1;
+  // 落下中的點
+  for(const d of drops){const e=d.p<.5?2*d.p*d.p:1-Math.pow(-2*d.p+2,2)/2;const x1=G.x0+G.binW*(d.b+0.5),y1=G.base-r-d.slot*st;
+    const x=d.x0+(x1-d.x0)*e,y=d.y0+(y1-d.y0)*e-Math.sin(Math.PI*d.p)*18;ctx.beginPath();ctx.arc(x,y,r+1,0,7);ctx.fillStyle=d.t<=STD?C.must:C.blue;ctx.fill();}
+  // 軸
+  ctx.strokeStyle=C.dim;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(G.x0,G.base);ctx.lineTo(G.x1,G.base);ctx.stroke();
+  ctx.fillStyle=C.dim;ctx.textAlign='center';const stp=(G.x1-G.x0)<420?2:1;
+  for(let t=LO;t<=HI;t+=stp)ctx.fillText(t,tx(t),G.base+14);
+  ctx.textAlign='right';ctx.fillText('百米秒數（愈左愈快）',G.x1,G.base+ (W>900?28:26));
+}
+const eN=document.getElementById('gN'),eM=document.getElementById('gM'),eS=document.getElementById('gS'),eP=document.getElementById('gP');
+function show(){if(!eN)return;const S=stats();eN.textContent=S.n;eM.textContent=S.n<2?'—':S.m.toFixed(2);eS.textContent=S.n<2?'—':S.sd.toFixed(2);if(eP)eP.textContent=S.n<2?'—':Math.round(S.pass*100)+'%';}
+function loop(ts){if(!running)return;const dt=Math.min(50,ts-(last||ts));last=ts;
+  spawnAcc+=dt;if(spawnAcc>420){spawnAcc=0;if(!resetting&&times.length+runners.length+drops.length<CAP)spawn();}
+  step(dt);draw();statAcc+=dt;if(statAcc>200){show();statAcc=0;}requestAnimationFrame(loop);}
+function start(){if(running||RM)return;running=true;last=0;requestAnimationFrame(loop);}
+function stop(){running=false;}
+layout();
+if(RM){for(let i=0;i<160;i++){const t=newTime();times.push(t);counts[Math.floor((t-LO)/BW)]++;}draw();show();}
+else{for(let i=0;i<3;i++)spawn(i*0.25);start();}
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{layout();draw();},120);});
+new IntersectionObserver(es=>{visible=es[0].isIntersecting;visible&&!document.hidden?start():stop();},{threshold:0.02}).observe(intro);
+document.addEventListener('visibilitychange',()=>{document.hidden?stop():visible&&start();});
+cv.addEventListener('click',()=>{if(RM||resetting)return;for(let i=0;i<20;i++)spawn(i*0.12);});
+// 章節列進場
+const rows=[...document.querySelectorAll('.chrow')];
+if(!RM&&'IntersectionObserver' in window){rows.forEach(r=>r.classList.add('pre'));
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const i=rows.indexOf(e.target);e.target.style.transitionDelay=(i%2)*80+'ms';e.target.classList.add('in');e.target.classList.remove('pre');io.unobserve(e.target);}}),{rootMargin:'0px 0px -8% 0px'});
+  rows.forEach(r=>io.observe(r));}
+})();
+
+(()=>{const M=JSON.parse(document.getElementById('homeData').textContent);
+M.forEach(c=>{let S=null;try{S=JSON.parse(localStorage.getItem('mstat-ch'+c.id+'-v1')||'null');}catch(e){}
+  const row=document.querySelector('[data-ch="'+c.id+'"]');if(!row)return;let p=0;
+  if(S){const v=Object.values(S.videos||{}).filter(Boolean).length;const sp=Object.values(S.spss||{}).filter(Boolean).length;
+    const qz=Object.values(S.quiz||{}).filter(x=>x&&x.ok).length;
+    const hw=Object.values(S.hw||{}).filter(x=>Array.isArray(x)?x.length:(typeof x==='number'||(typeof x==='string'&&x.trim()))).length;
+    const u=Math.min(1,v/c.nV)+(S.slidesDone?1:0)+Math.min(1,sp/c.nSec)+Math.min(1,qz/c.nQ)+Math.min(1,hw/c.nHW);p=Math.round(u/5*100);}
+  row.querySelector('.pct').firstChild.textContent=p;row.querySelector('.bar i').style.width=p+'%';row.classList.toggle('done',p>=100);
+  row.querySelector('.cta span').textContent=p>=100?'再看一次':p>0?'繼續學習':'開始這一章';});
+})();
+</script>
+</body></html>

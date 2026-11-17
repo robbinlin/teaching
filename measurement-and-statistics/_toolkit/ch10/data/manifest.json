@@ -1,0 +1,22 @@
+[
+ {
+  "file": "table10-1_illinois_girls10.csv",
+  "label": "表 10-1　伊利諾體適能數據庫百分位數表（10 歲女生，98 列）",
+  "ext": "CSV"
+ },
+ {
+  "file": "fig10-2_grade_values.csv",
+  "label": "圖 10-2　十二個等第的等第值對照",
+  "ext": "CSV"
+ },
+ {
+  "file": "fig10-2_weights.csv",
+  "label": "圖 10-2　四個項目的等第、等第值與權重",
+  "ext": "CSV"
+ },
+ {
+  "file": "fig10-3_contract.csv",
+  "label": "圖 10-3　長曲棍球評分契約的 15 項目標與分數",
+  "ext": "CSV"
+ }
+]

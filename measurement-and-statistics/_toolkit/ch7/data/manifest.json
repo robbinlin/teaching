@@ -1,0 +1,42 @@
+[
+ {
+  "file": "table7-1_cutoff.csv",
+  "label": "表 7-1　兩套標準的跑走測驗 × 效標 V̇O₂（Fitnessgram 左下格用更正值 64）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table7-2_retest.csv",
+  "label": "表 7-2　400 人兩天的通過情形（2×2 列聯表）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table7-6_equivalence.csv",
+  "label": "表 7-6　等同信度的範例（40 人，0＝失敗、1＝通過）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table7-7_stability.csv",
+  "label": "表 7-7　穩定信度的範例（39 人，星期五與星期一）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table7-8_validity.csv",
+  "label": "表 7-8　下背與體前彎的分類（60 人）",
+  "ext": "CSV"
+ },
+ {
+  "file": "roc_practice.csv",
+  "label": "講義第 29 張　ROC 練習資料（gold 與 score，14 筆）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table7-10_cholesterol.csv",
+  "label": "表 7-10　膽固醇與心臟病死亡的假設性研究",
+  "ext": "CSV"
+ },
+ {
+  "file": "table7-11_delivery.csv",
+  "label": "表 7-11　懷孕中的身體活動與生產方式（練習題）",
+  "ext": "CSV"
+ }
+]

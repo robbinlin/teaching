@@ -1,0 +1,37 @@
+[
+ {
+  "file": "table6-1_sbp.csv",
+  "label": "表 6-1　十位受試者的收縮壓（觀察、真實、誤差）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table6-2_situp.csv",
+  "label": "表 6-2　十位受試者兩次仰臥起坐",
+  "ext": "CSV"
+ },
+ {
+  "file": "table6-3_oddeven.csv",
+  "label": "表 6-3　十位受試者的奇數題與偶數題分數",
+  "ext": "CSV"
+ },
+ {
+  "file": "table6-5_plus10.csv",
+  "label": "表 6-5　第二次每人都多 10 分",
+  "ext": "CSV"
+ },
+ {
+  "file": "table6-6_alpha.csv",
+  "label": "表 6-6　五位受試者的三次測驗（算 alpha 係數）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table6-9_bland_altman.csv",
+  "label": "表 6-9　兩種血壓計的收縮壓",
+  "ext": "CSV"
+ },
+ {
+  "file": "table6-10_bland_altman.csv",
+  "label": "表 6-10　修正後的收縮壓數據",
+  "ext": "CSV"
+ }
+]

@@ -1,0 +1,27 @@
+[
+ {
+  "file": "fig9-6_scoring.csv",
+  "label": "圖 9-6　身體活動感覺問卷 12 題的計分對照（代碼已更正）",
+  "ext": "CSV"
+ },
+ {
+  "file": "fig9-6_bands.csv",
+  "label": "圖 9-6　總分的五個解釋區間",
+  "ext": "CSV"
+ },
+ {
+  "file": "fig9-13_rating.csv",
+  "label": "圖 9-13　教師評量表四位學生的代碼與講義印的點數",
+  "ext": "CSV"
+ },
+ {
+  "file": "fig9-13_points.csv",
+  "label": "圖 9-13　記分欄的點數值",
+  "ext": "CSV"
+ },
+ {
+  "file": "fig9-3_maxscores.csv",
+  "label": "圖 9-3　身體活動態度量表六個構面的最高分與題數",
+  "ext": "CSV"
+ }
+]

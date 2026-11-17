@@ -1,0 +1,12 @@
+[
+ {
+  "file": "table4-1_pullups.csv",
+  "label": "表 4-1　10 位受試者的體重、反手與正手引體向上",
+  "ext": "CSV"
+ },
+ {
+  "file": "table4-2_r_calc.csv",
+  "label": "表 4-2　相關係數計算表（第 1 列 X² 已更正為 100）",
+  "ext": "CSV"
+ }
+]

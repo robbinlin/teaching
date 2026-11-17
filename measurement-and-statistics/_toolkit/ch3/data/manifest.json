@@ -1,0 +1,12 @@
+[
+ {
+  "file": "table3-1_vo2max.csv",
+  "label": "表 3-1　65 位學生的 VO₂max（ml/kg/min）",
+  "ext": "CSV"
+ },
+ {
+  "file": "table3-2_variance.csv",
+  "label": "表 3-2　計算變異數的 10 個分數",
+  "ext": "CSV"
+ }
+]
