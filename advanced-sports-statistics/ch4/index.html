@@ -952,8 +952,8 @@ function blocks(text){
     const hd=/^(#{1,6}) (.*)/.exec(line);
     if(hd){close();const lv=hd[1].length;h+=lv<=3?`<h3>${inline(hd[2])}</h3>`:`<h4>${inline(hd[2])}</h4>`;const m=(CH.stepRefs||[]).find(r=>hd[2].startsWith(r[0]));if(m)h+=slideRef(m[1],m[2]);continue;}
     if(line.startsWith('|')){close();const rows=[line];while(i+1<lines.length&&lines[i+1].trim().startsWith('|'))rows.push(lines[++i].trim());const cells=rows.filter(r=>!/^\|[\s:|-]+\|$/.test(r)).map(r=>r.replace(/^\||\|$/g,'').split('|'));h+=`<div class="tbl-wrap"><table>${cells.map((r,j)=>`<tr>${r.map(c=>j===0?`<th>${inline(c.trim())}</th>`:`<td>${inline(c.trim())}</td>`).join('')}</tr>`).join('')}</table></div>`;continue;}
-    const ol=/^\d+\.\s+(.*)/.exec(line),ul=/^[-*]\s+(.*)/.exec(line);
-    if(ol){if(list!=='ol'){close();h+='<ol>';list='ol';}h+=`<li>${inline(ol[1])}</li>`;continue;}
+    const ol=/^(\d+)\.\s+(.*)/.exec(line),ul=/^[-*]\s+(.*)/.exec(line);
+    if(ol){if(list!=='ol'){close();h+=+ol[1]>1?`<ol start="${+ol[1]}">`:'<ol>';list='ol';}h+=`<li>${inline(ol[2])}</li>`;continue;}
     if(ul){if(list!=='ul'){close();h+='<ul>';list='ul';}h+=`<li>${inline(ul[1])}</li>`;continue;}
     close();h+=`<p>${inline(line)}</p>`;
   }
