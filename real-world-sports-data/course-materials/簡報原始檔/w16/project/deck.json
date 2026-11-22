@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:00:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W16 報告、可重現性與 AI 使用揭露",
+  "cover": "cover",
+  "order": ["cover", "copypaste", "folder", "rerun", "guides", "disclose", "disclosebad", "dashboard", "accept1", "accept2", "task", "next"],
+  "sections": {
+    "s1": {"description": "可重跑的報告、專案資料夾與重跑測試。", "start": "cover"},
+    "s2": {"description": "報告規範、AI 使用揭露與互動儀表板。", "start": "guides"},
+    "s3": {"description": "期末專案驗收清單、課堂任務與下週預告。", "start": "accept1"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

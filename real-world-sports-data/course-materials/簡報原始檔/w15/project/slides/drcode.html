@@ -1,0 +1,8 @@
+<section id="drcode" data-transition="fade">
+<p class="eyebrow">雙重穩健估計</p>
+<h2>在加權後的樣本上再跑一次結果模型</h2>
+<p class="code">library(WeightIt); library(marginaleffects)<br><br>w&#160;&#160;&#160;&lt;- weightit(club ~ sex + grade + school_type + urban,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;data = d, method = "glm", estimand = "ATE")<br>fit &lt;- glm_weightit(<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;regular ~ club * (sex + grade + school_type + urban),<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;data = d, <span class="hl">weightit = w</span>, family = binomial)<br>avg_comparisons(fit, variables = "club")</p>
+<p class="note">保護的是模型設定錯誤，不保護未測混淆。兩個模型都少了同一個變項時，兩次機會都是錯的。</p>
+<p class="foot">真實世界運動大數據分析　W15</p>
+<aside>變項名稱為示意，請替換為編碼簿中的實際變項。weightit 是處理模型，glm_weightit 是結果模型並帶入權重。輸出是調整後的比例差。請學生把這個數字與上週單獨加權的結果比較。</aside>
+</section>

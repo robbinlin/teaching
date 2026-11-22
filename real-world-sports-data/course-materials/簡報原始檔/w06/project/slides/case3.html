@@ -1,0 +1,9 @@
+<section id="case3" data-transition="fade">
+<p class="eyebrow">案例三</p>
+<h2>軸標籤寫百分比，畫的是人數</h2>
+<p class="code">proc sgplot data=survey4;<br>&#160;&#160;<span class="hl">vbar urban / response=regular datalabel;</span><br>&#160;&#160;yaxis label="Exercise Percentage (%)";<br>run;</p>
+<p class="body gap">vbar 搭配 response= 時，預設統計量是加總。regular 是 0/1，加總就是規律運動的人數。人數最多的層級柱子最高，與比例無關。</p>
+<p class="note">要畫比例須加上 stat=mean。圖上的數字若是幾千幾萬，就不可能是百分比。</p>
+<p class="foot">真實世界運動大數據分析　W06</p>
+<aside>現場執行原始程式，請學生讀圖上的 datalabel，再問：這是百分比嗎？加上 stat=mean 重跑，比較兩張圖中最高的柱子是否為同一層。對應的驗證技術是「手算一格」與「合理性檢查」。</aside>
+</section>

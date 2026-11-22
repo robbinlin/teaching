@@ -1,0 +1,14 @@
+<section id="joins" data-transition="fade">
+<p class="eyebrow">四種合併</p>
+<h2>多對一合併的列數規則</h2>
+<table class="t">
+<tr class="hd"><th style="width:20%">合併</th><th style="width:34%">保留誰</th><th style="width:46%">多對一時的列數</th></tr>
+<tr><td>inner</td><td>兩邊都有的</td><td>小於或等於左表</td></tr>
+<tr><td>left</td><td>左表全部</td><td>等於左表</td></tr>
+<tr><td>right</td><td>右表全部</td><td>大於或等於右表</td></tr>
+<tr><td>full</td><td>兩邊全部</td><td>大於或等於較大者</td></tr>
+</table>
+<p class="note">把縣市層級的資料併到學生層級，用 left join。合併後列數必須等於左表列數。變多，表示右表的鍵不唯一。</p>
+<p class="foot">真實世界運動大數據分析　W05</p>
+<aside>四種合併快速帶過，可對照 intermediate.sas 的 join 範例。重點放在 left join 這一列：這門課最常做的合併就是多對一的 left join，只需要記一條規則。</aside>
+</section>

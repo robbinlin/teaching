@@ -1,0 +1,14 @@
+<section id="outlier" data-transition="fade">
+<p class="eyebrow">離群值</p>
+<h2>離群值不等於錯誤</h2>
+<table class="t">
+<tr class="hd"><th style="width:20%"></th><th style="width:38%">%Errors</th><th style="width:42%">%Auto_Outliers</th></tr>
+<tr><td>判斷依據</td><td>你給定的合理上下限</td><td>截尾後的平均 ± 數個標準差</td></tr>
+<tr><td>需要什麼</td><td>領域知識</td><td>不需要，但偏態資料會誤判</td></tr>
+<tr><td>適合</td><td>有明確合理範圍的變項</td><td>初步掃描</td></tr>
+</table>
+<p class="body gap">被標出的值有三種可能：輸入錯誤、遺漏碼、真實的極端值。只有前兩種該處理。</p>
+<p class="note">每週運動 20 小時的學生可能是校隊。刪除之前回到原始紀錄確認，並在列數帳中記錄。</p>
+<p class="foot">真實世界運動大數據分析　W07</p>
+<aside>兩個巨集都在既有的 SAS macros 資料夾，取自 Cody 的資料清理教材。用 data processing 20250401.sas 中 sashelp.cars 的範例現場執行，比較兩者標出的觀察值有何不同。</aside>
+</section>

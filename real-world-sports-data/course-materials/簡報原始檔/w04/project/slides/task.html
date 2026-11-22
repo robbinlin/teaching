@@ -1,0 +1,9 @@
+<section id="task" class="task" data-transition="fade">
+<p class="eyebrow">課堂任務　60 分鐘</p>
+<h2>審查這段 AI 寫的清理程式</h2>
+<p class="small">指令只有一句「幫我清理這份資料」。程式可以執行，沒有錯誤訊息。</p>
+<p class="code gap">survey &lt;- read_csv("data108.csv")<br>clean &lt;- survey |&gt;<br>&#160;&#160;mutate(across(b13:b21, ~ na_if(.x, -1))) |&gt;<br>&#160;&#160;mutate(b9_1b = as.numeric(b9_1b)) |&gt;<br>&#160;&#160;distinct(id, .keep_all = TRUE) |&gt;<br>&#160;&#160;drop_na()<br>nrow(clean)</p>
+<p class="small gap">用審查五問找出問題。每一項寫出：在哪一行、後果是什麼、用什麼輸出證明、如何修正。</p>
+<p class="foot">真實世界運動大數據分析　W04</p>
+<aside>id 請替換為編碼簿中的受訪者編號變項。解答共四個問題，不要先公布：一、across(b13:b21) 只處理九題，其餘欄位的 -1 仍被當作數值。二、as.numeric(b9_1b) 轉換失敗會變成 NA，程式沒有回報筆數。三、distinct(id, .keep_all = TRUE) 在未檢查重複內容的情況下保留第一筆。四、drop_na() 只要任何一欄遺漏就刪除整列，樣本數大幅縮減，而且沒有訊息。要求每一項都附輸出作為證據，只說「怪怪的」不算。最後十分鐘各組報告一項。</aside>
+</section>

@@ -1,0 +1,9 @@
+<section id="weights" data-transition="fade">
+<p class="eyebrow">調查權重</p>
+<h2>未加權描述樣本，加權估計母體</h2>
+<p class="code">library(survey)<br>des &lt;- svydesign(ids = ~1, <span class="hl">weights = ~wt</span>, data = survey4)<br>svymean(~regular, des, na.rm = TRUE)<br>svyby(~regular, ~urban, des, svymean, na.rm = TRUE)</p>
+<p class="body gap">wt 請替換為編碼簿中的權重變項；有分層與叢集變項時一併放入 svydesign。SAS 對應的是 PROC SURVEYFREQ 與 PROC SURVEYMEANS。</p>
+<p class="note">AI 幾乎不會主動加權，除非你在規格書中寫明。</p>
+<p class="foot">真實世界運動大數據分析　W07</p>
+<aside>加權與未加權差多少，取決於抽樣時各層的抽出率差多少。若釋出資料沒有權重變項與分層資訊，這一頁改為概念說明，作業的加權部分取消。</aside>
+</section>

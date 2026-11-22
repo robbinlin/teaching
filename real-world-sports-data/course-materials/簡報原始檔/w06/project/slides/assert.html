@@ -1,0 +1,12 @@
+<section id="assert" data-transition="fade">
+<p class="eyebrow">驗證技術</p>
+<h2>斷言：把檢查寫進程式</h2>
+<p class="code">stopifnot(nrow(merged) == nrow(survey))<br>stopifnot(!any(is.na(survey4$urban)))</p>
+<div class="rows gap">
+<div class="row"><p class="k">第一行</p><p class="v">合併後的列數必須等於合併前。第 5 週的列數規則。</p></div>
+<div class="row"><p class="k">第二行</p><p class="v">每位學生都必須被分到一個都市化層級。案例一。</p></div>
+<div class="row"><p class="k">不成立時</p><p class="v">程式停止並報錯。不會報錯的錯誤，變成會報錯的錯誤。</p></div>
+</div>
+<p class="foot">真實世界運動大數據分析　W06</p>
+<aside>交叉表是今天看一次；斷言是之後每次重跑都自動檢查。資料更新或有人修改程式時，斷言會在問題發生的那一步停下來。請 AI 寫程式時，可以要求它把規格書的驗收條件寫成斷言。</aside>
+</section>

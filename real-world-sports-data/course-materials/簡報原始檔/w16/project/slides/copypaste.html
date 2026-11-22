@@ -1,0 +1,9 @@
+<section id="copypaste" data-transition="fade">
+<p class="eyebrow">可重跑的報告</p>
+<h2>文中的數字由程式填入</h2>
+<p class="body">在統計軟體跑出結果，再把數字抄進文書軟體：資料或定義一改，總有幾個數字忘了改。第 9 週期中報告裡「內文與表格數字不一致」就是這樣來的。</p>
+<p class="code gap">分析樣本共 <span class="hl">`r nrow(d)`</span> 人，其中規律運動者占<br><span class="hl">`r round(100 * mean(d$regular, na.rm = TRUE), 1)`</span>%。</p>
+<p class="small gap">Quarto 把文字、程式與輸出放在同一份文件。資料或定義改了，重新產生文件，所有數字一起更新。</p>
+<p class="foot">真實世界運動大數據分析　W16</p>
+<aside>現場開一份 Quarto 文件示範：先產生一次，改掉規律運動的定義，再產生一次，讓學生看到內文的人數與百分比跟著變。問學生：你的期末報告草稿裡，有幾個數字是手抄的。</aside>
+</section>

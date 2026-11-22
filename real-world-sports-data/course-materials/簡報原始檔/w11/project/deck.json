@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:00:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W11 監督式學習：預測模型",
+  "cover": "cover",
+  "order": ["cover", "define", "split", "suspect", "leaktypes", "models", "evaluate", "importance", "code", "task", "checklist", "next"],
+  "sections": {
+    "s1": {"description": "預測任務的定義、資料切分與交叉驗證。", "start": "cover"},
+    "s2": {"description": "資料洩漏的五種類型，以及模型選擇、評估與解讀。", "start": "suspect"},
+    "s3": {"description": "最小可執行範例、課堂任務、檢核清單與作業。", "start": "code"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

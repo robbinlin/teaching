@@ -1,0 +1,16 @@
+<section id="table2" data-transition="fade">
+<p class="eyebrow">表二謬誤</p>
+<h2>把所有 OR 畫成一張森林圖</h2>
+<div class="cols">
+<div class="col">
+<p class="code">proc logistic data=survey4;<br>&#160;&#160;class a1 a5 a6 urban;<br>&#160;&#160;model regular(ref=First) =<br>&#160;&#160;&#160;&#160;<span class="hl">a1 a2 a3 a4 a5 a6</span><br>&#160;&#160;&#160;&#160;<span class="hl">b13-b21 urban</span> / expb;<br>run;</p>
+<p class="small gap">課程既有分析：人口學變項、九題體育學習認知與都市化層級，全部放進一個模型。</p>
+</div>
+<div class="col">
+<p class="body">每個係數調整的變項組合不同。有的調整了自己的中介，有的沒調整自己的混淆。</p>
+<p class="body gap">Westreich 與 Greenland（2013）稱之為表二謬誤。</p>
+</div>
+</div>
+<p class="foot">真實世界運動大數據分析　W10</p>
+<aside>這是我們自己的程式，直接拿來當案例。問學生：森林圖上「性別」那一條，調整了什麼？「運動態度」那一條呢？兩者的調整集一樣，但它們各自需要的調整集不一樣。</aside>
+</section>

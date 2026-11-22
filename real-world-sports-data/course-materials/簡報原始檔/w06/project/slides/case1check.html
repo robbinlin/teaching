@@ -1,0 +1,11 @@
+<section id="case1check" data-transition="fade">
+<p class="eyebrow">案例一</p>
+<h2>一個交叉表就能看出來</h2>
+<div class="rows">
+<div class="row"><p class="k">county=1</p><p class="v">第一行先成立，第二行的 1 永遠不會被用到。可能是筆誤，原本想寫另一個代碼。</p></div>
+<div class="row"><p class="k">county=2</p><p class="v">不在任何一行，urban 為遺漏值。proc freq 預設不顯示遺漏值，這個縣市的學生從分析中消失。</p></div>
+</div>
+<p class="code gap">proc freq data=survey4;<br>&#160;&#160;tables county*urban / <span class="hl">missing</span> norow nocol nopercent;<br>run;</p>
+<p class="foot">真實世界運動大數據分析　W06</p>
+<aside>現場執行這段 proc freq。每個縣市應該只落在一個層級，而且沒有任何縣市落在遺漏值那一欄。請學生對照編碼簿確認各代碼對應的縣市。這是七種驗證技術的第一種：衍生變項交叉表。</aside>
+</section>

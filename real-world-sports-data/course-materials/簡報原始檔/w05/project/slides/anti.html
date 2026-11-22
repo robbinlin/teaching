@@ -1,0 +1,14 @@
+<section id="anti" data-transition="fade">
+<p class="eyebrow">沒對上的列</p>
+<h2>用 anti join 找出沒對上的列</h2>
+<p class="body">left join 之後，右表欄位為遺漏值的列，就是沒對上的列。</p>
+<p class="code gap">anti_join(survey, urban_level, by = "county") |&gt; count(county)</p>
+<table class="t gap">
+<tr class="hd"><th style="width:34%">常見原因</th><th style="width:66%">例子</th></tr>
+<tr><td>代碼表漏列</td><td>分層表少了某個縣市</td></tr>
+<tr><td>文字不一致</td><td>前後有空白、大小寫或全半形不同</td></tr>
+<tr><td>型態不同</td><td>一邊是數值，一邊是文字</td></tr>
+</table>
+<p class="foot">真實世界運動大數據分析　W05</p>
+<aside>列數正確不代表每一列都對上了。anti join 回傳 0 列才算完成。預告第 6 週案例一：分層規則漏掉一個縣市代碼，該縣市的學生就從分析中消失。</aside>
+</section>

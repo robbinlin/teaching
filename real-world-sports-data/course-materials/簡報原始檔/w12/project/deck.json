@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:00:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W12 非監督式學習：分群與降維",
+  "cover": "cover",
+  "order": ["cover", "always", "pca", "scale", "methods", "choosek", "stability", "reading", "task", "project", "checklist", "next"],
+  "sections": {
+    "s1": {"description": "非監督式學習的目的、主成分分析與尺度的影響。", "start": "cover"},
+    "s2": {"description": "分群方法、群數選擇、穩定性檢查與兩個解讀上的錯誤。", "start": "methods"},
+    "s3": {"description": "課堂任務、期末專案說明、檢核清單與繳交事項。", "start": "task"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

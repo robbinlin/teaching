@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:00:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W05 合併、彙總與 SQL",
+  "cover": "cover",
+  "order": ["cover", "grain", "joins", "guard", "m2m", "silent", "anti", "denom", "duckdb", "demo", "task", "check", "next"],
+  "sections": {
+    "s1": {"description": "粒度、鍵，以及多對一合併的列數規則。", "start": "cover"},
+    "s2": {"description": "多對多合併、沒對上的列，以及彙總時的分母。", "start": "m2m"},
+    "s3": {"description": "DuckDB 示範、課堂任務、檢核清單與作業。", "start": "duckdb"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

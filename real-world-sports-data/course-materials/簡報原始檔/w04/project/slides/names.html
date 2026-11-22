@@ -1,0 +1,13 @@
+<section id="names" data-transition="fade">
+<p class="eyebrow">先對齊名詞</p>
+<h2>三種縮放，對 AI 下指令時直接寫公式</h2>
+<table class="t">
+<tr class="hd"><th style="width:21%">名稱</th><th style="width:27%">公式</th><th style="width:22%">結果</th><th style="width:30%">SAS</th></tr>
+<tr><td>Min-max 縮放</td><td>(x − min) / (max − min)</td><td>0 到 1</td><td>proc stdize method=range</td></tr>
+<tr><td>Z 分數標準化</td><td>(x − 平均) / 標準差</td><td>平均 0、標準差 1</td><td>proc stdize method=std</td></tr>
+<tr><td>占比</td><td>x / 總和</td><td>加總為 1</td><td>以 proc sql 計算</td></tr>
+</table>
+<p class="note">中文的「正規化」「歸一化」「標準化」在不同教材指不同的東西。只寫名稱，模型會自己挑一種。</p>
+<p class="foot">真實世界運動大數據分析　W04</p>
+<aside>既有檔案中用 sashelp.cars 的三段範例可以現場執行對照。這張表第 12 週談分群的尺度問題時會再用到。提醒學生：規格書的變項定義欄，遇到縮放就寫公式。</aside>
+</section>

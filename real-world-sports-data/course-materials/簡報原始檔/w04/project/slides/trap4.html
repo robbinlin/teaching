@@ -1,0 +1,12 @@
+<section id="trap4" data-transition="fade">
+<p class="eyebrow">語言陷阱　四</p>
+<h2>日期的月與日，由系統設定決定</h2>
+<p class="code">01/02/2019</p>
+<div class="rows gap">
+<div class="row"><p class="k">兩種讀法</p><p class="v">一月二日，或二月一日。取決於系統設定（SAS 的 DATESTYLE），不取決於資料。</p></div>
+<div class="row"><p class="k">讀入後檢查</p><p class="v">最小值與最大值是否在合理範圍。</p></div>
+<div class="row"><p class="k">再檢查</p><p class="v">「日」大於 12 的筆數是否合理。全部都不超過 12，月與日很可能讀反了。</p></div>
+</div>
+<p class="foot">真實世界運動大數據分析　W04</p>
+<aside>用既有程式中 anydtdtm 讀入多種日期格式的範例示範。主資料集沒有日期欄位，這一點是為期末專案使用自備資料的組準備的，五分鐘帶過即可。</aside>
+</section>

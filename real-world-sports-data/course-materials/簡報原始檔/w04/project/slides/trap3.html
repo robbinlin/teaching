@@ -1,0 +1,12 @@
+<section id="trap3" data-transition="fade">
+<p class="eyebrow">語言陷阱　三</p>
+<h2>去重留下哪一筆，取決於你怎麼寫</h2>
+<p class="code">proc sort data=readin <span class="hl">nodupkey</span>; by id; run;</p>
+<div class="rows gap">
+<div class="row"><p class="k">nodupkey</p><p class="v">只比對 id。同一個 id 留下排序後的第一筆，其餘刪除，即使其他欄位內容不同。</p></div>
+<div class="row"><p class="k">nodup</p><p class="v">整列內容相同才算重複。</p></div>
+</div>
+<p class="note">範例資料中，ID 1 的 David 有 45 分與 74 分兩筆。nodupkey 之後只剩一筆。刪除之前先看重複的是什麼。</p>
+<p class="foot">真實世界運動大數據分析　W04</p>
+<aside>用既有檔案 data processing 20250401.sas 的 readin 資料現場跑 nodup 與 nodupkey，比較剩下的列數。問學生：David 的兩筆是重複輸入，還是考了兩次？程式不知道，要回到資料來源才知道。R 的 distinct(id, .keep_all = TRUE) 行為與 nodupkey 相同，課堂任務會用到。</aside>
+</section>

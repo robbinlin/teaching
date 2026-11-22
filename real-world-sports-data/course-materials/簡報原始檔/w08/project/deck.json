@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:00:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W08 統計推論",
+  "cover": "cover",
+  "order": ["cover", "three", "methods", "large", "report", "multiple", "after", "garden", "guard", "jasp", "task1", "task2", "next"],
+  "sections": {
+    "s1": {"description": "選方法的三個問題，以及大樣本下該報告的差異大小與信賴區間。", "start": "cover"},
+    "s2": {"description": "多重比較、檢定之後的工作與岔路花園。", "start": "multiple"},
+    "s3": {"description": "用 JASP 獨立驗證、課堂任務與課後作業。", "start": "jasp"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

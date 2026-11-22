@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:00:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W15 雙重穩健與敏感度分析",
+  "cover": "cover",
+  "order": ["cover", "twomodels", "drcode", "evalue", "evaluebench", "negctrl", "designs", "fe", "agree", "limits4", "limitswrite", "task", "next"],
+  "sections": {
+    "s1": {"description": "雙重穩健估計、E-value 與負對照。", "start": "cover"},
+    "s2": {"description": "處理未測混淆的其他設計，以及多種方法結果一致的意義。", "start": "designs"},
+    "s3": {"description": "限制段落的寫法、課堂任務與下週預告。", "start": "limits4"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

@@ -1,0 +1,7 @@
+<section id="code" data-transition="fade">
+<p class="eyebrow">最小可執行範例</p>
+<h2>補值與標準化寫在 recipe 裡</h2>
+<p class="code">library(tidymodels)<br>set.seed(2027)<br>split &lt;- initial_split(d, prop = 0.8, strata = irregular)<br>train &lt;- training(split); test &lt;- testing(split)<br><span class="hl">rec &lt;- recipe(irregular ~ ., data = train) |&gt;</span><br><span class="hl">&#160;&#160;step_impute_median(all_numeric_predictors()) |&gt;</span><br><span class="hl">&#160;&#160;step_normalize(all_numeric_predictors())</span><br>wf &lt;- workflow() |&gt; add_recipe(rec) |&gt; add_model(logistic_reg())<br>cv &lt;- vfold_cv(train, v = 5, strata = irregular)<br>fit_resamples(wf, cv, metrics = metric_set(roc_auc, brier_class)) |&gt;<br>&#160;&#160;collect_metrics()</p>
+<p class="foot">真實世界運動大數據分析　W11</p>
+<aside>標亮的三行是重點：補值與標準化寫在 recipe 裡，每一折只用該折的訓練部分計算，這樣才不會洩漏。對照錯誤寫法：先對整份資料標準化，再切分。set.seed 固定種子；strata 讓各份資料的結果比例相近。irregular 為示意名稱，d 的特徵欄位要先依四題答案篩過。</aside>
+</section>

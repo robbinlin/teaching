@@ -1,0 +1,13 @@
+<section id="split" data-transition="fade">
+<p class="eyebrow">切分與交叉驗證</p>
+<h2>三份資料，三種用途</h2>
+<table class="t">
+<tr class="hd"><th style="width:30%">資料</th><th style="width:30%">用途</th><th style="width:40%">規則</th></tr>
+<tr><td>訓練集</td><td>配適模型</td><td>—</td></tr>
+<tr><td>驗證集或交叉驗證</td><td>選模型、調參數</td><td>可以重複使用</td></tr>
+<tr><td>測試集</td><td>報告最終表現</td><td>只用一次，最後才打開</td></tr>
+</table>
+<p class="note">固定亂數種子，寫進紀錄。同一所學校的學生彼此相似；資料有學校代碼時，以學校為單位切分。</p>
+<p class="foot">真實世界運動大數據分析　W11</p>
+<aside>強調測試集只打開一次。看了測試結果再回頭調整模型，測試集就變成驗證集，報告的表現會偏高。亂數種子對應第 3 週可重現的最低要求。請確認主資料集是否有學校代碼；沒有的話，以學校為單位切分只做概念說明。</aside>
+</section>

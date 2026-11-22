@@ -1,0 +1,14 @@
+<section id="trap2" data-transition="fade">
+<p class="eyebrow">語言陷阱　二</p>
+<h2>文字轉數值失敗時，程式不會停下來</h2>
+<p class="code">temp1 = input(b9_1b, best32.);</p>
+<table class="t">
+<tr class="hd"><th style="width:50%">寫法</th><th style="width:50%">轉換失敗時你會看到</th></tr>
+<tr><td>SAS　input()</td><td>紀錄檔裡的一行 NOTE</td></tr>
+<tr><td>R　as.numeric()</td><td>一則警告</td></tr>
+<tr><td>pandas　pd.to_numeric(errors="coerce")</td><td>完全沒有訊息</td></tr>
+</table>
+<p class="note">無法轉換的內容都變成遺漏。轉換前後各算一次遺漏數。</p>
+<p class="foot">真實世界運動大數據分析　W04</p>
+<aside>程式碼取自課程既有的 SRDA example v2.sas，b9_1b 與 b9_1c 原本被讀成文字。現場執行後打開紀錄檔找 NOTE。問學生：如果 AI 用 pandas 寫，你要怎麼知道有幾筆轉換失敗？</aside>
+</section>

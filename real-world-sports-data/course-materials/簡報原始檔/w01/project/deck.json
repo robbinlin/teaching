@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T17:30:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W01 課程介紹",
+  "cover": "cover",
+  "order": ["cover", "question", "decisions", "same", "three", "oldnew", "units", "grading", "rules", "log", "task", "setup", "next"],
+  "sections": {
+    "s1": {"description": "開場示範：同一句話交給 AI 兩次，得到兩個答案。", "start": "cover"},
+    "s2": {"description": "留給人的三件事，以及課程架構、評分與規範。", "start": "three"},
+    "s3": {"description": "課堂任務、環境設定與下週預告。", "start": "task"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

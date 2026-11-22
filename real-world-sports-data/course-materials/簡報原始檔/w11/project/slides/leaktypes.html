@@ -1,0 +1,14 @@
+<section id="leaktypes" data-transition="fade">
+<p class="eyebrow">資料洩漏</p>
+<h2>五種洩漏與檢查方式</h2>
+<table class="t">
+<tr class="hd"><th style="width:25%">類型</th><th style="width:42%">例子</th><th style="width:33%">檢查方式</th></tr>
+<tr><td>特徵包含結果的成分</td><td>用「運動時會流汗會喘」預測規律運動</td><td>逐一核對特徵與結果的定義</td></tr>
+<tr><td>特徵是結果的後果</td><td>用運動後才形成的態度預測運動</td><td>預測當下這個值存在嗎</td></tr>
+<tr><td>前處理在切分之前</td><td>用全部資料算平均來標準化或補值</td><td>前處理包在交叉驗證裡面</td></tr>
+<tr><td>同一單位跨越兩邊</td><td>同一位學生的多筆紀錄分在訓練與測試</td><td>以個人或學校為單位切分</td></tr>
+<tr><td>重複使用測試集</td><td>看了測試結果後回頭調整模型</td><td>測試集只打開一次</td></tr>
+</table>
+<p class="foot">真實世界運動大數據分析　W11</p>
+<aside>第一列說明：規律運動的定義本身就包含「運動時會流汗會喘」這一題，把它放進特徵等於把答案給模型。第二列呼應第 10 週：橫斷面資料分不出態度與運動的先後。第三列下一段程式會示範正確寫法。</aside>
+</section>

@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:00:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W14 傾向分數",
+  "cover": "cover",
+  "order": ["cover", "psdef", "separate", "sixsteps", "matchweight", "balance", "stage1", "stage2", "critique", "aierrors", "task", "checklist", "next"],
+  "sections": {
+    "s1": {"description": "傾向分數的概念、設計與分析分離，以及六個步驟。", "start": "cover"},
+    "s2": {"description": "配對、加權、平衡診斷與兩階段的程式骨架。", "start": "matchweight"},
+    "s3": {"description": "對配對的批評、AI 常犯的錯、課堂任務與下週預告。", "start": "critique"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

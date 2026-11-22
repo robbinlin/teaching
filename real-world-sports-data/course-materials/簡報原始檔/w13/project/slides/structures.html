@@ -1,0 +1,13 @@
+<section id="structures" data-transition="fade">
+<p class="eyebrow">有向無環圖</p>
+<h2>DAG 的三種基本結構</h2>
+<table class="t">
+<tr class="hd"><th style="width:13%">結構</th><th style="width:27%">箭頭關係</th><th style="width:38%">例子</th><th style="width:22%">該不該調整</th></tr>
+<tr><td>混淆</td><td>社團 ← 性別 → 運動</td><td>性別同時影響參加社團與運動習慣</td><td>要</td></tr>
+<tr><td>中介</td><td>社團 → 運動技能 → 運動</td><td>社團透過提升技能促進運動</td><td>不要（若想估總效果）</td></tr>
+<tr><td>衝突因子</td><td>社團 → 校隊 ← 運動</td><td>參加社團與規律運動都提高入選校隊的機會</td><td>不要</td></tr>
+</table>
+<p class="note">調整混淆因子去除偏誤。調整中介會把效果的一部分扣掉。調整衝突因子，或只分析它的某一層（例如只看校隊學生），會製造原本不存在的關聯。</p>
+<p class="foot">真實世界運動大數據分析　W13</p>
+<aside>DAG 用箭頭畫出你對「誰影響誰」的主張。三列逐一在白板上畫出來，請學生判斷箭頭方向。衝突因子最不直覺：舉「只分析校隊學生」的例子，校隊裡沒參加社團的人多半本來就很常運動，於是社團與運動看起來呈負相關。</aside>
+</section>

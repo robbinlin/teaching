@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:20:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W07 探索式資料分析與視覺化",
+  "cover": "cover",
+  "order": ["cover", "anscombe", "table1", "missing", "outlier", "weights", "charts", "mislead", "airule", "task", "check", "next"],
+  "sections": {
+    "s1": {"description": "建模之前先看資料：表一、遺漏型態與離群值。", "start": "cover"},
+    "s2": {"description": "調查權重、選圖，以及四種常見的誤導。", "start": "weights"},
+    "s3": {"description": "課堂任務、檢核清單與作業。", "start": "task"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

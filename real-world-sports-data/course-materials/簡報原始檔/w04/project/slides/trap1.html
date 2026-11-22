@@ -1,0 +1,13 @@
+<section id="trap1" data-transition="fade">
+<p class="eyebrow">語言陷阱　一</p>
+<h2>遺漏值的比較，三種語言三種結果</h2>
+<table class="t">
+<tr class="hd"><th style="width:34%">敘述</th><th style="width:66%">遇到遺漏值時</th></tr>
+<tr><td>SAS　if x &lt; 3</td><td>成立。SAS 把數值遺漏視為比任何數都小</td></tr>
+<tr><td>R　filter(x &lt; 3)</td><td>比較結果為 NA，該列被丟掉</td></tr>
+<tr><td>pandas　df[df.x &lt; 3]</td><td>比較結果為 False，該列被丟掉</td></tr>
+</table>
+<p class="note">把一段 SAS 程式請 AI 翻成 R，邏輯看似相同，樣本數可能不同。</p>
+<p class="foot">真實世界運動大數據分析　W04</p>
+<aside>在 SAS OnDemand 現場跑一個三列的小資料，其中一列 x 為遺漏，示範 if x &lt; 3 把它留下來。再用 R 跑同一份資料。這一點在第 6 週的案例二會再出現。</aside>
+</section>

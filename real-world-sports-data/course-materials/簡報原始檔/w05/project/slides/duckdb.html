@@ -1,0 +1,11 @@
+<section id="duckdb" data-transition="fade">
+<p class="eyebrow">DuckDB</p>
+<h2>直接對 CSV 檔下 SQL</h2>
+<p class="code">select county, count(*) as n<br>from 'data108.csv'<br>group by county<br>order by county;</p>
+<div class="rows gap">
+<div class="row"><p class="k">不需要建資料庫</p><p class="v">檔名直接寫在 from 後面。</p></div>
+<div class="row"><p class="k">適合的用法</p><p class="v">讓 AI 寫查詢，自己一步一步驗證列數。</p></div>
+</div>
+<p class="foot">真實世界運動大數據分析　W05</p>
+<aside>現場開啟 DuckDB 執行這段查詢。接著請 AI 寫一段把分層表併入主資料集的 SQL，每加一個步驟就先 select count(*) 核對一次。</aside>
+</section>

@@ -1,0 +1,12 @@
+<section id="task" class="task" data-transition="fade">
+<p class="eyebrow">課堂任務　60 分鐘</p>
+<h2>建立基準模型，找出資料洩漏</h2>
+<div class="steps">
+<div class="step"><p class="n">1</p><p class="s">寫下預測任務的四題答案，列出可以用與不可以用的特徵。15 分鐘。</p></div>
+<div class="step"><p class="n">2</p><p class="s">建立邏輯斯迴歸基準，以五折交叉驗證回報區辨力。15 分鐘。</p></div>
+<div class="step"><p class="n">3</p><p class="s">教師提供一段 AI 寫的隨機森林流程，區辨力高得不合理。找出洩漏來源並修正。20 分鐘。</p></div>
+<div class="step"><p class="n">4</p><p class="s">修正後與基準比較，畫校準圖。10 分鐘。</p></div>
+</div>
+<p class="foot">真實世界運動大數據分析　W11</p>
+<aside>解答，不要先講：第 3 步的流程植入兩處洩漏。一，特徵中包含定義結果的題目；二，標準化在切分之前以全部資料計算。第一處會讓區辨力接近 1，學生應先找到它。只找到第一處的組，提示他們對照五種洩漏的表逐列檢查。可用 R tidymodels 或 Python scikit-learn（Google Colab）。</aside>
+</section>

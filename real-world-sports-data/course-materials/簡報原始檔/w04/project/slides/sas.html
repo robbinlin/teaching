@@ -1,0 +1,8 @@
+<section id="sas" data-transition="fade">
+<p class="eyebrow">同一件事，三種語言</p>
+<h2>SAS：把 -1 改成遺漏值</h2>
+<p class="code">data survey2;<br>&#160;&#160;set survey;<br>&#160;&#160;<span class="hl">array vars {*} a1-a6 b1-b8 b9_2 b10_1 b13-b21;</span><br>&#160;&#160;do i = 1 to dim(vars);<br>&#160;&#160;&#160;&#160;<span class="hl">if vars[i] = -1 then vars[i] = .;</span><br>&#160;&#160;end;<br>&#160;&#160;drop i;<br>run;</p>
+<p class="note">讀程式先找兩件事：作用在哪些欄位、做了什麼替換。這份清單沒有 b9_1a、b9_1b、b9_1c，它們的 -1 還在。</p>
+<p class="foot">真實世界運動大數據分析　W04</p>
+<aside>這是課程既有程式。先不給註記，請學生指出哪一行決定「作用在哪些欄位」、哪一行決定「做了什麼替換」。再問：有沒有哪些 b 開頭的欄位不在清單裡？讓學生自己發現 b9_1a、b9_1b、b9_1c。</aside>
+</section>

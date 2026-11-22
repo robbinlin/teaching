@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:10:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W06 驗證與除錯",
+  "cover": "cover",
+  "order": ["cover", "quiet", "types", "case1", "case1check", "case2", "case3", "methods", "assert", "reviewer", "task", "check", "next"],
+  "sections": {
+    "s1": {"description": "六類不會報錯的錯誤，以及取自課程既有程式的三個案例。", "start": "cover"},
+    "s2": {"description": "七種驗證技術、斷言，以及請 AI 擔任審查者的規則。", "start": "methods"},
+    "s3": {"description": "找錯競賽、檢核清單與作業。", "start": "task"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

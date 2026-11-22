@@ -1,0 +1,12 @@
+<section id="denom" data-transition="fade">
+<p class="eyebrow">彙總的分母</p>
+<h2>count(*) 與 count(欄位) 算的不是同一群人</h2>
+<p class="code">select county,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;sum(regular = 1) / <span class="hl">count(*)</span> as regular_pct<br>from survey4<br>group by county;</p>
+<div class="rows gap">
+<div class="row"><p class="k">count(*)</p><p class="v">計算所有列，包含 regular 為遺漏值的人。</p></div>
+<div class="row"><p class="k">count(regular)</p><p class="v">只計算 regular 非遺漏的人。</p></div>
+</div>
+<p class="note">兩者的差別就是「沒回答的人算不算分母」。這個決定寫在規格書裡，不由寫 SQL 的人或模型臨時決定。</p>
+<p class="foot">真實世界運動大數據分析　W05</p>
+<aside>這段 SQL 取自課程既有程式 SRDA example v2.sas。回到第 1 週示範的五個決策之一：沒回答的人算不算分母。請學生翻出第 3 週自己的規格書，看分母寫了沒有。</aside>
+</section>

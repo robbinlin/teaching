@@ -1,0 +1,11 @@
+<section id="guard" data-transition="fade">
+<p class="eyebrow">四種合併</p>
+<h2>把列數規則寫進程式</h2>
+<p class="small">R</p>
+<p class="code">left_join(survey, urban_level, by = "county",<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="hl">relationship = "many-to-one"</span>)</p>
+<p class="small gap">Python</p>
+<p class="code">survey.merge(urban_level, on="county", how="left", <span class="hl">validate="m:1"</span>)</p>
+<p class="note">右表的鍵不唯一時，程式會報錯並停下來，不會默默產生多餘的列。</p>
+<p class="foot">真實世界運動大數據分析　W05</p>
+<aside>AI 寫的合併程式通常不會加這兩個參數。請學生養成習慣：審查合併程式時，先找有沒有這一項；沒有就要求補上，或自己在合併後核對列數。</aside>
+</section>

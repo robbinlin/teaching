@@ -1,0 +1,281 @@
+section {
+  background: #F5F2EA;
+  color: #1C2B33;
+  font-family: 'Noto Sans TC', Arial, sans-serif;
+  padding: 112px 128px 160px;
+}
+
+h1 {
+  font-family: 'Noto Serif TC', Georgia, serif;
+  font-weight: 700;
+  font-size: 112px;
+  line-height: 1.28;
+}
+
+h2 {
+  font-family: 'Noto Serif TC', Georgia, serif;
+  font-weight: 700;
+  font-size: 68px;
+  line-height: 1.25;
+  margin-bottom: 56px;
+}
+
+h3 {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: #A63D2A;
+  margin-bottom: 20px;
+}
+
+.lead {
+  font-size: 44px;
+  line-height: 1.55;
+}
+
+.body {
+  font-size: 34px;
+  line-height: 1.65;
+  color: #2B3A42;
+}
+
+.small {
+  font-size: 28px;
+  line-height: 1.6;
+  color: #46565E;
+}
+
+.gap {
+  margin-top: 40px;
+}
+
+.foot {
+  position: absolute;
+  left: 128px;
+  bottom: 64px;
+  width: 1400px;
+  font-size: 24px;
+  letter-spacing: 2px;
+  color: #56666D;
+}
+
+/* 定義列：左欄名稱，右欄說明 */
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  gap: 48px;
+  padding: 24px 0;
+  border-top: 2px solid #C9C2B2;
+}
+
+.row .k {
+  width: 340px;
+  flex-shrink: 0;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #1C2B33;
+}
+
+.row .v {
+  flex: 1;
+  font-size: 34px;
+  line-height: 1.5;
+  color: #2B3A42;
+}
+
+/* 表格 */
+.t {
+  width: 100%;
+  font-size: 30px;
+  line-height: 1.5;
+  color: #1C2B33;
+}
+
+.t .hd {
+  background: #E6DFD0;
+}
+
+/* 程式碼 */
+.code {
+  font-family: 'JetBrains Mono', 'Noto Sans TC', 'Courier New', monospace;
+  font-size: 28px;
+  line-height: 1.6;
+  background: #1C2B33;
+  color: #EDE8DC;
+  padding: 36px 44px;
+  border-radius: 10px;
+}
+
+.code .hl {
+  color: #F0B45B;
+}
+
+.code .dim {
+  color: #8FA3AB;
+}
+
+/* 重點註記 */
+.note {
+  font-size: 32px;
+  line-height: 1.6;
+  color: #1C2B33;
+  border-left: 8px solid #A63D2A;
+  padding: 4px 0 4px 32px;
+  margin-top: 40px;
+}
+
+/* 兩欄 */
+.cols {
+  display: flex;
+  gap: 64px;
+}
+
+.col {
+  flex: 1;
+}
+
+/* 大數字 */
+.nums {
+  display: flex;
+  gap: 64px;
+}
+
+.num {
+  flex: 1;
+  border-top: 6px solid #1C2B33;
+  padding-top: 28px;
+}
+
+.num .fig {
+  font-family: 'Noto Serif TC', Georgia, serif;
+  font-weight: 700;
+  font-size: 150px;
+  line-height: 1.15;
+  color: #A63D2A;
+}
+
+.num .lab {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.num .sub {
+  font-size: 28px;
+  line-height: 1.6;
+  color: #46565E;
+  margin-top: 12px;
+}
+
+/* 步驟 */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.step {
+  display: flex;
+  gap: 36px;
+}
+
+.step .n {
+  width: 72px;
+  flex-shrink: 0;
+  font-family: 'Noto Serif TC', Georgia, serif;
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1.3;
+  color: #A63D2A;
+}
+
+.step .s {
+  flex: 1;
+  font-size: 34px;
+  line-height: 1.55;
+  color: #1C2B33;
+}
+
+/* 一句話 */
+.say {
+  font-family: 'Noto Serif TC', Georgia, serif;
+  font-weight: 700;
+  font-size: 80px;
+  line-height: 1.45;
+  color: #1C2B33;
+  margin-top: 96px;
+}
+
+.after {
+  font-size: 36px;
+  line-height: 1.6;
+  color: #46565E;
+  margin-top: 56px;
+}
+
+/* 封面 */
+.cover {
+  background: #1C2B33;
+  color: #F5F2EA;
+  padding: 128px;
+}
+
+.cover .eyebrow {
+  color: #F0B45B;
+}
+
+.cover h1 {
+  color: #F5F2EA;
+  margin-top: 140px;
+}
+
+.cover .meta {
+  font-size: 32px;
+  line-height: 1.6;
+  color: #B9C7CC;
+  margin-top: 72px;
+}
+
+/* 深色陳述頁 */
+.stmt {
+  background: #1C2B33;
+  color: #F5F2EA;
+}
+
+.stmt .eyebrow {
+  color: #F0B45B;
+}
+
+.stmt .say {
+  color: #F5F2EA;
+}
+
+.stmt .after {
+  color: #B9C7CC;
+}
+
+.stmt .foot {
+  color: #B9C7CC;
+}
+
+/* 課堂任務頁 */
+.task {
+  background: #EBE5D6;
+}
+
+.task .row {
+  border-top: 2px solid #BDB49F;
+}

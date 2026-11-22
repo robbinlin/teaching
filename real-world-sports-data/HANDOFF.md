@@ -4,7 +4,7 @@
 
 ## 目前狀態
 
-- 課綱、18 週講義、簡報原始檔：`robbinlin/robbinlin` 的 `claude/gracious-allen-8r8q5t` 分支，`1152-RWD-course/`。
+- 課綱、18 週講義、範本、簡報原始檔：本分支 `real-world-sports-data/course-materials/`（`robbinlin/robbinlin` 的 `claude/gracious-allen-8r8q5t` 分支留有同一份舊副本，以本分支為準）。
 - 課程網站已公開：https://robbinlin.github.io/teaching/real-world-sports-data/
   - 原始檔與產生程式在本分支 `real-world-sports-data/`（`gen/build_rwd.py`，說明見 `README.md`）。
   - 公開版在 `gh-pages` 分支的 `real-world-sports-data/` 資料夾。

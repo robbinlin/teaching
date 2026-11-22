@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:10:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W03 AI 協作分析工作流與分析規格書",
+  "cover": "cover",
+  "order": ["cover", "recall", "flow", "modes", "spec1", "spec2", "shell", "test", "repro", "gov", "task", "check", "next"],
+  "sections": {
+    "s1": {"description": "五步工作流，以及純對話與可執行環境的差別。", "start": "cover"},
+    "s2": {"description": "分析規格書的八個欄位、表格外殼、可重現要求與資料治理。", "start": "spec1"},
+    "s3": {"description": "課堂任務：寫規格、交換執行、比對數字；檢核清單與作業。", "start": "task"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

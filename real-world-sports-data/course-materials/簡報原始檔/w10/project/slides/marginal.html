@@ -1,0 +1,8 @@
+<section id="marginal" data-transition="fade">
+<p class="eyebrow">勝算比</p>
+<h2>改報模型預測的比例與比例差</h2>
+<p class="code">library(marginaleffects)<br>fit &lt;- glm(regular ~ club + sex + grade + urban,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;data = d, family = binomial)<br><br><span class="hl">avg_predictions</span>(fit, by = "club")&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="dim"># 各組調整後的比例</span><br><span class="hl">avg_comparisons</span>(fit, variables = "club")&#160;&#160;&#160;<span class="dim"># 調整後的比例差</span></p>
+<p class="note">「參加社團的學生規律運動比例高 [__] 個百分點」比「OR = [__]」容易理解，也不容易被誤讀。</p>
+<p class="foot">真實世界運動大數據分析　W10</p>
+<aside>現場執行。先看 glm 的係數與 OR，再看 avg_comparisons 的比例差與信賴區間，請學生各寫一句結論，比較哪一句讀者比較不會誤解。club、sex、grade 為示意名稱，依編碼簿替換。</aside>
+</section>

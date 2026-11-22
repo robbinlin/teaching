@@ -6,6 +6,10 @@
 - 進度與作答只存在瀏覽器（localStorage，key 前綴 `rwd-w`）。沒有登入與教師頁。
 - 影片：目前各週 `videos` 為空。影片上傳後，在 `gen/content/wNN.json` 的 `videos` 填入 YouTube ID 與時間軸，並在該週資料夾放 `thumbs/<k>.jpg`，重新建置。
 
+## 課程教材
+
+`course-materials/` 放課綱（`00_課綱.md`）、18 週講義（`講義/`）、空白範本、Word 版（`docx/`）、簡報原始檔（`簡報原始檔/`）與簡報連結清單（`course-materials/README.md`）。網站建置用的講義副本在 `gen/handouts/`，修改講義後兩處要一起更新。
+
 ## 重新建置
 
 ```

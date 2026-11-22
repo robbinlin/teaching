@@ -1,0 +1,13 @@
+<section id="demo" data-transition="fade">
+<p class="eyebrow">課堂示範</p>
+<h2>把都市化分層表併入主資料集</h2>
+<div class="steps">
+<div class="step"><p class="n">1</p><p class="s">檢查分層表的 county 是否唯一。</p></div>
+<div class="step"><p class="n">2</p><p class="s">left join，核對合併後列數等於主資料集列數。</p></div>
+<div class="step"><p class="n">3</p><p class="s">anti join，列出沒對上的縣市。</p></div>
+<div class="step"><p class="n">4</p><p class="s">故意在分層表中重複一個縣市，重跑一次。</p></div>
+<div class="step"><p class="n">5</p><p class="s">比較兩次的列數，以及該縣市的規律運動比例。</p></div>
+</div>
+<p class="foot">真實世界運動大數據分析　W05</p>
+<aside>第 4、5 步是重點：分層表多一列，主資料集該縣市的每位學生都變成兩列，沒有任何錯誤訊息。讓學生看列數怎麼變、以人數為分子或分母的統計量怎麼被灌水。</aside>
+</section>

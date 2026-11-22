@@ -1,0 +1,8 @@
+<section id="rlang" data-transition="fade">
+<p class="eyebrow">同一件事，三種語言</p>
+<h2>R 與 Python：結構和 SAS 相同</h2>
+<p class="code">survey2 &lt;- survey |&gt;<br>&#160;&#160;mutate(across(<span class="hl">c(a1:a6, b1:b8, b9_2, b10_1, b13:b21)</span>,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="hl">~ na_if(.x, -1)</span>))</p>
+<p class="code gap">cols = <span class="hl">["a1","a2","a3","a4","a5","a6","b9_2","b10_1"]</span> \<br>&#160;&#160;&#160;&#160;&#160;+ [f"b{i}" for i in range(1, 9)] \<br>&#160;&#160;&#160;&#160;&#160;+ [f"b{i}" for i in range(13, 22)]<br>survey2 = survey.copy()<br>survey2[cols] = <span class="hl">survey2[cols].replace(-1, np.nan)</span></p>
+<p class="foot">真實世界運動大數據分析　W04</p>
+<aside>上面是 R，下面是 Python。三段程式做同一件事：指定一組欄位，逐欄把 -1 換成遺漏。請學生在兩段程式中各指出「哪些欄位」與「什麼替換」。學生不需要三種都會寫，但要能讀。</aside>
+</section>

@@ -1,0 +1,13 @@
+<section id="methods" data-transition="fade">
+<p class="eyebrow">分群方法</p>
+<h2>三種方法，適合不同的資料</h2>
+<table class="t">
+<tr class="hd"><th style="width:24%">方法</th><th style="width:46%">適合的資料</th><th style="width:30%">需要指定</th></tr>
+<tr><td>k-means</td><td>連續變項，群大致呈球狀</td><td>群數 k</td></tr>
+<tr><td>階層式分群</td><td>樣本不大，想看巢狀結構</td><td>距離與連結方式</td></tr>
+<tr><td>潛在類別分析</td><td>類別或序位題項</td><td>類別數</td></tr>
+</table>
+<p class="note">五點量表題項屬於序位資料，潛在類別分析比 k-means 更合適。大樣本下階層式分群的計算量過大，可先抽樣。</p>
+<p class="foot">真實世界運動大數據分析　W12</p>
+<aside>課堂任務用 k-means，因為最容易執行與檢查穩定性。有餘力的組可用 R 的 poLCA 對五點量表題項做潛在類別分析，比較兩種結果。</aside>
+</section>

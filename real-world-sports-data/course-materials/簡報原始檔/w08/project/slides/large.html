@@ -1,0 +1,16 @@
+<section id="large" data-transition="fade">
+<p class="eyebrow">讀結果</p>
+<h2>樣本很大時，九題都會顯著</h2>
+<div class="cols">
+<div class="col">
+<p class="code">proc ttest data=survey4;<br>&#160;&#160;class regular;<br>&#160;&#160;var <span class="hl">b13-b21</span>;<br>run;</p>
+<p class="small gap">課程既有分析：比較規律與不規律運動兩組，在體育學習認知九題上的平均。</p>
+</div>
+<div class="col">
+<p class="body">主資料集的樣本數很大。五點量表上 0.05 分的差異，也會得到很小的 p 值。</p>
+<p class="body gap">p 值回答的是「差異是否剛好為零」。樣本這麼大時，這個問題沒有意義。</p>
+</div>
+</div>
+<p class="foot">真實世界運動大數據分析　W08</p>
+<aside>現場執行這段程式，讓學生看九個 p 值。接著只問一題：哪一題的差異最大，差多少分？學生會發現要回頭找平均差，p 值排不出順序。</aside>
+</section>

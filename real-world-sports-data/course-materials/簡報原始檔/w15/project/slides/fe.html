@@ -1,0 +1,9 @@
+<section id="fe" data-transition="fade">
+<p class="eyebrow">其他設計</p>
+<h2>用追蹤資料示範固定效果</h2>
+<p class="body">happiness_data.csv 是國家 × 年的追蹤資料。固定效果模型只比較同一個國家在不同年度的變化。</p>
+<p class="code gap">library(fixest)<br>feols(`Life Ladder` ~ `Log GDP per capita` | <span class="hl">`Country name` + year</span>,<br>&#160;&#160;&#160;&#160;&#160;&#160;data = happy, cluster = ~`Country name`)</p>
+<p class="note">與不含固定效果的迴歸比較：係數縮小多少？</p>
+<p class="foot">真實世界運動大數據分析　W15</p>
+<aside>現場執行兩個模型並排比較。直線後面的 Country name 與 year 是固定效果，吸收了各國不隨時間改變的未測特徵。縮小的部分就是那些特徵原本造成的混淆。</aside>
+</section>

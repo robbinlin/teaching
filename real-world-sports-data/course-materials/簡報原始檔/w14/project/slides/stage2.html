@@ -1,0 +1,8 @@
+<section id="stage2" data-transition="fade">
+<p class="eyebrow">程式骨架</p>
+<h2>階段二：分析</h2>
+<p class="code">library(marginaleffects)<br><br>md&#160;&#160;&lt;- match.data(m)<br>fit &lt;- glm(<span class="hl">regular</span> ~ club, data = md, weights = weights,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;family = quasibinomial)<br>avg_comparisons(fit, variables = "club",<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;vcov = ~subclass,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;newdata = subset(md, club == 1))</p>
+<p class="note">加權改用 WeightIt::weightit(..., method = "glm", estimand = "ATE")，平衡診斷的函數相同。SAS 對應的程序是 PROC PSMATCH。</p>
+<p class="foot">真實世界運動大數據分析　W14</p>
+<aside>結果變項 regular 到這一段才出現。vcov = ~subclass 讓標準誤考慮配對；newdata 限定在處理組，估計的是處理組的平均效果（ATT）。輸出是比例差與信賴區間，沿用第 10 週的報告方式，不報勝算比。</aside>
+</section>

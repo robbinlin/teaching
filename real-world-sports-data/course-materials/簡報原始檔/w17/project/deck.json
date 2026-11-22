@@ -1,0 +1,19 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T17:45:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W17 期末報告（一）",
+  "cover": "cover",
+  "order": ["cover", "format", "talk", "qa", "feedback", "rubric"],
+  "sections": {
+    "s1": {"description": "期末報告當天的形式、口頭報告內容與答詢規則。", "start": "cover"},
+    "s2": {"description": "聽眾回饋單與評分表。", "start": "feedback"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

@@ -1,0 +1,7 @@
+<section id="stage1" data-transition="fade">
+<p class="eyebrow">程式骨架</p>
+<h2>階段一：設計</h2>
+<p class="code">library(MatchIt); library(cobalt)<br><br><span class="dim"># 這一段沒有出現結果變項 regular</span><br>m &lt;- matchit(club ~ sex + grade + school_type + urban,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;data = d, method = "nearest",<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;distance = "glm", link = "linear.logit",<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span class="hl">caliper = 0.2</span>)<br>summary(m)&#160;&#160;&#160;<span class="dim"># 配對前後人數與平衡</span><br>love.plot(m, thresholds = c(m = .1))<br>bal.plot(m, var.name = "distance", which = "both")</p>
+<p class="foot">真實世界運動大數據分析　W14</p>
+<aside>club、sex、grade、school_type 為示意名稱，請替換為編碼簿中的實際變項。逐行說明：matchit 的公式右邊來自 DAG 的調整集；link 設為 linear.logit 讓卡尺以 logit 的標準差為單位；summary 看人數，love.plot 看 SMD 是否都在 0.1 以內，bal.plot 看重疊。</aside>
+</section>

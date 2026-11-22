@@ -1,0 +1,10 @@
+<section id="case2" data-transition="fade">
+<p class="eyebrow">案例二</p>
+<h2>else 把遺漏值變成 0</h2>
+<p class="code">if b9_1a&gt;=4 and b9_2=1 then regular=1;<br><span class="hl">else regular=0;</span></p>
+<p class="body gap">兩題都沒回答的學生，條件不成立，被歸為「不規律運動」。規律運動比例被低估，低估的幅度取決於遺漏的人數。</p>
+<p class="small gap">修正：先處理遺漏值</p>
+<p class="code"><span class="hl">if missing(b9_1a) or missing(b9_2) then regular=.;</span><br>else if b9_1a&gt;=4 and b9_2=1 then regular=1;<br>else regular=0;</p>
+<p class="foot">真實世界運動大數據分析　W06</p>
+<aside>先只看上面兩行，問學生：沒回答這兩題的人，regular 是多少？連回第 1 週的決策「沒回答的人算不算分母」與第 5 週的 count(*)。同樣用交叉表檢查：b9_1a 乘 regular，加上 missing 選項。</aside>
+</section>

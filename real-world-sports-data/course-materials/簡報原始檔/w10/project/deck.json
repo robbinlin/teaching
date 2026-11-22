@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:20:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W10 迴歸模型",
+  "cover": "cover",
+  "order": ["cover", "review", "uses", "oddsratio", "marginal", "table2", "coef", "role", "checks", "avoid", "task", "next"],
+  "sections": {
+    "s1": {"description": "期中檢討，以及迴歸模型的三種用途。", "start": "cover"},
+    "s2": {"description": "勝算比的解讀、表二謬誤與變項在模型中的角色。", "start": "oddsratio"},
+    "s3": {"description": "模型檢查、不該做的事、課堂任務與課後作業。", "start": "checks"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}

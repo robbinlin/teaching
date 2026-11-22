@@ -1,0 +1,13 @@
+<section id="m2m" data-transition="fade">
+<p class="eyebrow">多對多合併</p>
+<h2>同一份資料，DATA step 與 SQL 的列數不同</h2>
+<p class="body">課程範例：alfa 與 beta 兩張表，A21 各有一筆，A25 各有三筆。</p>
+<table class="t gap">
+<tr class="hd"><th style="width:42%">做法</th><th style="width:16%">結果列數</th><th style="width:42%">原因</th></tr>
+<tr><td>DATA; MERGE alfa beta; BY id;</td><td>4</td><td>同一鍵內依序一對一配對</td></tr>
+<tr><td>PROC SQL inner join</td><td>10</td><td>同一鍵內兩兩配對：1 + 3×3</td></tr>
+</table>
+<p class="note">多對多幾乎都不是你要的。遇到時先回頭確認：其中一張表的粒度是否弄錯。</p>
+<p class="foot">真實世界運動大數據分析　W05</p>
+<aside>開啟 intermediate.sas 中 THE MANY-TO-MANY MERGE 一段，現場執行兩種寫法，讓學生看 proc print 的結果。先請學生預測各自的列數再執行。</aside>
+</section>

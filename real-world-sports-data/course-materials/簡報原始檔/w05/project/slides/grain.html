@@ -1,0 +1,12 @@
+<section id="grain" data-transition="fade">
+<p class="eyebrow">粒度與鍵</p>
+<h2>合併之前，先說出一列代表什麼</h2>
+<div class="rows">
+<div class="row"><p class="k">主資料集</p><p class="v">一列是一位學生。</p></div>
+<div class="row"><p class="k">都市化分層表</p><p class="v">一列是一個縣市。</p></div>
+<div class="row"><p class="k">鍵</p><p class="v">兩張表用 county 對應。合併前先檢查它在分層表中是否唯一。</p></div>
+</div>
+<p class="code gap">urban_level |&gt; count(county) |&gt; filter(n &gt; 1) &#160;&#160;<span class="dim"># 應回傳 0 列</span></p>
+<p class="foot">真實世界運動大數據分析　W05</p>
+<aside>粒度就是「一列代表什麼」。請學生對手上的每張表各說一次。鍵唯一性檢查是今天所有內容的起點：回傳的列數不是 0，後面的合併就會出問題。</aside>
+</section>

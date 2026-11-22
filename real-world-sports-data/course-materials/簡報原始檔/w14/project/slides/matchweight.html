@@ -1,0 +1,16 @@
+<section id="matchweight" data-transition="fade">
+<p class="eyebrow">配對與加權</p>
+<h2>配對與加權回答不同的問題</h2>
+<table class="t">
+<tr class="hd"><th style="width:18%"></th><th style="width:41%">配對</th><th style="width:41%">加權</th></tr>
+<tr><td>做法</td><td>每位處理組找一位傾向分數最接近的對照</td><td>處理組權重 1/e，對照組 1/(1−e)</td></tr>
+<tr><td>樣本</td><td>配不到對的人被捨棄</td><td>不捨棄任何人</td></tr>
+<tr><td>估計對象</td><td>處理組的平均效果（ATT）</td><td>全體的平均效果（ATE）</td></tr>
+<tr><td>白話</td><td>對參加社團的學生，社團的效果</td><td>所有學生都參加，相對於都不參加</td></tr>
+<tr><td>要注意</td><td>卡尺：logit 的 0.2 個標準差</td><td>極端權重；必要時截尾</td></tr>
+<tr><td>必須報告</td><td>配對前後兩組各多少人</td><td>權重的最大值與分布</td></tr>
+</table>
+<p class="note">兩者結果不同，未必是哪一個錯了。</p>
+<p class="foot">真實世界運動大數據分析　W14</p>
+<aside>卡尺寬度出自 Austin（2011）：兩人傾向分數 logit 的差距超過 0.2 個標準差就不配對。加權時傾向分數接近 0 或 1 的人權重極大，少數幾個人主導結果；截尾的話，要報告截尾前後的結果。</aside>
+</section>

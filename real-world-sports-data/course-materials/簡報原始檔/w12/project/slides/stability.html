@@ -1,0 +1,11 @@
+<section id="stability" data-transition="fade">
+<p class="eyebrow">穩定性</p>
+<h2>分群結果至少通過兩個檢查</h2>
+<div class="rows">
+<div class="row"><p class="k">換種子</p><p class="v">用 20 個不同種子重跑。各次結果的調整蘭德指數應接近 1。</p></div>
+<div class="row"><p class="k">換樣本</p><p class="v">隨機抽 80% 重新分群，重複多次。同一對學生是否多數時候同群？</p></div>
+</div>
+<p class="code gap">library(mclust)&#160;&#160;&#160;<span class="dim"># adjustedRandIndex</span><br>set.seed(1); k1 &lt;- kmeans(x, centers = 4, nstart = 1)$cluster<br>set.seed(2); k2 &lt;- kmeans(x, centers = 4, nstart = 1)$cluster<br><span class="hl">adjustedRandIndex(k1, k2)</span></p>
+<p class="foot">真實世界運動大數據分析　W12</p>
+<aside>k-means 的起始點是隨機的，所以換種子結果可能不同。範例用 nstart = 1 是為了讓差異看得出來；正式分析用 nstart = 25 以上，讓演算法自己多試幾個起點。現場示範：跑兩個種子，看指數是多少。</aside>
+</section>

@@ -1,0 +1,13 @@
+<section id="checks" data-transition="fade">
+<p class="eyebrow">模型檢查</p>
+<h2>四個檢查，以及它們在主資料集的情況</h2>
+<table class="t">
+<tr class="hd"><th style="width:22%">檢查</th><th style="width:30%">做法</th><th style="width:48%">本資料的情況</th></tr>
+<tr><td>共線性</td><td>變異數膨脹因子</td><td>九題認知彼此高度相關，個別係數不穩定</td></tr>
+<tr><td>連續變項的線性</td><td>加入平方項或樣條比較</td><td>年級與結果未必是直線關係</td></tr>
+<tr><td>交互作用</td><td>事前指定，不逐一嘗試</td><td>例如性別 × 社團</td></tr>
+<tr><td>影響點</td><td>殘差與槓桿值</td><td>大樣本下影響有限</td></tr>
+</table>
+<p class="foot">真實世界運動大數據分析　W10</p>
+<aside>共線性用 R 的 car 套件 vif() 現場算一次。交互作用那一列連回第 8 週的岔路花園：逐一嘗試交互作用就是在走岔路。</aside>
+</section>

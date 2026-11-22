@@ -1,0 +1,9 @@
+<section id="evaluebench" data-transition="fade">
+<p class="eyebrow">E-value</p>
+<h2>E-value 要和已測混淆因子比較</h2>
+<p class="body">E-value 本身不說明結論可不可信。先找出資料中最強的已測混淆因子：它與處理、結果的關聯各是多少？</p>
+<p class="note">如果「原本的運動興趣」很可能比它更強，而 E-value 只有 1.7，結論就站不住。</p>
+<p class="code gap">library(EValue)<br>evalues.RR(est = 1.5, lo = 1.3, hi = 1.7)</p>
+<p class="foot">真實世界運動大數據分析　W15</p>
+<aside>evalues.RR 同時回報點估計與信賴區間下限的 E-value。比較基準在課堂任務第 3 步由各組自己找。常見的誤用是只報一個 E-value 數字而沒有任何比較。</aside>
+</section>

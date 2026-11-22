@@ -1,0 +1,20 @@
+{
+  "v": 5,
+  "createdOnFiles": {"v": 1, "at": "2026-11-13T18:20:00Z"},
+  "lists": "css",
+  "format": {"v": 1, "shared": ["project/deck.css"]},
+  "title": "真實世界運動大數據分析 W04 讀懂 AI 寫的程式（一）讀入與清理",
+  "cover": "cover",
+  "order": ["cover", "goal", "sas", "rlang", "five", "trap1", "trap2", "trap3", "trap4", "names", "task", "check", "next"],
+  "sections": {
+    "s1": {"description": "同一件事的三種寫法，以及審查清理程式的五個問題。", "start": "cover"},
+    "s2": {"description": "四個語言陷阱，以及標準化相關名詞的對齊。", "start": "trap1"},
+    "s3": {"description": "課堂任務：審查一段 AI 寫的清理程式；檢核清單與作業。", "start": "task"}
+  },
+  "faces": {
+    "noto-serif-tc": {"family": "Noto Serif TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&display=swap"},
+    "noto-sans-tc": {"family": "Noto Sans TC", "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"}
+  },
+  "designSystems": []
+}
