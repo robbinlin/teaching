@@ -46,6 +46,20 @@ const ARCH=(function(){
   // orbs + extra warm light pools (replacing the pendant lamps)
   const orbs=[];for(let i=0;i<14;i++){const c=[0xffc86a,0x8fe0d0,0xc6a2ff][i%3];const o=glow(c,0.22+Math.random()*0.2,0.8);const b=new THREE.Vector3((Math.random()-.5)*13,1.4+Math.random()*3.4,-4.4+Math.random()*7);o.position.copy(b);scene.add(o);orbs.push({o,b,ph:Math.random()*6,sp:0.3+Math.random()*0.4});}
   [[-3,3.2,-1.2,0xffc88a],[3,3.2,-1.2,0xffc88a],[0,2.6,-3.4,0xb8a0ff]].forEach(([x,y,z,c])=>{const l=new THREE.PointLight(c,0.5,9,1.6);l.position.set(x,y,z);scene.add(l);});
-  return {tick(dt,t){flyers.forEach(f=>{const a=f.a+t*f.sp;f.g.position.set(Math.cos(a)*4.8,f.base.y+Math.sin(t*0.9+f.ph)*0.18,-1.6+Math.sin(a)*2.0);f.g.rotation.set(0.25+Math.sin(t*0.7+f.ph)*0.12,-a+Math.PI/2,Math.sin(t+f.ph)*0.1);const o=0.55+Math.sin(t*2.2+f.ph)*0.25;f.L.rotation.z=o;f.R.rotation.z=-o;f.fp.rotation.z=-(0.2+((t*0.9+f.ph)%1)*2.6);});
+  // generated 3D models (Tripo), embedded as base64 GLB; primitives stay as fallback if loading fails
+  let flame=null,flameL=null,owl=null,armil=null;
+  (function(){if(typeof MODELS==='undefined'||!window.__desk)return;
+    const urls=['https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js','https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js'];
+    const put=(k,cb)=>{if(!MODELS[k])return;try{const bs=atob(MODELS[k]),u=new Uint8Array(bs.length);for(let i=0;i<bs.length;i++)u[i]=bs.charCodeAt(i);
+      new THREE.GLTFLoader().parse(u.buffer,'',g=>{const m=g.scene;m.traverse(o=>{if(o.isMesh){o.castShadow=true;o.raycast=()=>{};}});cb(m);window.__models=(window.__models||0)+1;},e=>console.warn('model',k,e));}catch(e){console.warn('model',k,e);}};
+    const go=()=>{
+      put('candle',m=>{m.scale.setScalar(0.5);m.position.set(-0.6,0.9,-0.2);window.__desk.add(m);window.__deskLamp.visible=false;
+        flame=glow(0xffc070,0.5,0.95);flame.position.set(-0.6,0.9+0.5*1.03,-0.2);window.__desk.add(flame);const core=glow(0xfff4d0,0.16,1);core.position.copy(flame.position);window.__desk.add(core);
+        flameL=new THREE.PointLight(0xffb060,0.9,4.5,1.8);flameL.position.copy(flame.position);window.__desk.add(flameL);});
+      put('owl',m=>{m.scale.setScalar(1.15);owl=new THREE.Group();owl.add(m);owl.position.set(2.75,0,2.1);owl.rotation.y=-0.45;scene.add(owl);OBST.push({x:2.75,z:2.1,r:0.6});
+        const l=new THREE.PointLight(0xffe0b0,0.5,3.5,1.6);l.position.set(2.6,1.6,3.0);scene.add(l);});
+      put('armillary',m=>{m.scale.setScalar(1.7);armil=m;m.position.set(-6.4,0,2.8);m.rotation.y=0.5;scene.add(m);if(window.__globeStand)window.__globeStand.visible=false;});};
+    const tryLoad=i=>{if(i>=urls.length)return;const s=document.createElement('script');s.src=urls[i];s.onload=go;s.onerror=()=>tryLoad(i+1);document.head.appendChild(s);};tryLoad(0);})();
+  return {tick(dt,t){if(flame){const f=0.85+0.15*Math.sin(t*9)+0.08*Math.sin(t*23.7);flame.material.opacity=0.8*f;flame.scale.setScalar(0.5*(0.9+0.12*f));flameL.intensity=0.9*f;}if(owl){owl.position.y=0.02+Math.sin(t*1.6)*0.02;owl.rotation.y=-0.45+Math.sin(t*0.5)*0.12;owl.rotation.z=Math.sin(t*1.1)*0.025;}flyers.forEach(f=>{const a=f.a+t*f.sp;f.g.position.set(Math.cos(a)*4.8,f.base.y+Math.sin(t*0.9+f.ph)*0.18,-1.6+Math.sin(a)*2.0);f.g.rotation.set(0.25+Math.sin(t*0.7+f.ph)*0.12,-a+Math.PI/2,Math.sin(t+f.ph)*0.1);const o=0.55+Math.sin(t*2.2+f.ph)*0.25;f.L.rotation.z=o;f.R.rotation.z=-o;f.fp.rotation.z=-(0.2+((t*0.9+f.ph)%1)*2.6);});
     orbs.forEach(q=>{q.o.position.set(q.b.x+Math.sin(t*q.sp+q.ph)*0.3,q.b.y+Math.sin(t*q.sp*1.4+q.ph)*0.2,q.b.z+Math.cos(t*q.sp+q.ph)*0.3);q.o.material.opacity=0.5+0.3*Math.sin(t*1.6+q.ph);});
     con.rotation.z=Math.sin(t*0.15)*0.25;cp.forEach((s,i)=>s.material.opacity=0.6+0.4*Math.sin(t*2+i));roseGlow.material.opacity=0.18+0.06*Math.sin(t*0.8);}};})();

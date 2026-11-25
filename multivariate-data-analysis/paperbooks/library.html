@@ -146,7 +146,7 @@ const rug=new THREE.Mesh(new THREE.CircleGeometry(2.6,48),new THREE.MeshStandard
 /* ---------- desk + hologram, armchair, plant, globe ---------- */
 const OBST=[];let holo=null,globe=null;
 (function(){const g=new THREE.Group();g.position.set(4.6,0,0.9);g.rotation.y=-0.35;g.add(at(box(2.0,0.08,1.0,0x7a4f2c),0,0.86,0));[[-0.9,-0.42],[0.9,-0.42],[-0.9,0.42],[0.9,0.42]].forEach(([x,z])=>g.add(at(box(0.08,0.86,0.08,0x4e301a),x,0.43,z)));
-  g.add(at(cyl(0.12,0.16,0.04,0x2e4a40),-0.6,0.92,-0.2));g.add(at(cyl(0.015,0.015,0.55,0x2e4a40,6),-0.6,1.18,-0.2));const sh=cone(0.16,0.18,0x2e4a40,14);sh.position.set(-0.52,1.45,-0.15);sh.rotation.z=0.5;g.add(sh);
+  const lampG=new THREE.Group();g.add(lampG);window.__desk=g;window.__deskLamp=lampG;lampG.add(at(cyl(0.12,0.16,0.04,0x2e4a40),-0.6,0.92,-0.2));lampG.add(at(cyl(0.015,0.015,0.55,0x2e4a40,6),-0.6,1.18,-0.2));const sh=cone(0.16,0.18,0x2e4a40,14);sh.position.set(-0.52,1.45,-0.15);sh.rotation.z=0.5;lampG.add(sh);
   for(let i=0;i<3;i++){const b=box(0.42,0.06,0.3,[0x7a2e1f,0x1f4e5a,0x8a6a2a][i]);b.position.set(0.55,0.93+i*0.06,-0.18);b.rotation.y=i*0.2;g.add(b);}
   const pp=box(0.4,0.005,0.28,0xf4eddc);pp.position.set(0.05,0.905,0.15);pp.rotation.y=0.2;g.add(pp);g.add(at(cyl(0.05,0.045,0.11,0xc0573a,10),-0.25,0.96,0.25));scene.add(g);OBST.push({x:4.6,z:0.9,r:1.25});
   holo=new THREE.Group();holo.position.set(4.75,1.75,0.8);scene.add(holo);const ring=new THREE.Mesh(new THREE.RingGeometry(0.42,0.45,48),new THREE.MeshBasicMaterial({color:0x7fe0d0,transparent:true,opacity:.5,side:THREE.DoubleSide,toneMapped:false}));ring.rotation.x=-Math.PI/2;ring.position.y=-0.45;holo.add(ring);
@@ -156,7 +156,7 @@ const OBST=[];let holo=null,globe=null;
   const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.45,0.12,0.75,24,1,true),new THREE.MeshBasicMaterial({color:0x7fe0d0,transparent:true,opacity:.06,side:THREE.DoubleSide,depthWrite:false,toneMapped:false}));beam.position.y=-0.75;holo.add(beam);})();
 (function(){const g=new THREE.Group();g.position.set(-4.8,0,1.4);g.rotation.y=0.6;const c=0x6e2f2a;g.add(at(box(1.1,0.4,1.0,c),0,0.35,0));g.add(at(box(1.1,0.9,0.22,c),0,0.8,-0.42));[-0.6,0.6].forEach(x=>g.add(at(box(0.22,0.6,1.0,c),x,0.55,0)));g.add(at(box(0.9,0.12,0.8,0x8a3f36),0,0.6,0.05));[[-0.45,-0.4],[0.45,-0.4],[-0.45,0.4],[0.45,0.4]].forEach(([x,z])=>g.add(at(cyl(0.04,0.03,0.15,0x3a2414,6),x,0.07,z)));scene.add(g);OBST.push({x:-4.8,z:1.4,r:0.95});
   const pot=new THREE.Group();pot.position.set(-6.6,0,-4.0);pot.add(at(cyl(0.32,0.24,0.6,0xa0522d),0,0.3,0));for(let i=0;i<9;i++){const l=cone(0.14,0.9,0x3f7a44,6);l.position.set(Math.cos(i*0.7)*0.18,0.95,Math.sin(i*0.7)*0.18);l.rotation.set(Math.sin(i)*0.5,0,Math.cos(i)*0.5);pot.add(l);}scene.add(pot);OBST.push({x:-6.6,z:-4.0,r:0.55});
-  const gw=new THREE.Group();gw.position.set(-6.4,0,2.8);gw.add(at(cyl(0.2,0.26,0.05,0x5a3a22),0,0.03,0));gw.add(at(cyl(0.03,0.03,0.9,0x5a3a22,6),0,0.48,0));globe=sph(0.32,0x2f6f8a,18);globe.position.y=1.15;gw.add(globe);const mer=M(new THREE.TorusGeometry(0.36,0.015,6,32),0xc9a14a);mer.position.y=1.15;mer.rotation.y=0.4;gw.add(mer);scene.add(gw);OBST.push({x:-6.4,z:2.8,r:0.5});})();
+  const gw=new THREE.Group();window.__globeStand=gw;gw.position.set(-6.4,0,2.8);gw.add(at(cyl(0.2,0.26,0.05,0x5a3a22),0,0.03,0));gw.add(at(cyl(0.03,0.03,0.9,0x5a3a22,6),0,0.48,0));globe=sph(0.32,0x2f6f8a,18);globe.position.y=1.15;gw.add(globe);const mer=M(new THREE.TorusGeometry(0.36,0.015,6,32),0xc9a14a);mer.position.y=1.15;mer.rotation.y=0.4;gw.add(mer);scene.add(gw);OBST.push({x:-6.4,z:2.8,r:0.5});})();
 
 /* ---------- bookshelf ---------- */
 const SHELF_Z=-4.62,SW=7.8,ROWS=[2.02,1.06,0.1],BOARD=0.06,BOOKX=i=>-3.575+((i%4)*3+Math.floor(i/4))*0.65;
@@ -247,7 +247,7 @@ function putBack(){if(!selected||busy)return;busy=true;card.classList.remove('on
 function openBook(){if(!selected||busy)return;busy=true;const bk=selected;AUDIO.open();card.classList.remove('on');const g=bk.grp;const dir=new THREE.Vector3();camera.getWorldDirection(dir);
   gsap.to(g.position,{x:camera.position.x+dir.x*1.0,y:camera.position.y+dir.y*1.0,z:camera.position.z+dir.z*1.0,duration:0.9,ease:'power2.in'});
   $('fadeT').textContent='《'+bk.b.title+'》';setTimeout(()=>$('fade').classList.add('on'),450);setTimeout(()=>{location.href=bk.b.file;},1250);}
-window.__lib={books:BOOKS.map(b=>b.b.title),choose:i=>chooseBook(BOOKS[i]),open:openBook,back:putBack,walk:(x,z)=>walkTo({x,z}),state:()=>({selected:selected?selected.i:null,busy,near:nearB?nearB.i:null,hero:hero.g.position.toArray().map(v=>+v.toFixed(2)),mode:cam.mode})};
+window.__lib={scene,renderer,books:BOOKS.map(b=>b.b.title),choose:i=>chooseBook(BOOKS[i]),open:openBook,back:putBack,walk:(x,z)=>walkTo({x,z}),state:()=>({selected:selected?selected.i:null,busy,near:nearB?nearB.i:null,hero:hero.g.position.toArray().map(v=>+v.toFixed(2)),mode:cam.mode})};
 
 let down=null;
 renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];AUDIO.init();});

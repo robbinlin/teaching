@@ -276,7 +276,12 @@ header{{max-width:1100px;margin:0 auto 28px;color:#f3ead6}}header .k{{letter-spa
                     'summary': re.sub(r'<[^>]+>', '', c.get('summary', '')), 'acts': [a.get('title', '') for a in b.get('acts', [])],
                     'notes': len(b.get('notes', {})), 'viz': nviz, 'choices': nc, 'color': b.get('spineColor', '')})
     tpl = open(os.path.join(HERE, 'library.html'), encoding='utf-8').read()
-    tpl = tpl.replace('/*__ARCHIVE__*/', open(os.path.join(HERE, 'archive.js'), encoding='utf-8').read())
+    import base64
+    models = {}
+    for k, fn in (('candle', 'candlestick.glb'), ('owl', 'owl.glb'), ('armillary', 'armillary.glb')):
+        fp = os.path.join(HERE, 'assets', fn)
+        if os.path.exists(fp): models[k] = base64.b64encode(open(fp, 'rb').read()).decode()
+    tpl = tpl.replace('/*__ARCHIVE__*/', 'const MODELS=' + json.dumps(models) + ';' + chr(10) + open(os.path.join(HERE, 'archive.js'), encoding='utf-8').read())
     js = json.dumps(lib, ensure_ascii=False).replace('</', '<\\/')
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(tpl.replace('/*__LIB__*/', 'const LIB=' + js + ';'))
     print('  → index.html (3D 書房) + list.html')
