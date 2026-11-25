@@ -283,7 +283,7 @@ header{{max-width:1100px;margin:0 auto 28px;color:#f3ead6}}header .k{{letter-spa
         if os.path.exists(fp): tex[k] = 'data:image/jpeg;base64,' + base64.b64encode(open(fp, 'rb').read()).decode()
     tpl = tpl.replace('/*__TEX__*/', 'const TEX=' + json.dumps(tex) + ';')
     models = {}
-    for k, fn in (('candle', 'candlestick.glb'), ('owl', 'owl.glb'), ('armillary', 'armillary.glb')):
+    for k, fn in (('candle', 'candlestick.glb'), ('owl', 'owl.glb'), ('armillary', 'armillary.glb'), ('hero', 'hero.glb'), ('desk', 'desk.glb')):
         fp = os.path.join(HERE, 'assets', fn)
         if os.path.exists(fp): models[k] = base64.b64encode(open(fp, 'rb').read()).decode()
     tpl = tpl.replace('/*__ARCHIVE__*/', 'const MODELS=' + json.dumps(models) + ';' + chr(10) + open(os.path.join(HERE, 'archive.js'), encoding='utf-8').read())

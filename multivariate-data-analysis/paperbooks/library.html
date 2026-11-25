@@ -147,7 +147,7 @@ const rug=new THREE.Mesh(new THREE.CircleGeometry(2.6,48),new THREE.MeshStandard
 
 /* ---------- desk + hologram, armchair, plant, globe ---------- */
 const OBST=[];let holo=null,globe=null;
-(function(){const g=new THREE.Group();g.position.set(4.6,0,0.9);g.rotation.y=-0.35;g.add(at(box(2.0,0.08,1.0,0x7a4f2c),0,0.86,0));[[-0.9,-0.42],[0.9,-0.42],[-0.9,0.42],[0.9,0.42]].forEach(([x,z])=>g.add(at(box(0.08,0.86,0.08,0x4e301a),x,0.43,z)));
+(function(){const g=new THREE.Group();g.position.set(4.6,0,0.9);g.rotation.y=-0.35;const dk=new THREE.Group();g.add(dk);window.__deskPrim=dk;dk.add(at(box(2.0,0.08,1.0,0x7a4f2c),0,0.86,0));[[-0.9,-0.42],[0.9,-0.42],[-0.9,0.42],[0.9,0.42]].forEach(([x,z])=>dk.add(at(box(0.08,0.86,0.08,0x4e301a),x,0.43,z)));
   const lampG=new THREE.Group();g.add(lampG);window.__desk=g;window.__deskLamp=lampG;lampG.add(at(cyl(0.12,0.16,0.04,0x2e4a40),-0.6,0.92,-0.2));lampG.add(at(cyl(0.015,0.015,0.55,0x2e4a40,6),-0.6,1.18,-0.2));const sh=cone(0.16,0.18,0x2e4a40,14);sh.position.set(-0.52,1.45,-0.15);sh.rotation.z=0.5;lampG.add(sh);
   for(let i=0;i<3;i++){const b=box(0.42,0.06,0.3,[0x7a2e1f,0x1f4e5a,0x8a6a2a][i]);b.position.set(0.55,0.93+i*0.06,-0.18);b.rotation.y=i*0.2;g.add(b);}
   const pp=box(0.4,0.005,0.28,0xf4eddc);pp.position.set(0.05,0.905,0.15);pp.rotation.y=0.2;g.add(pp);g.add(at(cyl(0.05,0.045,0.11,0xc0573a,10),-0.25,0.96,0.25));scene.add(g);OBST.push({x:4.6,z:0.9,r:1.25});
