@@ -277,6 +277,11 @@ header{{max-width:1100px;margin:0 auto 28px;color:#f3ead6}}header .k{{letter-spa
                     'notes': len(b.get('notes', {})), 'viz': nviz, 'choices': nc, 'color': b.get('spineColor', '')})
     tpl = open(os.path.join(HERE, 'library.html'), encoding='utf-8').read()
     import base64
+    tex = {}
+    for k in ('floor', 'floor_n', 'wall', 'wall_n', 'wains', 'wains_n'):
+        fp = os.path.join(HERE, 'assets', 'tex_' + k + '.jpg')
+        if os.path.exists(fp): tex[k] = 'data:image/jpeg;base64,' + base64.b64encode(open(fp, 'rb').read()).decode()
+    tpl = tpl.replace('/*__TEX__*/', 'const TEX=' + json.dumps(tex) + ';')
     models = {}
     for k, fn in (('candle', 'candlestick.glb'), ('owl', 'owl.glb'), ('armillary', 'armillary.glb')):
         fp = os.path.join(HERE, 'assets', fn)
