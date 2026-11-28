@@ -2,6 +2,7 @@
 import json, os, re, shutil, base64, zipfile, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import build as B
+from lecvid import lecvid
 R = B.R
 OUT = sys.argv[1]
 NAV = {str(i): f'../ch{i}/' for i in range(1, 9)}
@@ -96,7 +97,7 @@ for ch in range(2, 9):
     slides = sorted(f for f in os.listdir(f'{R}/ch{ch}/slides') if f.startswith('s-'))
     c.update({'slidesN': len(slides), 'deckName': B.DECK[ch], 'guide': guide_md, 'guideType': src['guide_type'],
               'files': files, 'zip': zipname, 'widgets': B.WIDGETS[ch], 'nav': NAV, 'static': True, 'pptxPath': 'slides/deck.pptx'})
-    open(f'{dst}/index.html', 'w', encoding='utf-8').write('<!doctype html>\n<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n' + withauth(filelinks(epflow(B.page(c), BOOT, EPMAP.get(ch)), fmap)).replace('<style>', '<style>\n:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}\n', 1) + '</html>\n')
+    open(f'{dst}/index.html', 'w', encoding='utf-8').write('<!doctype html>\n<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n' + lecvid(withauth(filelinks(epflow(B.page(c), BOOT, EPMAP.get(ch)), fmap)), ch).replace('<style>', '<style>\n:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}\n', 1) + '</html>\n')
     print('ch', ch)
 
 # chapter 1 (original template)
@@ -136,7 +137,7 @@ if os.path.exists(man1):
         a0 = h.index('<script type="application/json" id="guideData">') + len('<script type="application/json" id="guideData">'); b0 = h.index('</script>', a0)
         h = h[:a0] + json.dumps(g2, ensure_ascii=False).replace('</', '<\\/') + h[b0:]
     fmap1 = {x['file']: 'data/' + x['file'] for x in M}
-h = withauth(filelinks(epflow(h, BOOT1), fmap1))
+h = lecvid(withauth(filelinks(epflow(h, BOOT1), fmap1)), 1)
 open(f'{dst}/index.html', 'w', encoding='utf-8').write('<!doctype html>\n<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n' + h.replace('<style>', '<style>\n:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}\n', 1) + '</html>\n')
 print('ch 1')
 

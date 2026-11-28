@@ -18,6 +18,8 @@
 | `auth.js/.css` | Firebase Google 登入、本機＋雲端進度合併、首頁個人進度、教師入口 |
 | `teacher.html` | 教師頁：學生進度表、排序搜尋、作業答案明細、CSV 匯出 |
 | `intro.*` | 首頁 Galton board 動畫 |
+| `lecvid.*` | 投影片頁上方的「完整講解影片」；影片 ID 寫在網站根目錄 `lecture-videos.js`，留空的章節不顯示 |
+| `render_decks.py` | 講義轉投影片圖前的修正副本（公式、Wingdings、字型行高、SmartArt），完整流程寫在檔頭 |
 | `example-*.json` | content.json、source.json、資料 manifest 的實例 |
 
 ## 換到新課程時要改

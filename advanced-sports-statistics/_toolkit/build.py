@@ -3,8 +3,11 @@ R = '/tmp/claude-0/-home-claude/cd232513-5fae-5ea8-89b2-c8c53a010923/scratchpad'
 G = R + '/gen'
 WIDGETS = {2: ['condprob', 'binom', 'normal', 'clt'], 3: ['sdse', 'ci', 'ztest'], 4: ['design', 'ttest', 'tails'],
            5: ['anova', 'fwer', None], 6: [None, 'chi2', 'fisher'], 7: ['corr', None, 'r2'], 8: ['simpson', 'interact', 'rate']}
-DECK = {2: '基礎機率及分配、抽樣分配_lin20250304', 3: '估計與檢定 lin20250304', 4: '單樣本及雙樣本檢定_lin20260411',
-        5: '平均數檢定_多組樣本_lin20260411', 6: '兩個類別變數之檢定_lin20220520', 7: '相關和廻歸分析(一)_lin20241122', 8: '多變量迴歸分析20241128'}
+# 2026-11: decks switched to the unified-style versions (統一風格20261027); slide counts and order unchanged.
+# Slide images are rendered with _toolkit/render_decks.py (fixes LibreOffice 24 rendering of these decks).
+DECK = {2: '基礎機率及分配與抽樣分配_統一風格20261027', 3: '估計與檢定_統一風格20261027', 4: '單樣本及雙樣本檢定_統一風格20261027',
+        5: '平均數檢定_多組樣本_統一風格20261027', 6: '兩個類別變數之檢定_統一風格20261027', 7: '相關和迴歸分析_統一風格20261027',
+        8: '多變量迴歸分析_統一風格20261027'}
 nav = json.load(open(G + '/nav.json')) if os.path.exists(G + '/nav.json') else {}
 
 def page(chdata, extra_js=''):
