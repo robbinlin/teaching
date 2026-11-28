@@ -3,12 +3,12 @@
    對應 Dropbox「統計學課程講義/高等體育統計_八章講義_統一風格」的中文版影片；
    注意 Dropbox 的 06 是相關和迴歸（網站第 7 章），07 是兩個類別變數（網站第 6 章）。 */
 window.LECTURE_VIDEOS = {
-  1: {id: '', minutes: null},
-  2: {id: '', minutes: null},
-  3: {id: '', minutes: null},
-  4: {id: '', minutes: null},
+  1: {id: '', minutes: 19},
+  2: {id: '', minutes: 20},
+  3: {id: '', minutes: 18},
+  4: {id: '', minutes: 13},
   5: {id: '', minutes: 16},
-  6: {id: '', minutes: null},
-  7: {id: '', minutes: null},
+  6: {id: '', minutes: 11},
+  7: {id: '', minutes: 18},
   8: {id: '', minutes: 14}
 };
